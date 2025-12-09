@@ -11,6 +11,10 @@ const DocumentDrafter = ({ country, onClose }) => {
     const [categoryFilter, setCategoryFilter] = useState('all'); // all, general, real-estate, business
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Check if user is a kid/teen for free access
+    const ageGroup = localStorage.getItem('ageGroup');
+    const isYoung = ageGroup && (ageGroup.toLowerCase() === 'kids' || ageGroup.toLowerCase() === 'teens');
+
     const documents = getAllDocuments().filter(doc =>
         doc.countries.includes(country) &&
         (categoryFilter === 'all' || doc.category === categoryFilter) &&
@@ -101,7 +105,8 @@ const DocumentDrafter = ({ country, onClose }) => {
     const handleDownloadPDF = () => {
         const template = documentTemplates[selectedDoc];
         const filename = `${template.name.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.pdf`;
-        generatePDF(generatedDocument, filename, false); // false = free tier (with watermark)
+        // If isYoung, pass true for isPremium to remove watermark
+        generatePDF(generatedDocument, filename, isYoung);
     };
 
     const handleCopyToClipboard = () => {
@@ -207,7 +212,7 @@ const DocumentDrafter = ({ country, onClose }) => {
                         >
                             <div style={{ fontWeight: 'bold', marginBottom: '0.3rem' }}>
                                 {doc.name}
-                                {doc.tier === 'premium' && (
+                                {doc.tier === 'premium' && !isYoung && (
                                     <span style={{
                                         marginLeft: '0.5rem',
                                         fontSize: '0.7rem',

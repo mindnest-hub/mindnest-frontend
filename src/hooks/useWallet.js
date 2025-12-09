@@ -46,12 +46,17 @@ export const useWallet = () => {
     }, [moduleBalances, moduleEarnings, balance]);
 
     const getModuleCap = (module) => {
-        if (module === 'finance') {
-            const savedAgeGroup = localStorage.getItem('ageGroup');
-            if (savedAgeGroup && (savedAgeGroup.toLowerCase() === 'kids' || savedAgeGroup.toLowerCase() === 'teens')) {
-                return 1500;
-            }
+        const savedAgeGroup = localStorage.getItem('ageGroup');
+        const isYoung = savedAgeGroup && (savedAgeGroup.toLowerCase() === 'kids' || savedAgeGroup.toLowerCase() === 'teens');
+
+        // Global Anti-Exploitation Cap for Kids/Teens
+        if (isYoung) {
+            // Special exception for History module as requested
+            if (module === 'history') return 2000;
+            // Default cap for all other modules for kids
+            return 1000;
         }
+
         return MODULE_CAPS[module] || DEFAULT_CAP;
     };
 

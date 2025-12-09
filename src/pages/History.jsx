@@ -26,6 +26,37 @@ const History = ({ ageGroup }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentQuestion, setCurrentQuestion] = useState(null);
 
+    // --- TTS STATE ---
+    const [isReading, setIsReading] = useState(false);
+
+    useEffect(() => {
+        return () => window.speechSynthesis.cancel();
+    }, []);
+
+    const speakText = (text) => {
+        if (isReading) {
+            window.speechSynthesis.cancel();
+            setIsReading(false);
+            return;
+        }
+        setIsReading(true);
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // Try to find a Nigerian voice, fallback to British, then default
+        const voices = window.speechSynthesis.getVoices();
+        const nigerianVoice = voices.find(v => v.lang.includes('NG') || v.name.includes('Nigeria'));
+        const britishVoice = voices.find(v => v.lang.includes('en-GB'));
+
+        if (nigerianVoice) {
+            utterance.voice = nigerianVoice;
+        } else if (britishVoice) {
+            utterance.voice = britishVoice;
+        }
+
+        utterance.onend = () => setIsReading(false);
+        window.speechSynthesis.speak(utterance);
+    };
+
     // Initialize Game
     useEffect(() => {
         if (showGame && shuffledQuestions.length === 0) {
@@ -245,6 +276,25 @@ const History = ({ ageGroup }) => {
                                 }}
                             >
                                 {expandedEvent === index ? "Read Less" : "Read More"}
+                            </button>
+
+                            <button
+                                onClick={() => speakText(`${event.title}. ${event.desc}. ${event.details}`)}
+                                style={{
+                                    background: isReading ? '#ff4444' : '#00C851',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '20px',
+                                    marginTop: '0.5rem',
+                                    marginLeft: '0.5rem',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem'
+                                }}
+                            >
+                                {isReading ? "🤫 Stop" : "🔊 Read to Me"}
                             </button>
 
                             {expandedEvent === index && (

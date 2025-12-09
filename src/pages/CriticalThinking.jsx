@@ -110,49 +110,7 @@ const CriticalThinking = ({ ageGroup }) => {
     ];
 
     // Module 2: Asking Good Questions (Chat Bot)
-    const [questChat, setQuestChat] = useState([
-        { sender: 'elder', text: "I am the Village Mentor. Wisdom grows from curiosity. Ask me a question starting with 'Why' or 'How'." }
-    ]);
-    const [questInput, setQuestInput] = useState("");
-    const [questStep, setQuestStep] = useState(0);
-
-    // --- DECISION MAKING STATE ---
-    const [decisionLevel, setDecisionLevel] = useState(() => Number(localStorage.getItem('decisionLevel')) || 0);
-    const [decisionStep, setDecisionStep] = useState(0); // 0: Question, 1: Wrong, 2: Correct (Transient)
-    const [decisionEarnings, setDecisionEarnings] = useState(0);
-
-    useEffect(() => {
-        localStorage.setItem('decisionLevel', decisionLevel);
-    }, [decisionLevel]);
-
-    const decisionScenarios = [
-        {
-            q: "You find a wallet on the ground. 👛",
-            good: "Find Owner 🙋‍♂️",
-            bad: "Keep it 🤫",
-            goodRes: "✅ You returned it! The owner needed it for medicine. You feel proud!",
-            badRes: "❌ Oh no! The owner needed that money for medicine. You feel guilty."
-        },
-        {
-            q: "Your friend broke a window and blamed you. 🪟",
-            good: "Tell the Truth 🗣️",
-            bad: "Accept Blame 😔",
-            goodRes: "✅ Honesty is best! The teacher appreciates your truthfulness.",
-            badRes: "❌ Now you are in trouble for something you didn't do. Always speak up!"
-        },
-        {
-            q: "You have extra food at lunch. 🍱",
-            good: "Share it 🤝",
-            bad: "Throw it away 🗑️",
-            goodRes: "✅ Sharing is caring! Your friend is happy and full.",
-            badRes: "❌ Wasting food is not good. Someone else could have eaten that."
-        }
-    ];
-
-    // Module 9: Fact vs Opinion
-    const [factScore, setFactScore] = useState(0);
-    const [factIndex, setFactIndex] = useState(0);
-    const factQuestions = [
+    const chatQuestions = [
         { q: "The sun is hot. ☀️", type: "FACT" },
         { q: "Blue is the best color. 💙", type: "OPINION" },
         { q: "Dogs have 4 legs. 🐕", type: "FACT" }
@@ -194,7 +152,259 @@ const CriticalThinking = ({ ageGroup }) => {
         { q: "You promised to keep a secret, but it might hurt someone. Do you tell?", options: ["Keep Secret", "Tell to protect", "Ignore it"], good: "Tell to protect" }
     ];
 
+    // --- TEACH A FRIEND STATE ---
+    const [teachTopicIndex, setTeachTopicIndex] = useState(0);
+    const [teachExplanation, setTeachExplanation] = useState("");
+    const [teachFeedback, setTeachFeedback] = useState("");
+    const [teachScore, setTeachScore] = useState(0);
+
+    // --- LEGEND OF TRUTH STATE ---
+    const [truthStep, setTruthStep] = useState(0);
+    const [isReading, setIsReading] = useState(false);
+
+    useEffect(() => {
+        return () => window.speechSynthesis.cancel();
+    }, []);
+
+    const speakText = (text) => {
+        if (isReading) {
+            window.speechSynthesis.cancel();
+            setIsReading(false);
+            return;
+        }
+        setIsReading(true);
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.onend = () => setIsReading(false);
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const teachTopics = [
+        {
+            topic: "Why do we need to drink water?",
+            keywords: ["thirsty", "body", "healthy", "live", "survive", "hydrate"],
+            goodResponse: "Amazing! 🌟 You explained it so well! Water keeps our body working and helps us stay healthy. You're a great teacher!",
+            encouragement: "Good try! 💪 Remember: Water helps our body work properly. We need it to stay alive and healthy. Try explaining it in your own words!"
+        },
+        {
+            topic: "Why should we be kind to others?",
+            keywords: ["happy", "feel", "good", "friends", "nice", "help", "love"],
+            goodResponse: "Wonderful! ❤️ You understand kindness! Being kind makes everyone feel good and helps us make friends. Keep teaching!",
+            encouragement: "That's a start! 😊 Think about: How do YOU feel when someone is kind to you? Being kind makes people happy and helps us be friends!"
+        },
+        {
+            topic: "Why do plants need sunlight?",
+            keywords: ["grow", "food", "energy", "green", "photosynthesis", "leaves"],
+            goodResponse: "Excellent! 🌱 You know how plants work! Sunlight helps plants make their own food so they can grow big and strong!",
+            encouragement: "Nice thinking! 🌞 Here's a hint: Plants use sunlight like we use food - it gives them energy to grow! Can you explain it that way?"
+        },
+        {
+            topic: "Why is it important to tell the truth?",
+            keywords: ["trust", "believe", "honest", "friends", "right", "good"],
+            goodResponse: "Perfect! 🦁 You understand honesty! When we tell the truth, people can trust us and we feel good inside!",
+            encouragement: "Good effort! 💭 Think about: What happens when someone lies to you? Truth helps people trust each other. Try again!"
+        }
+    ];
+
+    const handleTeachSubmit = () => {
+        if (!teachExplanation.trim()) {
+            setTeachFeedback("Tell me what you would teach your friend! 😊");
+            return;
+        }
+
+        verifyAction(() => {
+            const currentTopic = teachTopics[teachTopicIndex];
+            const explanation = teachExplanation.toLowerCase();
+
+            // Check if explanation contains key concepts
+            const keywordsFound = currentTopic.keywords.filter(keyword =>
+                explanation.includes(keyword.toLowerCase())
+            ).length;
+
+            const isGoodExplanation = keywordsFound >= 2 || explanation.length > 30;
+
+            if (isGoodExplanation) {
+                setTeachFeedback(currentTopic.goodResponse);
+                setTeachScore(prev => prev + 1);
+                triggerConfetti();
+                addEarnings('criticalThinking', 50);
+
+                setTimeout(() => {
+                    setTeachFeedback("");
+                    setTeachExplanation("");
+                    if (teachTopicIndex < teachTopics.length - 1) {
+                        setTeachTopicIndex(prev => prev + 1);
+                    } else {
+                        markComplete(13); // Teach a Friend module ID
+                    }
+                }, 4000);
+            } else {
+                setTeachFeedback(currentTopic.encouragement);
+                setTimeout(() => setTeachFeedback(""), 3000);
+            }
+        }, "Listening to your teaching... 👂");
+    };
+
+    // --- BASIC REASONING GAMES STATE ---
+    const [reasoningGame, setReasoningGame] = useState(0); // 0: Shape Match, 1: What's Next, 2: Odd One Out
+    const [reasoningLevel, setReasoningLevel] = useState(0);
+    const [reasoningScore, setReasoningScore] = useState(0);
+    const [reasoningFeedback, setReasoningFeedback] = useState("");
+
+    // Game 1: Shape Matching
+    const shapeGames = [
+        { shapes: ["🔴", "🔴", "🟦"], question: "Which shapes are the same?", answer: "🔴", options: ["🔴", "🟦", "🟢"] },
+        { shapes: ["⭐", "⭐", "⭐", "🌙"], question: "Which one is different?", answer: "🌙", options: ["⭐", "🌙", "🔴"] },
+        { shapes: ["🔺", "🔺", "🔻"], question: "Which shapes match?", answer: "🔺", options: ["🔺", "🔻", "🟦"] }
+    ];
+
+    // Game 2: What Comes Next (Patterns)
+    const sequenceGames = [
+        { sequence: ["🍎", "🍌", "🍎", "🍌", "🍎", "?"], answer: "🍌", options: ["🍌", "🍎", "🍊"] },
+        { sequence: ["🐶", "🐱", "🐶", "🐱", "?"], answer: "🐶", options: ["🐶", "🐱", "🐭"] },
+        { sequence: ["🌞", "🌙", "🌞", "🌙", "?"], answer: "🌞", options: ["🌞", "🌙", "⭐"] }
+    ];
+
+    // Game 3: Odd One Out
+    const oddOneGames = [
+        { items: ["🍎", "🍌", "🍊", "🚗"], question: "Which doesn't belong?", answer: "🚗", options: ["🍎", "🍌", "🚗"] },
+        { items: ["🐶", "🐱", "🐭", "🌳"], question: "Which is not an animal?", answer: "🌳", options: ["🐶", "🌳", "🐭"] },
+        { items: ["⚽", "🏀", "🎾", "🍕"], question: "Which is not a ball?", answer: "🍕", options: ["⚽", "🍕", "🏀"] }
+    ];
+
+    const handleReasoningAnswer = (answer) => {
+        verifyAction(() => {
+            let correct = false;
+            let currentGame;
+
+            if (reasoningGame === 0) {
+                currentGame = shapeGames[reasoningLevel];
+            } else if (reasoningGame === 1) {
+                currentGame = sequenceGames[reasoningLevel];
+            } else {
+                currentGame = oddOneGames[reasoningLevel];
+            }
+
+            if (answer === currentGame.answer) {
+                setReasoningFeedback(`Correct! 🎉 ${getRandomFact()}`);
+                setReasoningScore(prev => prev + 1);
+                triggerConfetti();
+                addEarnings('criticalThinking', 30);
+
+                setTimeout(() => {
+                    setReasoningFeedback("");
+                    if (reasoningLevel < 2) {
+                        setReasoningLevel(prev => prev + 1);
+                    } else if (reasoningGame < 2) {
+                        setReasoningGame(prev => prev + 1);
+                        setReasoningLevel(0);
+                    } else {
+                        markComplete(11); // Basic Reasoning complete
+                    }
+                }, 3000);
+            } else {
+                setReasoningFeedback("Try again! Think carefully 🤔");
+                setTimeout(() => setReasoningFeedback(""), 1500);
+            }
+        }, "Checking your answer...");
+    };
+
+    // --- LOGIC GAMES STATE (Module 3) ---
+    const [logicGame, setLogicGame] = useState(0); // 0: Boat Puzzle, 1: True/False, 2: Number Sequences, 3: If-Then
+    const [logicLevel, setLogicLevel] = useState(0);
+    const [logicScore, setLogicScore] = useState(0);
+    const [logicFeedback, setLogicFeedback] = useState("");
+
+    // Game 1: True or False Logic
+    const trueFalseGames = [
+        { statement: "All birds can fly", answer: false, explanation: "Penguins and ostriches are birds but can't fly! 🐧" },
+        { statement: "The sun rises in the east", answer: true, explanation: "Correct! The sun always rises in the east! ☀️" },
+        { statement: "Fish can live without water", answer: false, explanation: "Fish need water to breathe! 🐠" },
+        { statement: "Lions are the king of the jungle", answer: true, explanation: "Yes! Lions are called the king of the jungle! 🦁" }
+    ];
+
+    // Game 2: Number Sequences (What's Missing?)
+    const numberSequences = [
+        { sequence: [2, 4, "?", 8, 10], answer: "6", options: ["5", "6", "7"], explanation: "Count by 2s: 2, 4, 6, 8, 10!" },
+        { sequence: [1, 3, 5, "?", 9], answer: "7", options: ["6", "7", "8"], explanation: "Odd numbers: 1, 3, 5, 7, 9!" },
+        { sequence: [10, 20, 30, "?"], answer: "40", options: ["35", "40", "50"], explanation: "Count by 10s: 10, 20, 30, 40!" },
+        { sequence: [5, 10, 15, "?", 25], answer: "20", options: ["18", "20", "22"], explanation: "Count by 5s: 5, 10, 15, 20, 25!" }
+    ];
+
+    // Game 3: If-Then Logic
+    const ifThenGames = [
+        {
+            question: "If it rains, the ground gets ___",
+            options: ["Wet 💧", "Dry ☀️", "Hot 🔥"],
+            answer: "Wet 💧",
+            explanation: "When it rains, water makes the ground wet!"
+        },
+        {
+            question: "If you study hard, you will ___",
+            options: ["Learn 📚", "Sleep 😴", "Play 🎮"],
+            answer: "Learn 📚",
+            explanation: "Studying helps you learn new things!"
+        },
+        {
+            question: "If you plant a seed, it will ___",
+            options: ["Grow 🌱", "Fly 🦅", "Swim 🏊"],
+            answer: "Grow 🌱",
+            explanation: "Seeds grow into plants with water and sunlight!"
+        },
+        {
+            question: "If you are kind to others, they will ___",
+            options: ["Be happy 😊", "Be sad 😢", "Be angry 😠"],
+            answer: "Be happy 😊",
+            explanation: "Kindness makes people happy!"
+        }
+    ];
+
+    const handleLogicAnswer = (answer) => {
+        verifyAction(() => {
+            let currentGame, correct = false, explanation = "";
+
+            if (logicGame === 1) {
+                // True/False
+                currentGame = trueFalseGames[logicLevel];
+                correct = answer === currentGame.answer;
+                explanation = currentGame.explanation;
+            } else if (logicGame === 2) {
+                // Number Sequences
+                currentGame = numberSequences[logicLevel];
+                correct = answer === currentGame.answer;
+                explanation = currentGame.explanation;
+            } else if (logicGame === 3) {
+                // If-Then
+                currentGame = ifThenGames[logicLevel];
+                correct = answer === currentGame.answer;
+                explanation = currentGame.explanation;
+            }
+
+            if (correct) {
+                setLogicFeedback(`Correct! 🎉\n\n${explanation}\n\n${getRandomFact()}`);
+                setLogicScore(prev => prev + 1);
+                triggerConfetti();
+                addEarnings('criticalThinking', 35);
+
+                setTimeout(() => {
+                    setLogicFeedback("");
+                    if (logicLevel < 3) {
+                        setLogicLevel(prev => prev + 1);
+                    } else if (logicGame < 3) {
+                        setLogicGame(prev => prev + 1);
+                        setLogicLevel(0);
+                    } else {
+                        markComplete(3); // All logic games complete!
+                    }
+                }, 4000);
+            } else {
+                setLogicFeedback("Try again! Think carefully 🤔");
+                setTimeout(() => setLogicFeedback(""), 1500);
+            }
+        }, "Thinking...");
+    };
+
     // --- RIDDLE STATE ---
+    const [riddleGame, setRiddleGame] = useState(0); // 0: Classic Riddles, 1: Animal Sounds, 2: Rhyme Time
     const [riddleScore, setRiddleScore] = useState(0);
     const [riddleIndex, setRiddleIndex] = useState(() => Number(localStorage.getItem('riddleIndex')) || 0);
     const [showRiddleResult, setShowRiddleResult] = useState(null);
@@ -203,11 +413,31 @@ const CriticalThinking = ({ ageGroup }) => {
         localStorage.setItem('riddleIndex', riddleIndex);
     }, [riddleIndex]);
 
-    const riddles = [
+    // Game 1: Classic African Riddles
+    const classicRiddles = [
         { q: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?", options: ["A Map 🗺️", "A Dream 💭", "A Painting 🎨"], ans: "A Map 🗺️" },
         { q: "The more of this there is, the less you see. What is it?", options: ["Darkness 🌑", "Fog 🌫️", "Light 💡"], ans: "Darkness 🌑" },
-        { q: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?", options: ["An Echo 🗣️", "A Ghost 👻", "A Cloud ☁️"], ans: "An Echo 🗣️" }
+        { q: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?", options: ["An Echo 🗣️", "A Ghost 👻", "A Cloud ☁️"], ans: "An Echo 🗣️" },
+        { q: "I have a neck but no head. I have two arms but no hands. What am I?", options: ["A Shirt 👕", "A Tree 🌳", "A River 🌊"], ans: "A Shirt 👕" }
     ];
+
+    // Game 2: Animal Sounds (What Animal Makes This Sound?)
+    const animalSounds = [
+        { sound: "ROAR!", emoji: "🦁", question: "What animal makes this sound?", options: ["Lion 🦁", "Elephant 🐘", "Monkey 🐒"], ans: "Lion 🦁" },
+        { sound: "MOO!", emoji: "🐄", question: "What animal makes this sound?", options: ["Goat 🐐", "Cow 🐄", "Sheep 🐑"], ans: "Cow 🐄" },
+        { sound: "TWEET TWEET!", emoji: "🐦", question: "What animal makes this sound?", options: ["Bird 🐦", "Frog 🐸", "Cat 🐱"], ans: "Bird 🐦" },
+        { sound: "HISS!", emoji: "🐍", question: "What animal makes this sound?", options: ["Snake 🐍", "Lion 🦁", "Dog 🐕"], ans: "Snake 🐍" }
+    ];
+
+    // Game 3: Rhyme Time (Complete the Rhyme)
+    const rhymeGames = [
+        { line1: "Twinkle, twinkle, little ___", options: ["Star ⭐", "Car 🚗", "Jar 🏺"], ans: "Star ⭐", hint: "It shines in the sky!" },
+        { line1: "The cat sat on the ___", options: ["Mat 🧘", "Bat 🦇", "Hat 🎩"], ans: "Mat 🧘", hint: "You sit or stand on it!" },
+        { line1: "I see a big red ___", options: ["Ball ⚽", "Wall 🧱", "Doll 🪆"], ans: "Ball ⚽", hint: "You can throw and catch it!" },
+        { line1: "The sun is very ___", options: ["Hot ☀️", "Pot 🍲", "Dot •"], ans: "Hot ☀️", hint: "It gives us warmth!" }
+    ];
+
+    const riddles = classicRiddles; // Keep for backward compatibility
 
     // --- PATTERN STATE ---
     const [patternLevel, setPatternLevel] = useState(() => Number(localStorage.getItem('patternLevel')) || 0);
@@ -445,18 +675,6 @@ const CriticalThinking = ({ ageGroup }) => {
     const scienceScenarios = isKid ? kidScience : teenScience;
 
 
-
-    // --- WISDOM LOG STATE (Reflection) ---
-    const [wisdomEntry, setWisdomEntry] = useState("");
-    const [savedWisdom, setSavedWisdom] = useState(() => localStorage.getItem('wisdomLog') || "");
-
-    // --- LEGEND OF TRUTH & LIE STATE ---
-    const [truthStep, setTruthStep] = useState(0);
-
-    // --- ANTI-RUSH STATE ---
-    const [isVerifying, setIsVerifying] = useState(false);
-    const [verificationMessage, setVerificationMessage] = useState("");
-
     // --- VERIFICATION HELPER ---
     const verifyAction = (callback, message = "Verifying Wisdom... 🦁") => {
         setIsVerifying(true);
@@ -666,24 +884,46 @@ const CriticalThinking = ({ ageGroup }) => {
     // --- NEW HANDLERS ---
     const handleRiddleAnswer = (option) => {
         verifyAction(() => {
-            const currentRiddle = riddles[riddleIndex];
-            if (option === currentRiddle.a) {
+            let currentRiddle, correctAnswer;
+
+            if (riddleGame === 0) {
+                currentRiddle = classicRiddles[riddleIndex];
+                correctAnswer = currentRiddle.ans;
+            } else if (riddleGame === 1) {
+                currentRiddle = animalSounds[riddleIndex];
+                correctAnswer = currentRiddle.ans;
+            } else {
+                currentRiddle = rhymeGames[riddleIndex];
+                correctAnswer = currentRiddle.ans;
+            }
+
+            if (option === correctAnswer) {
                 setShowRiddleResult(`Correct! 🎉\n\n${getRandomFact()}`);
                 setRiddleScore(prev => prev + 1);
                 triggerConfetti();
+                addEarnings('criticalThinking', 40);
+
                 setTimeout(() => {
                     setShowRiddleResult(null);
-                    if (riddleIndex < riddles.length - 1) {
+
+                    const maxIndex = riddleGame === 0 ? classicRiddles.length - 1 :
+                        riddleGame === 1 ? animalSounds.length - 1 :
+                            rhymeGames.length - 1;
+
+                    if (riddleIndex < maxIndex) {
                         setRiddleIndex(prev => prev + 1);
+                    } else if (riddleGame < 2) {
+                        setRiddleGame(prev => prev + 1);
+                        setRiddleIndex(0);
                     } else {
-                        markComplete(14);
+                        markComplete(14); // All 3 games complete!
                     }
                 }, 4000);
             } else {
                 setShowRiddleResult("Try again! 🤔");
-                setTimeout(() => setShowRiddleResult(null), 1000);
+                setTimeout(() => setShowRiddleResult(null), 1500);
             }
-        }, "Solving Riddle...");
+        }, "Thinking...");
     };
     const handlePatternCheck = (option) => {
         verifyAction(() => {
@@ -987,72 +1227,253 @@ const CriticalThinking = ({ ageGroup }) => {
         {
             id: 3,
             title: "Logical Thinking 🧩",
-            desc: "The River Crossing Puzzle.",
+            desc: "4 Fun Logic Games!",
             content: (
                 <div>
-                    <p>Help the Farmer get the Lion, Goat, and Yam across the river!</p>
-                    <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#444', borderRadius: '8px', border: '2px solid #FFD700' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                            <h4 style={{ color: '#FFD700', margin: 0 }}>🚣 River Crossing Challenge</h4>
-                            <button onClick={resetRiverGame} className="btn btn-sm" style={{ backgroundColor: '#ff4444' }}>🔄 Reset</button>
+                    <p style={{ marginBottom: '1rem' }}>
+                        <strong>
+                            {logicGame === 0 && "🚣 Game 1: River Crossing Puzzle"}
+                            {logicGame === 1 && "✅ Game 2: True or False"}
+                            {logicGame === 2 && "🔢 Game 3: Number Sequences"}
+                            {logicGame === 3 && "🤔 Game 4: If-Then Logic"}
+                        </strong>
+                    </p>
+
+                    {/* Game Selector */}
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', overflowX: 'auto' }}>
+                        {['🚣 Boat', '✅ T/F', '🔢 Numbers', '🤔 If-Then'].map((label, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => setLogicGame(idx)}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '8px',
+                                    border: logicGame === idx ? '2px solid #FFD700' : '2px solid #555',
+                                    background: logicGame === idx ? '#FFD700' : '#333',
+                                    color: logicGame === idx ? '#000' : '#fff',
+                                    cursor: 'pointer',
+                                    fontSize: '0.9rem',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Game 1: Boat Puzzle (Original) */}
+                    {logicGame === 0 && (
+                        <div>
+                            <p>Help the Farmer get the Lion, Goat, and Yam across the river!</p>
+                            <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#444', borderRadius: '8px', border: '2px solid #FFD700' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <h4 style={{ color: '#FFD700', margin: 0 }}>🚣 River Crossing Challenge</h4>
+                                    <button onClick={resetRiverGame} className="btn btn-sm" style={{ backgroundColor: '#ff4444' }}>🔄 Reset</button>
+                                </div>
+
+                                <p style={{ textAlign: 'center', marginBottom: '1rem', minHeight: '3rem', color: riverStatus === 'lost' ? '#ff4444' : '#fff' }}>
+                                    {riverMessage}
+                                </p>
+
+                                {/* GAME AREA */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '200px', position: 'relative' }}>
+
+                                    {/* LEFT BANK */}
+                                    <div style={{ width: '30%', height: '100%', backgroundColor: '#2e7d32', borderRadius: '10px', padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', border: boatSide === 'left' ? '2px solid #FFD700' : 'none' }}>
+                                        <div style={{ textAlign: 'center', fontWeight: 'bold' }}>Left Bank</div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+                                            {riverItems.filter(i => i.side === 'left').map(item => (
+                                                <button key={item.id} onClick={() => handleRiverMove('load', item.id)} disabled={boatSide !== 'left' || riverStatus !== 'playing'} style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                    {item.emoji}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* RIVER & BOAT */}
+                                    <div style={{ flex: 1, height: '100%', backgroundColor: '#0288d1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                        <div style={{
+                                            width: '80px', height: '50px', backgroundColor: '#795548', borderRadius: '0 0 40px 40px',
+                                            display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2rem',
+                                            position: 'absolute', left: boatSide === 'left' ? '10%' : 'auto', right: boatSide === 'right' ? '10%' : 'auto',
+                                            transition: 'all 1s ease'
+                                        }}>
+                                            {boatContent ? riverItems.find(i => i.id === boatContent)?.emoji : ''}
+                                            <span style={{ fontSize: '1rem', position: 'absolute', top: '-20px' }}>👨‍🌾</span>
+                                        </div>
+
+                                        {/* CONTROLS */}
+                                        <div style={{ marginTop: '100px', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
+                                            {boatContent ? (
+                                                <button onClick={() => handleRiverMove('unload')} className="btn btn-sm" style={{ backgroundColor: '#ffbb33', color: '#000' }}>Unload</button>
+                                            ) : null}
+                                            <button onClick={() => handleRiverMove('cross')} className="btn btn-sm" style={{ backgroundColor: '#fff', color: '#000' }}>Row Boat 🚣</button>
+                                        </div>
+                                    </div>
+
+                                    {/* RIGHT BANK */}
+                                    <div style={{ width: '30%', height: '100%', backgroundColor: '#2e7d32', borderRadius: '10px', padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', border: boatSide === 'right' ? '2px solid #FFD700' : 'none' }}>
+                                        <div style={{ textAlign: 'center', fontWeight: 'bold' }}>Right Bank</div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+                                            {riverItems.filter(i => i.side === 'right').map(item => (
+                                                <button key={item.id} onClick={() => handleRiverMove('load', item.id)} disabled={boatSide !== 'right' || riverStatus !== 'playing'} style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                                    {item.emoji}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                {riverStatus === 'won' && <div style={{ textAlign: 'center', marginTop: '1rem' }}>🏆 You Won! <button onClick={resetRiverGame} className="btn btn-sm">Replay</button></div>}
+                                {riverStatus === 'lost' && <div style={{ textAlign: 'center', marginTop: '1rem' }}><button onClick={resetRiverGame} className="btn btn-sm" style={{ backgroundColor: '#ff4444' }}>Try Again</button></div>}
+                            </div>
                         </div>
+                    )}
 
-                        <p style={{ textAlign: 'center', marginBottom: '1rem', minHeight: '3rem', color: riverStatus === 'lost' ? '#ff4444' : '#fff' }}>
-                            {riverMessage}
-                        </p>
-
-                        {/* GAME AREA */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '200px', position: 'relative' }}>
-
-                            {/* LEFT BANK */}
-                            <div style={{ width: '30%', height: '100%', backgroundColor: '#2e7d32', borderRadius: '10px', padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', border: boatSide === 'left' ? '2px solid #FFD700' : 'none' }}>
-                                <div style={{ textAlign: 'center', fontWeight: 'bold' }}>Left Bank</div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-                                    {riverItems.filter(i => i.side === 'left').map(item => (
-                                        <button key={item.id} onClick={() => handleRiverMove('load', item.id)} disabled={boatSide !== 'left' || riverStatus !== 'playing'} style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                            {item.emoji}
+                    {/* Game 2: True or False */}
+                    {logicGame === 1 && (
+                        <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '10px' }}>
+                            {logicFeedback ? (
+                                <div style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }}>
+                                    <h3 style={{ color: logicFeedback.includes('Correct') ? '#00C851' : '#FFC107' }}>
+                                        {logicFeedback}
+                                    </h3>
+                                </div>
+                            ) : (
+                                <>
+                                    <div style={{ fontSize: '2.5rem', textAlign: 'center', marginBottom: '1rem' }}>🤔</div>
+                                    <p style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: '1.5rem', fontWeight: 'bold' }}>
+                                        {trueFalseGames[logicLevel].statement}
+                                    </p>
+                                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                        <button
+                                            onClick={() => handleLogicAnswer(true)}
+                                            style={{
+                                                padding: '1rem 2rem',
+                                                borderRadius: '10px',
+                                                border: '2px solid #00C851',
+                                                background: '#00C851',
+                                                color: '#fff',
+                                                cursor: 'pointer',
+                                                fontSize: '1.2rem',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
+                                            ✅ TRUE
                                         </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* RIVER & BOAT */}
-                            <div style={{ flex: 1, height: '100%', backgroundColor: '#0288d1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                <div style={{
-                                    width: '80px', height: '50px', backgroundColor: '#795548', borderRadius: '0 0 40px 40px',
-                                    display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2rem',
-                                    position: 'absolute', left: boatSide === 'left' ? '10%' : 'auto', right: boatSide === 'right' ? '10%' : 'auto',
-                                    transition: 'all 1s ease'
-                                }}>
-                                    {boatContent ? riverItems.find(i => i.id === boatContent)?.emoji : ''}
-                                    <span style={{ fontSize: '1rem', position: 'absolute', top: '-20px' }}>👨‍🌾</span>
-                                </div>
-
-                                {/* CONTROLS */}
-                                <div style={{ marginTop: '100px', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
-                                    {boatContent ? (
-                                        <button onClick={() => handleRiverMove('unload')} className="btn btn-sm" style={{ backgroundColor: '#ffbb33', color: '#000' }}>Unload</button>
-                                    ) : null}
-                                    <button onClick={() => handleRiverMove('cross')} className="btn btn-sm" style={{ backgroundColor: '#fff', color: '#000' }}>Row Boat 🚣</button>
-                                </div>
-                            </div>
-
-                            {/* RIGHT BANK */}
-                            <div style={{ width: '30%', height: '100%', backgroundColor: '#2e7d32', borderRadius: '10px', padding: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', border: boatSide === 'right' ? '2px solid #FFD700' : 'none' }}>
-                                <div style={{ textAlign: 'center', fontWeight: 'bold' }}>Right Bank</div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
-                                    {riverItems.filter(i => i.side === 'right').map(item => (
-                                        <button key={item.id} onClick={() => handleRiverMove('load', item.id)} disabled={boatSide !== 'right' || riverStatus !== 'playing'} style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                            {item.emoji}
+                                        <button
+                                            onClick={() => handleLogicAnswer(false)}
+                                            style={{
+                                                padding: '1rem 2rem',
+                                                borderRadius: '10px',
+                                                border: '2px solid #ff4444',
+                                                background: '#ff4444',
+                                                color: '#fff',
+                                                cursor: 'pointer',
+                                                fontSize: '1.2rem',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
+                                            ❌ FALSE
                                         </button>
-                                    ))}
-                                </div>
+                                    </div>
+                                </>
+                            )}
+                            <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                                Question {logicLevel + 1}/4
                             </div>
-
                         </div>
+                    )}
 
-                        {riverStatus === 'won' && <div style={{ textAlign: 'center', marginTop: '1rem' }}>🏆 You Won! <button onClick={resetRiverGame} className="btn btn-sm">Replay</button></div>}
-                        {riverStatus === 'lost' && <div style={{ textAlign: 'center', marginTop: '1rem' }}><button onClick={resetRiverGame} className="btn btn-sm" style={{ backgroundColor: '#ff4444' }}>Try Again</button></div>}
+                    {/* Game 3: Number Sequences */}
+                    {logicGame === 2 && (
+                        <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '10px' }}>
+                            {logicFeedback ? (
+                                <div style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }}>
+                                    <h3 style={{ color: logicFeedback.includes('Correct') ? '#00C851' : '#FFC107' }}>
+                                        {logicFeedback}
+                                    </h3>
+                                </div>
+                            ) : (
+                                <>
+                                    <div style={{ fontSize: '2.5rem', textAlign: 'center', marginBottom: '1rem' }}>🔢</div>
+                                    <p style={{ textAlign: 'center', marginBottom: '1rem' }}>What number is missing?</p>
+                                    <div style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '1.5rem', letterSpacing: '1rem' }}>
+                                        {numberSequences[logicLevel].sequence.join(' ')}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                        {numberSequences[logicLevel].options.map((opt, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleLogicAnswer(opt)}
+                                                style={{
+                                                    padding: '1rem 1.5rem',
+                                                    borderRadius: '10px',
+                                                    border: '2px solid #555',
+                                                    background: '#333',
+                                                    color: '#fff',
+                                                    cursor: 'pointer',
+                                                    fontSize: '1.5rem',
+                                                    fontWeight: 'bold'
+                                                }}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                            <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                                Sequence {logicLevel + 1}/4
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Game 4: If-Then Logic */}
+                    {logicGame === 3 && (
+                        <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '10px' }}>
+                            {logicFeedback ? (
+                                <div style={{ textAlign: 'center', whiteSpace: 'pre-wrap' }}>
+                                    <h3 style={{ color: logicFeedback.includes('Correct') ? '#00C851' : '#FFC107' }}>
+                                        {logicFeedback}
+                                    </h3>
+                                </div>
+                            ) : (
+                                <>
+                                    <div style={{ fontSize: '2.5rem', textAlign: 'center', marginBottom: '1rem' }}>💭</div>
+                                    <p style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: '1.5rem', fontWeight: 'bold' }}>
+                                        {ifThenGames[logicLevel].question}
+                                    </p>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        {ifThenGames[logicLevel].options.map((opt, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleLogicAnswer(opt)}
+                                                style={{
+                                                    padding: '1rem',
+                                                    borderRadius: '8px',
+                                                    border: '2px solid #555',
+                                                    background: '#333',
+                                                    color: '#fff',
+                                                    cursor: 'pointer',
+                                                    fontSize: '1.1rem'
+                                                }}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                            <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                                Question {logicLevel + 1}/4
+                            </div>
+                        </div>
+                    )}
+
+                    <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                        Total Score: {logicScore}/16 • Game {logicGame + 1}/4
                     </div>
                 </div>
             )
@@ -1320,19 +1741,6 @@ const CriticalThinking = ({ ageGroup }) => {
                                         <p style={{ color: '#FFD700', fontWeight: 'bold', marginTop: '0.5rem' }}>Observation: {scienceObservation}</p>
                                         <p style={{ color: '#00C851', marginTop: '0.5rem' }}>Conclusion: {scienceScenarios[scienceLevel].conclusion}</p>
                                         <p style={{ marginTop: '0.5rem', fontStyle: 'italic', color: '#FFD700' }}>{getRandomFact()}</p>
-
-                                        <button onClick={() => {
-                                            setScienceEarnings(prev => Math.min(prev + 50, MAX_EARNINGS));
-                                            setScienceStep(0);
-                                            setScienceObservation("");
-                                            if (scienceLevel < scienceScenarios.length - 1) {
-                                                setScienceLevel(l => l + 1);
-                                            } else {
-                                                markComplete(9);
-                                            }
-                                        }} className="btn btn-sm" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>
-                                            Next Level ➡️
-                                        </button>
                                     </div>
                                 )}
                             </div>
@@ -1368,13 +1776,121 @@ const CriticalThinking = ({ ageGroup }) => {
         {
             id: 11,
             title: "Basic Reasoning 🔗",
-            desc: "Making connections.",
+            desc: "3 Fun Brain Games!",
             content: (
                 <div>
-                    <p>Connect the dots.</p>
-                    <button onClick={() => markComplete(11)} className="btn btn-sm" style={{ marginTop: '1rem' }} disabled={completedModules.includes(11)}>
-                        {completedModules.includes(11) ? "Connected! ✅" : "I get it! 🔗"}
-                    </button>
+                    <p style={{ marginBottom: '1rem' }}>
+                        <strong>
+                            {reasoningGame === 0 && "🎯 Game 1: Shape Matching"}
+                            {reasoningGame === 1 && "🔮 Game 2: What Comes Next?"}
+                            {reasoningGame === 2 && "🎪 Game 3: Odd One Out"}
+                        </strong>
+                    </p>
+
+                    {/* Game 1: Shape Matching */}
+                    {reasoningGame === 0 && (
+                        <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '10px' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem', textAlign: 'center' }}>
+                                {shapeGames[reasoningLevel].shapes.join(' ')}
+                            </div>
+                            <p style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                                {shapeGames[reasoningLevel].question}
+                            </p>
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                {shapeGames[reasoningLevel].options.map((opt, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleReasoningAnswer(opt)}
+                                        style={{
+                                            fontSize: '2.5rem',
+                                            padding: '1rem',
+                                            borderRadius: '10px',
+                                            border: '2px solid #555',
+                                            background: '#333',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Game 2: What Comes Next */}
+                    {reasoningGame === 1 && (
+                        <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '10px' }}>
+                            <p style={{ textAlign: 'center', marginBottom: '1rem' }}>What comes next in the pattern?</p>
+                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem', textAlign: 'center' }}>
+                                {sequenceGames[reasoningLevel].sequence.join(' ')}
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                {sequenceGames[reasoningLevel].options.map((opt, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleReasoningAnswer(opt)}
+                                        style={{
+                                            fontSize: '2.5rem',
+                                            padding: '1rem',
+                                            borderRadius: '10px',
+                                            border: '2px solid #555',
+                                            background: '#333',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Game 3: Odd One Out */}
+                    {reasoningGame === 2 && (
+                        <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '10px' }}>
+                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem', textAlign: 'center' }}>
+                                {oddOneGames[reasoningLevel].items.join(' ')}
+                            </div>
+                            <p style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                                {oddOneGames[reasoningLevel].question}
+                            </p>
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                {oddOneGames[reasoningLevel].options.map((opt, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleReasoningAnswer(opt)}
+                                        style={{
+                                            fontSize: '2.5rem',
+                                            padding: '1rem',
+                                            borderRadius: '10px',
+                                            border: '2px solid #555',
+                                            background: '#333',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {reasoningFeedback && (
+                        <div style={{
+                            marginTop: '1rem',
+                            padding: '1rem',
+                            backgroundColor: reasoningFeedback.includes('Correct') ? 'rgba(0, 200, 81, 0.2)' : 'rgba(255, 193, 7, 0.2)',
+                            borderRadius: '8px',
+                            border: `2px solid ${reasoningFeedback.includes('Correct') ? '#00C851' : '#FFC107'}`,
+                            textAlign: 'center'
+                        }}>
+                            <p style={{ margin: 0 }}>{reasoningFeedback}</p>
+                        </div>
+                    )}
+
+                    <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                        Game {reasoningGame + 1}/3 • Level {reasoningLevel + 1}/3 • Score: {reasoningScore}/9
+                    </div>
                 </div>
             )
         },
@@ -1403,39 +1919,194 @@ const CriticalThinking = ({ ageGroup }) => {
         {
             id: 13,
             title: "Teach a Friend 🗣️",
-            desc: "The best way to learn.",
+            desc: "Explain what you learned!",
             content: (
                 <div>
-                    <p>Explain one thing you learned to a friend or family member.</p>
-                    <button onClick={() => markComplete(13)} className="btn btn-sm" style={{ marginTop: '1rem' }} disabled={completedModules.includes(13)}>
-                        {completedModules.includes(13) ? "Teacher Mode On! ✅" : "I taught someone! 🎓"}
+                    <p style={{ marginBottom: '1rem' }}>🎓 <strong>Be the Teacher!</strong></p>
+                    <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1rem' }}>
+                        Pretend you're teaching your friend. Explain this topic in your own words:
+                    </p>
+
+                    <div style={{ backgroundColor: '#2c2c2c', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                        <p style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#FFD700' }}>
+                            📚 {teachTopics[teachTopicIndex].topic}
+                        </p>
+                    </div>
+
+                    <textarea
+                        value={teachExplanation}
+                        onChange={(e) => setTeachExplanation(e.target.value)}
+                        placeholder="I would tell my friend that..."
+                        style={{
+                            width: '100%',
+                            padding: '0.8rem',
+                            borderRadius: '8px',
+                            border: '2px solid #555',
+                            backgroundColor: '#222',
+                            color: '#fff',
+                            fontSize: '0.95rem',
+                            minHeight: '100px',
+                            marginBottom: '1rem'
+                        }}
+                    />
+
+                    <button
+                        onClick={handleTeachSubmit}
+                        className="btn btn-sm"
+                        style={{
+                            backgroundColor: '#00C851',
+                            width: '100%',
+                            padding: '0.8rem',
+                            fontSize: '1rem'
+                        }}
+                    >
+                        Share My Teaching! 🎤
                     </button>
+
+                    {teachFeedback && (
+                        <div style={{
+                            marginTop: '1rem',
+                            padding: '1rem',
+                            backgroundColor: teachFeedback.includes('Amazing') || teachFeedback.includes('Wonderful') || teachFeedback.includes('Excellent') || teachFeedback.includes('Perfect')
+                                ? 'rgba(0, 200, 81, 0.2)'
+                                : 'rgba(255, 193, 7, 0.2)',
+                            borderRadius: '8px',
+                            border: `2px solid ${teachFeedback.includes('Amazing') || teachFeedback.includes('Wonderful') || teachFeedback.includes('Excellent') || teachFeedback.includes('Perfect') ? '#00C851' : '#FFC107'}`,
+                            whiteSpace: 'pre-wrap'
+                        }}>
+                            <p style={{ margin: 0, fontSize: '0.95rem' }}>{teachFeedback}</p>
+                        </div>
+                    )}
+
+                    <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                        Topic {teachTopicIndex + 1} of {teachTopics.length} • Score: {teachScore}
+                    </div>
                 </div>
             )
         },
         {
             id: 14,
             title: "Riddle Me This 🦁",
-            desc: "Ancient Wisdom.",
+            desc: "3 Fun Brain Games!",
             content: (
                 <div>
-                    <p>Solve the riddle to prove your wit!</p>
-                    <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#333', borderRadius: '8px', textAlign: 'center' }}>
+                    <p style={{ marginBottom: '1rem' }}>
+                        <strong>
+                            {riddleGame === 0 && "🧩 Game 1: Classic Riddles"}
+                            {riddleGame === 1 && "🐾 Game 2: Animal Sounds"}
+                            {riddleGame === 2 && "🎵 Game 3: Rhyme Time"}
+                        </strong>
+                    </p>
+
+                    <div style={{ marginTop: '1rem', padding: '1.5rem', backgroundColor: '#2c2c2c', borderRadius: '10px' }}>
                         {showRiddleResult ? (
-                            <h3 style={{ color: showRiddleResult.includes("Correct") ? '#00C851' : '#ff4444' }}>{showRiddleResult}</h3>
+                            <div style={{ textAlign: 'center' }}>
+                                <h3 style={{ color: showRiddleResult.includes("Correct") ? '#00C851' : '#ff4444', whiteSpace: 'pre-wrap' }}>
+                                    {showRiddleResult}
+                                </h3>
+                            </div>
                         ) : (
                             <>
-                                <p style={{ fontSize: '1.2rem', marginBottom: '1rem', fontStyle: 'italic' }}>"{riddles[riddleIndex].q}"</p>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                    {riddles[riddleIndex].options.map((opt, idx) => (
-                                        <button key={idx} onClick={() => handleRiddleAnswer(opt)} className="btn" style={{ backgroundColor: '#444' }}>
-                                            {opt}
-                                        </button>
-                                    ))}
-                                </div>
+                                {/* Game 1: Classic Riddles */}
+                                {riddleGame === 0 && (
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🤔</div>
+                                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', fontStyle: 'italic', lineHeight: '1.6' }}>
+                                            "{classicRiddles[riddleIndex].q}"
+                                        </p>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            {classicRiddles[riddleIndex].options.map((opt, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => handleRiddleAnswer(opt)}
+                                                    style={{
+                                                        padding: '0.8rem',
+                                                        borderRadius: '8px',
+                                                        border: '2px solid #555',
+                                                        background: '#333',
+                                                        color: '#fff',
+                                                        cursor: 'pointer',
+                                                        fontSize: '1rem'
+                                                    }}
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Game 2: Animal Sounds */}
+                                {riddleGame === 1 && (
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>
+                                            {animalSounds[riddleIndex].emoji}
+                                        </div>
+                                        <p style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: '#FFD700' }}>
+                                            {animalSounds[riddleIndex].sound}
+                                        </p>
+                                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>
+                                            {animalSounds[riddleIndex].question}
+                                        </p>
+                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                            {animalSounds[riddleIndex].options.map((opt, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => handleRiddleAnswer(opt)}
+                                                    style={{
+                                                        padding: '1rem',
+                                                        borderRadius: '10px',
+                                                        border: '2px solid #555',
+                                                        background: '#333',
+                                                        color: '#fff',
+                                                        cursor: 'pointer',
+                                                        fontSize: '1.5rem'
+                                                    }}
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Game 3: Rhyme Time */}
+                                {riddleGame === 2 && (
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎶</div>
+                                        <p style={{ fontSize: '1.3rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                                            {rhymeGames[riddleIndex].line1}
+                                        </p>
+                                        <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+                                            Hint: {rhymeGames[riddleIndex].hint}
+                                        </p>
+                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                                            {rhymeGames[riddleIndex].options.map((opt, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => handleRiddleAnswer(opt)}
+                                                    style={{
+                                                        padding: '1rem',
+                                                        borderRadius: '10px',
+                                                        border: '2px solid #555',
+                                                        background: '#333',
+                                                        color: '#fff',
+                                                        cursor: 'pointer',
+                                                        fontSize: '1.2rem'
+                                                    }}
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </>
                         )}
-                        <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#aaa' }}>Score: {riddleScore}/{riddles.length}</p>
+                    </div>
+
+                    <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
+                        Game {riddleGame + 1}/3 • Question {riddleIndex + 1}/4 • Score: {riddleScore}/12
                     </div>
                 </div>
             )
@@ -1464,19 +2135,32 @@ const CriticalThinking = ({ ageGroup }) => {
             )
         },
         {
-            id: 16,
+            id: 17,
             title: "Legend of Truth & Lie 🎭",
             desc: "A story of wisdom.",
             content: (
                 <div>
-                    <p><strong>The Naked Truth and the Dressed-Up Lie</strong></p>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <p><strong>The Naked Truth and the Dressed-Up Lie</strong></p>
+                        <button
+                            onClick={() => speakText("The Naked Truth and the Dressed-Up Lie. One day, Truth and Lie met...")}
+                            className="btn btn-sm"
+                            style={{ backgroundColor: isReading ? '#ff4444' : '#00C851' }}
+                        >
+                            {isReading ? "🤫 Stop" : "🔊 Read to Me"}
+                        </button>
+                    </div>
+
                     <div style={{ marginTop: '1rem', padding: '1.5rem', backgroundColor: '#222', borderRadius: '15px', border: '1px solid #FFD700' }}>
                         {truthStep === 0 && (
                             <div style={{ animation: 'fadeIn 0.5s' }}>
                                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🤝</div>
                                 <p>One day, Truth and Lie met. Lie said to Truth, "It's a marvelous day today!"</p>
                                 <p>Truth looked up at the sky and sighed, for the day was truly beautiful.</p>
-                                <button onClick={() => setTruthStep(1)} className="btn" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>Continue...</button>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                                    <button onClick={() => speakText("One day, Truth and Lie met. Lie said to Truth, It's a marvelous day today! Truth looked up at the sky and sighed, for the day was truly beautiful.")} className="btn btn-sm" style={{ backgroundColor: '#333' }}>🔊 Listen</button>
+                                    <button onClick={() => setTruthStep(1)} className="btn" style={{ backgroundColor: '#00C851', flex: 1 }}>Continue...</button>
+                                </div>
                             </div>
                         )}
                         {truthStep === 1 && (
@@ -1485,7 +2169,10 @@ const CriticalThinking = ({ ageGroup }) => {
                                 <p>They spent some time together, arriving at a well. Lie said, "The water is very nice, let's take a bath together!"</p>
                                 <p>Truth, once again suspicious, tested the water and discovered it was indeed very nice.</p>
                                 <p>They undressed and started bathing.</p>
-                                <button onClick={() => setTruthStep(2)} className="btn" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>What happened next?</button>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                                    <button onClick={() => speakText("They spent some time together, arriving at a well. Lie said, The water is very nice, let's take a bath together! Truth, once again suspicious, tested the water and discovered it was indeed very nice. They undressed and started bathing.")} className="btn btn-sm" style={{ backgroundColor: '#333' }}>🔊 Listen</button>
+                                    <button onClick={() => setTruthStep(2)} className="btn" style={{ backgroundColor: '#00C851', flex: 1 }}>What happened next?</button>
+                                </div>
                             </div>
                         )}
                         {truthStep === 2 && (
@@ -1493,7 +2180,10 @@ const CriticalThinking = ({ ageGroup }) => {
                                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏃‍♂️💨</div>
                                 <p>Suddenly, Lie came out of the water, put on Truth's clothes and ran away!</p>
                                 <p>The furious Truth came out of the well and ran everywhere to find Lie and to get his clothes back.</p>
-                                <button onClick={() => setTruthStep(3)} className="btn" style={{ marginTop: '1rem', backgroundColor: '#ff4444' }}>Oh no!</button>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                                    <button onClick={() => speakText("Suddenly, Lie came out of the water, put on Truth's clothes and ran away! The furious Truth came out of the well and ran everywhere to find Lie and to get his clothes back.")} className="btn btn-sm" style={{ backgroundColor: '#333' }}>🔊 Listen</button>
+                                    <button onClick={() => setTruthStep(3)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Oh no!</button>
+                                </div>
                             </div>
                         )}
                         {truthStep === 3 && (
@@ -1501,7 +2191,10 @@ const CriticalThinking = ({ ageGroup }) => {
                                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🫣</div>
                                 <p>The World, seeing Truth naked, turned its gaze away, with contempt and rage.</p>
                                 <p>Poor Truth returned to the well and disappeared forever, hiding therein, its shame.</p>
-                                <button onClick={() => setTruthStep(4)} className="btn" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>The Lesson...</button>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                                    <button onClick={() => speakText("The World, seeing Truth naked, turned its gaze away, with contempt and rage. Poor Truth returned to the well and disappeared forever, hiding therein, its shame.")} className="btn btn-sm" style={{ backgroundColor: '#333' }}>🔊 Listen</button>
+                                    <button onClick={() => setTruthStep(4)} className="btn" style={{ backgroundColor: '#00C851', flex: 1 }}>The Lesson...</button>
+                                </div>
                             </div>
                         )}
                         {truthStep === 4 && (
@@ -1510,25 +2203,26 @@ const CriticalThinking = ({ ageGroup }) => {
                                 <p style={{ fontStyle: 'italic', fontSize: '1.2rem', margin: '1rem 0' }}>
                                     "Since then, Lie travels around the world, dressed as Truth, satisfying the needs of society, because the World has no desire at all to meet the naked Truth."
                                 </p>
-                                <button
-                                    onClick={() => verifyAction(() => {
-                                        markComplete(16);
-                                        setTruthStep(5);
-                                    }, "Reflecting on Truth...")}
-                                    className="btn"
-                                    style={{ marginTop: '1rem', backgroundColor: '#00C851', width: '100%' }}
-                                    disabled={completedModules.includes(16)}
-                                >
-                                    {completedModules.includes(16) ? "Wisdom Gained ✅" : "I Understand (+₦130)"}
-                                </button>
+                                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+                                    <button onClick={() => speakText("Since then, Lie travels around the world, dressed as Truth, satisfying the needs of society, because the World has no desire at all to meet the naked Truth.")} className="btn btn-sm" style={{ backgroundColor: '#333' }}>🔊 Listen</button>
+                                    <button
+                                        onClick={() => verifyAction(() => {
+                                            markComplete(17);
+                                            setTruthStep(5);
+                                        }, "Reflecting on Truth...")}
+                                        className="btn"
+                                        style={{ backgroundColor: '#00C851', flex: 1 }}
+                                        disabled={completedModules.includes(17)}
+                                    >
+                                        {completedModules.includes(17) ? "Wisdom Gained ✅" : "I Understand (+₦130)"}
+                                    </button>
+                                </div>
                             </div>
                         )}
                         {truthStep === 5 && (
-                            <div style={{ animation: 'fadeIn 0.5s', textAlign: 'center' }}>
-                                <div style={{ fontSize: '4rem' }}>🦁✨</div>
-                                <p style={{ fontSize: '1.2rem', color: '#00C851' }}>You have learned a great secret.</p>
-                                <p>Always question what you see. Is it the Truth, or just a dressed-up Lie?</p>
-                                <button onClick={() => setTruthStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Read Again</button>
+                            <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
+                                <h3>🌟 Wisdom Added to Your Heart 🌟</h3>
+                                <button onClick={() => setTruthStep(0)} className="btn" style={{ marginTop: '1rem' }}>Read Again</button>
                             </div>
                         )}
                     </div>
