@@ -101,11 +101,11 @@ const History = ({ ageGroup }) => {
 
             // Apply profile specific settings
             if (voiceProfile === 'female') {
-                utterance.pitch = 1.1; // Soft, slightly higher
-                utterance.rate = 0.95; // Slightly slower
+                utterance.pitch = 0.95; // Softer, lower pitch
+                utterance.rate = 0.9;  // Relaxed pace
             } else if (voiceProfile === 'male') {
-                utterance.pitch = 0.95; // Tender, slightly lower
-                utterance.rate = 0.9; // Calm, teacher-like pace
+                utterance.pitch = 0.8;  // Deeper, resonant like Burna/Kendrick
+                utterance.rate = 0.85; // Cool, laid-back flow
             }
         }
 
@@ -322,14 +322,14 @@ const History = ({ ageGroup }) => {
                             className={`btn ${voiceProfile === 'female' ? 'btn-primary' : 'btn-outline'}`}
                             style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
                         >
-                            👩 Soft African
+                            👩 Soft Queen
                         </button>
                         <button
                             onClick={() => setVoiceProfile('male')}
                             className={`btn ${voiceProfile === 'male' ? 'btn-primary' : 'btn-outline'}`}
                             style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
                         >
-                            👨 African Teacher
+                            🎙️ Vibe (Burna Style)
                         </button>
                         <button
                             onClick={() => setVoiceProfile('custom')}
