@@ -13,10 +13,19 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     const [showAgeModal, setShowAgeModal] = useState(!ageGroup);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [hasShownAuthPrompt, setHasShownAuthPrompt] = useState(false);
 
     const handleAgeSelect = (group) => {
         setAgeGroup(group);
         setShowAgeModal(false);
+
+        // After age selection, prompt for login/signup if not already logged in
+        if (!user && !hasShownAuthPrompt) {
+            setTimeout(() => {
+                setShowAuthModal(true);
+                setHasShownAuthPrompt(true);
+            }, 500); // Small delay for smooth transition
+        }
     };
 
     const pillars = [
