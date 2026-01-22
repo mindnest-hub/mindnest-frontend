@@ -66,10 +66,10 @@ function App() {
               <Route path="/history" element={<History ageGroup={ageGroup} />} />
               <Route path="/finance" element={<Finance ageGroup={ageGroup} />} />
               <Route path="/critical-thinking" element={<CriticalThinking ageGroup={ageGroup} />} />
-              <Route path="/agri" element={<Agripreneurship />} />
-              <Route path="/tech" element={<Tech />} />
-              <Route path="/civics" element={<Civics />} />
-              <Route path="/health" element={<Health />} />
+              <Route path="/agri" element={<Agripreneurship ageGroup={ageGroup} />} />
+              <Route path="/tech" element={<Tech ageGroup={ageGroup} />} />
+              <Route path="/civics" element={<Civics ageGroup={ageGroup} />} />
+              <Route path="/health" element={<Health ageGroup={ageGroup} />} />
               <Route path="/transparency" element={<Transparency />} />
             </Routes>
           </Suspense>
