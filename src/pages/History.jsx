@@ -14,6 +14,8 @@ const History = ({ ageGroup }) => {
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
     const isAdult = !isKid && !isTeen;
 
+    const knowledgeDuration = isKid ? 5000 : isTeen ? 3500 : 3000;
+
     const [expandedEvent, setExpandedEvent] = useState(null);
 
     // --- RESOURCE GAME STATE ---
@@ -171,7 +173,7 @@ const History = ({ ageGroup }) => {
             setWrongAttempts(0); // Reset attempts on correct answer
             // Reward: ₦100 per correct answer
             addEarnings('history', 100);
-            showToast(`Correct! 🎉\n\nDid you know? ${currentQuestion.fact}\n\n(+₦100)`, 'success', 8000);
+            showToast(`Correct! 🎉\n\nDid you know? ${currentQuestion.fact}\n\n(+₦100)`, 'success', knowledgeDuration);
         } else {
             const newAttempts = wrongAttempts + 1;
             setWrongAttempts(newAttempts);
