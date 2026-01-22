@@ -50,32 +50,39 @@ const History = ({ ageGroup }) => {
 
     const findVoice = (profile) => {
         const voices = window.speechSynthesis.getVoices();
-
-        // Locales often associated with African countries or patterns
-        const africanLocales = ['en-NG', 'en-ZA', 'en-KE', 'en-GH', 'en-TZ'];
+        if (voices.length === 0) return null;
 
         if (profile === 'custom' && customVoiceURI) {
-            return voices.find(v => v.voiceURI === customVoiceURI);
+            return voices.find(v => v.voiceURI === customVoiceURI) || voices[0];
         }
 
-        let filtered = voices.filter(v =>
-            africanLocales.some(locale => v.lang.includes(locale)) ||
-            v.name.toLowerCase().includes('nigeria') ||
-            v.name.toLowerCase().includes('south africa') ||
-            v.name.toLowerCase().includes('kenya')
-        );
+        // African Locales
+        const africanLocales = ['en-NG', 'en-ZA', 'en-KE', 'en-GH', 'en-TZ'];
 
-        // Fallback to en-GB if no African voice found
-        if (filtered.length === 0) {
-            filtered = voices.filter(v => v.lang.includes('en-GB') || v.lang.includes('en-US'));
-        }
+        // Define common Male/Female voice markers for best effort gender matching
+        const femaleMarkers = ['female', 'zira', 'samantha', 'victoria', 'heera', 'google uk english female', 'hazel', 'susan'];
+        const maleMarkers = ['male', 'david', 'mark', 'george', 'google uk english male', 'james', 'ravi'];
 
-        if (profile === 'female') {
-            return filtered.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('google uk english female')) || filtered[0];
-        } else if (profile === 'male') {
-            return filtered.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('google uk english male')) || filtered[0];
-        }
+        const isMatch = (voice, type) => {
+            const name = voice.name.toLowerCase();
+            if (type === 'female') return femaleMarkers.some(m => name.includes(m));
+            if (type === 'male') return maleMarkers.some(m => name.includes(m));
+            return false;
+        };
 
+        // Priority 1: African Voice + Matching Gender
+        let match = voices.find(v => (africanLocales.some(l => v.lang.includes(l)) || v.name.toLowerCase().includes('nigeria') || v.name.toLowerCase().includes('kenya') || v.name.toLowerCase().includes('south africa')) && isMatch(v, profile));
+        if (match) return match;
+
+        // Priority 2: Any English Voice + Matching Gender
+        match = voices.find(v => v.lang.startsWith('en') && isMatch(v, profile));
+        if (match) return match;
+
+        // Priority 3: Any Voice that might match gender
+        match = voices.find(v => isMatch(v, profile));
+        if (match) return match;
+
+        // Fallback: Just get the first available if nothing specific found
         return voices[0];
     };
 
@@ -356,6 +363,9 @@ const History = ({ ageGroup }) => {
                         </select>
                     )}
                 </div>
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
+                    Active Voice: {findVoice(voiceProfile)?.name || 'Default Browser Voice'}
+                </p>
             </header>
 
             <div style={{
