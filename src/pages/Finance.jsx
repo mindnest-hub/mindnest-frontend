@@ -1164,7 +1164,7 @@ const Finance = ({ ageGroup }) => {
           <p><strong>Stage {debtStage + 1}/3:</strong> {debtStages[debtStage].title}</p>
           <p>Sharpen your sword! Slash <strong>{debtStages[debtStage].target === 'bad' ? 'BAD DEBT' : 'BAD DEBT'}</strong>.</p>
 
-          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
             {debtStages[debtStage].items.map((item, idx) => (
               <button
                 key={idx}
@@ -1217,7 +1217,7 @@ const Finance = ({ ageGroup }) => {
             </div>
           </div>
 
-          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
             {rainStages[rainStage].options.map((opt, idx) => (
               <button
                 key={idx}
@@ -1261,7 +1261,7 @@ const Finance = ({ ageGroup }) => {
             border: '2px solid #00C851', borderRadius: '10px', overflow: 'hidden', padding: '1rem',
             backgroundColor: '#222', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem'
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
               {assetStages[assetStage].items.map((item, idx) => (
                 <button
                   key={idx}
@@ -1380,22 +1380,22 @@ const Finance = ({ ageGroup }) => {
           )}
 
           {/* PORTFOLIO DISPLAY */}
-          <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', marginBottom: '1rem' }}>
+          <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', marginBottom: '1rem', border: '1px solid #444' }}>
             <h4 style={{ margin: '0 0 1rem 0', color: '#FFD700' }}>💼 Your Portfolio</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-              <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px' }}>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', flex: '1 1 120px' }}>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Cash</p>
-                <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>₦{Math.round(portfolio.cash)}</p>
+                <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>₦{Math.round(portfolio.cash)}</p>
               </div>
-              <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px' }}>
+              <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', flex: '1 1 120px' }}>
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Total Value</p>
-                <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#00C851' }}>
+                <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: '#00C851' }}>
                   ₦{Math.round(portfolio.cash + (portfolio.bitcoin * prices.bitcoin) + (portfolio.ethereum * prices.ethereum) + (portfolio.stocks * prices.stocks))}
                 </p>
               </div>
             </div>
             <p style={{ fontSize: '0.8rem', color: '#aaa', textAlign: 'center' }}>
-              Target: ₦{cryptoStages[cryptoStage].target}
+              Target to Pass: ₦{cryptoStages[cryptoStage].target}
             </p>
           </div>
 
@@ -1508,14 +1508,14 @@ const Finance = ({ ageGroup }) => {
         ← Back to Hub
       </button>
 
-      <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '3rem', color: 'var(--color-primary)' }}>
+      <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '800px', margin: '0 auto 3rem auto' }}>
+        <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
           {isKid || isTeen ? "Path to Wealth 🚀" : "Financial Literacy 💰"}
         </h1>
-        <p style={{ fontSize: '1.5rem', color: 'var(--color-text-muted)' }}>
+        <p style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', color: 'var(--color-text-muted)' }}>
           {isKid || isTeen ? "Level Up & Earn Real Cash!" : "Master the Rules of Money"}
         </p>
-        <div style={{ display: 'inline-block', padding: '0.5rem 1rem', border: '1px solid var(--color-primary)', borderRadius: '20px', marginTop: '1rem', color: 'var(--color-primary)' }}>
+        <div style={{ display: 'inline-block', padding: '0.4rem 1rem', border: '1px solid var(--color-primary)', borderRadius: '20px', marginTop: '1rem', color: 'var(--color-primary)', fontSize: '0.9rem' }}>
           Mode: {ageGroup || 'Adults'}
         </div>
       </header>
@@ -1540,10 +1540,10 @@ const Finance = ({ ageGroup }) => {
             </div>
 
             {showGoalInput ? (
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                <input type="text" placeholder="Goal (e.g. Bicycle)" value={dreamGoal} onChange={(e) => setDreamGoal(e.target.value)} style={{ flex: 2, padding: '0.5rem', borderRadius: '5px' }} />
-                <input type="number" placeholder="Cost (₦)" value={dreamCost} onChange={(e) => setDreamCost(Number(e.target.value))} style={{ flex: 1, padding: '0.5rem', borderRadius: '5px' }} />
-                <button onClick={() => setShowGoalInput(false)} className="btn btn-sm" style={{ backgroundColor: '#00C851' }}>Save</button>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                <input type="text" placeholder="Goal (e.g. Bicycle)" value={dreamGoal} onChange={(e) => setDreamGoal(e.target.value)} style={{ flex: '1 1 200px', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#333', color: 'white', border: '1px solid #444' }} />
+                <input type="number" placeholder="Cost (₦)" value={dreamCost} onChange={(e) => setDreamCost(Number(e.target.value))} style={{ flex: '1 1 120px', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#333', color: 'white', border: '1px solid #444' }} />
+                <button onClick={() => setShowGoalInput(false)} className="btn btn-primary" style={{ flex: '1 1 100%', padding: '0.8rem' }}>Save Goal</button>
               </div>
             ) : (
               <div style={{ textAlign: 'center' }}>
@@ -1584,8 +1584,9 @@ const Finance = ({ ageGroup }) => {
           {/* WALLET CARD */}
           <div style={{
             background: 'linear-gradient(135deg, #00C851 0%, #007E33 100%)',
-            padding: '1.5rem', borderRadius: '20px', color: 'white', marginBottom: '2rem',
-            boxShadow: '0 10px 20px rgba(0,200,81,0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+            padding: '2rem', borderRadius: '24px', color: 'white', marginBottom: '2rem',
+            boxShadow: '0 10px 30px rgba(0,200,81,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            flexWrap: 'wrap', gap: '1.5rem'
           }}>
             <div>
               <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Finance Wallet Balance</p>
@@ -1858,7 +1859,7 @@ const Finance = ({ ageGroup }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
           {/* FINANCIAL TOOLS SECTION */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div className="grid-cols">
             {/* LOAN CALCULATOR */}
             <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', border: '1px solid #444' }}>
               <h3 style={{ color: '#FFBB33', marginTop: 0 }}>🏦 Loan Calculator</h3>
@@ -1877,7 +1878,12 @@ const Finance = ({ ageGroup }) => {
                 >
                   Calculate Payment
                 </button>
-                {loanPayment && <p style={{ color: 'white', fontWeight: 'bold' }}>Monthly: ₦{Number(loanPayment).toLocaleString()}</p>}
+                {loanPayment && (
+                  <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'rgba(255, 187, 51, 0.1)', borderRadius: '10px', border: '1px solid rgba(255, 187, 51, 0.3)' }}>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Monthly Payment</p>
+                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#FFBB33' }}>₦{Number(loanPayment).toLocaleString()}</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1936,10 +1942,10 @@ const Finance = ({ ageGroup }) => {
           </div>
 
           {/* BEGINNER SECTION (Foundations) */}
-          <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '15px', border: '1px solid #444' }}>
-            <h2 style={{ color: '#FFBB33', borderBottom: '1px solid #444', paddingBottom: '0.5rem', marginTop: 0 }}>🔰 Financial Foundations (The Basics)</h2>
-            <p style={{ color: '#aaa', marginBottom: '1rem' }}>New to finance? Start here to build a solid understanding.</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+          <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '24px', border: '1px solid var(--color-border)' }}>
+            <h2 style={{ color: '#FFBB33', borderBottom: '1px solid #333', paddingBottom: '0.75rem', marginTop: 0 }}>🔰 Financial Foundations</h2>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>New to finance? Start here to build a solid understanding.</p>
+            <div className="grid-cols">
               {modules.slice(0, 6).map((module) => (
                 <div key={module.id} className="card" style={{ padding: '1rem', borderLeft: '4px solid #FFBB33' }}>
                   <h4 style={{ color: '#FFBB33', margin: '0 0 0.5rem 0' }}>{module.title}</h4>
@@ -1961,23 +1967,23 @@ const Finance = ({ ageGroup }) => {
           </div>
 
           {/* ADULT MODULES LIST (Advanced) */}
-          <div style={{ marginTop: '2rem' }}>
-            <h2 style={{ color: '#00C851', borderBottom: '1px solid #444', paddingBottom: '0.5rem' }}>🎓 Advanced Curriculum</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ marginTop: '3rem' }}>
+            <h2 style={{ color: '#00C851', borderBottom: '1px solid #333', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>🎓 Advanced Curriculum</h2>
+            <div className="grid-cols">
               {[
-                { id: 1, title: "Inflation Hedging 🛡️", desc: "Protecting against currency devaluation.", content: "Store value in assets like Real Estate, Gold, or Foreign Currency (Stablecoins) to beat inflation." },
-                { id: 2, title: "Emergency Funds 🚑", desc: "3-6 months of expenses.", content: "Keep this in a liquid, low-risk account (like a High-Yield Savings Account) for unexpected life events." },
-                { id: 3, title: "Debt Management 💳", desc: "Snowball vs Avalanche method.", content: "Snowball: Pay smallest debts first for momentum. Avalanche: Pay highest interest first for savings." },
-                { id: 4, title: "Estate Planning 📜", desc: "Wills and Trusts.", content: "Protect your legacy. Ensure your assets go to your loved ones without legal battles." },
-                { id: 5, title: "Retirement Savings Account (RSA) 🇳🇬", desc: "Pension Reform Act.", content: "Ensure your employer is remitting your pension. You can also make voluntary contributions." },
-                { id: 6, title: "Investment Diversification 📊", desc: "Don't put all eggs in one basket.", content: "Spread risk across sectors: Agriculture, Tech, Real Estate, and Bonds." },
-                { id: 7, title: "Taxation 101 🏛️", desc: "PAYE, VAT, and CIT.", content: "Know your obligations: PAYE (Income Tax), VAT (Consumption Tax 7.5%), and CIT (Company Income Tax for businesses)." },
-                { id: 8, title: "Risk Management ⚠️", desc: "Mitigating financial risks.", content: "Insurance, Emergency Funds, and Diversification are key to sleeping well at night." }
+                { id: 1, title: "Inflation Hedging 🛡️", desc: "Protecting against devaluation.", content: "Store value in assets like Real Estate, Gold, or Stablecoins to beat inflation." },
+                { id: 2, title: "Emergency Funds 🚑", desc: "3-6 months of expenses.", content: "Keep this in a liquid account (like a Savings Account) for unexpected events." },
+                { id: 3, title: "Debt Management 💳", desc: "Snowball vs Avalanche.", content: "Snowball: Smallest debts first. Avalanche: Highest interest first." },
+                { id: 4, title: "Estate Planning 📜", desc: "Wills and Trusts.", content: "Protect your legacy. Ensure your assets go to loved ones without legal battles." },
+                { id: 5, title: "Retirement Savings Account 🇳🇬", desc: "Pension Reform.", content: "Ensure employer remissions. You can also make voluntary contributions." },
+                { id: 6, title: "Diversification 📊", desc: "Risk Management.", content: "Spread risk across Agriculture, Tech, Real Estate, and Bonds." },
+                { id: 7, title: "Taxation 101 🏛️", desc: "PAYE, VAT, and CIT.", content: "Value Added Tax (7.5%) and Company Income Tax are key for builders." },
+                { id: 8, title: "Risk Mitigation ⚠️", desc: "Financial Safety.", content: "Insurance and Emergency Funds are key to sleeping well at night." }
               ].map((module) => (
-                <div key={module.id} className="card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--color-primary)' }}>
-                  <h3 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>{module.title}</h3>
-                  <p style={{ color: '#aaa', marginBottom: '1rem', fontStyle: 'italic' }}>{module.desc}</p>
-                  <p>{module.content}</p>
+                <div key={module.id} className="card" style={{ padding: '1.5rem', borderLeft: '4px solid #00C851', height: '100%', minHeight: '200px' }}>
+                  <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>{module.title}</h4>
+                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1rem', fontStyle: 'italic' }}>{module.desc}</p>
+                  <p style={{ fontSize: '0.9rem' }}>{module.content}</p>
                 </div>
               ))}
             </div>
