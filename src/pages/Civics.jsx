@@ -111,18 +111,18 @@ const Civics = () => {
                 ← Back to Hub
             </button>
 
-            <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '3rem', color: '#9C27B0' }}>Community Leader 👑</h1>
-                <p style={{ fontSize: '1.5rem', color: 'var(--color-text-muted)' }}>
+            <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '800px', margin: '0 auto 3rem auto' }}>
+                <h1 style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', color: '#9C27B0', marginBottom: '0.5rem' }}>Community Leader 👑</h1>
+                <p style={{ fontSize: 'clamp(1rem, 4vw, 1.3rem)', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
                     Lead with wisdom. Balance the needs of your people.
                 </p>
             </header>
 
             {/* STATS BAR */}
             <div style={{
-                display: 'flex', justifyContent: 'space-around', padding: '1rem',
-                backgroundColor: '#333', borderRadius: '15px', marginBottom: '2rem',
-                border: '2px solid #9C27B0'
+                display: 'flex', justifyContent: 'space-around', padding: '1.5rem',
+                backgroundColor: '#1E1E1E', borderRadius: '24px', marginBottom: '2rem',
+                border: '1px solid #9C27B0', flexWrap: 'wrap', gap: '1.5rem'
             }}>
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '2rem' }}>😊 {happiness}%</div>
@@ -146,7 +146,7 @@ const Civics = () => {
 
                     {gameMessage && <p style={{ color: '#FFD700', fontWeight: 'bold', marginBottom: '2rem', minHeight: '1.5rem' }}>{gameMessage}</p>}
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                         {scenarios[currentScenario].options.map((opt, idx) => (
                             <button
                                 key={idx}
@@ -155,11 +155,12 @@ const Civics = () => {
                                 style={{
                                     backgroundColor: '#4a148c',
                                     padding: '1.5rem',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                                    minHeight: '120px', justifyContent: 'center'
                                 }}
                             >
-                                <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{opt.text}</span>
-                                <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                                <span style={{ fontSize: '1rem', fontWeight: 'bold' }}>{opt.text}</span>
+                                <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>
                                     {opt.happy >= 0 ? `+${opt.happy} 😊` : `${opt.happy} 😞`}
                                 </span>
                             </button>

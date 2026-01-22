@@ -465,13 +465,13 @@ const Tech = () => {
         <div className="card" style={{ marginBottom: '2rem', border: '1px solid #666' }}>
           <h3>Multi-Factor Authentication (MFA) 📱</h3>
           <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>A password is not enough. You need multiple keys for your house.</p>
-          <div style={{ display: 'flex', gap: '15px' }}>
-            <div style={{ flex: 1, padding: '1rem', backgroundColor: '#2a2a2a', borderRadius: '8px', borderLeft: '4px solid #2196F3' }}>
-              <span style={{ display: 'block', fontSize: '1.2rem', marginBottom: '5px' }}>🔑 Something you know</span>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 200px', padding: '1rem', backgroundColor: '#2a2a2a', borderRadius: '8px', borderLeft: '4px solid #2196F3' }}>
+              <span style={{ display: 'block', fontSize: '1.1rem', marginBottom: '5px' }}>🔑 Something you know</span>
               <p style={{ fontSize: '0.8rem', color: '#888' }}>Standard passwords or PINs.</p>
             </div>
-            <div style={{ flex: 1, padding: '1rem', backgroundColor: '#2a2a2a', borderRadius: '8px', borderLeft: '4px solid #00C851' }}>
-              <span style={{ display: 'block', fontSize: '1.2rem', marginBottom: '5px' }}>📱 Something you have</span>
+            <div style={{ flex: '1 1 200px', padding: '1rem', backgroundColor: '#2a2a2a', borderRadius: '8px', borderLeft: '4px solid #00C851' }}>
+              <span style={{ display: 'block', fontSize: '1.1rem', marginBottom: '5px' }}>📱 Something you have</span>
               <p style={{ fontSize: '0.8rem', color: '#888' }}>Auth apps or SMS codes.</p>
             </div>
           </div>
@@ -538,9 +538,9 @@ const Tech = () => {
 
       {/* Shared Trainer */}
       <div style={{ fontSize: '8rem', marginBottom: '2rem' }}>{currentImage.emoji}</div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem' }}>
-        <button className="btn" style={{ backgroundColor: '#FF4500' }} onClick={() => handleTrain('wild')}>Wild / Unstructured 🦁</button>
-        <button className="btn" style={{ backgroundColor: '#00C851' }} onClick={() => handleTrain('domestic')}>Domestic / Labeled 🏠</button>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+        <button className="btn" style={{ flex: '1 1 180px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('wild')}>Wild / Unstructured 🦁</button>
+        <button className="btn" style={{ flex: '1 1 180px', backgroundColor: '#00C851' }} onClick={() => handleTrain('domestic')}>Domestic / Labeled 🏠</button>
       </div>
       <h3>{aiMessage}</h3>
 
@@ -737,11 +737,11 @@ const Tech = () => {
               ? 'GitHub and LinkedIn are your new resume. Start contributing to open source today.'
               : 'Upwork and Fiverr allow you to compete globally. Learn how to bid and win high-paying contracts.'}
           </p>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button className="btn btn-sm" style={{ flex: 1, backgroundColor: '#333' }} onClick={() => completeLesson('career-strategy', 40)}>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <button className="btn btn-sm" style={{ flex: '1 1 150px', backgroundColor: '#333' }} onClick={() => completeLesson('career-strategy', 40)}>
               {isTeen ? 'Setup GitHub' : 'Optimize Profile'}
             </button>
-            <button className="btn btn-sm" style={{ flex: 1, backgroundColor: '#333' }} onClick={() => completeLesson('career-resume', 40)}>
+            <button className="btn btn-sm" style={{ flex: '1 1 150px', backgroundColor: '#333' }} onClick={() => completeLesson('career-resume', 40)}>
               {isTeen ? 'Write Dev Portfolio' : 'Bid Strategy'}
             </button>
           </div>
@@ -791,25 +791,25 @@ const Tech = () => {
         ← Back to Hub
       </button>
 
-      <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <h1 style={{ fontSize: isKid ? '3rem' : '2.5rem', color: 'var(--color-accent)', textTransform: isKid ? 'none' : 'uppercase', letterSpacing: isKid ? 'normal' : '2px' }}>
+      <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '900px', margin: '0 auto 3rem auto' }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 8vw, 2.5rem)', color: 'var(--color-accent)', textTransform: isKid ? 'none' : 'uppercase', letterSpacing: isKid ? 'normal' : '2px', lineHeight: 1.2 }}>
           {isKid ? 'Tech & Digital 💻' : 'Technical & Digital Ecosystem'}
         </h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)', maxWidth: '700px', margin: '0 auto' }}>
+        <p style={{ fontSize: 'clamp(1rem, 4vw, 1.2rem)', color: 'var(--color-text-muted)', maxWidth: '750px', margin: '1rem auto 2rem auto', lineHeight: 1.6 }}>
           {isKid ? 'Build Your Tech Career!' : isTeen ? 'Engineering the future with advanced technical skills.' : 'Harnessing technology for economic mobility and professional impact.'}
         </p>
 
-        <div style={{ maxWidth: '600px', margin: '2rem auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <span>Tech Points:</span>
-            <span style={{ color: '#FFD700', fontWeight: 'bold' }}>{techPoints}</span>
+        <div style={{ maxWidth: '500px', margin: '0 auto 2.5rem auto', padding: '1rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid var(--color-border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Tech Points:</span>
+            <span style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '1.2rem' }}>{techPoints}</span>
           </div>
-          <div style={{ fontSize: '0.9rem', color: '#aaa' }}>
-            Lessons: {completedLessons.length}
+          <div style={{ fontSize: '0.8rem', color: '#666', textAlign: 'left' }}>
+            Completed: {completedLessons.length} Modules
           </div>
         </div>
 
-        <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', padding: '0 0.5rem' }}>
           {[
             { id: 'coding', label: '💻 Coding', color: '#2196F3' },
             { id: 'cybersecurity', label: '🔒 Security', color: '#ff4444' },
@@ -819,7 +819,16 @@ const Tech = () => {
             { id: 'logic', label: '🧩 Logic', color: '#FFD700' },
             { id: 'careers', label: '💼 Careers', color: '#E91E63' },
           ].map(tab => (
-            <button key={tab.id} className="btn btn-sm" style={{ backgroundColor: activeTab === tab.id ? tab.color : 'transparent', border: `1px solid ${tab.color}`, color: activeTab === tab.id ? '#000' : tab.color }} onClick={() => setActiveTab(tab.id)}>
+            <button key={tab.id} className="btn" style={{
+              padding: '0.6rem 1.2rem',
+              fontSize: '0.85rem',
+              backgroundColor: activeTab === tab.id ? tab.color : 'rgba(255,255,255,0.02)',
+              border: `1.5px solid ${tab.color}`,
+              color: activeTab === tab.id ? '#000' : tab.color,
+              flex: '1 1 auto',
+              minWidth: '100px',
+              maxWidth: '150px'
+            }} onClick={() => setActiveTab(tab.id)}>
               {tab.label}
             </button>
           ))}

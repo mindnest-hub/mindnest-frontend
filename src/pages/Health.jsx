@@ -45,18 +45,18 @@ const Health = () => {
                 ← Back to Hub
             </button>
 
-            <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '3rem', color: '#00FF7F' }}>Health & Wellness 🌿</h1>
-                <p style={{ fontSize: '1.5rem', color: 'var(--color-text-muted)' }}>
+            <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '800px', margin: '0 auto 3rem auto' }}>
+                <h1 style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', color: '#00FF7F', marginBottom: '0.5rem' }}>Health & Wellness 🌿</h1>
+                <p style={{ fontSize: 'clamp(1rem, 4vw, 1.3rem)', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
                     A healthy body fuels a brilliant mind.
                 </p>
             </header>
 
             {/* TABS */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <button onClick={() => setActiveTab('mind')} className="btn" style={{ backgroundColor: activeTab === 'mind' ? '#00FF7F' : '#333', color: activeTab === 'mind' ? '#000' : '#fff' }}>Mind 🧘‍♂️</button>
-                <button onClick={() => setActiveTab('body')} className="btn" style={{ backgroundColor: activeTab === 'body' ? '#00FF7F' : '#333', color: activeTab === 'body' ? '#000' : '#fff' }}>Body 🥗</button>
-                <button onClick={() => setActiveTab('move')} className="btn" style={{ backgroundColor: activeTab === 'move' ? '#00FF7F' : '#333', color: activeTab === 'move' ? '#000' : '#fff' }}>Move 🏃‍♂️</button>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+                <button onClick={() => setActiveTab('mind')} className="btn" style={{ flex: '1 1 100px', backgroundColor: activeTab === 'mind' ? '#00FF7F' : '#1E1E1E', color: activeTab === 'mind' ? '#000' : '#fff', border: '1px solid #00FF7F' }}>Mind 🧘‍♂️</button>
+                <button onClick={() => setActiveTab('body')} className="btn" style={{ flex: '1 1 100px', backgroundColor: activeTab === 'body' ? '#00FF7F' : '#1E1E1E', color: activeTab === 'body' ? '#000' : '#fff', border: '1px solid #00FF7F' }}>Body 🥗</button>
+                <button onClick={() => setActiveTab('move')} className="btn" style={{ flex: '1 1 100px', backgroundColor: activeTab === 'move' ? '#00FF7F' : '#1E1E1E', color: activeTab === 'move' ? '#000' : '#fff', border: '1px solid #00FF7F' }}>Move 🏃‍♂️</button>
             </div>
 
             {/* CONTENT */}
@@ -81,9 +81,9 @@ const Health = () => {
 
                 {/* BODY SECTION */}
                 {activeTab === 'body' && (
-                    <div style={{ width: '100%' }}>
+                    <div style={{ width: '100%', padding: '0 0.5rem' }}>
                         <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>African Superfoods 🌍</h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1.5rem' }}>
                             {superfoods.map((food, idx) => (
                                 <div key={idx} style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', textAlign: 'center' }}>
                                     <h3 style={{ color: '#00FF7F' }}>{food.name}</h3>
