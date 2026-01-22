@@ -7,9 +7,8 @@ import { africanResources } from '../data/africanResources';
 
 const History = ({ ageGroup }) => {
     const navigate = useNavigate();
-    const { balance, moduleEarnings, addEarnings, deductPenalty, getModuleCap, MODULE_CAP: defaultCap } = useWallet();
-    // Use getModuleCap if available, otherwise fallback to defaultCap or hardcoded value
-    const MODULE_CAP = getModuleCap ? getModuleCap('history') : (defaultCap || 2200);
+    const { balance, moduleEarnings, addEarnings, deductPenalty, getModuleCap } = useWallet();
+    const MODULE_CAP = getModuleCap('history');
 
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
@@ -28,6 +27,7 @@ const History = ({ ageGroup }) => {
     const [wrongAttempts, setWrongAttempts] = useState(0);
 
     // Game Logic State
+    const [showGame, setShowGame] = useState(false);
     const [shuffledQuestions, setShuffledQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentQuestion, setCurrentQuestion] = useState(null);
