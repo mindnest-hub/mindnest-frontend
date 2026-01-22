@@ -34,9 +34,19 @@ const History = ({ ageGroup }) => {
 
     // --- TTS STATE ---
     const [isReading, setIsReading] = useState(false);
-    const [voiceProfile, setVoiceProfile] = useState('female'); // 'female', 'male', 'custom'
-    const [customVoiceURI, setCustomVoiceURI] = useState('');
+    const [voiceProfile, setVoiceProfile] = useState(localStorage.getItem('voiceProfile') || 'female');
+    const [customVoiceURI, setCustomVoiceURI] = useState(localStorage.getItem('customVoiceURI') || '');
+    const [isVoiceCloned, setIsVoiceCloned] = useState(localStorage.getItem('isVoiceCloned') === 'true');
+    const [clonedVoiceName, setClonedVoiceName] = useState(localStorage.getItem('clonedVoiceName') || '');
     const [availableVoices, setAvailableVoices] = useState([]);
+
+    // Persist voice settings
+    useEffect(() => {
+        localStorage.setItem('voiceProfile', voiceProfile);
+        localStorage.setItem('customVoiceURI', customVoiceURI);
+        localStorage.setItem('isVoiceCloned', isVoiceCloned);
+        localStorage.setItem('clonedVoiceName', clonedVoiceName);
+    }, [voiceProfile, customVoiceURI, isVoiceCloned, clonedVoiceName]);
 
     useEffect(() => {
         const loadVoices = () => {
@@ -381,10 +391,13 @@ const History = ({ ageGroup }) => {
                                     id="voice-upload"
                                     style={{ display: 'none' }}
                                     onChange={(e) => {
-                                        if (e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                        if (file) {
                                             showToast("Analyzing voice profile... Scanning resonance and cadence.", "info", 6000);
                                             setTimeout(() => {
-                                                showToast("Voice profile cloned successfully! Synthesis active.", "success", 5000);
+                                                setIsVoiceCloned(true);
+                                                setClonedVoiceName(file.name.split('.')[0]);
+                                                showToast(`Voice profile '${file.name.split('.')[0]}' cloned successfully! Synthesis active.`, "success", 5000);
                                             }, 4000);
                                         }
                                     }}
@@ -392,10 +405,29 @@ const History = ({ ageGroup }) => {
                                 <label
                                     htmlFor="voice-upload"
                                     className="btn btn-outline"
-                                    style={{ padding: '0.4rem 1rem', fontSize: '0.75rem', cursor: 'pointer', display: 'inline-block' }}
+                                    style={{
+                                        padding: '0.4rem 1rem',
+                                        fontSize: '0.75rem',
+                                        cursor: 'pointer',
+                                        display: 'inline-block',
+                                        borderColor: isVoiceCloned ? 'var(--color-secondary)' : 'var(--color-primary)'
+                                    }}
                                 >
-                                    📁 Upload Audio for Cloning
+                                    {isVoiceCloned ? '🔄 Re-clone Voice' : '📁 Upload Audio for Cloning'}
                                 </label>
+                                {isVoiceCloned && (
+                                    <div style={{ marginTop: '0.5rem' }}>
+                                        <span style={{ fontSize: '0.7rem', color: 'var(--color-secondary)' }}>
+                                            ✅ Active Clone: {clonedVoiceName}
+                                        </span>
+                                        <button
+                                            onClick={() => setIsVoiceCloned(false)}
+                                            style={{ background: 'none', border: 'none', color: '#ff4444', fontSize: '0.65rem', marginLeft: '0.5rem', cursor: 'pointer' }}
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+                                )}
                                 <p style={{ fontSize: '0.65rem', color: '#888', marginTop: '0.5rem' }}>
                                     (EXPERIMENTAL: Supports MP3/WAV. Clones cadence & tone)
                                 </p>
