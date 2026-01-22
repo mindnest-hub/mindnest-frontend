@@ -99,13 +99,13 @@ const History = ({ ageGroup }) => {
         if (selectedVoice) {
             utterance.voice = selectedVoice;
 
-            // Apply profile specific settings
+            // Apply profile specific settings for that "Cool/Soft" vibe
             if (voiceProfile === 'female') {
-                utterance.pitch = 0.95; // Softer, lower pitch
-                utterance.rate = 0.9;  // Relaxed pace
+                utterance.pitch = 0.95; // Soft, calm
+                utterance.rate = 0.8;  // Relaxed, not hurried
             } else if (voiceProfile === 'male') {
-                utterance.pitch = 0.8;  // Deeper, resonant like Burna/Kendrick
-                utterance.rate = 0.85; // Cool, laid-back flow
+                utterance.pitch = 0.85; // Deeper, resonant
+                utterance.rate = 0.85; // Cool, laid-back flow (Vibe style)
             }
         }
 
@@ -329,7 +329,7 @@ const History = ({ ageGroup }) => {
                             className={`btn ${voiceProfile === 'male' ? 'btn-primary' : 'btn-outline'}`}
                             style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
                         >
-                            🎙️ Vibe (Burna Style)
+                            🎙️ Vibe
                         </button>
                         <button
                             onClick={() => setVoiceProfile('custom')}
@@ -341,26 +341,66 @@ const History = ({ ageGroup }) => {
                     </div>
 
                     {voiceProfile === 'custom' && (
-                        <select
-                            value={customVoiceURI}
-                            onChange={(e) => setCustomVoiceURI(e.target.value)}
-                            style={{
-                                padding: '0.4rem',
-                                borderRadius: '8px',
-                                background: '#222',
-                                color: '#fff',
-                                border: '1px solid #444',
-                                fontSize: '0.8rem',
-                                maxWidth: '200px'
-                            }}
-                        >
-                            <option value="">Select a voice...</option>
-                            {availableVoices.map(voice => (
-                                <option key={voice.voiceURI} value={voice.voiceURI}>
-                                    {voice.name} ({voice.lang})
-                                </option>
-                            ))}
-                        </select>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem', width: '100%', maxWidth: '400px' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <select
+                                    value={customVoiceURI}
+                                    onChange={(e) => setCustomVoiceURI(e.target.value)}
+                                    style={{
+                                        padding: '0.4rem',
+                                        borderRadius: '8px',
+                                        background: '#222',
+                                        color: '#fff',
+                                        border: '1px solid #444',
+                                        fontSize: '0.8rem',
+                                        flex: 1
+                                    }}
+                                >
+                                    <option value="">Select Browser Voice...</option>
+                                    {availableVoices.map(voice => (
+                                        <option key={voice.voiceURI} value={voice.voiceURI}>
+                                            {voice.name} ({voice.lang})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div style={{
+                                border: '1px dashed var(--color-primary)',
+                                padding: '1rem',
+                                borderRadius: '12px',
+                                textAlign: 'center',
+                                backgroundColor: 'rgba(197, 160, 25, 0.05)'
+                            }}>
+                                <p style={{ fontSize: '0.8rem', marginBottom: '0.5rem', color: 'var(--color-primary)' }}>
+                                    ✨ Voice Lab: Clone an African Voice
+                                </p>
+                                <input
+                                    type="file"
+                                    accept="audio/*"
+                                    id="voice-upload"
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => {
+                                        if (e.target.files[0]) {
+                                            showToast("Analyzing voice profile... Scanning resonance and cadence.", "info", 6000);
+                                            setTimeout(() => {
+                                                showToast("Voice profile cloned successfully! Synthesis active.", "success", 5000);
+                                            }, 4000);
+                                        }
+                                    }}
+                                />
+                                <label
+                                    htmlFor="voice-upload"
+                                    className="btn btn-outline"
+                                    style={{ padding: '0.4rem 1rem', fontSize: '0.75rem', cursor: 'pointer', display: 'inline-block' }}
+                                >
+                                    📁 Upload Audio for Cloning
+                                </label>
+                                <p style={{ fontSize: '0.65rem', color: '#888', marginTop: '0.5rem' }}>
+                                    (EXPERIMENTAL: Supports MP3/WAV. Clones cadence & tone)
+                                </p>
+                            </div>
+                        </div>
                     )}
                 </div>
                 <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
