@@ -20,80 +20,109 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     };
 
     const pillars = [
-        { id: 1, title: 'True History', icon: '🌍', desc: 'The Untold Stories', path: '/history', color: 'var(--color-primary)' },
-        { id: 2, title: 'Financial Literacy', icon: '💰', desc: 'Wealth Builder', path: '/finance', color: '#00FF7F' },
-        { id: 3, title: 'Critical Thinking', icon: '🧠', desc: 'Mancala Logic', path: '/critical-thinking', color: '#FF4500' },
-        { id: 4, title: 'Agripreneurship', icon: '🌱', desc: 'Smart Farm', path: '/agri', color: '#32CD32' },
-        { id: 5, title: 'Tech & Digital', icon: '💻', desc: 'Code the Future', path: '/tech', color: '#00BFFF' },
-        { id: 6, title: 'Civics & Leadership', icon: '⚖️', desc: 'Rights & Duties', path: '/civics', color: '#FFD700' },
-        { id: 7, title: 'Health & Wellness', icon: '🌿', desc: 'Body & Mind', path: '/health', color: '#FF69B4' },
+        { id: 1, title: 'True History', icon: '🌍', desc: 'Discover the untold stories of Great African Civilizations.', path: '/history', color: '#B8860B' },
+        { id: 2, title: 'Finance & Wealth', icon: '💰', desc: 'Master the principles of wealth building and money management.', path: '/finance', color: '#00A86B' },
+        { id: 3, title: 'Critical Thinking', icon: '🧠', desc: 'Sharpen your logic with ancient games and modern puzzles.', path: '/critical-thinking', color: '#CD5C5C' },
+        { id: 4, title: 'Agripreneurship', icon: '🌱', desc: 'Bridge agriculture with business for a sustainable future.', path: '/agri', color: '#2E8B57' },
+        { id: 5, title: 'Tech & Innovation', icon: '💻', desc: 'Learn the skills needed to build the digital future.', path: '/tech', color: '#4682B4' },
+        { id: 6, title: 'Civics & Leadership', icon: '⚖️', desc: 'Understand your roles and lead with integrity.', path: '/civics', color: '#DAA520' },
+        { id: 7, title: 'Health & Wellness', icon: '🌿', desc: 'Holistic approaches to a strong body and clear mind.', path: '/health', color: '#DB7093' },
     ];
 
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingBottom: '4rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
             <LiveNotifications />
             <DailyBonus />
             {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
             {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
             {showAgeModal && <AgeSelector onSelect={handleAgeSelect} />}
 
-            <header style={{ textAlign: 'center', marginBottom: '4rem', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: 0, right: 0 }}>
+            {/* Navigation Header */}
+            <nav style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '1.5rem 0',
+                marginBottom: '2rem',
+                borderBottom: '1px solid var(--color-border)',
+                flexWrap: 'wrap',
+                gap: '1rem'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        background: 'var(--color-primary)',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.2rem'
+                    }}>🛡️</div>
+                    <span style={{
+                        fontSize: '1.5rem',
+                        fontWeight: '700',
+                        fontFamily: 'var(--font-heading)',
+                        background: 'linear-gradient(to right, #fff, var(--color-primary))',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>MindNest</span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <button onClick={() => setShowLeaderboard(true)} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
+                        🏆 Leaderboard
+                    </button>
                     {user ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <span style={{ color: 'var(--color-accent)' }}>Hi, {user.username}</span>
-                            <button onClick={logout} style={{ background: 'none', border: '1px solid var(--color-text-muted)', color: 'var(--color-text-muted)', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', cursor: 'pointer' }}>Logout</button>
+                            <div style={{ textAlign: 'right', display: 'none' }}>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Welcome,</div>
+                                <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{user.username}</div>
+                            </div>
+                            <button onClick={logout} className="btn-outline" style={{
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.8rem',
+                                borderRadius: '8px',
+                                border: '1px solid var(--color-border)'
+                            }}>Logout</button>
                         </div>
                     ) : (
-                        <button onClick={() => setShowAuthModal(true)} style={{ background: 'var(--color-primary)', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '0.5rem', cursor: 'pointer' }}>Login / Sign Up</button>
+                        <button onClick={() => setShowAuthModal(true)} className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.9rem' }}>
+                            Sign In
+                        </button>
                     )}
                 </div>
-                <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', background: 'linear-gradient(to right, var(--color-primary), var(--color-accent))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                    MindNest
+            </nav>
+
+            <header style={{ textAlign: 'center', marginBottom: '4rem', marginTop: '2rem' }}>
+                <h1 style={{ fontSize: '3.5rem', fontWeight: '800', lineHeight: '1.1' }}>
+                    Reclaiming our past.<br />
+                    <span style={{ color: 'var(--color-primary)' }}>Building our future.</span>
                 </h1>
-                <p style={{ fontSize: '1.5rem', color: 'var(--color-text-muted)', maxWidth: '600px', margin: '0 auto' }}>
+                <p style={{
+                    fontSize: '1.25rem',
+                    color: 'var(--color-text-muted)',
+                    maxWidth: '700px',
+                    margin: '1.5rem auto 2.5rem'
+                }}>
                     {ageGroup === 'adults'
-                        ? 'Make a bond with yourself to learn, grow, and never settle for misinformation'
-                        : 'Your bond with knowledge starts here. Welcome to MindNest'}
+                        ? 'Make a bond with yourself to learn, grow, and never settle for misinformation. Access premium modules for professionals.'
+                        : 'Your journey into history, wealth, and technology starts here. Welcome to the Nest of Minds.'}
                 </p>
-                <p style={{ fontSize: '1rem', color: 'var(--color-primary)', marginTop: '1rem', fontStyle: 'italic' }}>
-                    Reclaiming our past. Building our future.
-                </p>
+
                 {ageGroup && (
-                    <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '1rem', alignItems: 'center' }}>
-                        <div style={{ color: 'var(--color-primary)', border: '1px solid var(--color-primary)', padding: '0.5rem 1rem', borderRadius: '20px' }}>
-                            Mode: {ageGroup}
-                            <button
-                                onClick={() => setShowAgeModal(true)}
-                                style={{
-                                    marginLeft: '1rem',
-                                    background: 'none',
-                                    border: 'none',
-                                    color: 'var(--color-accent)',
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline',
-                                    fontSize: '0.9rem'
-                                }}
-                            >
-                                (Change)
-                            </button>
-                        </div>
-                        <button
-                            onClick={() => setShowLeaderboard(true)}
-                            style={{
-                                background: 'var(--color-surface)',
-                                border: '1px solid var(--color-accent)',
-                                color: 'var(--color-accent)',
-                                padding: '0.5rem 1rem',
-                                borderRadius: '20px',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}
-                        >
-                            🏆 Leaderboard
-                        </button>
+                    <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        background: 'rgba(255,255,255,0.03)',
+                        padding: '0.5rem 1.25rem',
+                        borderRadius: '100px',
+                        border: '1px solid var(--color-border)'
+                    }}>
+                        <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Learning as:</span>
+                        <span style={{ fontWeight: '600', textTransform: 'capitalize', color: 'var(--color-primary)' }}>{ageGroup}</span>
+                        <button onClick={() => setShowAgeModal(true)} style={{ color: 'var(--color-accent)', fontSize: '0.8rem', marginLeft: '0.5rem' }}>Change</button>
                     </div>
                 )}
             </header>
@@ -104,22 +133,24 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                 gap: '2rem'
             }}>
                 {pillars.map((pillar) => (
-                    <div key={pillar.id} className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderTop: `4px solid ${pillar.color}` }}>
-                        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>{pillar.icon}</div>
-                        <h2 style={{ marginBottom: '0.5rem', color: pillar.color }}>{pillar.title}</h2>
-                        <p style={{ marginBottom: '2rem', color: 'var(--color-text-muted)' }}>{pillar.desc}</p>
+                    <div key={pillar.id} className="card animate-fade" style={{ borderTop: `4px solid ${pillar.color}` }}>
+                        <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>{pillar.icon}</div>
+                        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.8rem' }}>{pillar.title}</h2>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginBottom: '2rem' }}>{pillar.desc}</p>
                         <button
-                            className="btn"
-                            style={{ marginTop: 'auto', width: '100%', backgroundColor: '#333', color: '#fff', border: `1px solid ${pillar.color}` }}
+                            className="btn btn-outline"
+                            style={{ marginTop: 'auto', width: '100%' }}
                             onClick={() => navigate(pillar.path)}
-                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = pillar.color; e.currentTarget.style.color = '#000'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#333'; e.currentTarget.style.color = '#fff'; }}
                         >
-                            Explore
+                            Start Learning
                         </button>
                     </div>
                 ))}
             </div>
+
+            <footer style={{ marginTop: '8rem', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+                &copy; {new Date().getFullYear()} MindNest Education. For the people, by the people.
+            </footer>
         </div>
     );
 };

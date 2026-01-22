@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
 import ResourceList from '../components/ResourceList';
 import { useWallet } from '../hooks/useWallet';
 import { africanResources } from '../data/africanResources';
@@ -18,7 +19,12 @@ const History = ({ ageGroup }) => {
 
     // --- RESOURCE GAME STATE ---
     const [gameScore, setGameScore] = useState(0);
-    const [showGame, setShowGame] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
     const [wrongAttempts, setWrongAttempts] = useState(0);
 
     // Game Logic State
@@ -104,8 +110,8 @@ const History = ({ ageGroup }) => {
             setGameScore(prev => prev + 1);
             setWrongAttempts(0); // Reset attempts on correct answer
             // Reward: ₦100 per correct answer
-            const result = addEarnings('history', 100);
-            alert(`Correct! 🎉\n\nDid you know? ${currentQuestion.fact}\n\n(+₦100)`);
+            addEarnings('history', 100);
+            showToast(`Correct! 🎉\n\nDid you know? ${currentQuestion.fact}\n\n(+₦100)`, 'success');
         } else {
             const newAttempts = wrongAttempts + 1;
             setWrongAttempts(newAttempts);
@@ -113,9 +119,9 @@ const History = ({ ageGroup }) => {
             if (newAttempts >= 3) {
                 deductPenalty('history', 100);
                 setWrongAttempts(0);
-                alert(`⚠️ 3 Wrong Attempts! A penalty of ₦100 has been deducted from your History wallet.\n\nCorrect Answer: ${currentQuestion.correct}\nFact: ${currentQuestion.fact}`);
+                showToast(`⚠️ 3 Wrong Attempts! A penalty of ₦100 has been deducted from your History wallet.\n\nCorrect Answer: ${currentQuestion.correct}\nFact: ${currentQuestion.fact}`, 'error');
             } else {
-                alert(`Oops! ${currentQuestion.resource} is found in ${currentQuestion.correct}.\n\nFact: ${currentQuestion.fact}\n\n(Warning: ${newAttempts}/3 wrong attempts)`);
+                showToast(`Oops! ${currentQuestion.resource} is found in ${currentQuestion.correct}.\nFact: ${currentQuestion.fact}\n(Warning: ${newAttempts}/3 wrong attempts)`, 'warning');
             }
         }
 
@@ -126,7 +132,7 @@ const History = ({ ageGroup }) => {
             setCurrentIndex(nextIndex);
             generateQuestion(shuffledQuestions[nextIndex]);
         } else {
-            alert(`Game Over! You've toured all of Africa! 🌍\nFinal Score: ${gameScore + (isCorrect ? 1 : 0)}/${shuffledQuestions.length}`);
+            showToast(`Game Over! You've toured all of Africa! 🌍\nFinal Score: ${gameScore + (isCorrect ? 1 : 0)}/${shuffledQuestions.length}`, 'success');
             setShowGame(false);
             setShuffledQuestions([]); // Reset for next time
         }
@@ -218,6 +224,7 @@ const History = ({ ageGroup }) => {
 
     return (
         <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}
                 style={{
@@ -239,8 +246,9 @@ const History = ({ ageGroup }) => {
 
             <div style={{
                 background: 'linear-gradient(135deg, #FF8800 0%, #FFBB33 100%)',
-                padding: '1rem', borderRadius: '15px', color: 'white', marginBottom: '2rem',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '600px', margin: '0 auto 2rem auto'
+                padding: '1.25rem', borderRadius: '15px', color: 'white', marginBottom: '2rem',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
+                maxWidth: '600px', margin: '0 auto 2rem auto'
             }}>
                 <div>
                     <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Total Wallet Balance</p>
@@ -381,14 +389,14 @@ const History = ({ ageGroup }) => {
                             <h3 style={{ color: '#FFD700' }}>Question {currentIndex + 1}/{shuffledQuestions.length}</h3>
                             {currentQuestion && (
                                 <>
-                                    <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>Where is <strong>{currentQuestion.resource}</strong> found?</p>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                                    <p style={{ fontSize: '1.25rem', margin: '1rem 0' }}>Where is <strong>{currentQuestion.resource}</strong> found?</p>
+                                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem' }}>
                                         {currentQuestion.options.map((opt, i) => (
                                             <button
                                                 key={i}
                                                 onClick={() => handleGameAnswer(opt)}
-                                                className="btn"
-                                                style={{ backgroundColor: '#444' }}
+                                                className="btn btn-outline"
+                                                style={{ padding: '0.75rem' }}
                                             >
                                                 {opt}
                                             </button>

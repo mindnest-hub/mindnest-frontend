@@ -1,20 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
+import SoilLab from '../components/SoilLab';
+import AgriBusinessPlanner from '../components/AgriBusinessPlanner';
+import InvestPitch from '../components/InvestPitch';
+import { useWallet } from '../hooks/useWallet';
 
 const Agripreneurship = () => {
     const navigate = useNavigate();
+    const { addEarnings, deductGlobal, balance, getAgeGroup } = useWallet();
+    const ageGroup = getAgeGroup?.() || 'kids';
+    const isAdult = ageGroup !== 'kids' && ageGroup !== 'teens';
+    const [isPremium, setIsPremium] = useState(false);
     const [soilMoisture, setSoilMoisture] = useState(80);
     const [cropStage, setCropStage] = useState(0); // 0: Seed, 1: Sprout, 2: Mature, 3: Harvested
     const [money, setMoney] = useState(1000);
+    const [harvestCount, setHarvestCount] = useState(() => Number(localStorage.getItem('agriHarvestCount')) || 0);
+    const [showBank, setShowBank] = useState(false);
+    const [showCert, setShowCert] = useState(false);
     const [weather, setWeather] = useState('Sunny ☀️');
+    const [activeTab, setActiveTab] = useState('farm'); // farm, soil, business, future
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
+
+    // NEW STATES
+    const [hasProcessingUnit, setHasProcessingUnit] = useState(false);
+    const [processedStock, setProcessedStock] = useState(0);
+    const [climateResilience, setClimateResilience] = useState(0);
+    const [upgrades, setUpgrades] = useState({
+        solar: false,
+        vertical: false,
+        seeds: false
+    });
+
+    // Persistence
+    useEffect(() => {
+        localStorage.setItem('agriHarvestCount', harvestCount);
+    }, [harvestCount]);
 
     // Simulation tick
     useEffect(() => {
         const timer = setInterval(() => {
-            setSoilMoisture(prev => Math.max(0, prev - 5));
+            // Solar irrigation reduces moisture loss
+            const loss = upgrades.solar ? 2 : 5;
+            setSoilMoisture(prev => Math.max(0, prev - loss));
+
+            // Random Events based on Resilience
+            if (Math.random() > 0.95) {
+                const eventSeverity = Math.max(0, 100 - climateResilience);
+                if (eventSeverity > 50) {
+                    setWeather('Heatwave 🔥');
+                    setSoilMoisture(prev => Math.max(0, prev - 20));
+                } else {
+                    setWeather('Sunny ☀️');
+                }
+            }
         }, 2000);
         return () => clearInterval(timer);
-    }, []);
+    }, [climateResilience, upgrades.solar]);
 
     const handleWater = () => {
         setSoilMoisture(100);
@@ -30,13 +76,79 @@ const Agripreneurship = () => {
 
     const handleHarvest = () => {
         if (cropStage === 2) {
-            setMoney(prev => prev + 300);
-            setCropStage(3);
-            setTimeout(() => setCropStage(0), 2000); // Reset after 2s
+            // If user has vertical farm, yield is higher
+            const yieldMultiplier = upgrades.vertical ? 1.5 : 1;
+            const yieldAmount = 300 * yieldMultiplier;
+
+            if (hasProcessingUnit) {
+                // Auto-process or store for processing? Let's simplify: Direct Option
+                if (window.confirm("Harvest complete! Process into Corn Flakes for 3x value? (Requires time)")) {
+                    setCropStage(0);
+                    setProcessedStock(prev => prev + 1);
+                    showToast("Processing... 🏭", 'info');
+                } else {
+                    setMoney(prev => prev + yieldAmount);
+                    addEarnings('agri', yieldAmount);
+                    setCropStage(3);
+                    setTimeout(() => setCropStage(0), 2000);
+                }
+            } else {
+                setMoney(prev => prev + yieldAmount);
+                addEarnings('agri', yieldAmount);
+                setCropStage(3);
+                setTimeout(() => setCropStage(0), 2000);
+            }
+            setHarvestCount(prev => prev + 1);
         }
     };
 
-    // Grow crop if moisture is good
+    const handleSellProcessed = () => {
+        if (processedStock > 0) {
+            const earnings = 900; // 3x of 300
+            setMoney(prev => prev + earnings);
+            addEarnings('agri', earnings);
+            setProcessedStock(prev => prev - 1);
+            showToast("Sold Corn Flakes! 🥣 +₦900", 'success');
+        }
+    };
+
+    const buyProcessingUnit = () => {
+        if (money >= 5000) {
+            setMoney(prev => prev - 5000);
+            setHasProcessingUnit(true);
+            showToast("Processing Unit Acquired! 🏭\nYou can now convert Maize into Corn Flakes.", 'success');
+        } else {
+            showToast("Insufficient funds. Need ₦5,000.", 'error');
+        }
+    };
+
+    const buyUpgrade = (type, cost, resilienceBoost) => {
+        if (money >= cost && !upgrades[type]) {
+            setMoney(prev => prev - cost);
+            setUpgrades(prev => ({ ...prev, [type]: true }));
+            setClimateResilience(prev => prev + resilienceBoost);
+            showToast(`${type.toUpperCase()} Upgrade Installed! Resilience +${resilienceBoost}% 🌍`, 'success');
+        } else if (upgrades[type]) {
+            showToast("Already owned!", 'info');
+        } else {
+            showToast(`Insufficient funds. Need ₦${cost.toLocaleString()}.`, 'error');
+        }
+    };
+
+    const handleLabComplete = (score) => {
+        const reward = Math.floor(score / 2);
+        setMoney(prev => prev + reward);
+        addEarnings('agri', reward);
+        showToast(`Soil Lab complete! Earned ₦${reward}.`, 'success');
+    };
+
+    const handleDeal = (amount) => {
+        setMoney(prev => prev + amount);
+        addEarnings('agri', amount);
+        showToast(`Funding Received! ₦${amount.toLocaleString()} added to your farm capital.`, 'success');
+    };
+
+    // Grow crop
     useEffect(() => {
         if (cropStage === 1 && soilMoisture > 30) {
             const growTimer = setTimeout(() => setCropStage(2), 5000);
@@ -54,102 +166,323 @@ const Agripreneurship = () => {
         }
     };
 
+    const isMasterAgripreneur = balance >= 5000 && harvestCount >= 3;
+
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}
                 style={{
-                    background: 'none',
-                    color: 'var(--color-primary)',
-                    fontSize: '1.2rem',
-                    marginBottom: '2rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
+                    background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem',
+                    display: 'flex', alignItems: 'center', gap: '0.5rem', alignSelf: 'flex-start'
                 }}
             >
                 ← Back to Hub
             </button>
 
             <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '3rem', color: 'var(--color-secondary)' }}>Smart Agri-Tech 🌱</h1>
-                <p style={{ fontSize: '1.5rem', color: 'var(--color-text-muted)' }}>
-                    Tech + Land = The Future of Wealth.
-                </p>
+                <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>Smart Agri-Tech 🌱</h1>
+                <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>Farm Smart. Pitch Big. Feed Africa.</p>
+                <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div className="btn btn-outline" style={{ cursor: 'default', border: '1px solid var(--color-primary)', padding: '0.6rem 1.25rem' }}>
+                        Farm Capital: <span style={{ color: '#00C851', fontWeight: 'bold' }}>₦{money.toLocaleString()}</span>
+                    </div>
+                    <div className="btn btn-outline" style={{ cursor: 'default', border: '1px solid #FF8800', padding: '0.6rem 1.25rem' }}>
+                        Climate Resilience: <span style={{ color: climateResilience > 70 ? '#00C851' : climateResilience > 30 ? 'orange' : 'red', fontWeight: 'bold' }}>{climateResilience}%</span>
+                    </div>
+                </div>
             </header>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '2rem'
-            }}>
-                {/* Dashboard Card */}
-                <div className="card">
-                    <h2 style={{ marginBottom: '1rem' }}>Farm Status 📊</h2>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                        <span>Weather:</span>
-                        <strong>{weather}</strong>
-                    </div>
-                    <div style={{ marginBottom: '1rem' }}>
-                        <span>Soil Moisture:</span>
-                        <div style={{
-                            width: '100%',
-                            height: '10px',
-                            backgroundColor: '#333',
-                            borderRadius: '5px',
-                            marginTop: '0.5rem'
-                        }}>
-                            <div style={{
-                                width: `${soilMoisture}%`,
-                                height: '100%',
-                                backgroundColor: soilMoisture < 30 ? 'red' : '#00BFFF',
-                                borderRadius: '5px',
-                                transition: 'width 0.5s'
-                            }}></div>
+            {/* TAB NAVIGATION */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+                <button
+                    onClick={() => setActiveTab('farm')}
+                    style={{ padding: '1rem 2rem', background: 'none', border: 'none', color: activeTab === 'farm' ? 'var(--color-primary)' : '#aaa', borderBottom: activeTab === 'farm' ? '3px solid var(--color-primary)' : 'none', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 'bold' }}
+                >
+                    🚜 My Farm
+                </button>
+                <button
+                    onClick={() => setActiveTab('soil')}
+                    style={{ padding: '1rem 2rem', background: 'none', border: 'none', color: activeTab === 'soil' ? '#00BFFF' : '#aaa', borderBottom: activeTab === 'soil' ? '3px solid #00BFFF' : 'none', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 'bold' }}
+                >
+                    🧪 Soil Lab
+                </button>
+
+                {isAdult && (
+                    <button
+                        onClick={() => setActiveTab('business')}
+                        style={{ padding: '1rem 2rem', background: 'none', border: 'none', color: activeTab === 'business' ? 'var(--color-accent)' : '#aaa', borderBottom: activeTab === 'business' ? '3px solid var(--color-accent)' : 'none', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 'bold' }}
+                    >
+                        💼 Business Hub
+                    </button>
+                )}
+
+                <button
+                    onClick={() => setActiveTab('future')}
+                    style={{ padding: '1rem 2rem', background: 'none', border: 'none', color: activeTab === 'future' ? '#FF8800' : '#aaa', borderBottom: activeTab === 'future' ? '3px solid #FF8800' : 'none', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 'bold' }}
+                >
+                    🚀 Future Tech
+                </button>
+            </div>
+
+            {/* FARM SIMULATION TAB */}
+            {
+                activeTab === 'farm' && (
+                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                        <div className="card">
+                            <h2 style={{ marginBottom: '1rem' }}>Farm Status 📊</h2>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <span>Weather:</span>
+                                <strong>{weather}</strong>
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <span>Soil Moisture:</span>
+                                <div style={{ width: '100%', height: '10px', backgroundColor: '#333', borderRadius: '5px', marginTop: '0.5rem' }}>
+                                    <div style={{ width: `${soilMoisture}%`, height: '100%', backgroundColor: soilMoisture < 30 ? 'red' : '#00BFFF', borderRadius: '5px', transition: 'width 0.5s' }}></div>
+                                </div>
+                            </div>
+                            {hasProcessingUnit && (
+                                <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#333', borderRadius: '10px' }}>
+                                    <h4>🏭 Processing Unit</h4>
+                                    <p>Corn Flakes Stock: {processedStock} boxes</p>
+                                    <button
+                                        onClick={handleSellProcessed}
+                                        disabled={processedStock === 0}
+                                        className="btn"
+                                        style={{ width: '100%', backgroundColor: processedStock > 0 ? 'var(--color-secondary)' : '#555' }}
+                                    >
+                                        Sell Stock (+₦900/box)
+                                    </button>
+                                </div>
+                            )}
+                            {!hasProcessingUnit && (
+                                <button onClick={buyProcessingUnit} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#444', border: '1px solid var(--color-secondary)' }}>
+                                    Buy Processing Unit (₦5,000) 🏗️
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="card" style={{ textAlign: 'center' }}>
+                            <h2 style={{ marginBottom: '2rem' }}>Field 1 ({upgrades.vertical ? 'Vertical Farm 🏢' : 'Maize'})</h2>
+                            <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>{getCropEmoji()}</div>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                {cropStage === 0 && <button className="btn btn-primary" onClick={handlePlant}>Plant (-₦100)</button>}
+                                {cropStage > 0 && cropStage < 3 && <button className="btn" style={{ backgroundColor: '#00BFFF', color: '#fff' }} onClick={handleWater}>Irrigate 💧</button>}
+                                {cropStage === 2 && <button className="btn" style={{ backgroundColor: 'var(--color-secondary)', color: '#fff' }} onClick={handleHarvest}>Harvest (+₦{upgrades.vertical ? '450' : '300'})</button>}
+                            </div>
                         </div>
                     </div>
-                    <div style={{ fontSize: '2rem', color: 'var(--color-primary)' }}>
-                        Wallet: ₦{money}
+                )
+            }
+
+            {/* SOIL LAB TAB */}
+            {
+                activeTab === 'soil' && (
+                    <SoilLab onComplete={handleLabComplete} />
+                )
+            }
+
+            {/* BUSINESS HUB TAB */}
+            {activeTab === 'business' && (
+                <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', minHeight: '600px' }}>
+                    <div style={{ height: '100%' }}>
+                        <AgriBusinessPlanner onClose={() => { }} />
+                    </div>
+                    <div style={{ height: '100%' }}>
+                        {isPremium ? (
+                            <InvestPitch onDeal={handleDeal} />
+                        ) : (
+                            <div className="card" style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', border: '2px solid gold' }}>
+                                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔒</div>
+                                <h2 style={{ color: 'gold' }}>Premium Pitch Room</h2>
+                                <p style={{ color: '#aaa', margin: '1rem 0' }}>Unlock the ability to pitch your business to global investors.</p>
+                                <button
+                                    onClick={() => setIsPremium(true)}
+                                    className="btn"
+                                    style={{ backgroundColor: 'gold', color: 'black', fontWeight: 'bold', padding: '1rem 2rem' }}
+                                >
+                                    Unlock Premium Access (Demo)
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
+            )}
 
-                {/* Action Card */}
-                <div className="card" style={{ textAlign: 'center' }}>
-                    <h2 style={{ marginBottom: '2rem' }}>Field 1 (Maize)</h2>
-                    <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>
-                        {getCropEmoji()}
+            {/* FUTURE TECH TAB */}
+            {
+                activeTab === 'future' && (
+                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+                        <div className="card" style={{ textAlign: 'center' }}>
+                            <h2>Evolution of Farming 🚜</h2>
+                            <div style={{ display: 'flex', justifyContent: 'space-around', margin: '3rem 0', alignItems: 'center' }}>
+                                <div style={{ opacity: 0.5 }}>
+                                    <div style={{ fontSize: '3rem' }}>⛏️</div>
+                                    <p>Manual (1900s)</p>
+                                </div>
+                                <div style={{ fontSize: '2rem', color: '#555' }}>→</div>
+                                <div style={{ opacity: 0.8 }}>
+                                    <div style={{ fontSize: '3rem' }}>🚜</div>
+                                    <p>Mechanized (1980s)</p>
+                                </div>
+                                <div style={{ fontSize: '2rem', color: '#555' }}>→</div>
+                                <div style={{ transform: 'scale(1.2)' }}>
+                                    <div style={{ fontSize: '4rem' }}>🚁</div>
+                                    <p style={{ color: '#FF8800', fontWeight: 'bold' }}>Precision (Now)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* STATS BAR */}
+                        <div style={{
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            backgroundColor: '#333', padding: '1rem', borderRadius: '15px', marginBottom: '2rem',
+                            border: '1px solid #00C851', flexWrap: 'wrap', gap: '1rem'
+                        }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.9rem', color: '#aaa' }}>Farm Capital</div>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#00C851' }}>₦{money}</div>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.9rem', color: '#aaa' }}>Global Savings</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#FFD700' }}>₦{balance}</div>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '0.9rem', color: '#aaa' }}>Harvests</div>
+                                <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{harvestCount} 🌾</div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button onClick={() => setShowBank(!showBank)} className="btn btn-sm" style={{ backgroundColor: '#FFD700', color: '#000' }}>
+                                    🏦 Agri-Bank
+                                </button>
+                                <button onClick={() => setShowCert(!showCert)} className="btn btn-sm" style={{ backgroundColor: '#2196F3' }}>
+                                    🎓 Certification
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* BANK OVERLAY */}
+                        {showBank && (
+                            <div style={{
+                                marginBottom: '1rem', padding: '1rem', backgroundColor: '#444', borderRadius: '10px',
+                                border: '2px solid #FFD700', animation: 'fadeIn 0.3s'
+                            }}>
+                                <h3 style={{ color: '#FFD700', marginTop: 0 }}>🏦 Agri-Bank Capital Injection</h3>
+                                <p>Transfer earnings from other modules (Finance, Critical Thinking, etc.) to invest in your farm!</p>
+
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                    <button onClick={() => {
+                                        if (deductGlobal(100)) {
+                                            setMoney(m => m + 100);
+                                            showToast("Transferred ₦100 to Farm Capital! 💰", 'success');
+                                        } else {
+                                            showToast("Insufficient Global Savings! Play other games to earn more. 🎮", 'error');
+                                        }
+                                    }} className="btn btn-primary" style={{ flex: '1 1 140px' }}>
+                                        Inject ₦100
+                                    </button>
+                                    <button onClick={() => {
+                                        if (deductGlobal(500)) {
+                                            setMoney(m => m + 500);
+                                            showToast("Transferred ₦500 to Farm Capital! 💰", 'success');
+                                        } else {
+                                            showToast("Insufficient Global Savings! Play other games to earn more. 🎮", 'error');
+                                        }
+                                    }} className="btn btn-primary" style={{ flex: '1 1 140px' }}>
+                                        Inject ₦500
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* CERTIFICATION OVERLAY */}
+                        {showCert && (
+                            <div style={{
+                                marginBottom: '1rem', padding: '1rem', backgroundColor: '#222', borderRadius: '10px',
+                                border: '2px solid #2196F3', animation: 'fadeIn 0.3s', textAlign: 'center'
+                            }}>
+                                <h3 style={{ color: '#2196F3', marginTop: 0 }}>🎓 Master Agripreneur Certification</h3>
+                                <p>Prove your worthiness to withdraw real earnings!</p>
+
+                                <div style={{ margin: '1rem 0', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span>Total Earnings {'>'} ₦5,000:</span>
+                                        <span style={{ color: balance >= 5000 ? '#00C851' : '#ff4444' }}>{balance >= 5000 ? "✅ Passed" : `❌ (${balance}/5000)`}</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span>Harvest Cycles {'>'} 3:</span>
+                                        <span style={{ color: harvestCount >= 3 ? '#00C851' : '#ff4444' }}>{harvestCount >= 3 ? "✅ Passed" : `❌ (${harvestCount}/3)`}</span>
+                                    </div>
+                                </div>
+
+                                {isMasterAgripreneur ? (
+                                    <div style={{ padding: '2rem', backgroundColor: '#00C851', borderRadius: '15px', textAlign: 'center' }}>
+                                        <h2>🎊 Master Agripreneur Status Unlocked!</h2>
+                                        <button onClick={() => showToast("🎉 CERTIFIED! \n\nYou have proven yourself as a Master Agripreneur.\nShow this screen to your guardian to redeem your rewards!", 'success')} className="btn" style={{ backgroundColor: '#fff', color: '#00C851', marginTop: '1rem' }}>View Certificate</button>
+                                    </div>
+                                ) : (
+                                    <p style={{ color: '#aaa', fontStyle: 'italic' }}>Complete the requirements to unlock withdrawals.</p>
+                                )}
+                            </div>
+                        )}
+
+                        <div className="card">
+                            <h2>Future-Proof Upgrades 🌍</h2>
+                            <p style={{ color: '#aaa', marginBottom: '1rem' }}>Invest in sustainability to survive climate change.</p>
+
+                            <div className="grid-cols" style={{ gridTemplateColumns: '1fr', gap: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-surface-hover)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--color-border)', flexWrap: 'wrap', gap: '1rem' }}>
+                                    <div style={{ flex: '1 1 200px' }}>
+                                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>☀️ Solar Irrigation</div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>Reduces water usage. Resilience +20.</div>
+                                    </div>
+                                    <button
+                                        onClick={() => buyUpgrade('solar', 2000, 20)}
+                                        disabled={upgrades.solar}
+                                        className={upgrades.solar ? "btn btn-outline" : "btn btn-primary"}
+                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.solar ? 0.6 : 1 }}
+                                    >
+                                        {upgrades.solar ? 'Installed ✅' : '₦2,000'}
+                                    </button>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-surface-hover)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--color-border)', flexWrap: 'wrap', gap: '1rem' }}>
+                                    <div style={{ flex: '1 1 200px' }}>
+                                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>🌵 Drought Seeds</div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>Resist heatwaves. Resilience +10.</div>
+                                    </div>
+                                    <button
+                                        onClick={() => buyUpgrade('seeds', 500, 10)}
+                                        disabled={upgrades.seeds}
+                                        className={upgrades.seeds ? "btn btn-outline" : "btn btn-primary"}
+                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.seeds ? 0.6 : 1 }}
+                                    >
+                                        {upgrades.seeds ? 'Stocked ✅' : '₦500'}
+                                    </button>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--color-surface-hover)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--color-border)', flexWrap: 'wrap', gap: '1rem' }}>
+                                    <div style={{ flex: '1 1 200px' }}>
+                                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>🏢 Vertical Farm</div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>+50% Yield. Max Resilience.</div>
+                                    </div>
+                                    <button
+                                        onClick={() => buyUpgrade('vertical', 10000, 50)}
+                                        disabled={upgrades.vertical}
+                                        className={upgrades.vertical ? "btn btn-outline" : "btn btn-primary"}
+                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.vertical ? 0.6 : 1 }}
+                                    >
+                                        {upgrades.vertical ? 'Built ✅' : '₦10,000'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                        {cropStage === 0 && (
-                            <button className="btn btn-primary" onClick={handlePlant}>Plant (-₦100)</button>
-                        )}
-                        {cropStage > 0 && cropStage < 3 && (
-                            <button className="btn" style={{ backgroundColor: '#00BFFF', color: '#fff' }} onClick={handleWater}>Irrigate 💧</button>
-                        )}
-                        {cropStage === 2 && (
-                            <button className="btn" style={{ backgroundColor: 'var(--color-secondary)', color: '#fff' }} onClick={handleHarvest}>Harvest (+₦300)</button>
-                        )}
-                    </div>
-                </div>
-
-                {/* Knowledge Card */}
-                <div className="card">
-                    <h2 style={{ marginBottom: '1rem' }}>Agri-Facts 🚜</h2>
-                    <ul style={{ listStyle: 'none' }}>
-                        <li style={{ marginBottom: '1rem' }}>
-                            <strong>🌍 Food Security:</strong> Africa has 60% of the world's uncultivated arable land.
-                        </li>
-                        <li style={{ marginBottom: '1rem' }}>
-                            <strong>📱 Precision Farming:</strong> Using drones and sensors to save water and boost yields.
-                        </li>
-                        <li>
-                            <strong>🔄 Value Chain:</strong> Don't just sell cocoa beans; make chocolate. Process your produce!
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                )
+            }
+        </div >
     );
 };
 

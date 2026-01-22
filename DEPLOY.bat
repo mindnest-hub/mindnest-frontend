@@ -1,3 +1,4 @@
+
 @echo off
 echo ========================================
 echo MindNest - Auto Deploy to Vercel

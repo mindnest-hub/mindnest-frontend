@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Toast from './Toast';
 import { documentTemplates, getAllDocuments } from '../data/legalTemplates';
 import { generatePDF } from '../utils/pdfGenerator';
 import { promptAndSendEmail } from '../utils/emailService';
@@ -10,6 +11,11 @@ const DocumentDrafter = ({ country, onClose }) => {
     const [generatedDocument, setGeneratedDocument] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all'); // all, general, real-estate, business
     const [searchQuery, setSearchQuery] = useState('');
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
 
     // Check if user is a kid/teen for free access
     const ageGroup = localStorage.getItem('ageGroup');
@@ -111,7 +117,7 @@ const DocumentDrafter = ({ country, onClose }) => {
 
     const handleCopyToClipboard = () => {
         navigator.clipboard.writeText(generatedDocument);
-        alert('Document copied to clipboard!');
+        showToast('Document copied to clipboard!', 'success');
     };
 
     const handleReset = () => {
@@ -364,6 +370,7 @@ const DocumentDrafter = ({ country, onClose }) => {
     if (step === 'preview') {
         return (
             <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
                 <h3 style={{ marginTop: 0 }}>Document Preview</h3>
                 <div style={{
                     flex: 1,
@@ -477,7 +484,7 @@ const DocumentDrafter = ({ country, onClose }) => {
                                     <button
                                         onClick={() => {
                                             navigator.clipboard.writeText(doc.content);
-                                            alert('Document copied to clipboard!');
+                                            showToast('Document copied to clipboard!', 'success');
                                         }}
                                         style={{
                                             flex: 1,

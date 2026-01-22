@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import { triggerLiveEvent } from '../components/LiveNotifications';
 import { africanResources } from '../data/africanResources';
+import Toast from '../components/Toast';
 const CriticalThinking = ({ ageGroup }) => {
     console.log("CriticalThinking: Component Mounting...");
     const navigate = useNavigate();
@@ -21,6 +22,62 @@ const CriticalThinking = ({ ageGroup }) => {
     const { addEarnings } = wallet || {};
 
     const [expandedModule, setExpandedModule] = useState(null);
+    const [globalError, setGlobalError] = useState(null);
+
+    // DEBUGGING: Catch runtime errors
+    useEffect(() => {
+        const handleError = (event) => {
+            console.error("CriticalThinking Error Caught:", event);
+            setGlobalError({
+                message: event.message || "Unknown Error",
+                stack: event.error?.stack || "No stack trace",
+                lineno: event.lineno,
+                filename: event.filename
+            });
+        };
+
+        const handleRejection = (event) => {
+            console.error("CriticalThinking Promise Rejection:", event);
+            setGlobalError({
+                message: "Promise Rejection: " + (event.reason?.message || event.reason),
+                stack: event.reason?.stack,
+                type: "Unhandled Rejection"
+            });
+        };
+
+        window.addEventListener('error', handleError);
+        window.addEventListener('unhandledrejection', handleRejection);
+
+        return () => {
+            window.removeEventListener('error', handleError);
+            window.removeEventListener('unhandledrejection', handleRejection);
+        };
+    }, []);
+
+    if (globalError) {
+        return (
+            <div style={{
+                padding: '2rem', color: '#ff4444', backgroundColor: '#1a1a1a',
+                minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '1rem',
+                fontFamily: 'monospace'
+            }}>
+                <h1 style={{ fontSize: '2rem' }}>⚠️ Application Error</h1>
+                <div style={{ padding: '1rem', border: '1px solid #ff4444', borderRadius: '10px' }}>
+                    <p style={{ fontWeight: 'bold' }}>{globalError.message}</p>
+                    {globalError.filename && <p>File: {globalError.filename}:{globalError.lineno}</p>}
+                    <pre style={{ whiteSpace: 'pre-wrap', overflowX: 'auto', fontSize: '0.8rem', color: '#aaa' }}>
+                        {globalError.stack}
+                    </pre>
+                </div>
+                <button
+                    onClick={() => window.location.reload()}
+                    style={{ padding: '1rem', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '5px', fontSize: '1.2rem', cursor: 'pointer' }}
+                >
+                    🔄 Reload Page
+                </button>
+            </div>
+        );
+    }
 
     const toggleModule = (id) => {
         if (expandedModule === id) {
@@ -41,7 +98,15 @@ const CriticalThinking = ({ ageGroup }) => {
     const [brainPower, setBrainPower] = useState(() => Number(localStorage.getItem('brainPower')) || 0);
     const [showLevelUp, setShowLevelUp] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [verificationMessage, setVerificationMessage] = useState("");
+    const [creativeMode, setCreativeMode] = useState(null); // 'delib-cog', 'delib-emo', 'spon-cog', 'spon-emo'
+    const [toast, setToast] = useState(null);
     const MAX_EARNINGS = 1500;
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
 
     const [seenFacts, setSeenFacts] = useState(() => {
         try {
@@ -90,6 +155,36 @@ const CriticalThinking = ({ ageGroup }) => {
     const [chatInput, setChatInput] = useState("");
     const chatEndRef = useRef(null);
 
+    // --- MISSING STATES (FIXED) ---
+    const [wisdomEntry, setWisdomEntry] = useState("");
+    const [savedWisdom, setSavedWisdom] = useState(() => localStorage.getItem('wisdomLog') || "");
+
+    // --- DETECTIVE MODE STATES ---
+    const [detectiveCase, setDetectiveCase] = useState(0); // Case index
+    const [detectiveStep, setDetectiveStep] = useState(0); // 0: Case Selection, 1: Solving
+    const [detectiveSuspect, setDetectiveSuspect] = useState(null);
+    const [detectiveFeedback, setDetectiveFeedback] = useState("");
+    const [solvedCases, setSolvedCases] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem('solvedDetectiveCases')) || [];
+        } catch (e) {
+            return [];
+        }
+    });
+
+    // --- BRAIN GYM STATES ---
+    const [gymStatus, setGymStatus] = useState('idle'); // idle, playing, complete
+    const [gymScore, setGymScore] = useState(0);
+    const [gymTimer, setGymTimer] = useState(60);
+    const [gymQuestion, setGymQuestion] = useState(null);
+    const [gymAnswer, setGymAnswer] = useState("");
+
+
+
+
+
+
+
     // --- MINI-GAME STATES ---
     // Module 1: Observation (Interactive)
     const [obsLevel, setObsLevel] = useState(0);
@@ -110,6 +205,11 @@ const CriticalThinking = ({ ageGroup }) => {
     ];
 
     // Module 2: Asking Good Questions (Chat Bot)
+    const [questChat, setQuestChat] = useState([
+        { sender: 'elder', text: "Greetings! Ask me anything. Start with 'Why' or 'How'. 🦁" }
+    ]);
+    const [questInput, setQuestInput] = useState("");
+
     const chatQuestions = [
         { q: "The sun is hot. ☀️", type: "FACT" },
         { q: "Blue is the best color. 💙", type: "OPINION" },
@@ -598,6 +698,80 @@ const CriticalThinking = ({ ageGroup }) => {
         { q: "You are angry at your parents. 😡", good: "Talk calmly 🗣️", bad: "Yell & slam door 🚪", goodRes: "✅ Communication solves problems. Yelling creates them.", badRes: "❌ Anger controls you. Calmness controls the situation." }
     ];
 
+    // --- DECISION MAKING STATE (Module 5) ---
+    const [decisionGame, setDecisionGame] = useState('menu'); // 'menu', 'habits', 'empathy'
+
+    // Game 1: Healthy Habits
+    const [habitScore, setHabitScore] = useState(0);
+    const [habitStep, setHabitStep] = useState(0);
+    const [habitMessage, setHabitMessage] = useState("");
+    const habitScenarios = [
+        { q: "You're thirsty! What do you drink?", options: [{ txt: "Water 💧", type: "good" }, { txt: "Soda 🥤", type: "bad" }], good: "Hydration Hero! 💧", bad: "Sugar crash coming! 📉" },
+        { q: "You found ₦500. What now?", options: [{ txt: "Save it 🐖", type: "good" }, { txt: "Buy sweets 🍬", type: "bad" }], good: "Future Millionaire! 💰", bad: "Money gone! 💸" },
+        { q: "It's late. Bedtime?", options: [{ txt: "Sleep 😴", type: "good" }, { txt: "Play games 🎮", type: "bad" }], good: "Restored Energy! ⚡", bad: "Tired tomorrow... 😴" }
+    ];
+
+    // Game 2: Empathy Challenge
+    const [empathyScore, setEmpathyScore] = useState(0);
+    const [empathyStep, setEmpathyStep] = useState(0);
+    const [empathyMessage, setEmpathyMessage] = useState("");
+    const empathyScenarios = [
+        { q: "Friend fell down.", options: [{ txt: "Laugh 😂", type: "bad" }, { txt: "Help up 🤝", type: "good" }], good: "Kindness is power! ❤️", bad: "Ouch. That hurts feelings. 💔" },
+        { q: "New kid alone.", options: [{ txt: "Say Hello 👋", type: "good" }, { txt: "Ignore 😒", type: "bad" }], good: "New friend made! 🌟", bad: "Loneliness is sad. 😢" },
+        { q: "Sister broke toy.", options: [{ txt: "Forgive 🕊️", type: "good" }, { txt: "Yell 😡", type: "bad" }], good: "Peace maker! 🏳️", bad: "Anger doesn't fix toys. 🧩" }
+    ];
+
+    // Handlers
+    const handleHabitClick = (type) => {
+        if (type === 'good') {
+            setHabitScore(s => s + 1);
+            setHabitMessage(habitScenarios[habitStep].good);
+            triggerConfetti();
+        } else {
+            setHabitMessage(habitScenarios[habitStep].bad);
+        }
+
+        setTimeout(() => {
+            setHabitMessage("");
+            if (habitStep < habitScenarios.length - 1) {
+                setHabitStep(s => s + 1);
+            } else {
+                setHabitMessage(`Game Over! Score: ${habitScore + (type === 'good' ? 1 : 0)}/${habitScenarios.length}`);
+                setTimeout(() => {
+                    markComplete(5);
+                    setDecisionGame('menu');
+                    setHabitStep(0);
+                    setHabitScore(0);
+                }, 2000);
+            }
+        }, 1500);
+    };
+
+    const handleEmpathyClick = (type) => {
+        if (type === 'good') {
+            setEmpathyScore(s => s + 1);
+            setEmpathyMessage(empathyScenarios[empathyStep].good);
+            triggerConfetti();
+        } else {
+            setEmpathyMessage(empathyScenarios[empathyStep].bad);
+        }
+
+        setTimeout(() => {
+            setEmpathyMessage("");
+            if (empathyStep < empathyScenarios.length - 1) {
+                setEmpathyStep(s => s + 1);
+            } else {
+                setEmpathyMessage(`Compassion Champion! Score: ${empathyScore + (type === 'good' ? 1 : 0)}/${empathyScenarios.length}`);
+                setTimeout(() => {
+                    markComplete(5);
+                    setDecisionGame('menu');
+                    setEmpathyStep(0);
+                    setEmpathyScore(0);
+                }, 2000);
+            }
+        }, 1500);
+    };
+
     const palaverScenarios = isKid ? kidPalaver : teenPalaver;
 
 
@@ -1005,11 +1179,11 @@ const CriticalThinking = ({ ageGroup }) => {
             const current = marketScenarios[marketIndex];
             if (option === current.choice) {
                 triggerConfetti();
-                alert(`Correct! 🎉\n\n${getRandomFact()}`);
+                showToast(`Correct! 🎉\n\n${getRandomFact()}`, 'success');
                 if (marketIndex < marketScenarios.length - 1) setMarketIndex(i => i + 1);
-                else markComplete(8); // Financial Thinking ID
+                else markComplete(14); // Financial Thinking ID
             } else {
-                alert("Think about value! " + current.reason);
+                showToast("Think about value! " + current.reason, 'warning');
             }
         }, "Checking Value...");
     };
@@ -1138,6 +1312,212 @@ const CriticalThinking = ({ ageGroup }) => {
             setQuestInput("");
         }, "Consulting the Elder...");
     };
+
+    // --- DETECTIVE MODE HANDLERS ---
+    // Comprehensive case database
+    const detectiveCases = {
+        kids: [
+            {
+                id: 0,
+                title: "The Cookie Mystery 🍪",
+                scenario: "Someone ate all the cookies from the jar! Who did it?",
+                clues: [
+                    "It has 4 legs.",
+                    "It loves to eat everything (grass, cans, clothes!).",
+                    "It says 'Meee' not 'Moo'."
+                ],
+                suspects: [
+                    { id: 1, name: "Lion 🦁", emoji: "🦁" },
+                    { id: 2, name: "Goat 🐐", emoji: "🐐" },
+                    { id: 3, name: "Chicken 🐔", emoji: "🐔" }
+                ],
+                culprit: 2,
+                reward: 100
+            }
+        ],
+        teens: [
+            {
+                id: 0,
+                title: "The Missing Trophy 🏆",
+                scenario: "The school trophy disappeared overnight. Security footage shows someone in a blue uniform.",
+                clues: [
+                    "The thief wore a BLUE uniform.",
+                    "The janitor was cleaning the gym until 10 PM.",
+                    "The coach left at 6 PM (has alibi).",
+                    "The rival team captain was seen near the trophy case at 9 PM."
+                ],
+                suspects: [
+                    { id: 1, name: "Coach", emoji: "👨‍🏫", detail: "Left early" },
+                    { id: 2, name: "Janitor", emoji: "🧹", detail: "Blue uniform" },
+                    { id: 3, name: "Rival Captain", emoji: "⚽", detail: "Red jersey" }
+                ],
+                culprit: 2,
+                reward: 150
+            },
+            {
+                id: 1,
+                title: "Science Fair Sabotage 🧪",
+                scenario: "A chemistry project was destroyed. Chemical residue found: H2O2 (hydrogen peroxide).",
+                clues: [
+                    "The saboteur used hydrogen peroxide (found in biology lab).",
+                    "Lab partner was home sick (verified by parents).",
+                    "Rival student has access to biology lab (member of science club).",
+                    "Janitor doesn't have keys to chemical storage."
+                ],
+                suspects: [
+                    { id: 1, name: "Lab Partner", emoji: "👥", detail: "Sick at home" },
+                    { id: 2, name: "Rival Student", emoji: "🎓", detail: "Science club" },
+                    { id: 3, name: "Janitor", emoji: "🧹", detail: "No chem access" }
+                ],
+                culprit: 2,
+                reward: 200
+            }
+        ],
+        adults: [
+            {
+                id: 0,
+                title: "The Gold Heist 💰",
+                scenario: "Gold stolen from the palace vault. The thief wore red.",
+                clues: [
+                    "The thief was wearing RED.",
+                    "The Farmer was working in the field all day (witnessed by neighbors).",
+                    "The Scholar was reading in the library (librarian confirms).",
+                    "The Merchant was seen near the vault at noon."
+                ],
+                suspects: [
+                    { id: 1, name: "Merchant", emoji: "👤", detail: "Blue robes" },
+                    { id: 2, name: "Soldier", emoji: "👤", detail: "Red uniform" },
+                    { id: 3, name: "Farmer", emoji: "👤", detail: "Green clothes" },
+                    { id: 4, name: "Scholar", emoji: "👤", detail: "Yellow robes" }
+                ],
+                culprit: 2,
+                reward: 150
+            },
+            {
+                id: 1,
+                title: "Corporate Whistleblower 📊",
+                scenario: "Confidential financial documents leaked to the press. Email metadata shows sender used CFO credentials.",
+                clues: [
+                    "Email sent at 2:47 AM using CFO's login credentials.",
+                    "Security footage shows someone in a BLUE SUIT near server room at 2:30 AM.",
+                    "CEO was at a conference in Lagos (flight records confirm).",
+                    "CFO claims they were home sleeping (no verification).",
+                    "IT Admin has motive (passed over for promotion) but was logged out at midnight."
+                ],
+                suspects: [
+                    { id: 1, name: "CEO", emoji: "👔", detail: "Red tie, in Lagos" },
+                    { id: 2, name: "CFO", emoji: "💼", detail: "Blue suit, weak alibi" },
+                    { id: 3, name: "IT Admin", emoji: "💻", detail: "Green hoodie, logged out" }
+                ],
+                culprit: 2,
+                reward: 250
+            }
+        ]
+    };
+
+    // Get current case data
+    const getCurrentAgeGroup = () => {
+        if (isKid) return 'kids';
+        if (isTeen) return 'teens';
+        return 'adults';
+    };
+
+    const currentCaseData = detectiveCases[getCurrentAgeGroup()][detectiveCase] || detectiveCases[getCurrentAgeGroup()][0];
+    const suspects = currentCaseData.suspects;
+
+    const generateGymQuestion = () => {
+        const types = ['math', 'logic'];
+        const type = types[Math.floor(Math.random() * types.length)];
+
+        if (type === 'math') {
+            const a = Math.floor(Math.random() * 10) + 1;
+            const b = Math.floor(Math.random() * 10) + 1;
+            const op = Math.random() > 0.5 ? '+' : '-';
+            return {
+                q: `${a} ${op} ${b} = ?`,
+                a: op === '+' ? (a + b).toString() : (a - b).toString()
+            };
+        } else {
+            // Simple logic for speed
+            const items = ["Apple", "Banana", "Carrot", "Dog"];
+            const q = "Which is NOT a food?";
+            return { q: q, a: "Dog" };
+        }
+    };
+
+    const handleDetectiveGuess = (suspectId) => {
+        verifyAction(() => {
+            const correctId = currentCaseData.culprit;
+
+            if (suspectId === correctId) {
+                const caseKey = `${getCurrentAgeGroup()}-${detectiveCase}`;
+                setDetectiveFeedback(`Correct! You solved the case! 🕵️‍♂️ ${getRandomFact()}`);
+                triggerConfetti();
+                addEarnings('criticalThinking', currentCaseData.reward);
+
+                // Mark case as solved
+                const newSolved = [...solvedCases, caseKey];
+                setSolvedCases(newSolved);
+                localStorage.setItem('solvedDetectiveCases', JSON.stringify(newSolved));
+
+                setTimeout(() => {
+                    setDetectiveFeedback("");
+                    markComplete(18);
+                    setDetectiveStep(0); // Return to case selection
+                }, 4000);
+            } else {
+                setDetectiveFeedback("Not quite. Review the clues! 🧐");
+                setTimeout(() => setDetectiveFeedback(""), 2000);
+            }
+        }, "Analyzing Evidence...");
+    };
+
+    const selectCase = (caseId) => {
+        setDetectiveCase(caseId);
+        setDetectiveStep(1); // Move to solving phase
+        setDetectiveFeedback("");
+        setDetectiveSuspect(null);
+    };
+
+    const startBrainGym = () => {
+        setGymStatus('playing');
+        setGymScore(0);
+        setGymTimer(60);
+        setGymQuestion(generateGymQuestion());
+    };
+
+    const handleGymSubmit = (ans) => {
+        if (!gymQuestion) return;
+
+        if (ans.toLowerCase().trim() === gymQuestion.a.toLowerCase()) {
+            setGymScore(s => s + 10);
+            setGymFeedback("Correct! +10");
+            triggerConfetti();
+        } else {
+            setGymFeedback("Missed it!");
+        }
+
+        setGymQuestion(generateGymQuestion());
+        setGymAnswer("");
+        setTimeout(() => setGymFeedback(""), 500);
+    };
+
+    // Brain Gym Timer
+    useEffect(() => {
+        let timer;
+        if (gymStatus === 'playing' && gymTimer > 0) {
+            timer = setInterval(() => setGymTimer(t => t - 1), 1000);
+        } else if (gymTimer === 0 && gymStatus === 'playing') {
+            setGymStatus('complete');
+            addEarnings('criticalThinking', gymScore);
+            if (gymScore >= 50) markComplete(19);
+        }
+        return () => clearInterval(timer);
+    }, [gymStatus, gymTimer]);
+
+    // Additional State for gym feedback
+    const [gymFeedback, setGymFeedback] = useState("");
+
 
     // --- CURRICULUM MODULES ---
     const modules = [
@@ -1548,59 +1928,90 @@ const CriticalThinking = ({ ageGroup }) => {
         {
             id: 5,
             title: "Decision-Making ⚖️",
-            desc: "Choices have consequences.",
+            desc: "Choices for a better life.",
             content: (
-                <div>
-                    {decisionLevel < decisionScenarios.length ? (
-                        <div>
-                            {decisionStep === 0 ? (
-                                <div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                        <p style={{ margin: 0 }}><strong>Scenario {decisionLevel + 1}:</strong> Choices have consequences.</p>
-                                        <div style={{ backgroundColor: '#00C851', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '10px', fontSize: '0.8rem' }}>
-                                            Earned: ₦{decisionEarnings}
-                                        </div>
-                                    </div>
-                                    <p style={{ fontSize: '1.2rem', marginBottom: '1rem' }}><strong>Situation:</strong> {decisionScenarios[decisionLevel].q}</p>
-                                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                        <button onClick={() => setDecisionStep(1)} className="btn" style={{ backgroundColor: '#ff4444' }}>{decisionScenarios[decisionLevel].bad}</button>
-                                        <button onClick={() => {
-                                            setDecisionStep(2);
-                                            triggerConfetti();
-                                            setDecisionEarnings(prev => prev + 50);
-                                            setTimeout(() => {
-                                                setDecisionStep(0);
-                                                if (decisionLevel < decisionScenarios.length - 1) {
-                                                    setDecisionLevel(l => l + 1);
-                                                } else {
-                                                    markComplete(5);
-                                                }
-                                            }, 2000);
-                                        }} className="btn" style={{ backgroundColor: '#00C851' }}>{decisionScenarios[decisionLevel].good}</button>
-                                    </div>
-                                </div>
-                            ) : decisionStep === 1 ? (
-                                <div style={{ marginTop: '1rem', color: '#ff4444' }}>
-                                    <p><strong>Outcome:</strong></p>
-                                    <p>{decisionScenarios[decisionLevel].badRes}</p>
-                                    <button onClick={() => setDecisionStep(0)} className="btn btn-sm" style={{ marginTop: '0.5rem' }}>Try Again</button>
+                <div style={{ padding: '1rem', backgroundColor: '#2c2c2c', borderRadius: '10px' }}>
+                    {decisionGame === 'menu' && (
+                        <div style={{ textAlign: 'center' }}>
+                            <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>Choose your path:</p>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                <button onClick={() => setDecisionGame('habits')} className="btn" style={{ background: 'linear-gradient(45deg, #4CAF50, #8BC34A)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem 2rem' }}>
+                                    <span style={{ fontSize: '2rem' }}>🥗</span>
+                                    <span>Healthy Habits</span>
+                                </button>
+                                <button onClick={() => setDecisionGame('empathy')} className="btn" style={{ background: 'linear-gradient(45deg, #2196F3, #03A9F4)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1rem 2rem' }}>
+                                    <span style={{ fontSize: '2rem' }}>❤️</span>
+                                    <span>Empathy Challenge</span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {decisionGame === 'habits' && (
+                        <div style={{ animation: 'fadeIn 0.5s' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h3 style={{ margin: 0 }}>🥗 Healthy Habits</h3>
+                                <button onClick={() => setDecisionGame('menu')} className="btn btn-sm" style={{ backgroundColor: '#555' }}>Back</button>
+                            </div>
+
+                            {habitMessage ? (
+                                <div style={{ textAlign: 'center', padding: '2rem', backgroundColor: '#333', borderRadius: '8px' }}>
+                                    <p style={{ fontSize: '1.5rem', color: habitMessage.includes('!') ? '#00C851' : '#ff4444' }}>{habitMessage}</p>
                                 </div>
                             ) : (
-                                <div style={{ marginTop: '1rem', color: '#00C851' }}>
-                                    <p><strong>Outcome:</strong></p>
-                                    <p>{decisionScenarios[decisionLevel].goodRes}</p>
+                                <div>
+                                    <p style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: '1.5rem' }}>{habitScenarios[habitStep].q}</p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        {habitScenarios[habitStep].options.map((opt, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleHabitClick(opt.type)}
+                                                className="btn"
+                                                style={{ padding: '1.5rem', fontSize: '1.1rem', backgroundColor: '#333', border: '1px solid #555' }}
+                                            >
+                                                {opt.txt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p style={{ marginTop: '1rem', textAlign: 'center', color: '#888' }}>Question {habitStep + 1}/{habitScenarios.length}</p>
                                 </div>
                             )}
                         </div>
-                    ) : (
-                        <div style={{ textAlign: 'center', color: '#00C851' }}>
-                            <h3>Wise Decision Maker! 🦁</h3>
-                            <p>You have completed all scenarios.</p>
+                    )}
+
+                    {decisionGame === 'empathy' && (
+                        <div style={{ animation: 'fadeIn 0.5s' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h3 style={{ margin: 0 }}>❤️ Empathy Challenge</h3>
+                                <button onClick={() => setDecisionGame('menu')} className="btn btn-sm" style={{ backgroundColor: '#555' }}>Back</button>
+                            </div>
+
+                            {empathyMessage ? (
+                                <div style={{ textAlign: 'center', padding: '2rem', backgroundColor: '#333', borderRadius: '8px' }}>
+                                    <p style={{ fontSize: '1.5rem', color: empathyMessage.includes('!') ? '#00C851' : '#ff4444' }}>{empathyMessage}</p>
+                                </div>
+                            ) : (
+                                <div>
+                                    <p style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: '1.5rem' }}>{empathyScenarios[empathyStep].q}</p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                        {empathyScenarios[empathyStep].options.map((opt, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleEmpathyClick(opt.type)}
+                                                className="btn"
+                                                style={{ padding: '1.5rem', fontSize: '1.1rem', backgroundColor: '#333', border: '1px solid #555' }}
+                                            >
+                                                {opt.txt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p style={{ marginTop: '1rem', textAlign: 'center', color: '#888' }}>Scenario {empathyStep + 1}/{empathyScenarios.length}</p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
             )
-
         },
         {
             id: 6,
@@ -1727,7 +2138,7 @@ const CriticalThinking = ({ ageGroup }) => {
                                                     setScienceStep(1);
                                                     triggerConfetti();
                                                 } else {
-                                                    alert(`Not quite! 🧠\n\n${scienceScenarios[scienceLevel].explanation}`);
+                                                    showToast(`Not quite! 🧠\n\n${scienceScenarios[scienceLevel].explanation}`, 'warning');
                                                 }
                                             }} className="btn btn-sm" style={{ textAlign: 'left' }}>
                                                 {opt}
@@ -2135,6 +2546,116 @@ const CriticalThinking = ({ ageGroup }) => {
             )
         },
         {
+            id: 16,
+            title: "The Innovator's Studio 💡",
+            desc: "4 Types of Creativity",
+            content: (
+                <div>
+                    <p style={{ marginBottom: '1rem', textAlign: 'center' }}>"Creativity has 4 flavors. Which one are you today?"</p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        {/* 1. Deliberate Cognitive */}
+                        <div
+                            onClick={() => setCreativeMode('delib-cog')}
+                            style={{
+                                padding: '1rem', backgroundColor: creativeMode === 'delib-cog' ? '#FFD700' : '#333', color: creativeMode === 'delib-cog' ? '#000' : '#fff',
+                                borderRadius: '10px', cursor: 'pointer', textAlign: 'center', border: '1px solid #555'
+                            }}>
+                            <div style={{ fontSize: '2rem' }}>🔬🧠</div>
+                            <p><strong>The Detective</strong></p>
+                            <p style={{ fontSize: '0.8rem' }}>(Deliberate Cognitive)</p>
+                        </div>
+
+                        {/* 2. Deliberate Emotional */}
+                        <div
+                            onClick={() => setCreativeMode('delib-emo')}
+                            style={{
+                                padding: '1rem', backgroundColor: creativeMode === 'delib-emo' ? '#FF4081' : '#333', color: creativeMode === 'delib-emo' ? '#fff' : '#fff',
+                                borderRadius: '10px', cursor: 'pointer', textAlign: 'center', border: '1px solid #555'
+                            }}>
+                            <div style={{ fontSize: '2rem' }}>📝❤️</div>
+                            <p><strong>The Poet</strong></p>
+                            <p style={{ fontSize: '0.8rem' }}>(Deliberate Emotional)</p>
+                        </div>
+
+                        {/* 3. Spontaneous Cognitive */}
+                        <div
+                            onClick={() => setCreativeMode('spon-cog')}
+                            style={{
+                                padding: '1rem', backgroundColor: creativeMode === 'spon-cog' ? '#00BFFF' : '#333', color: creativeMode === 'spon-cog' ? '#fff' : '#fff',
+                                borderRadius: '10px', cursor: 'pointer', textAlign: 'center', border: '1px solid #555'
+                            }}>
+                            <div style={{ fontSize: '2rem' }}>🍎💡</div>
+                            <p><strong>The Newton</strong></p>
+                            <p style={{ fontSize: '0.8rem' }}>(Spontaneous Cognitive)</p>
+                        </div>
+
+                        {/* 4. Spontaneous Emotional */}
+                        <div
+                            onClick={() => setCreativeMode('spon-emo')}
+                            style={{
+                                padding: '1rem', backgroundColor: creativeMode === 'spon-emo' ? '#7B1FA2' : '#333', color: creativeMode === 'spon-emo' ? '#fff' : '#fff',
+                                borderRadius: '10px', cursor: 'pointer', textAlign: 'center', border: '1px solid #555'
+                            }}>
+                            <div style={{ fontSize: '2rem' }}>🎷🎨</div>
+                            <p><strong>The Artist</strong></p>
+                            <p style={{ fontSize: '0.8rem' }}>(Spontaneous Emotional)</p>
+                        </div>
+                    </div>
+
+                    {/* DETAILS PANEL */}
+                    {creativeMode && (
+                        <div style={{ marginTop: '1.5rem', padding: '1.5rem', backgroundColor: '#222', borderRadius: '15px', border: '2px solid #FFD700', animation: 'fadeIn 0.5s' }}>
+                            {creativeMode === 'delib-cog' && (
+                                <div>
+                                    <h3 style={{ color: '#FFD700' }}>Deliberate Cognitive: "The Detective" 🕵️‍♂️</h3>
+                                    <p>This is when you sit down and focus really hard to solve a problem.</p>
+                                    <ul style={{ textAlign: 'left', marginTop: '1rem', paddingLeft: '1.5rem' }}>
+                                        <li><strong>Example:</strong> Thomas Edison trying 1,000 ways to make a lightbulb. 💡</li>
+                                        <li><strong>Fun Task:</strong> Build a tower using only spaghetti and tape!</li>
+                                    </ul>
+                                    <button onClick={() => { triggerConfetti(); addEarnings('criticalThinking', 25); markComplete(16); }} className="btn btn-sm" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>I get it! (+₦25)</button>
+                                </div>
+                            )}
+                            {creativeMode === 'delib-emo' && (
+                                <div>
+                                    <h3 style={{ color: '#FF4081' }}>Deliberate Emotional: "The Poet" 📝</h3>
+                                    <p>This is when you think deeply about your feelings to create something.</p>
+                                    <ul style={{ textAlign: 'left', marginTop: '1rem', paddingLeft: '1.5rem' }}>
+                                        <li><strong>Example:</strong> Writing a diary entry about a sad day to resolve your feelings. 📔</li>
+                                        <li><strong>Fun Task:</strong> Write a funny poem about a hungry goat!</li>
+                                    </ul>
+                                    <button onClick={() => { triggerConfetti(); addEarnings('criticalThinking', 25); markComplete(16); }} className="btn btn-sm" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>I get it! (+₦25)</button>
+                                </div>
+                            )}
+                            {creativeMode === 'spon-cog' && (
+                                <div>
+                                    <h3 style={{ color: '#00BFFF' }}>Spontaneous Cognitive: "The Newton" 🍏</h3>
+                                    <p>The "Aha!" moment! When an idea hits you while you're doing something else.</p>
+                                    <ul style={{ textAlign: 'left', marginTop: '1rem', paddingLeft: '1.5rem' }}>
+                                        <li><strong>Example:</strong> Isaac Newton seeing an apple fall and realizing Gravity exists!</li>
+                                        <li><strong>Fun Task:</strong> Go for a walk. Let your mind wander. See what pops in!</li>
+                                    </ul>
+                                    <button onClick={() => { triggerConfetti(); addEarnings('criticalThinking', 25); markComplete(16); }} className="btn btn-sm" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>I get it! (+₦25)</button>
+                                </div>
+                            )}
+                            {creativeMode === 'spon-emo' && (
+                                <div>
+                                    <h3 style={{ color: '#7B1FA2' }}>Spontaneous Emotional: "The Artist" 🎨</h3>
+                                    <p>Creativity that flows from the heart without planning.</p>
+                                    <ul style={{ textAlign: 'left', marginTop: '1rem', paddingLeft: '1.5rem' }}>
+                                        <li><strong>Example:</strong> A jazz musician playing a solo they just made up on the spot. 🎷</li>
+                                        <li><strong>Fun Task:</strong> Turn on music and dance however you feel! No steps, just flow!</li>
+                                    </ul>
+                                    <button onClick={() => { triggerConfetti(); addEarnings('criticalThinking', 25); markComplete(16); }} className="btn btn-sm" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>I get it! (+₦25)</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )
+        },
+        {
             id: 17,
             title: "Legend of Truth & Lie 🎭",
             desc: "A story of wisdom.",
@@ -2228,11 +2749,188 @@ const CriticalThinking = ({ ageGroup }) => {
                     </div>
                 </div>
             )
+        },
+        {
+            id: 18,
+            title: "The Detective's Office 🕵️‍♂️",
+            desc: "Solve the Mystery!",
+            content: (
+                <div>
+                    {/* CASE SELECTION (Teens/Adults only) */}
+                    {!isKid && detectiveStep === 0 ? (
+                        <div>
+                            <h3 style={{ color: '#FFD700', marginBottom: '1rem' }}>Choose Your Case</h3>
+                            <p style={{ marginBottom: '1.5rem', color: '#aaa' }}>Select a mystery to solve. Harder cases award more coins!</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {detectiveCases[getCurrentAgeGroup()].map((caseData) => {
+                                    const caseKey = `${getCurrentAgeGroup()}-${caseData.id}`;
+                                    const isSolved = solvedCases.includes(caseKey);
+                                    return (
+                                        <div
+                                            key={caseData.id}
+                                            style={{
+                                                backgroundColor: '#222',
+                                                padding: '1.5rem',
+                                                borderRadius: '15px',
+                                                border: isSolved ? '2px solid #00C851' : '2px solid #444',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s',
+                                                opacity: isSolved ? 0.7 : 1
+                                            }}
+                                            onClick={() => !isSolved && selectCase(caseData.id)}
+                                        >
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                                <h4 style={{ margin: 0, color: isSolved ? '#00C851' : '#FFD700' }}>
+                                                    {caseData.title} {isSolved && '✅'}
+                                                </h4>
+                                                <span style={{
+                                                    backgroundColor: isSolved ? '#00C851' : '#FF8800',
+                                                    padding: '0.3rem 0.8rem',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: 'bold'
+                                                }}>
+                                                    {isSolved ? 'Solved' : `₦${caseData.reward}`}
+                                                </span>
+                                            </div>
+                                            <p style={{ margin: 0, fontSize: '0.9rem', color: '#ccc' }}>{caseData.scenario}</p>
+                                            {!isSolved && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); selectCase(caseData.id); }}
+                                                    className="btn btn-sm"
+                                                    style={{ marginTop: '1rem', backgroundColor: '#FFD700', color: '#000' }}
+                                                >
+                                                    Investigate 🔍
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ) : (
+                        /* SOLVING PHASE */
+                        <div>
+                            {!isKid && (
+                                <button
+                                    onClick={() => setDetectiveStep(0)}
+                                    className="btn btn-sm"
+                                    style={{ marginBottom: '1rem', backgroundColor: '#444' }}
+                                >
+                                    ← Back to Cases
+                                </button>
+                            )}
+                            <p style={{ marginBottom: '1rem', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                                {currentCaseData.title}
+                            </p>
+                            <p style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#aaa' }}>
+                                {currentCaseData.scenario}
+                            </p>
+                            <div style={{ backgroundColor: '#222', padding: '1rem', borderRadius: '15px', border: '1px solid #FFD700' }}>
+                                {detectiveFeedback ? (
+                                    <div style={{ textAlign: 'center' }}>
+                                        <h3 style={{ color: detectiveFeedback.includes('Correct') ? '#00C851' : '#ff4444' }}>{detectiveFeedback}</h3>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        {/* CLUES */}
+                                        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#333', borderRadius: '10px' }}>
+                                            <h4 style={{ color: '#FFD700', marginTop: 0 }}>🔍 Clues:</h4>
+                                            <ul style={{ textAlign: 'left', paddingLeft: '1.5rem' }}>
+                                                {currentCaseData.clues.map((clue, idx) => (
+                                                    <li key={idx} style={{ marginBottom: '0.5rem' }}>{clue}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        {/* SUSPECTS */}
+                                        <p style={{ marginBottom: '1rem' }}>Whodunnit?</p>
+                                        <div style={{ display: 'grid', gridTemplateColumns: isKid ? '1fr 1fr 1fr' : (suspects.length === 4 ? '1fr 1fr' : '1fr 1fr 1fr'), gap: '0.5rem' }}>
+                                            {suspects.map(s => (
+                                                <button
+                                                    key={s.id}
+                                                    onClick={() => handleDetectiveGuess(s.id)}
+                                                    className="btn"
+                                                    style={{
+                                                        backgroundColor: '#444',
+                                                        padding: '1rem',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        border: detectiveSuspect === s.id ? '2px solid #FFD700' : '1px solid #555'
+                                                    }}
+                                                >
+                                                    <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+                                                        {s.emoji || '👤'}
+                                                    </div>
+                                                    <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{s.name}</span>
+                                                    {s.detail && <span style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '0.25rem' }}>{s.detail}</span>}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )
+        },
+        {
+            id: 19,
+            title: "Brain Gym 🏋️‍♂️",
+            desc: "Speed Mental Workout!",
+            content: (
+                <div>
+                    {gymStatus === 'idle' ? (
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏱️</div>
+                            <p>Answer as many questions as you can in 60 seconds!</p>
+                            <button onClick={startBrainGym} className="btn" style={{ marginTop: '1rem', backgroundColor: '#00C851', fontSize: '1.2rem', padding: '1rem 2rem' }}>
+                                Start Workout! 🏃💨
+                            </button>
+                        </div>
+                    ) : gymStatus === 'playing' ? (
+                        <div style={{ textAlign: 'center' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', fontSize: '1.2rem', fontWeight: 'bold' }}>
+                                <span style={{ color: '#FFD700' }}>Score: {gymScore}</span>
+                                <span style={{ color: gymTimer < 10 ? '#ff4444' : '#fff' }}>Time: {gymTimer}s</span>
+                            </div>
+
+                            <div style={{ padding: '2rem', backgroundColor: '#333', borderRadius: '15px', marginBottom: '1rem', border: '2px solid #00C851' }}>
+                                <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{gymQuestion?.q}</h2>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="text"
+                                    value={gymAnswer}
+                                    onChange={(e) => setGymAnswer(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleGymSubmit(gymAnswer)}
+                                    placeholder="Type answer..."
+                                    autoFocus
+                                    style={{ flex: 1, padding: '1rem', fontSize: '1.2rem', borderRadius: '10px', border: 'none' }}
+                                />
+                                <button onClick={() => handleGymSubmit(gymAnswer)} className="btn" style={{ backgroundColor: '#00C851' }}>Submit 🚀</button>
+                            </div>
+                            {gymFeedback && <p style={{ marginTop: '0.5rem', color: '#FFD700', fontWeight: 'bold', animation: 'fadeOut 1s forwards' }}>{gymFeedback}</p>}
+                        </div>
+                    ) : (
+                        <div style={{ textAlign: 'center' }}>
+                            <h2>Workout Complete! 💦</h2>
+                            <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>Final Score: <span style={{ color: '#FFD700' }}>{gymScore}</span></p>
+                            <p>{gymScore >= 50 ? "Amazing! Your brain is huge! 🧠" : "Good logic! Try again to beat your score!"}</p>
+                            <button onClick={startBrainGym} className="btn" style={{ marginTop: '1rem', backgroundColor: '#2196F3' }}>Agian! 🔄</button>
+                        </div>
+                    )}
+                </div>
+            )
         }
     ];
 
     return (
         <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             {/* CONFETTI */}
             {showConfetti && (
                 <div style={{
@@ -2293,246 +2991,291 @@ const CriticalThinking = ({ ageGroup }) => {
                 </div>
             </header>
 
-            {
-                isKid || isTeen ? (
-                    <>
-                        {/* PROGRESS BAR */}
-                        <div style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '15px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                <span><strong>Brain Power:</strong> {brainPower} XP</span>
-                                <span>{completedModules.length}/15 Modules</span>
-                            </div>
-                            <div style={{ width: '100%', height: '15px', backgroundColor: '#333', borderRadius: '10px', overflow: 'hidden' }}>
-                                <div style={{ width: `${(completedModules.length / 15) * 100}%`, height: '100%', backgroundColor: '#00C851', transition: 'width 0.5s' }}></div>
-                            </div>
-                            {showLevelUp && <div style={{ textAlign: 'center', color: '#FFD700', fontWeight: 'bold', marginTop: '0.5rem', animation: 'bounce 0.5s' }}>🎉 LEVEL UP! +10 XP</div>}
-                        </div>
+            {(isKid || isTeen) && (
+                <div style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '15px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <span><strong>Brain Power:</strong> {brainPower} XP</span>
+                        <span>{completedModules.length}/15 Modules</span>
+                    </div>
+                    <div style={{ width: '100%', height: '15px', backgroundColor: '#333', borderRadius: '10px', overflow: 'hidden' }}>
+                        <div style={{ width: `${(completedModules.length / 15) * 100}%`, height: '100%', backgroundColor: '#00C851', transition: 'width 0.5s' }}></div>
+                    </div>
+                    {showLevelUp && <div style={{ textAlign: 'center', color: '#FFD700', fontWeight: 'bold', marginTop: '0.5rem', animation: 'bounce 0.5s' }}>🎉 LEVEL UP! +10 XP</div>}
+                </div>
+            )}
 
-                        {/* MODULES LIST */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            {modules.map((module) => (
+            {/* MODULES LIST */}
+            {(isKid || isTeen) && (
+                <>
+                    {/* MODULES QUEST MAP */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                        {modules.map((module, index) => {
+                            const isLocked = index > 0 && !completedModules.includes(modules[index - 1].id) && !completedModules.includes(module.id);
+                            // Relaxed locking for fun: only lock if > 2 levels ahead? No, strict linear is better for "Game" feel.
+                            // Actually, let's just visual lock but allow click for exploration if they want? No, let's keep it open but visually distinct.
+
+                            const isExpanded = expandedModule === module.id;
+
+                            return (
                                 <div
                                     key={module.id}
                                     className="card"
                                     style={{
-                                        padding: '0', overflow: 'hidden',
-                                        borderLeft: completedModules.includes(module.id) ? '4px solid #00C851' : (expandedModule === module.id ? '4px solid var(--color-primary)' : '4px solid transparent'),
+                                        padding: '0',
+                                        overflow: 'hidden',
+                                        gridColumn: isExpanded ? '1 / -1' : 'auto',
+                                        border: isExpanded ? '2px solid var(--color-primary)' : 'none',
+                                        backgroundColor: isExpanded ? '#222' : 'rgba(255,255,255,0.05)',
                                         transition: 'all 0.3s ease',
-                                        opacity: completedModules.includes(module.id) ? 0.8 : 1
+                                        position: 'relative',
+                                        opacity: isLocked && !isExpanded ? 0.6 : 1,
+                                        transform: isExpanded ? 'scale(1)' : 'scale(0.98)'
                                     }}
                                 >
                                     <div
                                         onClick={() => toggleModule(module.id)}
                                         style={{
-                                            padding: '1.5rem', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                            backgroundColor: expandedModule === module.id ? 'rgba(255,255,255,0.05)' : 'transparent'
+                                            padding: '1.5rem',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            flexDirection: isExpanded ? 'row' : 'column',
+                                            justifyContent: isExpanded ? 'space-between' : 'center',
+                                            alignItems: 'center',
+                                            textAlign: isExpanded ? 'left' : 'center',
+                                            height: isExpanded ? 'auto' : '200px',
+                                            background: completedModules.includes(module.id)
+                                                ? 'linear-gradient(45deg, rgba(0,200,81,0.2), transparent)'
+                                                : 'transparent'
                                         }}
                                     >
-                                        <div>
-                                            <h3 style={{ margin: 0, color: completedModules.includes(module.id) ? '#00C851' : (expandedModule === module.id ? 'var(--color-primary)' : 'var(--color-text)') }}>
-                                                {module.id}. {module.title} {completedModules.includes(module.id) && '✅'}
+                                        <div style={{ marginBottom: isExpanded ? 0 : '1rem' }}>
+                                            <div style={{
+                                                fontSize: '2.5rem',
+                                                marginBottom: '0.5rem',
+                                                filter: isLocked && !completedModules.includes(module.id) ? 'grayscale(1)' : 'none'
+                                            }}>
+                                                {module.title.split(" ")[module.title.split(" ").length - 1]}
+                                                {/* Uses the last emoji as the icon */}
+                                            </div>
+                                            <h3 style={{ margin: 0, color: completedModules.includes(module.id) ? '#00C851' : (isExpanded ? 'var(--color-primary)' : '#fff') }}>
+                                                {isLocked && !completedModules.includes(module.id) ? "🔒 Locked" : module.title}
                                             </h3>
-                                            <p style={{ margin: '0.5rem 0 0 0', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>{module.desc}</p>
+                                            <p style={{ margin: '0.5rem 0 0 0', color: 'var(--color-text-muted)', fontSize: '0.9rem', display: isExpanded ? 'block' : 'none' }}>
+                                                {module.desc}
+                                            </p>
                                         </div>
-                                        <span style={{ fontSize: '1.5rem', transform: expandedModule === module.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>▼</span>
+
+                                        {!isExpanded && (
+                                            <button className="btn btn-sm" style={{
+                                                backgroundColor: completedModules.includes(module.id) ? '#00C851' : (isLocked ? '#555' : 'var(--color-primary)'),
+                                                marginTop: 'auto'
+                                            }}>
+                                                {completedModules.includes(module.id) ? "Replay ↺" : (isLocked ? "Locked" : "Start ▶")}
+                                            </button>
+                                        )}
+
+                                        {isExpanded && <span style={{ fontSize: '1.5rem', transform: 'rotate(180deg)' }}>▼</span>}
                                     </div>
 
-                                    {expandedModule === module.id && (
+                                    {isExpanded && (
                                         <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', animation: 'fadeIn 0.5s' }}>
                                             {module.content}
                                         </div>
                                     )}
                                 </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* MENTOR CHAT FAB */}
+                    <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000 }}>
+                        {!showChat && (
+                            <button
+                                onClick={() => setShowChat(true)}
+                                style={{
+                                    width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary)',
+                                    border: 'none', color: '#000', fontSize: '2rem', boxShadow: '0 5px 15px rgba(0,0,0,0.5)',
+                                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}
+                            >
+                                🦁
+                            </button>
+                        )}
+                    </div>
+
+                    {/* MENTOR CHAT WINDOW */}
+                    {showChat && (
+                        <div style={{
+                            position: 'fixed', bottom: '5rem', right: '2rem', width: '350px', height: '500px',
+                            backgroundColor: '#1a1a1a', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+                            display: 'flex', flexDirection: 'column', border: '2px solid var(--color-primary)', zIndex: 1000,
+                            animation: 'fadeIn 0.3s'
+                        }}>
+                            <div style={{
+                                padding: '1rem', backgroundColor: 'var(--color-primary)', color: '#000',
+                                borderTopLeftRadius: '18px', borderTopRightRadius: '18px',
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                            }}>
+                                <h3 style={{ margin: 0 }}>🦁 Village Mentor</h3>
+                                <button onClick={() => setShowChat(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+                            </div>
+
+                            <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {chatMessages.map((msg, i) => (
+                                    <div key={i} style={{
+                                        alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                        backgroundColor: msg.sender === 'user' ? '#333' : '#004d40',
+                                        padding: '0.8rem', borderRadius: '15px', maxWidth: '80%'
+                                    }}>
+                                        {msg.text}
+                                    </div>
+                                ))}
+                                <div ref={chatEndRef} />
+                            </div>
+
+                            <form onSubmit={handleChatSubmit} style={{ padding: '1rem', borderTop: '1px solid #333', display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="text"
+                                    value={chatInput}
+                                    onChange={(e) => setChatInput(e.target.value)}
+                                    placeholder="I helped my mom..."
+                                    style={{ flex: 1, padding: '0.8rem', borderRadius: '20px', border: 'none', backgroundColor: '#333', color: '#fff' }}
+                                />
+                                <button type="submit" style={{ width: '40px', height: '40px', borderRadius: '50%', border: 'none', backgroundColor: 'var(--color-primary)', cursor: 'pointer' }}>➤</button>
+                            </form>
+                        </div>
+                    )}
+                </>
+            )}
+
+            {(!isKid && !isTeen) && (
+                // --- ADULT VIEW ---
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    {/* FALLACY DETECTIVE */}
+                    <div className="card" style={{ padding: '2rem', borderLeft: '4px solid #FF8800' }}>
+                        <h3 style={{ color: '#FF8800', marginTop: 0 }}>🕵️‍♂️ Fallacy Detective</h3>
+                        <p>Identify the flaw in the logic.</p>
+                        <div style={{ marginTop: '1rem', padding: '1.5rem', backgroundColor: '#333', borderRadius: '15px' }}>
+                            {showFallacyResult ? (
+                                <h4 style={{ color: showFallacyResult.includes("Correct") ? '#00C851' : '#ff4444' }}>{showFallacyResult}</h4>
+                            ) : (
+                                <>
+                                    <p style={{ fontSize: '1.2rem', fontStyle: 'italic', marginBottom: '1.5rem' }}>"{fallacies[fallacyIndex].q}"</p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                                        {fallacies[fallacyIndex].options.map((opt, i) => (
+                                            <button key={i} onClick={() => handleFallacyAnswer(opt)} className="btn" style={{ backgroundColor: '#444' }}>{opt}</button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                            <p style={{ marginTop: '1rem', textAlign: 'right', color: '#aaa' }}>Score: {fallacyScore}/{fallacies.length}</p>
+                        </div>
+                    </div>
+
+                    {/* STRATEGY ROOM */}
+                    <div className="card" style={{ padding: '2rem', borderLeft: '4px solid #00C851' }}>
+                        <h3 style={{ color: '#00C851', marginTop: 0 }}>🦁 Strategy Room (Advanced Oware)</h3>
+                        <p>Master the endgame.</p>
+
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                            {strategies.map((strat, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => startStrategyLevel(i)}
+                                    className="btn btn-sm"
+                                    style={{
+                                        backgroundColor: strategyLevel === i ? 'var(--color-primary)' : '#333',
+                                        color: strategyLevel === i ? '#000' : '#fff',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    {strat.name}
+                                </button>
                             ))}
                         </div>
 
-                        {/* MENTOR CHAT FAB */}
-                        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000 }}>
-                            {!showChat && (
-                                <button
-                                    onClick={() => setShowChat(true)}
-                                    style={{
-                                        width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary)',
-                                        border: 'none', color: '#000', fontSize: '2rem', boxShadow: '0 5px 15px rgba(0,0,0,0.5)',
-                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}
-                                >
-                                    🦁
-                                </button>
-                            )}
-                        </div>
-
-                        {/* MENTOR CHAT WINDOW */}
-                        {showChat && (
-                            <div style={{
-                                position: 'fixed', bottom: '5rem', right: '2rem', width: '350px', height: '500px',
-                                backgroundColor: '#1a1a1a', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-                                display: 'flex', flexDirection: 'column', border: '2px solid var(--color-primary)', zIndex: 1000,
-                                animation: 'fadeIn 0.3s'
-                            }}>
-                                <div style={{
-                                    padding: '1rem', backgroundColor: 'var(--color-primary)', color: '#000',
-                                    borderTopLeftRadius: '18px', borderTopRightRadius: '18px',
-                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                                }}>
-                                    <h3 style={{ margin: 0 }}>🦁 Village Mentor</h3>
-                                    <button onClick={() => setShowChat(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
-                                </div>
-
-                                <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    {chatMessages.map((msg, i) => (
-                                        <div key={i} style={{
-                                            alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                                            backgroundColor: msg.sender === 'user' ? '#333' : '#004d40',
-                                            padding: '0.8rem', borderRadius: '15px', maxWidth: '80%'
-                                        }}>
-                                            {msg.text}
-                                        </div>
-                                    ))}
-                                    <div ref={chatEndRef} />
-                                </div>
-
-                                <form onSubmit={handleChatSubmit} style={{ padding: '1rem', borderTop: '1px solid #333', display: 'flex', gap: '0.5rem' }}>
-                                    <input
-                                        type="text"
-                                        value={chatInput}
-                                        onChange={(e) => setChatInput(e.target.value)}
-                                        placeholder="I helped my mom..."
-                                        style={{ flex: 1, padding: '0.8rem', borderRadius: '20px', border: 'none', backgroundColor: '#333', color: '#fff' }}
-                                    />
-                                    <button type="submit" style={{ width: '40px', height: '40px', borderRadius: '50%', border: 'none', backgroundColor: 'var(--color-primary)', cursor: 'pointer' }}>➤</button>
-                                </form>
-                            </div>
-                        )}
-                    </>
-                ) : (
-                    // --- ADULT VIEW ---
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                        {/* FALLACY DETECTIVE */}
-                        <div className="card" style={{ padding: '2rem', borderLeft: '4px solid #FF8800' }}>
-                            <h3 style={{ color: '#FF8800', marginTop: 0 }}>🕵️‍♂️ Fallacy Detective</h3>
-                            <p>Identify the flaw in the logic.</p>
-                            <div style={{ marginTop: '1rem', padding: '1.5rem', backgroundColor: '#333', borderRadius: '15px' }}>
-                                {showFallacyResult ? (
-                                    <h4 style={{ color: showFallacyResult.includes("Correct") ? '#00C851' : '#ff4444' }}>{showFallacyResult}</h4>
-                                ) : (
-                                    <>
-                                        <p style={{ fontSize: '1.2rem', fontStyle: 'italic', marginBottom: '1.5rem' }}>"{fallacies[fallacyIndex].q}"</p>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-                                            {fallacies[fallacyIndex].options.map((opt, i) => (
-                                                <button key={i} onClick={() => handleFallacyAnswer(opt)} className="btn" style={{ backgroundColor: '#444' }}>{opt}</button>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
-                                <p style={{ marginTop: '1rem', textAlign: 'right', color: '#aaa' }}>Score: {fallacyScore}/{fallacies.length}</p>
-                            </div>
-                        </div>
-
-                        {/* STRATEGY ROOM */}
-                        <div className="card" style={{ padding: '2rem', borderLeft: '4px solid #00C851' }}>
-                            <h3 style={{ color: '#00C851', marginTop: 0 }}>🦁 Strategy Room (Advanced Oware)</h3>
-                            <p>Master the endgame.</p>
-
-                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                                {strategies.map((strat, i) => (
+                        <div style={{ backgroundColor: '#3e2723', padding: '2rem', borderRadius: '20px', textAlign: 'center' }}>
+                            <p style={{ color: '#FFD700', marginBottom: '1rem' }}>{strategyMessage}</p>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+                                {pits.map((seeds, index) => (
                                     <button
-                                        key={i}
-                                        onClick={() => startStrategyLevel(i)}
-                                        className="btn btn-sm"
+                                        key={index} onClick={() => handleSow(index)} disabled={seeds === 0}
                                         style={{
-                                            backgroundColor: strategyLevel === i ? 'var(--color-primary)' : '#333',
-                                            color: strategyLevel === i ? '#000' : '#fff',
-                                            whiteSpace: 'nowrap'
+                                            width: '50px', height: '50px', borderRadius: '50%', backgroundColor: '#5d4037',
+                                            border: 'none', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold',
+                                            cursor: seeds > 0 ? 'pointer' : 'default', margin: '0 auto'
                                         }}
                                     >
-                                        {strat.name}
+                                        {seeds}
                                     </button>
                                 ))}
                             </div>
-
-                            <div style={{ backgroundColor: '#3e2723', padding: '2rem', borderRadius: '20px', textAlign: 'center' }}>
-                                <p style={{ color: '#FFD700', marginBottom: '1rem' }}>{strategyMessage}</p>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
-                                    {pits.map((seeds, index) => (
-                                        <button
-                                            key={index} onClick={() => handleSow(index)} disabled={seeds === 0}
-                                            style={{
-                                                width: '50px', height: '50px', borderRadius: '50%', backgroundColor: '#5d4037',
-                                                border: 'none', color: '#fff', fontSize: '1.2rem', fontWeight: 'bold',
-                                                cursor: seeds > 0 ? 'pointer' : 'default', margin: '0 auto'
-                                            }}
-                                        >
-                                            {seeds}
-                                        </button>
-                                    ))}
-                                </div>
-                                <button onClick={() => startStrategyLevel(strategyLevel)} className="btn btn-sm" style={{ backgroundColor: '#ff4444' }}>Reset Level</button>
-                            </div>
+                            <button onClick={() => startStrategyLevel(strategyLevel)} className="btn btn-sm" style={{ backgroundColor: '#ff4444' }}>Reset Level</button>
                         </div>
+                    </div>
 
-                        {/* MENTOR CHAT FAB (Shared) */}
-                        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000 }}>
-                            {!showChat && (
-                                <button
-                                    onClick={() => setShowChat(true)}
-                                    style={{
-                                        width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary)',
-                                        border: 'none', color: '#000', fontSize: '2rem', boxShadow: '0 5px 15px rgba(0,0,0,0.5)',
-                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}
-                                >
-                                    🦁
-                                </button>
-                            )}
-                        </div>
-
-                        {/* MENTOR CHAT WINDOW */}
-                        {showChat && (
-                            <div style={{
-                                position: 'fixed', bottom: '5rem', right: '2rem', width: '350px', height: '500px',
-                                backgroundColor: '#1a1a1a', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-                                display: 'flex', flexDirection: 'column', border: '2px solid var(--color-primary)', zIndex: 1000,
-                                animation: 'fadeIn 0.3s'
-                            }}>
-                                <div style={{
-                                    padding: '1rem', backgroundColor: 'var(--color-primary)', color: '#000',
-                                    borderTopLeftRadius: '18px', borderTopRightRadius: '18px',
-                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                                }}>
-                                    <h3 style={{ margin: 0 }}>🦁 Village Mentor</h3>
-                                    <button onClick={() => setShowChat(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
-                                </div>
-
-                                <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    {chatMessages.map((msg, i) => (
-                                        <div key={i} style={{
-                                            alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                                            backgroundColor: msg.sender === 'user' ? '#333' : '#004d40',
-                                            padding: '0.8rem', borderRadius: '15px', maxWidth: '80%'
-                                        }}>
-                                            {msg.text}
-                                        </div>
-                                    ))}
-                                    <div ref={chatEndRef} />
-                                </div>
-
-                                <form onSubmit={handleChatSubmit} style={{ padding: '1rem', borderTop: '1px solid #333', display: 'flex', gap: '0.5rem' }}>
-                                    <input
-                                        type="text"
-                                        value={chatInput}
-                                        onChange={(e) => setChatInput(e.target.value)}
-                                        placeholder="I helped my mom..."
-                                        style={{ flex: 1, padding: '0.8rem', borderRadius: '20px', border: 'none', backgroundColor: '#333', color: '#fff' }}
-                                    />
-                                    <button type="submit" style={{ width: '40px', height: '40px', borderRadius: '50%', border: 'none', backgroundColor: 'var(--color-primary)', cursor: 'pointer' }}>➤</button>
-                                </form>
-                            </div>
+                    {/* MENTOR CHAT FAB (Shared) */}
+                    <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000 }}>
+                        {!showChat && (
+                            <button
+                                onClick={() => setShowChat(true)}
+                                style={{
+                                    width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--color-primary)',
+                                    border: 'none', color: '#000', fontSize: '2rem', boxShadow: '0 5px 15px rgba(0,0,0,0.5)',
+                                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}
+                            >
+                                🦁
+                            </button>
                         )}
                     </div>
-                )
-            }
-        </div >
+
+                    {/* MENTOR CHAT WINDOW */}
+                    {showChat && (
+                        <div style={{
+                            position: 'fixed', bottom: '5rem', right: '2rem', width: '350px', height: '500px',
+                            backgroundColor: '#1a1a1a', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+                            display: 'flex', flexDirection: 'column', border: '2px solid var(--color-primary)', zIndex: 1000,
+                            animation: 'fadeIn 0.3s'
+                        }}>
+                            <div style={{
+                                padding: '1rem', backgroundColor: 'var(--color-primary)', color: '#000',
+                                borderTopLeftRadius: '18px', borderTopRightRadius: '18px',
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                            }}>
+                                <h3 style={{ margin: 0 }}>🦁 Village Mentor</h3>
+                                <button onClick={() => setShowChat(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+                            </div>
+
+                            <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {chatMessages.map((msg, i) => (
+                                    <div key={i} style={{
+                                        alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                        backgroundColor: msg.sender === 'user' ? '#333' : '#004d40',
+                                        padding: '0.8rem', borderRadius: '15px', maxWidth: '80%'
+                                    }}>
+                                        {msg.text}
+                                    </div>
+                                ))}
+                                <div ref={chatEndRef} />
+                            </div>
+
+                            <form onSubmit={handleChatSubmit} style={{ padding: '1rem', borderTop: '1px solid #333', display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="text"
+                                    value={chatInput}
+                                    onChange={(e) => setChatInput(e.target.value)}
+                                    placeholder="I helped my mom..."
+                                    style={{ flex: 1, padding: '0.8rem', borderRadius: '20px', border: 'none', backgroundColor: '#333', color: '#fff' }}
+                                />
+                                <button type="submit" style={{ width: '40px', height: '40px', borderRadius: '50%', border: 'none', backgroundColor: 'var(--color-primary)', cursor: 'pointer' }}>➤</button>
+                            </form>
+                        </div>
+                    )}
+                </div>
+            )}
+
+        </div>
     );
 };
 

@@ -14,23 +14,31 @@ const AgeSelector = ({ onSelect }) => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.9)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            backdropFilter: 'blur(10px)'
+            backgroundColor: 'rgba(0,0,0,0.95)',
+            zIndex: 3000,
+            backdropFilter: 'blur(15px)',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            padding: '2rem 1rem'
         }}>
-            <div className="container" style={{ textAlign: 'center', maxWidth: '800px' }}>
-                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>Welcome to MindNest</h2>
-                <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)', marginBottom: '3rem' }}>
+            <div style={{
+                textAlign: 'center',
+                maxWidth: '800px',
+                width: '100%',
+                margin: '0 auto',
+                minHeight: 'fit-content'
+            }}>
+                <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '1rem', color: 'var(--color-primary)' }}>Welcome to MindNest</h2>
+                <p style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)', color: 'var(--color-text-muted)', marginBottom: '3rem' }}>
                     Select your age group to begin your journey.
                 </p>
 
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: '2rem'
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                    gap: '1.5rem',
+                    marginBottom: '2rem'
                 }}>
                     {ageGroups.map((group) => (
                         <button
@@ -40,7 +48,7 @@ const AgeSelector = ({ onSelect }) => {
                                 backgroundColor: 'var(--color-surface)',
                                 border: `2px solid ${group.color}`,
                                 borderRadius: 'var(--border-radius)',
-                                padding: '2rem',
+                                padding: '2rem 1rem',
                                 color: 'var(--color-text)',
                                 transition: 'transform 0.3s, box-shadow 0.3s',
                                 cursor: 'pointer'
@@ -54,8 +62,8 @@ const AgeSelector = ({ onSelect }) => {
                                 e.currentTarget.style.boxShadow = 'none';
                             }}
                         >
-                            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>{group.icon}</div>
-                            <h3 style={{ color: group.color, marginBottom: '0.5rem' }}>{group.label}</h3>
+                            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>{group.icon}</div>
+                            <h3 style={{ color: group.color, marginBottom: '0.5rem', fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>{group.label}</h3>
                         </button>
                     ))}
                 </div>

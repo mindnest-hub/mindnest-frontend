@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLeaderboard } from '../hooks/useLeaderboard';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 
 const MODULE_CAPS = {
     history: 4000,
@@ -14,6 +16,7 @@ const DEFAULT_CAP = 2000;
 const WITHDRAWAL_LIMIT = 5000;
 
 export const useWallet = () => {
+    const { token } = useAuth();
     // Track spendable balance per module
     const [moduleBalances, setModuleBalances] = useState(() => {
         try {
@@ -38,12 +41,45 @@ export const useWallet = () => {
     const balance = Object.values(moduleBalances).reduce((acc, val) => acc + (Number(val) || 0), 0);
 
     const { updateEarnings } = useLeaderboard();
+    const [isSyncing, setIsSyncing] = useState(false);
+
+    // Fetch progress from backend on mount or when token changes
+    useEffect(() => {
+        if (token) {
+            setIsSyncing(true);
+            api.getProfile(token)
+                .then(userData => {
+                    if (userData.moduleBalances && typeof userData.moduleBalances === 'object') {
+                        setModuleBalances(userData.moduleBalances);
+                    }
+                    if (userData.moduleEarnings && typeof userData.moduleEarnings === 'object') {
+                        setModuleEarnings(userData.moduleEarnings);
+                    }
+                })
+                .catch(err => console.error("Failed to fetch profile from backend:", err))
+                .finally(() => setIsSyncing(false));
+        }
+    }, [token]);
 
     useEffect(() => {
         localStorage.setItem('moduleBalances', JSON.stringify(moduleBalances));
         localStorage.setItem('moduleEarnings', JSON.stringify(moduleEarnings));
-        localStorage.setItem('walletBalance', balance); // Keep for backward compatibility if needed
-    }, [moduleBalances, moduleEarnings, balance]);
+        localStorage.setItem('walletBalance', balance);
+
+        // Sync with backend if logged in (Debounced)
+        if (token) {
+            const timeoutId = setTimeout(() => {
+                api.updateProgress(token, {
+                    moduleBalances,
+                    moduleEarnings,
+                    xp: (moduleEarnings.history || 0) + (moduleEarnings.finance || 0) + (moduleEarnings.tech || 0),
+                    walletBalance: balance
+                }).catch(err => console.error("Failed to sync progress with backend:", err));
+            }, 2000); // 2 second debounce
+
+            return () => clearTimeout(timeoutId);
+        }
+    }, [moduleBalances, moduleEarnings, balance, token]);
 
     const getModuleCap = (module) => {
         const savedAgeGroup = localStorage.getItem('ageGroup');
@@ -53,6 +89,8 @@ export const useWallet = () => {
         if (isYoung) {
             // Special exception for History module as requested
             if (module === 'history') return 2000;
+            // Special exception for Finance module (15 levels * 100 coins)
+            if (module === 'finance') return 1500;
             // Default cap for all other modules for kids
             return 1000;
         }
@@ -96,14 +134,33 @@ export const useWallet = () => {
         setModuleBalances(prev => ({ ...prev, [module]: Math.max(0, newBalance) }));
     };
 
-    return {
-        balance, // Global sum
-        moduleBalances, // Individual balances
-        moduleEarnings, // Lifetime earnings (for caps)
-        addEarnings,
-        deductPenalty,
-        getModuleCap,
-        WITHDRAWAL_LIMIT,
-        setModuleBalance
+    const deductGlobal = (amount) => {
+        let remaining = amount;
+        let newBalances = { ...moduleBalances };
+
+        // Order of spending: Finance -> History -> Tech -> Others
+        const modules = Object.keys(newBalances);
+
+        for (const module of modules) {
+            if (remaining <= 0) break;
+
+            const available = newBalances[module];
+            const spend = Math.min(available, remaining);
+
+            if (spend > 0) {
+                newBalances[module] -= spend;
+                remaining -= spend;
+            }
+        }
+
+        if (remaining === 0) {
+            setModuleBalances(newBalances);
+            return true; // Success
+        }
+        return false; // Insufficient funds
     };
+
+    const getAgeGroup = () => localStorage.getItem('ageGroup');
+
+    return { balance, moduleBalances, addEarnings, deductPenalty, setModuleBalance, getModuleCap, deductGlobal, moduleEarnings, getAgeGroup, WITHDRAWAL_LIMIT, isSyncing };
 };

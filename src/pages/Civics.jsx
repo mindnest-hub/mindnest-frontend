@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const Civics = () => {
     const navigate = useNavigate();
@@ -8,6 +9,12 @@ const Civics = () => {
     const [happiness, setHappiness] = useState(50);
     const [funds, setFunds] = useState(1000);
     const [year, setYear] = useState(1);
+    const [activeTab, setActiveTab] = useState('budget');
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
     const [gameOver, setGameOver] = useState(false);
     const [gameMessage, setGameMessage] = useState("Welcome, Chief! Lead your village to prosperity. 🌍");
 
@@ -63,7 +70,7 @@ const Civics = () => {
 
     const handleDecision = (option) => {
         if (funds < option.cost) {
-            alert("Not enough funds! Choose another option.");
+            showToast("Not enough funds! Choose another option.", 'warning');
             return;
         }
 
@@ -93,6 +100,7 @@ const Civics = () => {
 
     return (
         <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}
                 style={{

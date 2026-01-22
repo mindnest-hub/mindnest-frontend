@@ -23,7 +23,8 @@ const AuthModal = ({ onClose }) => {
             }
             onClose();
         } catch (err) {
-            setError('Authentication failed. Please check your details.');
+            console.error("Auth Error:", err);
+            setError(err.message || 'Authentication failed. Please check your details.');
         } finally {
             setLoading(false);
         }
@@ -32,56 +33,77 @@ const AuthModal = ({ onClose }) => {
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000
+            backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5000,
+            padding: '1rem', backdropFilter: 'blur(10px)'
         }}>
-            <div style={{
-                background: 'var(--color-surface)', padding: '2rem', borderRadius: '1rem', width: '90%', maxWidth: '400px',
-                position: 'relative', color: '#fff'
+            <div className="card" style={{
+                width: '100%', maxWidth: '420px',
+                position: 'relative', padding: '2.5rem 2rem',
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                border: '1px solid var(--color-border)'
             }}>
-                <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: 'var(--color-text-muted)', fontSize: '1.5rem', transition: 'var(--transition)' }}>&times;</button>
 
-                <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--color-primary)' }}>
-                    {isLogin ? 'Welcome Back!' : 'Join MindNest'}
-                </h2>
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <h2 style={{ fontSize: '2rem', color: '#fff' }}>
+                        {isLogin ? 'Welcome Back' : 'Get Started'}
+                    </h2>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                        {isLogin ? 'Sign in to continue your journey' : 'Create an account to save your progress'}
+                    </p>
+                </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     {!isLogin && (
                         <input
                             type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required
-                            style={{ padding: '0.8rem', borderRadius: '0.5rem', border: 'none' }}
+                            style={{
+                                padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                fontFamily: 'inherit', fontSize: '1rem'
+                            }}
                         />
                     )}
                     <input
-                        type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required
-                        style={{ padding: '0.8rem', borderRadius: '0.5rem', border: 'none' }}
+                        type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required
+                        style={{
+                            padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                            fontFamily: 'inherit', fontSize: '1rem'
+                        }}
                     />
                     <input
                         type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required
-                        style={{ padding: '0.8rem', borderRadius: '0.5rem', border: 'none' }}
+                        style={{
+                            padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                            fontFamily: 'inherit', fontSize: '1rem'
+                        }}
                     />
                     {!isLogin && (
-                        <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)} style={{ padding: '0.8rem', borderRadius: '0.5rem', border: 'none' }}>
-                            <option value="kids">Kids (Under 13)</option>
-                            <option value="teens">Teens (13-18)</option>
-                            <option value="adults">Adults (18+)</option>
-                        </select>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>Select Age Group</label>
+                            <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)} style={{
+                                padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                fontFamily: 'inherit', fontSize: '1rem'
+                            }}>
+                                <option value="kids">Kids (5-12)</option>
+                                <option value="teens">Teens (13-19)</option>
+                                <option value="adults">Adults (20+)</option>
+                            </select>
+                        </div>
                     )}
 
-                    {error && <p style={{ color: '#ff6b6b', fontSize: '0.9rem', textAlign: 'center' }}>{error}</p>}
+                    {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', textAlign: 'center', background: 'rgba(255,69,0,0.1)', padding: '0.75rem', borderRadius: '8px' }}>{error}</p>}
 
-                    <button type="submit" disabled={loading} style={{
-                        background: 'var(--color-primary)', color: '#fff', padding: '1rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', fontWeight: 'bold'
-                    }}>
-                        {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+                    <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', padding: '1rem' }}>
+                        {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
                     </button>
                 </form>
 
-                <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
+                <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
                     {isLogin ? "Don't have an account? " : "Already have an account? "}
-                    <button onClick={() => setIsLogin(!isLogin)} style={{ background: 'none', border: 'none', color: 'var(--color-accent)', cursor: 'pointer', textDecoration: 'underline' }}>
-                        {isLogin ? 'Sign Up' : 'Login'}
+                    <button onClick={() => setIsLogin(!isLogin)} style={{ color: 'var(--color-primary)', fontWeight: '600', marginLeft: '0.25rem', textDecoration: 'underline' }}>
+                        {isLogin ? 'Sign Up' : 'Sign In'}
                     </button>
-                </p>
+                </div>
             </div>
         </div>
     );

@@ -1,11 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const Transparency = () => {
     const navigate = useNavigate();
+    const [toast, setToast] = useState(null);
+
+    const showToast = (message, type = 'info') => {
+        setToast({ message, type });
+    };
 
     return (
         <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}
                 style={{
@@ -76,7 +83,7 @@ const Transparency = () => {
                     <button
                         className="btn"
                         style={{ width: '100%', backgroundColor: '#333', border: '1px solid #00C851', color: '#00C851' }}
-                        onClick={() => alert("This would download a sample PDF of a C of O and Survey Plan.")}
+                        onClick={() => showToast("This would download a sample PDF of a C of O and Survey Plan.", 'info')}
                     >
                         📥 Download Sample Search Report
                     </button>
