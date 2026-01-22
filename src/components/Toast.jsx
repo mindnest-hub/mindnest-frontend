@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 
-const Toast = ({ message, type = 'info', onClose }) => {
+const Toast = ({ message, type = 'info', duration = 5000, onClose }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();
-        }, 3000); // Auto-dismiss after 3s
+        }, duration); // Use provided duration or default to 5s
         return () => clearTimeout(timer);
-    }, [onClose]);
+    }, [onClose, duration]);
 
     if (!message) return null;
 

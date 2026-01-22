@@ -21,8 +21,8 @@ const History = ({ ageGroup }) => {
     const [showConfetti, setShowConfetti] = useState(false);
     const [toast, setToast] = useState(null);
 
-    const showToast = (message, type = 'info') => {
-        setToast({ message, type });
+    const showToast = (message, type = 'info', duration = 5000) => {
+        setToast({ message, type, duration });
     };
     const [wrongAttempts, setWrongAttempts] = useState(0);
 
@@ -161,7 +161,7 @@ const History = ({ ageGroup }) => {
             setWrongAttempts(0); // Reset attempts on correct answer
             // Reward: ₦100 per correct answer
             addEarnings('history', 100);
-            showToast(`Correct! 🎉\n\nDid you know? ${currentQuestion.fact}\n\n(+₦100)`, 'success');
+            showToast(`Correct! 🎉\n\nDid you know? ${currentQuestion.fact}\n\n(+₦100)`, 'success', 8000);
         } else {
             const newAttempts = wrongAttempts + 1;
             setWrongAttempts(newAttempts);
@@ -169,9 +169,9 @@ const History = ({ ageGroup }) => {
             if (newAttempts >= 3) {
                 deductPenalty('history', 100);
                 setWrongAttempts(0);
-                showToast(`⚠️ 3 Wrong Attempts! A penalty of ₦100 has been deducted from your History wallet.\n\nCorrect Answer: ${currentQuestion.correct}\nFact: ${currentQuestion.fact}`, 'error');
+                showToast(`⚠️ 3 Wrong Attempts! A penalty of ₦100 has been deducted from your History wallet.\n\nCorrect Answer: ${currentQuestion.correct}\nFact: ${currentQuestion.fact}`, 'error', 10000);
             } else {
-                showToast(`Oops! ${currentQuestion.resource} is found in ${currentQuestion.correct}.\nFact: ${currentQuestion.fact}\n(Warning: ${newAttempts}/3 wrong attempts)`, 'warning');
+                showToast(`Oops! ${currentQuestion.resource} is found in ${currentQuestion.correct}.\nFact: ${currentQuestion.fact}\n(Warning: ${newAttempts}/3 wrong attempts)`, 'warning', 8000);
             }
         }
 
@@ -182,7 +182,7 @@ const History = ({ ageGroup }) => {
             setCurrentIndex(nextIndex);
             generateQuestion(shuffledQuestions[nextIndex]);
         } else {
-            showToast(`Game Over! You've toured all of Africa! 🌍\nFinal Score: ${gameScore + (isCorrect ? 1 : 0)}/${shuffledQuestions.length}`, 'success');
+            showToast(`Game Over! You've toured all of Africa! 🌍\nFinal Score: ${gameScore + (isCorrect ? 1 : 0)}/${shuffledQuestions.length}`, 'success', 10000);
             setShowGame(false);
             setShuffledQuestions([]); // Reset for next time
         }
@@ -284,7 +284,7 @@ const History = ({ ageGroup }) => {
 
     return (
         <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
-            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+            {toast && <Toast message={toast.message} type={toast.type} duration={toast.duration} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}
                 style={{
