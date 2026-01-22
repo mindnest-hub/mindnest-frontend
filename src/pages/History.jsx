@@ -186,6 +186,16 @@ const History = ({ ageGroup }) => {
             details: "A wave of freedom swept across the continent, ending colonial rule in many places."
         },
         {
+            year: "1961",
+            title: "Patrice Lumumba's Vision & Sacrifice 🇨🇬",
+            desc: "The first Prime Minister of the independent Congo and a hero of African independence.",
+            details: "Lumumba was a Pan-Africanist who fought for the total economic independence of the Congo. He was assassinated in 1961 in a plot involving foreign powers who feared his vision of a strong, united Africa. To hide the crime, his body was dissolved in acid. However, a Belgian officer kept a single tooth as a trophy. In 2022, after 61 years of tireless fighting by his family, this last remain—his tooth—was finally returned to the Democratic Republic of Congo for a proper state funeral, symbolizing a closure to a painful chapter of history.",
+            speeches: [
+                { speaker: "Patrice Lumumba", text: "We are no longer your monkeys! Congo's independence is a decisive step towards the liberation of the whole African continent." },
+                { speaker: "Patrice Lumumba", text: "History will one day have its say... Africa will write its own history, and it will be, to the north and to the south of the Sahara, a history of glory and dignity." }
+            ]
+        },
+        {
             year: "1994",
             title: "Nelson Mandela becomes President 🇿🇦",
             desc: "Apartheid ended in South Africa.",
