@@ -34,10 +34,50 @@ const History = ({ ageGroup }) => {
 
     // --- TTS STATE ---
     const [isReading, setIsReading] = useState(false);
+    const [voiceProfile, setVoiceProfile] = useState('female'); // 'female', 'male', 'custom'
+    const [customVoiceURI, setCustomVoiceURI] = useState('');
+    const [availableVoices, setAvailableVoices] = useState([]);
 
     useEffect(() => {
+        const loadVoices = () => {
+            const voices = window.speechSynthesis.getVoices();
+            setAvailableVoices(voices);
+        };
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
         return () => window.speechSynthesis.cancel();
     }, []);
+
+    const findVoice = (profile) => {
+        const voices = window.speechSynthesis.getVoices();
+
+        // Locales often associated with African countries or patterns
+        const africanLocales = ['en-NG', 'en-ZA', 'en-KE', 'en-GH', 'en-TZ'];
+
+        if (profile === 'custom' && customVoiceURI) {
+            return voices.find(v => v.voiceURI === customVoiceURI);
+        }
+
+        let filtered = voices.filter(v =>
+            africanLocales.some(locale => v.lang.includes(locale)) ||
+            v.name.toLowerCase().includes('nigeria') ||
+            v.name.toLowerCase().includes('south africa') ||
+            v.name.toLowerCase().includes('kenya')
+        );
+
+        // Fallback to en-GB if no African voice found
+        if (filtered.length === 0) {
+            filtered = voices.filter(v => v.lang.includes('en-GB') || v.lang.includes('en-US'));
+        }
+
+        if (profile === 'female') {
+            return filtered.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('google uk english female')) || filtered[0];
+        } else if (profile === 'male') {
+            return filtered.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('google uk english male')) || filtered[0];
+        }
+
+        return voices[0];
+    };
 
     const speakText = (text) => {
         if (isReading) {
@@ -48,15 +88,18 @@ const History = ({ ageGroup }) => {
         setIsReading(true);
         const utterance = new SpeechSynthesisUtterance(text);
 
-        // Try to find a Nigerian voice, fallback to British, then default
-        const voices = window.speechSynthesis.getVoices();
-        const nigerianVoice = voices.find(v => v.lang.includes('NG') || v.name.includes('Nigeria'));
-        const britishVoice = voices.find(v => v.lang.includes('en-GB'));
+        const selectedVoice = findVoice(voiceProfile);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
 
-        if (nigerianVoice) {
-            utterance.voice = nigerianVoice;
-        } else if (britishVoice) {
-            utterance.voice = britishVoice;
+            // Apply profile specific settings
+            if (voiceProfile === 'female') {
+                utterance.pitch = 1.1; // Soft, slightly higher
+                utterance.rate = 0.95; // Slightly slower
+            } else if (voiceProfile === 'male') {
+                utterance.pitch = 0.95; // Tender, slightly lower
+                utterance.rate = 0.9; // Calm, teacher-like pace
+            }
         }
 
         utterance.onend = () => setIsReading(false);
@@ -252,6 +295,67 @@ const History = ({ ageGroup }) => {
                 <p style={{ fontSize: '1.5rem', color: 'var(--color-text-muted)' }}>
                     {isKid ? "Discover the heroes of the past!" : "Reclaiming our narrative."}
                 </p>
+
+                {/* Voice Selection UI */}
+                <div style={{
+                    marginTop: '2rem',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    flexWrap: 'wrap',
+                    padding: '1rem',
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderRadius: '12px'
+                }}>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Narrator Voice:</span>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                            onClick={() => setVoiceProfile('female')}
+                            className={`btn ${voiceProfile === 'female' ? 'btn-primary' : 'btn-outline'}`}
+                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                        >
+                            👩 Soft African
+                        </button>
+                        <button
+                            onClick={() => setVoiceProfile('male')}
+                            className={`btn ${voiceProfile === 'male' ? 'btn-primary' : 'btn-outline'}`}
+                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                        >
+                            👨 African Teacher
+                        </button>
+                        <button
+                            onClick={() => setVoiceProfile('custom')}
+                            className={`btn ${voiceProfile === 'custom' ? 'btn-primary' : 'btn-outline'}`}
+                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+                        >
+                            ⚙️ Custom
+                        </button>
+                    </div>
+
+                    {voiceProfile === 'custom' && (
+                        <select
+                            value={customVoiceURI}
+                            onChange={(e) => setCustomVoiceURI(e.target.value)}
+                            style={{
+                                padding: '0.4rem',
+                                borderRadius: '8px',
+                                background: '#222',
+                                color: '#fff',
+                                border: '1px solid #444',
+                                fontSize: '0.8rem',
+                                maxWidth: '200px'
+                            }}
+                        >
+                            <option value="">Select a voice...</option>
+                            {availableVoices.map(voice => (
+                                <option key={voice.voiceURI} value={voice.voiceURI}>
+                                    {voice.name} ({voice.lang})
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                </div>
             </header>
 
             <div style={{
