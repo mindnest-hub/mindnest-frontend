@@ -579,16 +579,18 @@ const Tech = () => {
         <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>
           {isKid ? 'Draw something beautiful for Africa!' : isTeen ? 'Create assets for your portfolio or game projects.' : 'Design and sell digital assets, icons, or UI kits.'}
         </p>
-        <div style={{ marginBottom: '1rem' }}>
-          <label style={{ marginRight: '1rem' }}>Palette:</label>
+        <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <label style={{ marginRight: '0.5rem', display: 'flex', alignItems: 'center' }}>Palette:</label>
           {['#FFD700', '#ff4444', '#00C851', '#2196F3', '#fff', '#000'].map(color => (
-            <button key={color} onClick={() => setSelectedColor(color)} style={{ width: '40px', height: '40px', backgroundColor: color, border: selectedColor === color ? '3px solid #fff' : 'none', marginRight: '0.5rem', borderRadius: '50%', cursor: 'pointer' }}></button>
+            <button key={color} onClick={() => setSelectedColor(color)} style={{ width: '40px', height: '40px', backgroundColor: color, border: selectedColor === color ? '3px solid #fff' : '1px solid #444', borderRadius: '50%', cursor: 'pointer', flexShrink: 0 }}></button>
           ))}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(16, 20px)', gap: '1px', marginBottom: '1.5rem', justifyContent: 'center', backgroundColor: '#222', padding: '5px', borderRadius: '8px' }}>
-          {pixelGrid.map((row, i) => row.map((color, j) => (
-            <div key={`${i}-${j}`} onClick={() => handlePixelClick(i, j)} style={{ width: '20px', height: '20px', backgroundColor: color, cursor: 'pointer', border: '0.5px solid #111' }}></div>
-          )))}
+        <div style={{ overflowX: 'auto', maxWidth: '100%', paddingBottom: '1rem', marginBottom: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(16, 20px)', gap: '1px', minWidth: '340px', justifyContent: 'center', backgroundColor: '#222', padding: '10px', borderRadius: '8px', margin: '0 auto' }}>
+            {pixelGrid.map((row, i) => row.map((color, j) => (
+              <div key={`${i}-${j}`} onClick={() => handlePixelClick(i, j)} style={{ width: '20px', height: '20px', backgroundColor: color, cursor: 'pointer', border: '0.5px solid #111' }}></div>
+            )))}
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <button onClick={clearCanvas} className="btn" style={{ backgroundColor: '#222', color: '#aaa', border: '1px solid #444' }}>Clear Canvas</button>
@@ -602,15 +604,17 @@ const Tech = () => {
       <div className="card">
         <h3>{isTeen || isAdult ? 'Sound Engineering & Logic Beats' : 'Beat Maker 🎵'}</h3>
         <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>Use mathematical patterns to create rhythm and melody.</p>
-        <div style={{ backgroundColor: '#111', padding: '1.5rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
-          {beatPattern.map((beat, i) => (
-            <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
-              <span style={{ width: '25px', color: currentBeat === i && isPlaying ? '#FF9800' : '#444', fontSize: '0.8rem' }}>{i + 1}</span>
-              <button onClick={() => toggleBeat(i, 'drum')} style={{ flex: 1, padding: '0.8rem', backgroundColor: beat.drum ? '#ff4444' : '#222', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{isKid ? '🥁' : 'KICK'}</button>
-              <button onClick={() => toggleBeat(i, 'piano')} style={{ flex: 1, padding: '0.8rem', backgroundColor: beat.piano ? '#2196F3' : '#222', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{isKid ? '🎹' : 'SYNTH'}</button>
-              <button onClick={() => toggleBeat(i, 'horn')} style={{ flex: 1, padding: '0.8rem', backgroundColor: beat.horn ? '#FFD700' : '#222', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{isKid ? '🎺' : 'GLITCH'}</button>
-            </div>
-          ))}
+        <div style={{ backgroundColor: '#111', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem', overflowX: 'auto' }}>
+          <div style={{ minWidth: '400px' }}>
+            {beatPattern.map((beat, i) => (
+              <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                <span style={{ width: '25px', color: currentBeat === i && isPlaying ? '#FF9800' : '#444', fontSize: '0.8rem' }}>{i + 1}</span>
+                <button onClick={() => toggleBeat(i, 'drum')} style={{ flex: 1, padding: '0.8rem', backgroundColor: beat.drum ? '#ff4444' : '#222', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{isKid ? '🥁' : 'KICK'}</button>
+                <button onClick={() => toggleBeat(i, 'piano')} style={{ flex: 1, padding: '0.8rem', backgroundColor: beat.piano ? '#2196F3' : '#222', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{isKid ? '🎹' : 'SYNTH'}</button>
+                <button onClick={() => toggleBeat(i, 'horn')} style={{ flex: 1, padding: '0.8rem', backgroundColor: beat.horn ? '#FFD700' : '#222', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>{isKid ? '🎺' : 'GLITCH'}</button>
+              </div>
+            ))}
+          </div>
         </div>
         <button onClick={playBeat} disabled={isPlaying} className="btn" style={{ backgroundColor: '#FF9800', width: '100%' }}>
           {isPlaying ? 'Synthesizing...' : 'Play Sequence ▶'}
