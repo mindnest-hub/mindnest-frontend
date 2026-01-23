@@ -26,20 +26,37 @@ const Agripreneurship = () => {
         setToast({ message, type });
     };
 
-    // NEW STATES
-    const [hasProcessingUnit, setHasProcessingUnit] = useState(false);
-    const [processedStock, setProcessedStock] = useState(0);
-    const [climateResilience, setClimateResilience] = useState(0);
-    const [upgrades, setUpgrades] = useState({
-        solar: false,
-        vertical: false,
-        seeds: false
-    });
+    // Level State
+    const [soldFlakes, setSoldFlakes] = useState(() => Number(localStorage.getItem('agriSoldFlakes')) || 0);
+
+    // Level Logic
+    // 1. Novice: Start
+    // 2. Smallholder: Harvests >= 3
+    // 3. Processor: Money >= 2000
+    // 4. Tech Farmer: Sold Flakes >= 5
+    // 5. Agri-Tycoon: Resilience >= 50
+    const getLevel = () => {
+        if (climateResilience >= 50 && soldFlakes >= 5 && money >= 2000 && harvestCount >= 3) return 5;
+        if (soldFlakes >= 5 && money >= 2000 && harvestCount >= 3) return 4;
+        if (money >= 2000 && harvestCount >= 3) return 3;
+        if (harvestCount >= 3) return 2;
+        return 1;
+    };
+
+    const level = getLevel();
+    const levelTitles = {
+        1: { title: "Novice Farmer 👨‍u200d🌾", next: "Harvest 3 crops to level up!" },
+        2: { title: "Smallholder 🚜", next: "Save ₦2,000 to unlock Processing!" },
+        3: { title: "Processor 🏭", next: "Sell 5 boxes of Corn Flakes to unlock Tech!" },
+        4: { title: "Tech Farmer ☀️", next: "Reach 50% Resilience to become a Tycoon!" },
+        5: { title: "Agri-Tycoon 🤴", next: "You are a Master of Agriculture!" }
+    };
 
     // Persistence
     useEffect(() => {
         localStorage.setItem('agriHarvestCount', harvestCount);
-    }, [harvestCount]);
+        localStorage.setItem('agriSoldFlakes', soldFlakes);
+    }, [harvestCount, soldFlakes]);
 
     // Simulation tick
     useEffect(() => {
@@ -81,7 +98,6 @@ const Agripreneurship = () => {
             const yieldAmount = 300 * yieldMultiplier;
 
             if (hasProcessingUnit) {
-                // Auto-process or store for processing? Let's simplify: Direct Option
                 if (window.confirm("Harvest complete! Process into Corn Flakes for 3x value? (Requires time)")) {
                     setCropStage(0);
                     setProcessedStock(prev => prev + 1);
@@ -108,11 +124,16 @@ const Agripreneurship = () => {
             setMoney(prev => prev + earnings);
             addEarnings('agri', earnings);
             setProcessedStock(prev => prev - 1);
+            setSoldFlakes(prev => prev + 1);
             showToast("Sold Corn Flakes! 🥣 +₦900", 'success');
         }
     };
 
     const buyProcessingUnit = () => {
+        if (level < 3) {
+            showToast(`Locked! Reach Level 3 (Smallholder) to unlock. Need ₦2,000 capital.`, 'error');
+            return;
+        }
         if (money >= 5000) {
             setMoney(prev => prev - 5000);
             setHasProcessingUnit(true);
@@ -122,7 +143,11 @@ const Agripreneurship = () => {
         }
     };
 
-    const buyUpgrade = (type, cost, resilienceBoost) => {
+    const buyUpgrade = (type, cost, resilienceBoost, requiredLevel) => {
+        if (level < requiredLevel) {
+            showToast(`Locked! Reach Level ${requiredLevel} to unlock this tech.`, 'error');
+            return;
+        }
         if (money >= cost && !upgrades[type]) {
             setMoney(prev => prev - cost);
             setUpgrades(prev => ({ ...prev, [type]: true }));
@@ -184,6 +209,19 @@ const Agripreneurship = () => {
             <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
                 <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>Smart Agri-Tech 🌱</h1>
                 <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>Farm Smart. Pitch Big. Feed Africa.</p>
+
+                {/* CAREER STATUS BAR */}
+                <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#1a1a1a', borderRadius: '12px', border: '1px solid #FFD700', maxWidth: '600px', margin: '1.5rem auto' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <span style={{ color: '#FFD700', fontWeight: 'bold' }}>⭐ {levelTitles[level].title}</span>
+                        <span style={{ fontSize: '0.9rem', color: '#aaa' }}>Level {level}/5</span>
+                    </div>
+                    <div style={{ width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px', marginBottom: '0.5rem', overflow: 'hidden' }}>
+                        <div style={{ width: `${(level / 5) * 100}%`, height: '100%', backgroundColor: '#FFD700', transition: 'width 0.5s' }}></div>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: '#ccc', margin: 0 }}>Next Goal: {levelTitles[level].next}</p>
+                </div>
+
                 <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                     <div className="btn btn-outline" style={{ cursor: 'default', border: '1px solid var(--color-primary)', padding: '0.6rem 1.25rem' }}>
                         Farm Capital: <span style={{ color: '#00C851', fontWeight: 'bold' }}>₦{money.toLocaleString()}</span>
@@ -257,8 +295,8 @@ const Agripreneurship = () => {
                                 </div>
                             )}
                             {!hasProcessingUnit && (
-                                <button onClick={buyProcessingUnit} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#444', border: '1px solid var(--color-secondary)' }}>
-                                    Buy Processing Unit (₦5,000) 🏗️
+                                <button onClick={buyProcessingUnit} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#444', border: '1px solid var(--color-secondary)', opacity: level >= 3 ? 1 : 0.5 }}>
+                                    {level >= 3 ? 'Buy Processing Unit (₦5,000) 🏗️' : '🔒 Locked (Reach Level 3)'}
                                 </button>
                             )}
                         </div>
@@ -439,12 +477,12 @@ const Agripreneurship = () => {
                                         <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>Reduces water usage. Resilience +20.</div>
                                     </div>
                                     <button
-                                        onClick={() => buyUpgrade('solar', 2000, 20)}
+                                        onClick={() => buyUpgrade('solar', 2000, 20, 4)}
                                         disabled={upgrades.solar}
                                         className={upgrades.solar ? "btn btn-outline" : "btn btn-primary"}
-                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.solar ? 0.6 : 1 }}
+                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.solar ? 0.6 : level < 4 ? 0.5 : 1 }}
                                     >
-                                        {upgrades.solar ? 'Installed ✅' : '₦2,000'}
+                                        {upgrades.solar ? 'Installed ✅' : level < 4 ? '🔒 Lvl 4' : '₦2,000'}
                                     </button>
                                 </div>
 
@@ -454,12 +492,12 @@ const Agripreneurship = () => {
                                         <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>Resist heatwaves. Resilience +10.</div>
                                     </div>
                                     <button
-                                        onClick={() => buyUpgrade('seeds', 500, 10)}
+                                        onClick={() => buyUpgrade('seeds', 500, 10, 2)}
                                         disabled={upgrades.seeds}
                                         className={upgrades.seeds ? "btn btn-outline" : "btn btn-primary"}
-                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.seeds ? 0.6 : 1 }}
+                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.seeds ? 0.6 : level < 2 ? 0.5 : 1 }}
                                     >
-                                        {upgrades.seeds ? 'Stocked ✅' : '₦500'}
+                                        {upgrades.seeds ? 'Stocked ✅' : level < 2 ? '🔒 Lvl 2' : '₦500'}
                                     </button>
                                 </div>
 
@@ -469,12 +507,12 @@ const Agripreneurship = () => {
                                         <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>+50% Yield. Max Resilience.</div>
                                     </div>
                                     <button
-                                        onClick={() => buyUpgrade('vertical', 10000, 50)}
+                                        onClick={() => buyUpgrade('vertical', 10000, 50, 5)}
                                         disabled={upgrades.vertical}
                                         className={upgrades.vertical ? "btn btn-outline" : "btn btn-primary"}
-                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.vertical ? 0.6 : 1 }}
+                                        style={{ padding: '0.6rem 1.25rem', opacity: upgrades.vertical ? 0.6 : level < 5 ? 0.5 : 1 }}
                                     >
-                                        {upgrades.vertical ? 'Built ✅' : '₦10,000'}
+                                        {upgrades.vertical ? 'Built ✅' : level < 5 ? '🔒 Lvl 5' : '₦10,000'}
                                     </button>
                                 </div>
                             </div>
