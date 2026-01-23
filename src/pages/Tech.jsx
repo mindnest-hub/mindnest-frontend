@@ -529,40 +529,175 @@ const Tech = () => {
     </div>
   );
 
+  const [aiLevel, setAiLevel] = useState(1);
+  const [aiScore, setAiScore] = useState(0);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+
+  const aiLevels = {
+    1: { title: 'Level 1: Pet vs Wild 🐶🦁', target: 5, data: [{ emoji: '🐶', type: 'pet' }, { emoji: '🦁', type: 'wild' }, { emoji: '🐱', type: 'pet' }, { emoji: '🐆', type: 'wild' }] },
+    2: { title: 'Level 2: Fruit vs Veggie 🍎🥕', target: 8, data: [{ emoji: '🍎', type: 'fruit' }, { emoji: '🥕', type: 'veggie' }, { emoji: '🍌', type: 'fruit' }, { emoji: '🥦', type: 'veggie' }] },
+    3: { title: 'Level 3: Land vs Sea 🐘🐳', target: 10, data: [{ emoji: '🐘', type: 'land' }, { emoji: '🐳', type: 'sea' }, { emoji: '🦒', type: 'land' }, { emoji: '🐙', type: 'sea' }] },
+    4: { title: 'Level 4: Flying vs Walking 🦅🐕', target: 12, data: [{ emoji: '🦅', type: 'fly' }, { emoji: '🐕', type: 'walk' }, { emoji: '🦜', type: 'fly' }, { emoji: '🐄', type: 'walk' }] },
+    5: { title: 'Level 5: Living vs Non-Living 🤖👩', target: 15, data: [{ emoji: '🤖', type: 'non-living' }, { emoji: '👩', type: 'living' }, { emoji: '📱', type: 'non-living' }, { emoji: '🌲', type: 'living' }] }
+  };
+
+  const currentLevelData = aiLevels[aiLevel];
+
+  useEffect(() => {
+    // Initialize first image for level 1
+    const levels = aiLevels[1].data;
+    setCurrentImage(levels[Math.floor(Math.random() * levels.length)]);
+  }, []);
+
+  const handleTrain = (selection) => {
+    // Mapping for button clicks to types
+    let isCorrect = false;
+
+    // Normalize selection for display buttons (which might send generic 'left'/'right' or specific types)
+    // Simplified logic: Check if selection matches current image type
+    if (selection === currentImage.type) {
+      isCorrect = true;
+    }
+
+    if (isCorrect) {
+      setAiScore(prev => prev + 1);
+      setAiMessage("✅ Correct!");
+      if (aiScore + 1 >= currentLevelData.target) {
+        setShowLevelUp(true);
+      }
+    } else {
+      setAiMessage("❌ Wrong!");
+    }
+
+    // Pick next image from current level
+    const nextImg = currentLevelData.data[Math.floor(Math.random() * currentLevelData.data.length)];
+    setCurrentImage(nextImg);
+  };
+
+  const nextLevel = () => {
+    if (aiLevel < 5) {
+      setAiLevel(prev => prev + 1);
+      setAiScore(0);
+      setShowLevelUp(false);
+      setAiMessage("New Level Started!");
+      // Set image for new level
+      const nextLvlData = aiLevels[aiLevel + 1].data;
+      setCurrentImage(nextLvlData[Math.floor(Math.random() * nextLvlData.length)]);
+    } else {
+      completeLesson('ai-master', 100);
+      setAiMessage("🎓 AI MASTER GRADUATE!");
+      setShowLevelUp(false);
+    }
+  };
+
   const renderAI = () => (
     <div className="card" style={{ textAlign: 'center' }}>
-      <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>🧠 {isKid ? 'AI Training' : 'Artificial Intelligence & Ethics'}</h2>
+      <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>🧠 {isKid ? 'AI Academy' : 'Artificial Intelligence & Ethics'}</h2>
       <p style={{ marginBottom: '2rem', color: '#aaa' }}>
-        {isKid ? 'Teach the AI to classify animals!' : isTeen ? 'Explore how AI learns, and the ethics of bias and deepfakes.' : 'Leverage AI for professional productivity and data analysis.'}
+        {isKid ? 'Train your AI model through 5 zones of intelligence!' : isTeen ? 'Explore how AI learns, and the ethics of bias and deepfakes.' : 'Leverage AI for professional productivity and data analysis.'}
       </p>
 
-      {/* Shared Trainer */}
-      <div style={{ fontSize: '8rem', marginBottom: '2rem' }}>{currentImage.emoji}</div>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-        <button className="btn" style={{ flex: '1 1 180px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('wild')}>Wild / Unstructured 🦁</button>
-        <button className="btn" style={{ flex: '1 1 180px', backgroundColor: '#00C851' }} onClick={() => handleTrain('domestic')}>Domestic / Labeled 🏠</button>
-      </div>
-      <h3>{aiMessage}</h3>
+      {/* Kids Game Area */}
+      {isKid ? (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', padding: '0 1rem', fontSize: '0.9rem', color: '#888' }}>
+            <span>Level {aiLevel}/5</span>
+            <span>Score: {aiScore}/{currentLevelData.target}</span>
+          </div>
 
-      <div style={{ maxWidth: '500px', margin: '2rem auto 0' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-          <span>{isKid ? 'Accuracy' : 'Model Convergence'}:</span><span>{aiAccuracy}%</span>
+          {!showLevelUp ? (
+            <>
+              <h3 style={{ color: '#00C851', marginBottom: '1rem' }}>{currentLevelData.title}</h3>
+              <div style={{ fontSize: '8rem', marginBottom: '2rem', transition: 'all 0.3s' }}>{currentImage.emoji}</div>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+                {/* Dynamic Buttons based on Level */}
+                {aiLevel === 1 && (
+                  <>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('wild')}>Wild 🦁</button>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }} onClick={() => handleTrain('pet')}>Pet 🐶</button>
+                  </>
+                )}
+                {aiLevel === 2 && (
+                  <>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('fruit')}>Fruit 🍎</button>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }} onClick={() => handleTrain('veggie')}>Veggie 🥕</button>
+                  </>
+                )}
+                {aiLevel === 3 && (
+                  <>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('land')}>Land 🐘</button>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }} onClick={() => handleTrain('sea')}>Sea 🐳</button>
+                  </>
+                )}
+                {aiLevel === 4 && (
+                  <>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('fly')}>Flying 🦅</button>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }} onClick={() => handleTrain('walk')}>Walking 🐕</button>
+                  </>
+                )}
+                {aiLevel === 5 && (
+                  <>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('non-living')}>Object 🤖</button>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }} onClick={() => handleTrain('living')}>Living 👩</button>
+                  </>
+                )}
+              </div>
+              <h3>{aiMessage}</h3>
+            </>
+          ) : (
+            <div style={{ padding: '2rem', backgroundColor: '#1a1a1a', borderRadius: '12px', border: '2px solid #FFD700' }}>
+              <h2 style={{ color: '#FFD700' }}>🎉 Level Complete!</h2>
+              <p>Your AI is getting smarter!</p>
+              <button className="btn" onClick={nextLevel} style={{ backgroundColor: '#00C851', marginTop: '1rem', width: '100%' }}>
+                {aiLevel < 5 ? 'Start Next Level 🚀' : 'Claim Master Certificate 🎓'}
+              </button>
+            </div>
+          )}
+
+          <div style={{ width: '100%', height: '10px', backgroundColor: '#333', borderRadius: '5px', marginTop: '2rem', overflow: 'hidden' }}>
+            <div style={{ width: `${(aiLevel / 5) * 100}%`, height: '100%', backgroundColor: '#2196F3', transition: 'width 0.5s' }}></div>
+          </div>
         </div>
-        <div style={{ width: '100%', height: '20px', backgroundColor: '#333', borderRadius: '10px', overflow: 'hidden' }}>
-          <div style={{ width: `${aiAccuracy}%`, height: '100%', backgroundColor: aiAccuracy > 80 ? '#00C851' : '#FFD700', transition: 'width 0.3s' }}></div>
+      ) : (
+        /* Teen/Adult View */
+        <div>
+          <div style={{ fontSize: '8rem', marginBottom: '2rem' }}>{currentImage.emoji}</div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+            <button className="btn" style={{ flex: '1 1 180px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('wild')}>Wild / Unstructured 🦁</button>
+            <button className="btn" style={{ flex: '1 1 180px', backgroundColor: '#00C851' }} onClick={() => handleTrain('domestic')}>Domestic / Labeled 🏠</button>
+          </div>
+          <h3>{aiMessage}</h3>
+
+          <div style={{ maxWidth: '500px', margin: '2rem auto 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span>Model Convergence:</span><span>{aiAccuracy}%</span>
+            </div>
+            <div style={{ width: '100%', height: '20px', backgroundColor: '#333', borderRadius: '10px', overflow: 'hidden' }}>
+              <div style={{ width: `${aiAccuracy}%`, height: '100%', backgroundColor: aiAccuracy > 80 ? '#00C851' : '#FFD700', transition: 'width 0.3s' }}></div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {!isKid && (
         <div style={{ marginTop: '3rem', textAlign: 'left', padding: '1.5rem', backgroundColor: '#1a1a1a', borderRadius: '12px', borderLeft: '5px solid #9C27B0' }}>
-          <h4 style={{ color: '#9C27B0', marginTop: 0 }}>{isTeen ? 'AI Ethics: Deepfakes & Bias' : 'AI for Business Productivity'}</h4>
-          <p style={{ fontSize: '0.9rem', color: '#888' }}>
+          <h4 style={{ color: '#9C27B0', marginTop: 0 }}>{isTeen ? 'AI Ethics: Deepfakes & Bias' : 'AI for Business Productivity 💼'}</h4>
+          <p style={{ fontSize: '0.9rem', color: '#888', lineHeight: '1.6' }}>
             {isTeen
               ? 'AI can be tricked! If you train it with biased data, it makes biased decisions. Always verify AI-generated content (Deepfakes).'
-              : 'As an adult, AI is your assistant. Learn to use LLMs (like ChatGPT/Claude) for email drafting, code debugging, and market research.'}
+              : (
+                <>
+                  Stop doing repetitive work manually. Use AI tools to 10x your output:
+                  <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem' }}>
+                    <li><strong>Automate Emails:</strong> Use LLMs to draft responses and summarize threads.</li>
+                    <li><strong>Data Analysis:</strong> Upload Excel sheets to AI to find trends instantly.</li>
+                    <li><strong>Code Assistance:</strong> Debug and write scripts faster with AI co-pilots.</li>
+                  </ul>
+                </>
+              )}
           </p>
           <button className="btn btn-sm" style={{ marginTop: '1rem', backgroundColor: '#9C27B0' }} onClick={() => completeLesson('ai-ethics', 50)}>
-            {isTeen ? 'Understand AI Bias' : 'Master Prompt Engineering'}
+            {isTeen ? 'Understand AI Bias' : 'Master Productivity Tools'}
           </button>
         </div>
       )}
