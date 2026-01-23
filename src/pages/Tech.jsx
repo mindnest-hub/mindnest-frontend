@@ -431,10 +431,10 @@ const Tech = () => {
           <div style={{ width: '100px', height: '100px', borderRadius: '50%', margin: '0 auto 1rem', backgroundColor: trafficLight === 'red' ? '#ff4444' : trafficLight === 'yellow' ? '#FFD700' : '#00C851' }}></div>
           <button onClick={() => setTrafficLight(trafficLight === 'red' ? 'yellow' : trafficLight === 'yellow' ? 'green' : 'red')} className="btn btn-sm">Change Light</button>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '1rem' }}>
-          <button onClick={() => handleConditionCheck('stop')} className="btn" style={{ backgroundColor: '#ff4444' }}>STOP 🛑</button>
-          <button onClick={() => handleConditionCheck('slow')} className="btn" style={{ backgroundColor: '#FFD700', color: '#000' }}>SLOW ⚠️</button>
-          <button onClick={() => handleConditionCheck('go')} className="btn" style={{ backgroundColor: '#00C851' }}>GO ✅</button>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '1rem', flexWrap: 'wrap' }}>
+          <button onClick={() => handleConditionCheck('stop')} className="btn" style={{ flex: '1 1 100px', backgroundColor: '#ff4444' }}>STOP 🛑</button>
+          <button onClick={() => handleConditionCheck('slow')} className="btn" style={{ flex: '1 1 100px', backgroundColor: '#FFD700', color: '#000' }}>SLOW ⚠️</button>
+          <button onClick={() => handleConditionCheck('go')} className="btn" style={{ flex: '1 1 100px', backgroundColor: '#00C851' }}>GO ✅</button>
         </div>
         {conditionFeedback && <p style={{ textAlign: 'center' }}>{conditionFeedback}</p>}
       </div>
