@@ -579,10 +579,10 @@ const Tech = () => {
         <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>
           {isKid ? 'Draw something beautiful for Africa!' : isTeen ? 'Create assets for your portfolio or game projects.' : 'Design and sell digital assets, icons, or UI kits.'}
         </p>
-        <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <label style={{ marginRight: '0.5rem', display: 'flex', alignItems: 'center' }}>Palette:</label>
+        <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center' }}>
+          <label style={{ marginRight: '0.5rem', display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'center', marginBottom: '0.5rem' }}>Select Color:</label>
           {['#FFD700', '#ff4444', '#00C851', '#2196F3', '#fff', '#000'].map(color => (
-            <button key={color} onClick={() => setSelectedColor(color)} style={{ width: '40px', height: '40px', backgroundColor: color, border: selectedColor === color ? '3px solid #fff' : '1px solid #444', borderRadius: '50%', cursor: 'pointer', flexShrink: 0 }}></button>
+            <button key={color} onClick={() => setSelectedColor(color)} style={{ width: '45px', height: '45px', backgroundColor: color, border: selectedColor === color ? '3px solid #fff' : '1px solid #444', borderRadius: '50%', cursor: 'pointer', flexShrink: 0, boxShadow: selectedColor === color ? '0 0 10px rgba(255,255,255,0.5)' : 'none', transition: 'all 0.2s' }}></button>
           ))}
         </div>
         <div style={{ overflowX: 'auto', maxWidth: '100%', paddingBottom: '1rem', marginBottom: '1rem' }}>
@@ -592,9 +592,9 @@ const Tech = () => {
             )))}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button onClick={clearCanvas} className="btn" style={{ backgroundColor: '#222', color: '#aaa', border: '1px solid #444' }}>Clear Canvas</button>
-          <button onClick={saveArt} className="btn" style={{ backgroundColor: '#00C851' }}>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button onClick={clearCanvas} className="btn" style={{ flex: '1 1 150px', backgroundColor: '#222', color: '#aaa', border: '1px solid #444' }}>Clear Canvas</button>
+          <button onClick={saveArt} className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }}>
             {isAdult ? 'Mint as Digital Product (₦)' : 'Save Artwork 🎨'}
           </button>
         </div>
