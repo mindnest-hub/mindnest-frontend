@@ -490,9 +490,9 @@ const Tech = () => {
             <div style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid #333' }}>
               <p style={{ fontStyle: 'italic', color: '#FFD700' }}>{scamExamples[currentScam].text}</p>
             </div>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-              <button onClick={() => handleScamAnswer(false)} className="btn" style={{ padding: '0.8rem 2rem', backgroundColor: '#333', border: '1px solid #00C851', color: '#00C851' }}>✅ AUTHENTIC</button>
-              <button onClick={() => handleScamAnswer(true)} className="btn" style={{ padding: '0.8rem 2rem', backgroundColor: '#333', border: '1px solid #ff4444', color: '#ff4444' }}>🚨 SCAM / PHISHING</button>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => handleScamAnswer(false)} className="btn" style={{ flex: '1 1 150px', padding: '0.8rem 2rem', backgroundColor: '#333', border: '1px solid #00C851', color: '#00C851' }}>✅ AUTHENTIC</button>
+              <button onClick={() => handleScamAnswer(true)} className="btn" style={{ flex: '1 1 150px', padding: '0.8rem 2rem', backgroundColor: '#333', border: '1px solid #ff4444', color: '#ff4444' }}>🚨 SCAM / PHISHING</button>
             </div>
             {scamFeedback && <p style={{ textAlign: 'center', marginTop: '1rem', color: '#FFD700', fontWeight: 'bold' }}>{scamFeedback}</p>}
           </div>
@@ -518,9 +518,9 @@ const Tech = () => {
             <div style={{ backgroundColor: '#222', padding: '2rem', borderRadius: '8px', marginBottom: '1rem' }}>
               <p>"{chatScenarios[currentChat].message}"</p>
             </div>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-              <button onClick={() => handleChatAnswer(true)} className="btn" style={{ backgroundColor: '#00C851' }}>✅ SAFE</button>
-              <button onClick={() => handleChatAnswer(false)} className="btn" style={{ backgroundColor: '#ff4444' }}>🚨 DANGER</button>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => handleChatAnswer(true)} className="btn" style={{ flex: '1 1 120px', backgroundColor: '#00C851' }}>✅ SAFE</button>
+              <button onClick={() => handleChatAnswer(false)} className="btn" style={{ flex: '1 1 120px', backgroundColor: '#ff4444' }}>🚨 DANGER</button>
             </div>
             {chatFeedback && <p style={{ textAlign: 'center', marginTop: '1rem' }}>{chatFeedback}</p>}
           </>
@@ -694,10 +694,10 @@ const Tech = () => {
             <div style={{ backgroundColor: '#1e1e1e', padding: '2rem', borderRadius: '12px', marginBottom: '1.5rem', borderLeft: '4px solid #FFD700' }}>
               <p style={{ fontSize: '1.1rem', color: '#eee' }}>{logicPuzzles[currentPuzzle].q}</p>
             </div>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-              <button onClick={() => handlePuzzleAnswer('yes')} className="btn" style={{ flex: 1, backgroundColor: '#333', border: '1px solid #00C851', color: '#00C851' }}>TRUE / YES</button>
-              <button onClick={() => handlePuzzleAnswer('no')} className="btn" style={{ flex: 1, backgroundColor: '#333', border: '1px solid #ff4444', color: '#ff4444' }}>FALSE / NO</button>
-              <button onClick={() => handlePuzzleAnswer('maybe')} className="btn" style={{ flex: 1, backgroundColor: '#333', border: '1px solid #FFD700', color: '#FFD700' }}>INDETERMINATE</button>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => handlePuzzleAnswer('yes')} className="btn" style={{ flex: '1 1 100px', backgroundColor: '#333', border: '1px solid #00C851', color: '#00C851' }}>TRUE / YES</button>
+              <button onClick={() => handlePuzzleAnswer('no')} className="btn" style={{ flex: '1 1 100px', backgroundColor: '#333', border: '1px solid #ff4444', color: '#ff4444' }}>FALSE / NO</button>
+              <button onClick={() => handlePuzzleAnswer('maybe')} className="btn" style={{ flex: '1 1 140px', backgroundColor: '#333', border: '1px solid #FFD700', color: '#FFD700' }}>INDETERMINATE</button>
             </div>
             {puzzleFeedback && <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '1.1rem', fontWeight: 'bold' }}>{puzzleFeedback}</p>}
           </>
