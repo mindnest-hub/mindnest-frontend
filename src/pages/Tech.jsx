@@ -90,13 +90,8 @@ const Tech = () => {
   // --- AI STATE ---
   const [aiAccuracy, setAiAccuracy] = useState(0);
   const [currentImage, setCurrentImage] = useState({ emoji: '🦁', type: 'wild' });
-  const [trainingCount, setTrainingCount] = useState(0);
   const [aiMessage, setAiMessage] = useState("Teach the AI!");
-  const trainingData = [
-    { emoji: '🐶', type: 'domestic' }, { emoji: '🐘', type: 'wild' },
-    { emoji: '🐱', type: 'domestic' }, { emoji: '🐆', type: 'wild' },
-    { emoji: '🐄', type: 'domestic' }, { emoji: '🦓', type: 'wild' },
-  ];
+
 
   // --- CREATIVITY STATE ---
   const [pixelGrid, setPixelGrid] = useState(Array(16).fill().map(() => Array(16).fill('#000')));
@@ -224,19 +219,7 @@ const Tech = () => {
     if (correct === infoItems.length) completeLesson('cyber-info', 25);
   };
 
-  const handleTrain = (selection) => {
-    if (selection === currentImage.type) {
-      setAiAccuracy(prev => Math.min(prev + 15, 100));
-      setAiMessage("✅ Correct!");
-    } else {
-      setAiAccuracy(prev => Math.max(prev - 10, 0));
-      setAiMessage("❌ Wrong!");
-    }
-    setTrainingCount(prev => prev + 1);
-    const nextImg = trainingData[Math.floor(Math.random() * trainingData.length)];
-    setCurrentImage(nextImg);
-    if (aiAccuracy >= 80) completeLesson('ai-training', 30);
-  };
+
 
   const handlePixelClick = (row, col) => {
     const newGrid = [...pixelGrid];
