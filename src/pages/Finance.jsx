@@ -709,6 +709,11 @@ const Finance = ({ ageGroup }) => {
       triggerConfetti();
     }
 
+    if (levelId === 14) {
+      setCityBuildings([]);
+      setTaxPaid(0);
+    }
+
     if (levelId === currentLevel) {
       setCurrentLevel(prev => prev + 1);
       setAttempts(0);
@@ -833,8 +838,8 @@ const Finance = ({ ageGroup }) => {
       desc: "Before money, we traded items.",
       content: (
         <div>
-          <p><strong>Stage {subStage + 1}/3:</strong> The villager wants <strong>{tradeScenarios[subStage].want}</strong>.</p>
-          <p>You have: <strong>{tradeScenarios[subStage].offer}</strong>.</p>
+          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> The villager wants <strong>{tradeScenarios[Math.min(subStage, 2)].want}</strong>.</p>
+          <p>You have: <strong>{tradeScenarios[Math.min(subStage, 2)].offer}</strong>.</p>
 
           {tradeStep === 0 && (
             <button onClick={() => setTradeStep(1)} className="btn" style={{ backgroundColor: '#FFBB33', color: 'black' }}>Start Trading</button>
@@ -842,7 +847,7 @@ const Finance = ({ ageGroup }) => {
 
           {tradeStep === 1 && (
             <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.75rem', marginTop: '1rem' }}>
-              {tradeScenarios[subStage].options.map((opt, idx) => (
+              {tradeScenarios[Math.min(subStage, 2)].options.map((opt, idx) => (
                 <button key={idx} onClick={() => handleTrade(opt)} className="btn btn-outline" style={{ padding: '0.75rem' }}>
                   {opt}
                 </button>
@@ -865,10 +870,10 @@ const Finance = ({ ageGroup }) => {
       desc: "Catch coins, avoid spenders!",
       content: (
         <div>
-          <p><strong>Stage {subStage + 1}/3:</strong> Save {coinTargets[subStage]} coins.</p>
+          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Save {coinTargets[Math.min(subStage, 2)] || 10} coins.</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <span>Score: {coinScore}/{coinTargets[subStage]}</span>
-            {!isCoinGameActive && coinScore < coinTargets[subStage] && (
+            <span>Score: {coinScore}/{coinTargets[Math.min(subStage, 2)] || 10}</span>
+            {!isCoinGameActive && coinScore < (coinTargets[Math.min(subStage, 2)] || 10) && (
               <button onClick={startCoinGame} className="btn btn-sm" style={{ backgroundColor: '#00C851' }}>Start Game</button>
             )}
           </div>
@@ -902,8 +907,8 @@ const Finance = ({ ageGroup }) => {
       desc: "Balance your needs and wants.",
       content: (
         <div>
-          <p><strong>Stage {subStage + 1}/3:</strong> {budgetScenarios[subStage].role}</p>
-          <p>{budgetScenarios[subStage].desc} (Income: ₦{budgetScenarios[subStage].income})</p>
+          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> {budgetScenarios[Math.min(subStage, 2)].role}</p>
+          <p>{budgetScenarios[Math.min(subStage, 2)].desc} (Income: ₦{budgetScenarios[Math.min(subStage, 2)].income})</p>
           <p><strong>Rule:</strong> 50% Needs, 30% Wants, 20% Savings. Total must be 100%.</p>
 
           <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
@@ -955,9 +960,9 @@ const Finance = ({ ageGroup }) => {
       desc: "Find the best value.",
       content: (
         <div>
-          <p><strong>Stage {subStage + 1}/3:</strong> Which option is the better value?</p>
+          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Which option is the better value?</p>
           <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-            {shopScenarios[subStage].map((item, idx) => (
+            {shopScenarios[Math.min(subStage, 2)].map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => handleShopChoice(item)}
@@ -983,7 +988,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Sort items to the right place.",
       content: (
         <div>
-          <p><strong>Stage {subStage + 1}/3:</strong> Sort 5 items correctly.</p>
+          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Sort 5 items correctly.</p>
 
           {!safeGameActive && safeScore < 5 ? (
             <button onClick={startSafeGame} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#9C27B0' }}>Start Sorting</button>
@@ -1292,7 +1297,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Why we pay taxes.",
       content: (
         <div>
-          <p><strong>Stage {subStage + 1}/3:</strong> Taxes build our community. Watch it grow!</p>
+          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Taxes build our community. Watch it grow!</p>
           <div style={{
             height: '150px', backgroundColor: '#222', borderRadius: '20px', border: '1px solid #555',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '1rem', marginBottom: '1rem'
