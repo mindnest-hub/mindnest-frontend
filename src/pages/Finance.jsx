@@ -36,6 +36,8 @@ const Finance = ({ ageGroup }) => {
   const [userNameInput, setUserNameInput] = useState("");
   const [userCountryInput, setUserCountryInput] = useState("");
 
+  const [showBadge, setShowBadge] = useState(false);
+
   useEffect(() => {
     localStorage.setItem('financeLevel', currentLevel);
   }, [currentLevel]);
@@ -678,7 +680,8 @@ const Finance = ({ ageGroup }) => {
     const stage = cryptoStages[cryptoStage];
 
     if (totalValue >= stage.target) {
-      const reward = cryptoStage === 2 ? 40 : 30;
+      // Level 16: No reward addition as per request (100x15 = 1500 cap)
+      const reward = 0;
       showToast(`Stage Complete! Portfolio: ₦${Math.round(totalValue)} 🎉`, 'success');
       handleStageComplete(16, reward);
 
@@ -718,11 +721,12 @@ const Finance = ({ ageGroup }) => {
   };
 
   const completeLevel = (levelId) => {
-    // Reward: ₦2000 / 15 ≈ ₦130
-    const reward = 130;
-    const result = addEarnings('finance', reward); // Will be silent if capped
+    // Reward: 100 per level for first 15 = 1500 total.
+    // Staged levels (1-15) already award 100 via handleStageComplete.
+    // Level 16 is graduation (no money).
 
-    if (result.success) {
+    if (levelId === 16) {
+      setShowBadge(true);
       triggerConfetti();
     }
 
@@ -1467,6 +1471,45 @@ const Finance = ({ ageGroup }) => {
 
   return (
     <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+      {/* MASTERY BADGE MODAL */}
+      {showBadge && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 10000,
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          padding: '1rem'
+        }}>
+          <div className="card" style={{
+            maxWidth: '400px', width: '100%', textAlign: 'center',
+            background: 'linear-gradient(135deg, #1a1a1a 0%, #333 100%)',
+            border: '2px solid #FFD700', borderRadius: '24px', padding: '2.5rem',
+            boxShadow: '0 0 30px rgba(255, 215, 0, 0.3)',
+            animation: 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          }}>
+            <div style={{ fontSize: '5rem', marginBottom: '1.5rem' }}>🏅</div>
+            <h2 style={{ color: '#FFD700', marginBottom: '0.5rem' }}>FINANCE MASTER!</h2>
+            <p style={{ color: '#fff', marginBottom: '1.5rem' }}>
+              Congratulations! You've unlocked all 16 levels of Financial Literacy.
+              You are now a certified Wealth Builder! 👑
+            </p>
+            <div style={{
+              backgroundColor: 'rgba(255,215,0,0.1)', border: '1px dashed #FFD700',
+              padding: '1rem', borderRadius: '12px', marginBottom: '2rem'
+            }}>
+              <span style={{ fontSize: '0.8rem', color: '#FFD700' }}>RANK EARNED</span>
+              <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }}>Village Treasurer 💰</div>
+            </div>
+            <button
+              onClick={() => setShowBadge(false)}
+              className="btn"
+              style={{ width: '100%', backgroundColor: '#FFD700', color: '#000', fontWeight: 'bold' }}
+            >
+              SHOW OFF MY BADGE! 🚀
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* CONFETTI */}
       {showConfetti && (
         <div style={{
