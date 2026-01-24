@@ -1933,15 +1933,7 @@ const Finance = ({ ageGroup }) => {
                   <h4 style={{ color: '#FFBB33', margin: '0 0 0.5rem 0' }}>{module.title}</h4>
                   <p style={{ fontSize: '0.9rem', color: '#ccc' }}>{module.desc}</p>
                   <div style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: '#fff' }}>
-                    {/* Render content but strip buttons to avoid confusion */}
-                    {React.isValidElement(module.content) ?
-                      React.cloneElement(module.content, {
-                        children: React.Children.map(module.content.props.children, child => {
-                          if (child?.type === 'button' || child?.props?.children?.type === 'button') return null;
-                          return child;
-                        })
-                      })
-                      : module.content}
+                    {module.content}
                   </div>
                 </div>
               ))}
