@@ -717,6 +717,20 @@ const Finance = ({ ageGroup }) => {
 
   const toggleModule = (id) => {
     if (isAdult || id <= currentLevel) {
+      if (expandedModule !== id) {
+        // Reset progression state when opening a NEW module
+        setSubStage(0);
+        // Reset level-specific states
+        if (id === 14) setCityBuildings([]);
+        if (id === 6) { setCareerStep(0); setCareerHistory([]); }
+        if (id === 7) setInvestYear(0);
+        if (id === 8) setRiskChoiceLevel(0);
+        if (id === 10) setRainStage(0);
+        if (id === 11) setScamStep(0);
+        if (id === 12) setAssetStage(0);
+        if (id === 13) setFreedomStep(0);
+        if (id === 15) setRiskStage(0);
+      }
       setExpandedModule(expandedModule === id ? null : id);
     }
   };
@@ -1264,10 +1278,10 @@ const Finance = ({ ageGroup }) => {
             {freedomStep > 1 && <p style={{ color: '#00C851' }}>Passive Income: ₦{passiveIncome}</p>}
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button onClick={() => handleFreedomAction('work')} className="btn" style={{ flex: 1, backgroundColor: '#4285F4', opacity: freedomStep === 0 ? 1 : 0.5 }}>Work 🔨</button>
-            <button onClick={() => handleFreedomAction('invest')} className="btn" style={{ flex: 1, backgroundColor: '#FF8800', opacity: freedomStep === 1 ? 1 : 0.5 }}>Invest 🧠</button>
-            <button onClick={() => handleFreedomAction('relax')} className="btn" style={{ flex: 1, backgroundColor: '#00C851', opacity: freedomStep === 2 ? 1 : 0.5 }}>Relax 🕊️</button>
+          <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
+            <button onClick={() => handleFreedomAction('work')} className="btn" style={{ backgroundColor: '#4285F4', opacity: freedomStep === 0 ? 1 : 0.5, border: '1px solid #fff' }}>Work 🔨</button>
+            <button onClick={() => handleFreedomAction('invest')} className="btn" style={{ backgroundColor: '#FF8800', opacity: freedomStep === 1 ? 1 : 0.5, border: '1px solid #fff' }}>Invest 🧠</button>
+            <button onClick={() => handleFreedomAction('relax')} className="btn" style={{ backgroundColor: '#00C851', opacity: freedomStep === 2 ? 1 : 0.5, border: '1px solid #fff' }}>Relax 🕊️</button>
           </div>
         </div>
       )
@@ -1280,17 +1294,28 @@ const Finance = ({ ageGroup }) => {
         <div>
           <p><strong>Stage {subStage + 1}/3:</strong> Taxes build our community. Watch it grow!</p>
           <div style={{
-            height: '150px', backgroundColor: '#222', borderRadius: '10px', border: '1px solid #555',
+            height: '150px', backgroundColor: '#222', borderRadius: '20px', border: '1px solid #555',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '1rem', marginBottom: '1rem'
           }}>
-            {cityBuildings.length === 0 && <p style={{ color: '#aaa', alignSelf: 'center' }}>Empty Land...</p>}
+            {cityBuildings.length === 0 && <p style={{ color: '#aaa', alignSelf: 'center' }}>Empty Land waiting for development...</p>}
             {cityBuildings.map((b, i) => (
-              <div key={i} style={{ fontSize: '2.5rem', animation: 'popIn 0.5s' }}>{b.split(' ')[1]}</div>
+              <div key={i} style={{ fontSize: '3rem', animation: 'popIn 0.5s' }}>{b.split(' ')[1]}</div>
             ))}
           </div>
 
-          <button onClick={handlePayTax} className="btn" style={{ width: '100%', backgroundColor: '#4285F4' }} disabled={subStage >= 3}>
-            {subStage >= 3 ? "City Built! 🌆" : `Pay Tax & Build ${['School', 'Road', 'Hospital'][subStage] || ''} 🏗️`}
+          <button
+            onClick={handlePayTax}
+            className="btn"
+            style={{
+              width: '100%',
+              backgroundColor: subStage >= 3 ? '#00C851' : '#4285F4',
+              color: '#fff',
+              fontSize: '1.1rem',
+              height: '50px'
+            }}
+            disabled={subStage >= 3}
+          >
+            {subStage >= 3 ? "Village Fully Built! 🌆✅" : `Pay Tax & Build ${['School', 'Road', 'Hospital'][subStage] || ''} 🏗️`}
           </button>
 
           {subStage >= 3 && (
