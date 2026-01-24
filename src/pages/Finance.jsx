@@ -276,10 +276,10 @@ const Finance = ({ ageGroup }) => {
     const currentScenario = tradeScenarios[subStage];
     if (option === currentScenario.correct) {
       const reward = subStage === 2 ? 40 : 30; // 30, 30, 40 distribution
-      alert(`Good Trade! +₦${reward}`);
+      showToast(`Good Trade! +₦${reward} 🤝`, 'success');
       handleStageComplete(1, reward);
     } else {
-      alert("Not a fair trade! Try again.");
+      showToast("Not a fair trade! Try again.", 'error');
     }
   };
 
@@ -297,7 +297,7 @@ const Finance = ({ ageGroup }) => {
         if (newScore >= target) {
           setIsCoinGameActive(false);
           const reward = subStage === 2 ? 40 : 30;
-          alert(`Jar Full! +₦${reward}`);
+          showToast(`Jar Full! +₦${reward} 💰`, 'success');
           handleStageComplete(2, reward);
         }
         return newScore;
@@ -739,7 +739,7 @@ const Finance = ({ ageGroup }) => {
     const financeBalance = moduleBalances.finance || 0;
 
     if (financeBalance < investAmount) {
-      alert(`Insufficient funds in Finance Wallet (₦${financeBalance})! You cannot invest what you don't have.`);
+      showToast(`Insufficient funds in Finance Wallet (₦${financeBalance})!`, 'error');
       return;
     }
 
@@ -819,7 +819,7 @@ const Finance = ({ ageGroup }) => {
       setTaxPaid(prev => prev + 1);
 
       const reward = subStage === 2 ? 40 : 30;
-      alert(`You built a ${buildings[subStage]}! +₦${reward}`);
+      showToast(`You built a ${buildings[subStage]}! +₦${reward} 🏗️`, 'success');
       handleStageComplete(14, reward);
     }
   };
