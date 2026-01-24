@@ -158,6 +158,11 @@ const Finance = ({ ageGroup }) => {
             completeLevel(levelId); // Mark level as done and reset
             setSubStage(0);
           }, 1500);
+
+          // CRITICAL FIX: Do not return 3 for array-based levels, as it crashes rendering (index out of bounds)
+          // Exception: Module 14 (City Builder) explicitly handles stage 3
+          if (levelId === 14) return 3;
+          return 2; // Stay at last stage visuals while completion triggers
         }
         return nextStage;
       });
