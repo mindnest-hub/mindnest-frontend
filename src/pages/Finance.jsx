@@ -189,19 +189,18 @@ const Finance = ({ ageGroup }) => {
   const [isGrowing, setIsGrowing] = useState(false);
   const [investYear, setInvestYear] = useState(0); // 0, 1, 2
   const investStages = [
-    { year: 1, title: "Sowing Seeds 🌱", desc: "Plant your money safely.", options: [{ name: "Govt Bond 🏛️", risk: "low" }, { name: "Lottery 🎫", risk: "high" }], correct: "low", reward: 30 },
-    { year: 2, title: "Watering 🚿", desc: "Nurture with steady growth.", options: [{ name: "Index Fund 📈", risk: "med" }, { name: "Cash under mattress 🛏️", risk: "none" }], correct: "med", reward: 30 },
+    { year: 1, title: "Sowing Seeds 🌱", desc: "Plant your money safely.", options: [{ name: "Govt Bond 🏛️", risk: "low" }, { name: "Daily Ajo 💰", risk: "low" }], correct: "low", reward: 30 },
+    { year: 2, title: "Watering 🚿", desc: "Nurture with steady growth.", options: [{ name: "Real Estate (Lagos Land) 🏘️", risk: "med" }, { name: "Cash under mattress 🛏️", risk: "none" }], correct: "med", reward: 30 },
     { year: 3, title: "Harvesting 🍎", desc: "Reap the rewards!", options: [{ name: "Tech Stock 💻", risk: "high" }, { name: "Ponzi Scheme ⚠️", risk: "scam" }], correct: "high", reward: 40 }
   ];
 
-  // Level 8: Risk Walker
-  const [balancePos, setBalancePos] = useState(50);
-  const [walkerMessage, setWalkerMessage] = useState("Keep steady!");
-  const [walkerLevel, setWalkerLevel] = useState(0); // 0, 1, 2
-  const walkerStages = [
-    { name: "Low Beam", width: 30, reward: 30 }, // Wide safety margin
-    { name: "High Wire", width: 20, reward: 30 },
-    { name: "Skyscraper", width: 10, reward: 40 } // Very narrow
+  // Level 8: Risk & Reward (Nigerian Choices)
+  const [riskChoiceFeedback, setRiskChoiceFeedback] = useState("");
+  const [riskChoiceLevel, setRiskChoiceLevel] = useState(0); // 0, 1, 2
+  const riskChoiceStages = [
+    { name: "Small Business 🏪", desc: "Opening a small kiosk at the market.", risk: "med", reward: 30, outcome: "Steady growth! You earned ₦30." },
+    { name: "Daily Savings 🐖", desc: "Saving ₦100 every day with the local Ajo.", risk: "low", reward: 30, outcome: "Safe and sound! You earned ₦30." },
+    { name: "Double-Money Scheme ⚠️", desc: "Someone promises to double your money in 1 hour.", risk: "scam", reward: 0, outcome: "Oh no! It was a scam. You lost your capital. 💸" }
   ];
 
   // Level 9: Debt Sorter (Ninja)
@@ -209,9 +208,9 @@ const Finance = ({ ageGroup }) => {
   const [currentDebtItem, setCurrentDebtItem] = useState(null);
   const [debtStage, setDebtStage] = useState(0); // 0, 1, 2
   const debtStages = [
-    { title: "Bad Debt: Payday Loans", target: "bad", items: [{ name: "Payday Loan 💸", type: "bad" }, { name: "Student Loan 🎓", type: "good" }], reward: 30 },
-    { title: "Bad Debt: Credit Cards", target: "bad", items: [{ name: "High Interest Card 💳", type: "bad" }, { name: "Mortgage 🏠", type: "good" }], reward: 30 },
-    { title: "Predatory Lenders", target: "bad", items: [{ name: "Loan Shark 🦈", type: "bad" }, { name: "Business Loan 💼", type: "good" }], reward: 40 }
+    { title: "Bad Debt: High Interest", target: "bad", items: [{ name: "Quick Credit (Lapo) 💸", type: "bad" }, { name: "Education Fund 🎓", type: "good" }], reward: 30 },
+    { title: "Bad Debt: Consumer Debt", target: "bad", items: [{ name: "Expensive Phone Loan 💳", type: "bad" }, { name: "Mortgage 🏠", type: "good" }], reward: 30 },
+    { title: "Predatory Lenders", target: "bad", items: [{ name: "Loan Shark 🦈", type: "bad" }, { name: "Small Business Loan 💼", type: "good" }], reward: 40 }
   ];
 
   // Level 10: Insurance (Rainy Day)
@@ -236,9 +235,9 @@ const Finance = ({ ageGroup }) => {
   // Level 12: Real Wealth (Sorter)
   const [assetStage, setAssetStage] = useState(0); // 0-2
   const assetStages = [
-    { title: "Sorter 🗑️", task: "Drag Assets to Pocket", items: [{ name: "Rental House 🏠", type: "asset" }, { name: "New Car 🚗", type: "liability" }], reward: 30 },
-    { title: "Cash Flow 💸", task: "Connect the flow", items: [{ name: "Business 🏢", type: "asset" }, { name: "Expensive Watch ⌚", type: "liability" }], reward: 30 },
-    { title: "Portfolio 💼", task: "Pick the best 3", items: ["Stock 📈", "Bond 📜", "Gold 🥇", "Lottery 🎫"], correct: ["Stock 📈", "Bond 📜", "Gold 🥇"], reward: 40 }
+    { title: "Money Magnet 🗑️", task: "Drag things that GROW your money here", items: [{ name: "Lagos Land/Plot 🏠", type: "asset" }, { name: "New iPhone 📱", type: "liability" }], reward: 30 },
+    { title: "Cash Flow 💸", task: "Which one yields profit every month?", items: [{ name: "Rental Shop 🏢", type: "asset" }, { name: "Luxury Watch ⌚", type: "liability" }], reward: 30 },
+    { title: "Income Team 💼", task: "Pick the team that makes you rich", items: ["Gold Bar 🥇", "Small Shop 🏪", "Lagos Land 🏘️", "Lottery Ticket 🎫"], correct: ["Gold Bar 🥇", "Small Shop 🏪", "Lagos Land 🏘️"], reward: 40 }
   ];
 
   // Level 13: Financial Freedom (Path)
@@ -423,42 +422,22 @@ const Finance = ({ ageGroup }) => {
     }
   };
 
-  const handleWalkerMove = (val) => {
-    setBalancePos(val);
-    const stage = walkerStages[walkerLevel];
-    const range = stage.width; // e.g. 30 means 35-65 is safe (50 +/- 15)
-    const min = 50 - (range / 2);
-    const max = 50 + (range / 2);
+  const handleRiskChoiceHander = (opt) => {
+    setRiskChoiceFeedback(`${opt.name}: ${opt.outcome}`);
+    handleStageComplete(8, opt.reward);
 
-    if (val < min || val > max) {
-      setWalkerMessage("Whoa! Too shaky! 😱");
-    } else {
-      setWalkerMessage("Steady... 👍");
-      // Check for success (holding steady logic simulated by verify button usually, but here simplicity)
-    }
-  };
-
-  const verifyWalker = () => {
-    const stage = walkerStages[walkerLevel];
-    const range = stage.width;
-    const min = 50 - (range / 2);
-    const max = 50 + (range / 2);
-
-    if (balancePos >= min && balancePos <= max) {
-      showToast(`Balanced! +₦${stage.reward} 🤸`, 'success');
-      handleStageComplete(8, stage.reward);
-
-      if (walkerLevel < 2) setWalkerLevel(l => l + 1);
-      else {
+    setTimeout(() => {
+      setRiskChoiceFeedback("");
+      if (riskChoiceLevel < 2) {
+        setRiskChoiceLevel(prev => prev + 1);
+      } else {
         triggerConfetti();
         if (currentLevel === 8) {
           setTimeout(() => completeLevel(8), 1500);
-          setWalkerLevel(0);
+          setRiskChoiceLevel(0);
         }
       }
-    } else {
-      showToast("Fell off! Get back to the center.", 'error');
-    }
+    }, 3000);
   };
 
   const handleDebtAction = (type) => { // 'good' or 'bad'
@@ -1067,21 +1046,23 @@ const Finance = ({ ageGroup }) => {
             <h4 style={{ color: 'var(--color-primary)', marginTop: 0 }}>Year {investStages[investYear].year} Strategy 🌳</h4>
 
             <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-              {investStages[investYear].options.map((opt, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleInvestChoice(opt.risk)}
-                  className="card"
-                  style={{
-                    padding: '1rem', border: '1px solid var(--color-border)',
-                    backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
-                  }}
-                >
-                  <span style={{ fontSize: '1.5rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
-                  <strong>{opt.name}</strong>
-                </button>
-              ))}
+              {investStages[investYear].options
+                .filter(opt => !(isKid && opt.name === "Tech Stock 💻")) // Filter out for kids
+                .map((opt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleInvestChoice(opt.risk)}
+                    className="card"
+                    style={{
+                      padding: '1rem', border: '1px solid var(--color-border)',
+                      backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                    }}
+                  >
+                    <span style={{ fontSize: '1.5rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
+                    <strong>{opt.name}</strong>
+                  </button>
+                ))}
             </div>
 
             <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#aaa' }}>Choose wisely to grow your garden!</p>
@@ -1091,55 +1072,45 @@ const Finance = ({ ageGroup }) => {
     },
     {
       id: 8,
-      title: "Risk & Reward: The Walker ⚖️",
+      title: "Risk & Reward: The Choice ⚖️",
       desc: "Balance risk and safety.",
       content: (
         <div>
-          <p><strong>Stage {walkerLevel + 1}/3:</strong> {walkerStages[walkerLevel].name}</p>
-          <p>High reward, high risk. Keep it steady!</p>
+          <p><strong>Scenario {riskChoiceLevel + 1}/3:</strong> Which risk is right for you?</p>
 
-          <div style={{ margin: '2rem 0', textAlign: 'center', backgroundColor: '#222', padding: '1rem', borderRadius: '10px' }}>
-            <div style={{ fontSize: '3rem', transform: `rotate(${(balancePos - 50)}deg)`, transition: 'transform 0.2s', marginBottom: '1rem' }}>
-              {Math.abs(balancePos - 50) > 20 ? '😱' : '🤸'}
+          <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid #FF9800' }}>
+            <h4 style={{ color: '#FF9800', marginTop: 0 }}>The Big Decision</h4>
+            <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Choose the option that matches your goals.</p>
+
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+              {riskChoiceStages.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleRiskChoiceHander(opt)}
+                  className="card"
+                  disabled={riskChoiceFeedback !== ""}
+                  style={{
+                    padding: '1rem', border: '2px solid var(--color-border)',
+                    backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                    opacity: riskChoiceFeedback !== "" && !riskChoiceFeedback.includes(opt.name) ? 0.5 : 1
+                  }}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
+                  <strong>{opt.name}</strong>
+                </button>
+              ))}
             </div>
 
-            {/* Beam Visual */}
-            <div style={{
-              height: '10px',
-              width: '100%',
-              background: '#444',
-              marginTop: '5px',
-              position: 'relative',
-              borderRadius: '5px'
-            }}>
-              {/* Safe Zone Indicator */}
+            {riskChoiceFeedback && (
               <div style={{
-                position: 'absolute',
-                left: `${50 - (walkerStages[walkerLevel].width / 2)}%`,
-                width: `${walkerStages[walkerLevel].width}%`,
-                height: '100%',
-                backgroundColor: '#00C851',
-                opacity: 0.5
-              }}></div>
-            </div>
-
-            <input
-              type="range" min="0" max="100" value={balancePos}
-              onChange={(e) => handleWalkerMove(Number(e.target.value))}
-              style={{ width: '100%', marginTop: '1.5rem', cursor: 'grab' }}
-            />
-            <p style={{ fontWeight: 'bold', color: walkerMessage.includes('!') ? '#ff4444' : '#00C851', marginTop: '1rem' }}>{walkerMessage}</p>
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <button
-              onClick={verifyWalker}
-              className="btn"
-              style={{ width: '100%', backgroundColor: '#FF8800' }}
-            >
-              Verify Balance ⚖️
-            </button>
-            <p style={{ fontSize: '0.8rem', color: '#aaa', marginTop: '0.5rem' }}>Keep the slider in the GREEN zone!</p>
+                marginTop: '1rem', padding: '1rem', borderRadius: '8px',
+                backgroundColor: 'rgba(255,152,0,0.1)', border: '1px solid #FF9800',
+                animation: 'popIn 0.3s'
+              }}>
+                <p style={{ margin: 0, fontWeight: 'bold' }}>{riskChoiceFeedback}</p>
+              </div>
+            )}
           </div>
         </div>
       )
@@ -1153,22 +1124,25 @@ const Finance = ({ ageGroup }) => {
           <p><strong>Stage {debtStage + 1}/3:</strong> {debtStages[debtStage].title}</p>
           <p>Sharpen your sword! Slash <strong>{debtStages[debtStage].target === 'bad' ? 'BAD DEBT' : 'BAD DEBT'}</strong>.</p>
 
-          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
             {debtStages[debtStage].items.map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => handleDebtAction(item.type)}
                 className="btn"
                 style={{
-                  height: '100px',
-                  fontSize: '1.2rem',
+                  minHeight: '140px',
+                  padding: '1rem',
+                  fontSize: '1rem',
+                  lineHeight: '1.2',
                   backgroundColor: '#333',
                   border: '2px solid #555',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  textAlign: 'center'
                 }}
               >
-                <span style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{item.name.split(' ').pop()}</span>
-                <span>{item.name.replace(item.name.split(' ').pop(), '')}</span>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{item.name.split(' ').pop()}</div>
+                <div style={{ fontWeight: 'bold' }}>{item.name.replace(item.name.split(' ').pop(), '')}</div>
               </button>
             ))}
           </div>
@@ -1240,28 +1214,37 @@ const Finance = ({ ageGroup }) => {
     },
     {
       id: 12,
-      title: "Real Wealth: Asset Chat 🏡",
+      title: "Real Wealth: The Money Magnet 🧲",
       desc: "Assets vs Liabilities.",
       content: (
         <div>
           <p><strong>Stage {assetStage + 1}/3:</strong> {assetStages[assetStage].title}</p>
-          <p>{assetStages[assetStage].task}</p>
+          <p style={{ color: '#FFD700', fontWeight: 'bold' }}>Your Task: {assetStages[assetStage].task}</p>
+
           <div style={{
-            border: '2px solid #00C851', borderRadius: '10px', overflow: 'hidden', padding: '1rem',
-            backgroundColor: '#222', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem'
+            border: '2px solid #00C851', borderRadius: '20px', overflow: 'hidden', padding: '1.5rem',
+            backgroundColor: 'rgba(0,200,81,0.05)', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem'
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
               {assetStages[assetStage].items.map((item, idx) => (
                 <button
                   key={idx}
-                  onClick={() => handleAssetAction(typeof item === 'string' ? item : item.name)}
-                  className="btn"
-                  style={{ backgroundColor: '#444' }}
+                  onClick={() => handleAssetAction(item)}
+                  className="card"
+                  style={{
+                    backgroundColor: '#333', border: '1px solid #555', padding: '1rem',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                    transition: 'transform 0.2s', minHeight: '120px'
+                  }}
                 >
-                  {typeof item === 'string' ? item : item.name}
+                  <div style={{ fontSize: '2.5rem' }}>{typeof item === 'string' ? item.split(' ').pop() : item.name.split(' ').pop()}</div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{typeof item === 'string' ? item.replace(item.split(' ').pop(), '') : item.name.replace(item.name.split(' ').pop(), '')}</div>
                 </button>
               ))}
             </div>
+            <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888' }}>
+              Click on the items that make you rich! 💰
+            </p>
           </div>
         </div>
       )
