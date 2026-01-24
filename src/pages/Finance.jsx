@@ -75,6 +75,30 @@ const Finance = ({ ageGroup }) => {
     localStorage.setItem('dreamCost', dreamCost);
   }, [dreamGoal, dreamCost]);
 
+  // --- PASSIVE INCOME LOOP (LEVEL 16) ---
+  useEffect(() => {
+    if (currentLevel < 16) return;
+
+    const interval = setInterval(() => {
+      setPortfolio(prev => {
+        // Calculate yields
+        const realEstateYield = prev.realEstate * 50; // Lagos Rent ₦50 per unit
+        const stockYield = prev.stocks * 5; // Dividends ₦5 per share
+        const bankYield = prev.bankFixed * 10; // Interest ₦10 per k
+
+        const totalIncome = realEstateYield + stockYield + bankYield;
+
+        if (totalIncome > 0) {
+          return { ...prev, cash: prev.cash + totalIncome };
+        }
+        return prev;
+      });
+    }, 5000); // Pulse every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [currentLevel]);
+
+
 
 
   // --- ADULT TOOLS STATE ---
@@ -251,18 +275,32 @@ const Finance = ({ ageGroup }) => {
 
   // Level 15: Risk Management (Egg Drop)
   const [riskStage, setRiskStage] = useState(0); // 0-2
-  const [eggsPlaced, setEggsPlaced] = useState(0);
+  const [riskFeedback, setRiskFeedback] = useState("");
   const riskStages = [
-    { title: "One Basket 🧺", baskets: 1, desc: "High Risk! All eggs in 1 basket.", reward: 30 },
-    { title: "Diversify 🧺🧺🧺", baskets: 3, desc: "Safety! Split eggs.", reward: 30 },
-    { title: "Market Crash 📉", baskets: 3, desc: "Survival Mode! Did you diversify?", reward: 40 }
+    { title: "One-Good Stall 🌽", choice: "single", desc: "You only sell corn. What happens during a poor harvest?", reward: 30, outcome: "Poor harvest! You have nothing else to sell. Learn to diversify! 📉" },
+    { title: "Diverse Stall 🥫", choice: "diverse", desc: "You sell maize, soap, and bread. What happens if bread is scarce?", reward: 30, outcome: "Safe! Your other goods still sell well. Good job! ✅" },
+    { title: "Market Fire 🕯️", choice: "diverse", desc: "A candle starts a fire. Does your diversified business survive?", reward: 40, outcome: "Survival! Your spread-out goods saved your capital. 🏆" }
   ];
 
-  // Level 16: Crypto & Global Markets
+  // Level 16: The Wealth Engine 🌍
   const [cryptoStage, setCryptoStage] = useState(0);
-  const [portfolio, setPortfolio] = useState({ bitcoin: 0, ethereum: 0, stocks: 0, cash: 1000 });
-  const [prices, setPrices] = useState({ bitcoin: 50000, ethereum: 3000, stocks: 100 });
+  const [portfolio, setPortfolio] = useState({
+    bitcoin: 0,
+    ethereum: 0,
+    stocks: 0,
+    realEstate: 0,
+    bankFixed: 0,
+    cash: 1000
+  });
+  const [prices, setPrices] = useState({
+    bitcoin: 50000,
+    ethereum: 3000,
+    stocks: 100,
+    realEstate: 5000,
+    bankFixed: 1000
+  });
   const [newsEvent, setNewsEvent] = useState(null);
+  const [passiveIncomeRate, setPassiveIncomeRate] = useState(0);
 
   const cryptoStages = [
     { title: "Buy Low, Sell High", desc: "Watch the trends!", target: 1200 },
@@ -581,31 +619,31 @@ const Finance = ({ ageGroup }) => {
     }
   };
 
-  const handleRiskAction = (baskets) => {
+  const handleRiskAction = (type) => {
     const stage = riskStages[riskStage];
 
-    // Check if user chose the right number of baskets for the stage
-    // Stage 1: 1 basket (demo risk) -> User clicks 1 basket (risky but that's the stage)
-    // Stage 2: 3 baskets -> User clicks 3
-    // Stage 3: Crash -> User clicks 'Survive'
-
-    if (baskets === stage.baskets) {
-      showToast(`Correct strategy for this stage! +₦${stage.reward} 🥚`, 'success');
+    if (type === stage.choice || (riskStage === 0 && type === 'single')) {
+      setRiskFeedback(stage.outcome);
       handleStageComplete(15, stage.reward);
-      if (riskStage < 2) setRiskStage(s => s + 1);
-      else {
-        triggerConfetti();
-        if (currentLevel === 15) {
-          setTimeout(() => completeLevel(15), 1500);
-          setRiskStage(0);
+
+      setTimeout(() => {
+        setRiskFeedback("");
+        if (riskStage < 2) setRiskStage(s => s + 1);
+        else {
+          triggerConfetti();
+          if (currentLevel === 15) {
+            setTimeout(() => completeLevel(15), 1500);
+            setRiskStage(0);
+          }
         }
-      }
+      }, 3000);
     } else {
-      showToast("Try a different strategy!", 'warning');
+      showToast("Not the best strategy! Think about safety.", 'warning');
     }
   };
 
   // --- CRYPTO HANDLERS ---
+  // --- CRYPTO & WEALTH HANDLERS ---
   const handleCryptoTrade = (asset, action) => {
     const price = prices[asset];
     const amount = 100;
@@ -617,7 +655,7 @@ const Finance = ({ ageGroup }) => {
           [asset]: prev[asset] + (amount / price),
           cash: prev.cash - amount
         }));
-        showToast(`Bought ${asset}! 📈`, 'success');
+        showToast(`Bought ${asset.toUpperCase()}! 📈`, 'success');
       } else {
         showToast("Not enough cash!", 'error');
       }
@@ -630,12 +668,20 @@ const Finance = ({ ageGroup }) => {
           [asset]: 0,
           cash: prev.cash + sellValue
         }));
-        showToast(`Sold ${asset} for ₦${Math.round(sellValue)}! 💰`, 'success');
+        showToast(`Sold ${asset.toUpperCase()} for ₦${Math.round(sellValue)}! 💰`, 'success');
       } else {
         showToast(`You don't own any ${asset}!`, 'warning');
       }
     }
   };
+
+  const wealthAssets = [
+    { id: 'bitcoin', name: 'Bitcoin ₿', color: '#F7931A', yieldDesc: 'Volatile' },
+    { id: 'realEstate', name: 'Lagos Land 🏘️', color: '#4CAF50', yieldDesc: '₦50/pulse' },
+    { id: 'stocks', name: 'Index Fund 📊', color: '#2196F3', yieldDesc: '₦5/pulse' },
+    { id: 'bankFixed', name: 'Bank Fixed 🏦', color: '#9C27B0', yieldDesc: '₦10/pulse' }
+  ];
+
 
   const triggerMarketEvent = () => {
     const event = newsEvents[Math.floor(Math.random() * newsEvents.length)];
@@ -734,11 +780,16 @@ const Finance = ({ ageGroup }) => {
         if (id === 11) setScamStep(0);
         if (id === 12) setAssetStage(0);
         if (id === 13) setFreedomStep(0);
-        if (id === 15) setRiskStage(0);
+        if (id === 15) { setRiskStage(0); setRiskFeedback(""); }
+        if (id === 16) {
+          setPortfolio({ bitcoin: 0, ethereum: 0, stocks: 0, realEstate: 0, bankFixed: 0, cash: 1000 });
+          setCryptoStage(0);
+        }
       }
       setExpandedModule(expandedModule === id ? null : id);
     }
   };
+
 
   const handleInvest = () => {
     const financeBalance = moduleBalances.finance || 0;
@@ -1334,149 +1385,120 @@ const Finance = ({ ageGroup }) => {
     },
     {
       id: 15,
-      title: "Risk Management: Egg Drop 🥚",
-      desc: "Protecting your wealth.",
+      title: "Risk Management: The Savvy Merchant 🌽",
+      desc: "Diversify to survive.",
       content: (
         <div>
-          <p><strong>Stage {riskStage + 1}/3:</strong> {riskStages[riskStage].title}</p>
-          <p>{riskStages[riskStage].desc}</p>
+          <p><strong>Scenario {riskStage + 1}/3:</strong> {riskStages[riskStage].title}</p>
+          <p><em>{riskStages[riskStage].desc}</em></p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '2rem 0' }}>
-            {Array.from({ length: riskStages[riskStage].baskets }).map((_, i) => (
-              <div key={i} style={{ fontSize: '3rem' }}>🧺</div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
-            <p style={{ textAlign: 'center' }}>Choose Strategy:</p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <button onClick={() => handleRiskAction(1)} className="btn" style={{ flex: 1, backgroundColor: '#ff4444' }}>1 Basket (Risky)</button>
-              <button onClick={() => handleRiskAction(3)} className="btn" style={{ flex: 1, backgroundColor: '#00C851' }}>3 Baskets (Safe)</button>
+          <div style={{ margin: '1.5rem 0' }}>
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+              <button
+                onClick={() => handleRiskAction('single')}
+                className="card"
+                disabled={riskFeedback !== ""}
+                style={{
+                  padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
+                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
+                  opacity: riskFeedback.includes('Poor harvest') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
+                }}
+              >
+                <div style={{ fontSize: '3rem' }}>🌽</div>
+                <strong>Sell Only Corn</strong>
+              </button>
+              <button
+                onClick={() => handleRiskAction('diverse')}
+                className="card"
+                disabled={riskFeedback !== ""}
+                style={{
+                  padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
+                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
+                  opacity: riskFeedback.includes('Safe') || riskFeedback.includes('Survival') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
+                }}
+              >
+                <div style={{ fontSize: '3rem' }}>🛍️</div>
+                <strong>Mixed Goods</strong>
+              </button>
             </div>
           </div>
+
+          {riskFeedback && (
+            <div style={{
+              padding: '1rem', borderRadius: '12px',
+              backgroundColor: riskFeedback.includes('Poor') ? 'rgba(255,68,68,0.1)' : 'rgba(0,200,81,0.1)',
+              border: `1px solid ${riskFeedback.includes('Poor') ? '#ff4444' : '#00C851'}`,
+              animation: 'popIn 0.3s'
+            }}>
+              <p style={{ margin: 0, fontWeight: 'bold', textAlign: 'center' }}>{riskFeedback}</p>
+            </div>
+          )}
         </div>
       )
     },
     {
       id: 16,
-      title: "Crypto & Global Markets 🌍",
-      desc: "High-risk, high-reward trading.",
+      title: "Wealth Engine: Diversified Choice 🌍",
+      desc: "Invest to earn passive income.",
       content: (
         <div>
-          <p><strong>Stage {cryptoStage + 1}/3:</strong> {cryptoStages[cryptoStage].title}</p>
-          <p style={{ fontSize: '0.9rem', color: '#aaa' }}>{cryptoStages[cryptoStage].desc}</p>
+          <p><strong>Stage {cryptoStage + 1}/3:</strong> Build your wealth engine.</p>
+          <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1rem' }}>
+            Hold assets to earn money automatically every 5 seconds! 💸
+          </p>
 
-          {/* NEWS TICKER */}
-          {newsEvent && (
-            <div style={{
-              backgroundColor: '#FF8800',
-              padding: '0.8rem',
-              borderRadius: '10px',
-              marginBottom: '1rem',
-              animation: 'slideIn 0.5s',
-              textAlign: 'center',
-              fontWeight: 'bold'
-            }}>
-              📰 {newsEvent.text}
-            </div>
-          )}
-
-          {/* PORTFOLIO DISPLAY */}
-          <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', marginBottom: '1rem', border: '1px solid #444' }}>
-            <h4 style={{ margin: '0 0 1rem 0', color: '#FFD700' }}>💼 Your Portfolio</h4>
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-              <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', flex: '1 1 120px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Cash</p>
-                <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>₦{Math.round(portfolio.cash)}</p>
+          {/* TOTAL WEALTH CARD */}
+          <div style={{
+            backgroundColor: '#007E33', padding: '1.5rem', borderRadius: '20px',
+            color: 'white', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.2)',
+            boxShadow: '0 8px 32px rgba(0,200,81,0.2)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>Available Cash</p>
+                <h3 style={{ margin: 0, fontSize: '1.8rem' }}>₦{Math.round(portfolio.cash)}</h3>
               </div>
-              <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', flex: '1 1 120px' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Total Value</p>
-                <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: '#00C851' }}>
-                  ₦{Math.round(portfolio.cash + (portfolio.bitcoin * prices.bitcoin) + (portfolio.ethereum * prices.ethereum) + (portfolio.stocks * prices.stocks))}
-                </p>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>Income Pulse</p>
+                <h3 style={{ margin: 0, color: '#00C851' }}>+₦{
+                  (portfolio.realEstate * 50) + (portfolio.stocks * 5) + (portfolio.bankFixed * 10)
+                }/5s</h3>
               </div>
             </div>
-            <p style={{ fontSize: '0.8rem', color: '#aaa', textAlign: 'center' }}>
-              Target to Pass: ₦{cryptoStages[cryptoStage].target}
+            <p style={{ fontSize: '0.75rem', marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
+              Target to Mastery: <strong>₦{cryptoStages[cryptoStage].target}</strong>
             </p>
           </div>
 
-          {/* TRADING INTERFACE */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {/* Bitcoin */}
-            <div style={{ backgroundColor: '#2c2c2c', padding: '1rem', borderRadius: '10px', border: '1px solid #F7931A' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <div>
-                  <h4 style={{ margin: 0, color: '#F7931A' }}>₿ Bitcoin</h4>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Holdings: {portfolio.bitcoin.toFixed(4)} BTC</p>
+          {/* ASSET GRID */}
+          <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+            {wealthAssets.map((asset) => (
+              <div key={asset.id} style={{
+                backgroundColor: '#2c2c2c', padding: '1rem', borderRadius: '15px',
+                border: `1px solid ${asset.color}`, display: 'flex', flexDirection: 'column', gap: '0.5rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                  <span style={{ fontSize: '1.2rem' }}>{asset.name}</span>
+                  <span style={{ fontSize: '0.7rem', color: '#aaa' }}>{asset.yieldDesc}</span>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>₦{prices.bitcoin.toLocaleString()}</p>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: prices.bitcoin > 50000 ? '#00C851' : '#ff4444' }}>
-                    {prices.bitcoin > 50000 ? '↗️' : '↘️'} {((prices.bitcoin / 50000 - 1) * 100).toFixed(1)}%
-                  </p>
+                <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>₦{prices[asset.id].toLocaleString()}</div>
+                <div style={{ fontSize: '0.75rem', color: '#888' }}>
+                  Owned: {portfolio[asset.id].toFixed(2)}
                 </div>
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button onClick={() => handleCryptoTrade('bitcoin', 'buy')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#00C851' }}>Buy ₦100</button>
-                <button onClick={() => handleCryptoTrade('bitcoin', 'sell')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#ff4444' }}>Sell All</button>
-              </div>
-            </div>
-
-            {/* Ethereum */}
-            <div style={{ backgroundColor: '#2c2c2c', padding: '1rem', borderRadius: '10px', border: '1px solid #627EEA' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <div>
-                  <h4 style={{ margin: 0, color: '#627EEA' }}>⟠ Ethereum</h4>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Holdings: {portfolio.ethereum.toFixed(4)} ETH</p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>₦{prices.ethereum.toLocaleString()}</p>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: prices.ethereum > 3000 ? '#00C851' : '#ff4444' }}>
-                    {prices.ethereum > 3000 ? '↗️' : '↘️'} {((prices.ethereum / 3000 - 1) * 100).toFixed(1)}%
-                  </p>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <button onClick={() => handleCryptoTrade(asset.id, 'buy')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#00C851', fontSize: '0.7rem', padding: '0.4rem' }}>Buy ₦100</button>
+                  <button onClick={() => handleCryptoTrade(asset.id, 'sell')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#ff4444', fontSize: '0.7rem', padding: '0.4rem' }}>Sell All</button>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button onClick={() => handleCryptoTrade('ethereum', 'buy')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#00C851' }}>Buy ₦100</button>
-                <button onClick={() => handleCryptoTrade('ethereum', 'sell')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#ff4444' }}>Sell All</button>
-              </div>
-            </div>
-
-            {/* Stocks */}
-            <div style={{ backgroundColor: '#2c2c2c', padding: '1rem', borderRadius: '10px', border: '1px solid #2196F3' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <div>
-                  <h4 style={{ margin: 0, color: '#2196F3' }}>📊 Index Fund</h4>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Holdings: {portfolio.stocks.toFixed(2)} shares</p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>₦{prices.stocks.toLocaleString()}</p>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: prices.stocks > 100 ? '#00C851' : '#ff4444' }}>
-                    {prices.stocks > 100 ? '↗️' : '↘️'} {((prices.stocks / 100 - 1) * 100).toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button onClick={() => handleCryptoTrade('stocks', 'buy')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#00C851' }}>Buy ₦100</button>
-                <button onClick={() => handleCryptoTrade('stocks', 'sell')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#ff4444' }}>Sell All</button>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* ACTION BUTTONS */}
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-            <button onClick={triggerMarketEvent} className="btn btn-outline" style={{ flex: '1 1 140px' }}>
-              📰 News
-            </button>
-            <button onClick={checkCryptoProgress} className="btn btn-primary" style={{ flex: '1 1 140px' }}>
-              ✅ Check Progress
-            </button>
+          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            <button onClick={checkCryptoProgress} className="btn btn-primary" style={{ width: '100%' }}>Check Progress ✅</button>
+            <p style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.5rem', fontStyle: 'italic' }}>
+              Mastery rule: Only investors can withdraw funds from this module.
+            </p>
           </div>
-
-          <p style={{ fontSize: '0.75rem', color: '#666', marginTop: '1rem', textAlign: 'center', fontStyle: 'italic' }}>
-            ⚠️ This is a simulation. Real crypto trading involves significant risk.
-          </p>
         </div>
       )
     }
@@ -1659,22 +1681,22 @@ const Finance = ({ ageGroup }) => {
 
                   {!verificationStatus || verificationStatus === 'idle' ? (
                     <>
-                      <p>To ensure secure transactions, we must verify your identity and academic records.</p>
+                      <p>To ensure secure transactions, we must verify your identity and wealth records.</p>
                       <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', margin: '1rem 0', textAlign: 'left' }}>
-                        <p style={{ margin: '0.5rem 0' }}>📋 <strong>Requirement 1:</strong> Finance Balance ≥ ₦{WITHDRAWAL_LIMIT} ✅</p>
-                        <p style={{ margin: '0.5rem 0' }}>📜 <strong>Requirement 2:</strong> History Wallet ≥ ₦2,000 {moduleBalances.history >= 2000 ? '✅' : '❌'}</p>
+                        <p style={{ margin: '0.4rem 0' }}>📋 <strong>Requirement 1:</strong> Balance ≥ ₦{WITHDRAWAL_LIMIT} ✅</p>
+                        <p style={{ margin: '0.4rem 0' }}>📜 <strong>Requirement 2:</strong> History Wallet ≥ ₦2,000 {moduleBalances.history >= 2000 ? '✅' : '❌'}</p>
+                        <p style={{ margin: '0.4rem 0' }}>🏗️ <strong>Requirement 3:</strong> Active Investments {(portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0) ? '✅' : '❌'}</p>
                       </div>
                       <div style={{ display: 'flex', gap: '1rem' }}>
                         <button
                           onClick={() => {
-                            setVerificationStatus('verifying');
-                            setTimeout(() => {
-                              if ((moduleBalances.history || 0) >= 2000) {
-                                setVerificationStatus('success');
-                              } else {
-                                setVerificationStatus('failed');
-                              }
-                            }, 3000);
+                            const hasInvestments = portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0;
+                            if (hasInvestments && (moduleBalances.history || 0) >= 2000) {
+                              setVerificationStatus('verifying');
+                              setTimeout(() => setVerificationStatus('success'), 3000);
+                            } else {
+                              setVerificationStatus('failed');
+                            }
                           }}
                           className="btn"
                           style={{ backgroundColor: '#00C851', flex: 1 }}
@@ -1684,6 +1706,7 @@ const Finance = ({ ageGroup }) => {
                         <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Cancel</button>
                       </div>
                     </>
+
                   ) : verificationStatus === 'verifying' ? (
                     <div style={{ padding: '2rem' }}>
                       <div className="spinner" style={{ width: '50px', height: '50px', border: '5px solid #333', borderTop: '5px solid #00C851', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem auto' }}></div>
