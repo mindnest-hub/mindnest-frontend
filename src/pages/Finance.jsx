@@ -40,25 +40,7 @@ const Finance = ({ ageGroup }) => {
     localStorage.setItem('financeLevel', currentLevel);
   }, [currentLevel]);
 
-  useEffect(() => {
-    // Auto-complete reading modules after 5 seconds
-    if (expandedModule && !isLocked && !isCompleted && !modules.find(m => m.id === expandedModule)?.content?.props?.children?.some?.(child => child?.type === 'button')) {
-      // logic to check if it has interactive elements is hard here due to ReactNode structure.
-      // Simplified: If module ID is NOT in the interactive list.
-      // Interactive IDs: 1, 2, 3, 4(no), 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-      // Actually 4 is "Supermarket Sweep" (interactive).
-      // Wait, modules defs are below.
-      // Let's rely on the "Mark as Done" removal logic: if a module has NO buttons.
-      // For now, I'll assume users read fast.
-      const timer = setTimeout(() => {
-        if (expandedModule === currentLevel) {
-          completeLevel(expandedModule);
-          showToast("Lesson Completed! ✅", "success");
-        }
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [expandedModule]);
+
 
   // --- GAME STATE ---
   const [budget, setBudget] = useState(0);
