@@ -517,7 +517,7 @@ const Tech = () => {
   const [showLevelUp, setShowLevelUp] = useState(false);
 
   const aiLevels = {
-    1: { title: 'Level 1: Pet vs Wild 🐶🦁', target: 5, data: [{ emoji: '🐶', type: 'pet' }, { emoji: '🦁', type: 'wild' }, { emoji: '🐱', type: 'pet' }, { emoji: '🐆', type: 'wild' }] },
+    1: { title: 'Level 1: Domestic vs Wild 🐶🦁', target: 5, data: [{ emoji: '🐶', type: 'domestic' }, { emoji: '🦁', type: 'wild' }, { emoji: '🐱', type: 'domestic' }, { emoji: '🐆', type: 'wild' }] },
     2: { title: 'Level 2: Fruit vs Veggie 🍎🥕', target: 8, data: [{ emoji: '🍎', type: 'fruit' }, { emoji: '🥕', type: 'veggie' }, { emoji: '🍌', type: 'fruit' }, { emoji: '🥦', type: 'veggie' }] },
     3: { title: 'Level 3: Land vs Sea 🐘🐳', target: 10, data: [{ emoji: '🐘', type: 'land' }, { emoji: '🐳', type: 'sea' }, { emoji: '🦒', type: 'land' }, { emoji: '🐙', type: 'sea' }] },
     4: { title: 'Level 4: Flying vs Walking 🦅🐕', target: 12, data: [{ emoji: '🦅', type: 'fly' }, { emoji: '🐕', type: 'walk' }, { emoji: '🦜', type: 'fly' }, { emoji: '🐄', type: 'walk' }] },
@@ -544,11 +544,13 @@ const Tech = () => {
 
     if (isCorrect) {
       setAiScore(prev => prev + 1);
+      setAiAccuracy(prev => Math.min(prev + 15, 100)); // Update for Adult View
       setAiMessage("✅ Correct!");
       if (aiScore + 1 >= currentLevelData.target) {
         setShowLevelUp(true);
       }
     } else {
+      setAiAccuracy(prev => Math.max(prev - 10, 0)); // Update for Adult View
       setAiMessage("❌ Wrong!");
     }
 
@@ -597,7 +599,7 @@ const Tech = () => {
                 {aiLevel === 1 && (
                   <>
                     <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#FF4500' }} onClick={() => handleTrain('wild')}>Wild 🦁</button>
-                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }} onClick={() => handleTrain('pet')}>Pet 🐶</button>
+                    <button className="btn" style={{ flex: '1 1 150px', backgroundColor: '#00C851' }} onClick={() => handleTrain('domestic')}>Domestic 🐶</button>
                   </>
                 )}
                 {aiLevel === 2 && (
