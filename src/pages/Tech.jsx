@@ -33,10 +33,12 @@ const Tech = () => {
   }, [completedLessons, techPoints]);
 
   const completeLesson = (lessonId, points) => {
+    // Award points and money every time to encourage replay
+    setTechPoints(prev => prev + points);
+    addEarnings('tech', points); // Will be silent if capped
+
     if (!completedLessons.includes(lessonId)) {
       setCompletedLessons([...completedLessons, lessonId]);
-      setTechPoints(prev => prev + points);
-      addEarnings('tech', points);
     }
   };
 

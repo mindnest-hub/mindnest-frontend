@@ -103,11 +103,7 @@ export const useWallet = () => {
         const currentModuleBalance = moduleBalances[module] || 0;
         const cap = getModuleCap(module);
 
-        if (currentModuleEarning >= cap) {
-            return { success: false, message: `Max earnings (₦${cap}) reached for this section! Try another module.` };
-        }
-
-        const remainingSpace = cap - currentModuleEarning;
+        const remainingSpace = Math.max(0, cap - currentModuleEarning);
         const actualAmount = Math.min(amount, remainingSpace);
 
         if (actualAmount > 0) {
@@ -117,10 +113,11 @@ export const useWallet = () => {
             // Update leaderboard
             updateEarnings(actualAmount);
 
-            return { success: true, amount: actualAmount };
+            return { success: true, amount: actualAmount, capped: false };
         }
 
-        return { success: false, message: "Cap reached." };
+        // Silent Cap: Still return success so games continue, but add nothing
+        return { success: true, amount: 0, capped: true };
     };
 
     const deductPenalty = (module, amount) => {

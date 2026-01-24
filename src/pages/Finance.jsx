@@ -718,19 +718,17 @@ const Finance = ({ ageGroup }) => {
   };
 
   const completeLevel = (levelId) => {
-    if (levelId === currentLevel) {
-      // Reward: ₦2000 / 15 ≈ ₦130
-      const reward = 130;
-      const result = addEarnings('finance', reward);
+    // Reward: ₦2000 / 15 ≈ ₦130
+    const reward = 130;
+    const result = addEarnings('finance', reward); // Will be silent if capped
 
-      if (result.success) {
-        triggerConfetti();
-        setCurrentLevel(prev => prev + 1);
-        setAttempts(0);
-      } else {
-        alert(result.message);
-        setCurrentLevel(prev => prev + 1); // Still advance even if capped
-      }
+    if (result.success) {
+      triggerConfetti();
+    }
+
+    if (levelId === currentLevel) {
+      setCurrentLevel(prev => prev + 1);
+      setAttempts(0);
     }
   };
 
