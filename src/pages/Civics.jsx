@@ -14,6 +14,34 @@ const Civics = ({ ageGroup }) => {
     const [activePillar, setActivePillar] = useState(1);
     const [toast, setToast] = useState(null);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [activeFact, setActiveFact] = useState(null); // { term, fact }
+
+    const civicFacts = {
+        "Executive": "The Executive branch (President/Governor) is like the 'Pilot' of the country. They make sure the engines are running and follow the flight plan!",
+        "Legislative": "The Legislative branch (National Assembly) are the 'Lawmakers'. They represent your voice and decide the rules for everyone to follow.",
+        "Legislature": "Same as Legislative! They make the rules.",
+        "Judiciary": "The Judiciary (Courts) are the 'Referees'. If there's a disagreement about a rule, they decide who is right based on the law book.",
+        "Democracy": "Democracy means 'Power to the People'. It's a system where YOU choose who leads you by voting.",
+        "Accountability": "This means leaders must explain their actions to the citizens. If they promise a road, they must show the road!",
+        "Constitution": "The Constitution is the 'Grand Rulebook' of Nigeria. No person, not even the President, is above the rules in this book.",
+        "Ward": "A Ward is the smallest area for voting. It's your immediate neighborhood in the eyes of the government.",
+        "Councillor": "A Councillor is the leader closest to you. They represent your Ward at the Local Government level.",
+        "Budget": "A Budget is a plan for how to spend money. It's like a shopping list for the whole state!",
+        "Integrity": "Integrity is doing the right thing even when no one is watching. It's the foundation of a great leader."
+    };
+
+    const Term = ({ name }) => (
+        <span
+            onClick={() => setActiveFact({ term: name, fact: civicFacts[name] })}
+            style={{
+                color: '#FFD700', textDecoration: 'underline', textDecorationStyle: 'dotted',
+                cursor: 'help', fontWeight: 'bold'
+            }}
+        >
+            {name}
+        </span>
+    );
+
 
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
@@ -50,6 +78,7 @@ const Civics = ({ ageGroup }) => {
         { q: "A new law is needed to protect children. Who makes it?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "The Legislative branch makes the laws." },
         { q: "Someone stole a cow and needs to be judged. Who handles this?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary interprets laws & settles disputes." }
     ];
+
 
     // --- PILLAR 7: BUDGET & SELF-RELIANCE ---
     const [budgetAllocation, setBudgetAllocation] = useState({ education: 25, health: 25, roads: 25, security: 25 });
@@ -92,13 +121,14 @@ const Civics = ({ ageGroup }) => {
                                     }
                                 }}
                                 className="btn btn-outline"
-                                style={{ height: '80px' }}
+                                style={{ height: '80px', textTransform: 'none' }}
                             >
-                                {opt}
+                                <Term name={opt} />
                             </button>
                         ))}
                     </div>
                 </div>
+
             ) : (
                 <div style={{ textAlign: 'center', color: '#00C851' }}>
                     <h4>Mastery Achieved! 🏆</h4>
@@ -277,8 +307,8 @@ const Civics = ({ ageGroup }) => {
 
     const renderEthics = () => (
         <div className="card" style={{ borderTop: '4px solid #00BCD4' }}>
-            <h3>Integrity Check 💎</h3>
-            <p>"Integrity is doing the right thing when no one is watching."</p>
+            <h3><Term name="Integrity" /> Check 💎</h3>
+            <p>"<Term name="Integrity" /> is doing the right thing when no one is watching."</p>
             <div style={{ marginTop: '1.5rem', backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px' }}>
                 <p><strong>Scenario:</strong> You find ₦1,000 on correctly marked school property.</p>
                 <div className="grid-cols" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
@@ -288,6 +318,7 @@ const Civics = ({ ageGroup }) => {
             </div>
         </div>
     );
+
 
     const renderLeadership = () => (
         <div className="card" style={{ borderTop: '4px solid #795548' }}>
@@ -310,18 +341,19 @@ const Civics = ({ ageGroup }) => {
     const renderLocal = () => (
         <div className="card" style={{ borderTop: '4px solid #3F51B5' }}>
             <h3>Local Power 🏘️</h3>
-            <p>Abuja is far. Your Ward Councillor is near.</p>
+            <p>Abuja is far. Your <Term name="Councillor" /> is near.</p>
             <div style={{ marginTop: '1.5rem' }}>
                 <p><strong>Who is around you?</strong></p>
                 <ul style={{ color: '#ccc', display: 'grid', gap: '0.8rem' }}>
-                    <li><strong>Ward Rep:</strong> Fixes local street lights and drainage.</li>
-                    <li><strong>Councillor:</strong> Represents you at the Local Govt level.</li>
+                    <li><strong><Term name="Ward" /> Rep:</strong> Fixes local street lights and drainage.</li>
+                    <li><strong><Term name="Councillor" />:</strong> Represents you at the Local Govt level.</li>
                     <li><strong>Chairman:</strong> Heads the whole Local Government Area (LGA).</li>
                 </ul>
             </div>
             <button onClick={() => handlePillarComplete(10)} className="btn" style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#3F51B5' }}>Engage Locally ✅</button>
         </div>
     );
+
 
     const activePillarData = pillars.find(p => p.id === activePillar);
 
@@ -390,13 +422,52 @@ const Civics = ({ ageGroup }) => {
                 </div>
             </div>
 
+            {/* CIVIC FACT MODAL */}
+            {activeFact && (
+                <div
+                    onClick={() => setActiveFact(null)}
+                    style={{
+                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center',
+                        alignItems: 'center', zIndex: 10000, padding: '1rem'
+                    }}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            backgroundColor: '#1E1E1E', padding: '2rem', borderRadius: '24px',
+                            width: '90%', maxWidth: '400px', border: '2px solid #FFD700',
+                            textAlign: 'center', boxShadow: '0 0 30px rgba(255,215,0,0.2)',
+                            animation: 'popIn 0.3s'
+                        }}
+                    >
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
+                        <h2 style={{ color: '#FFD700', marginTop: 0 }}>{activeFact.term}</h2>
+                        <p style={{ fontSize: '1.2rem', lineHeight: '1.6', color: '#fff' }}>{activeFact.fact}</p>
+                        <button
+                            onClick={() => setActiveFact(null)}
+                            className="btn"
+                            style={{ marginTop: '2rem', width: '100%', backgroundColor: '#FFD700', color: 'black' }}
+                        >
+                            Got it! 👑
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <style>{`
-        .btn-back { background: none; border: none; color: #9C27B0; font-size: 1.2rem; cursor: pointer; margin-bottom: 1rem; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-      `}</style>
+                .btn-back { background: none; border: none; color: #9C27B0; font-size: 1.2rem; cursor: pointer; margin-bottom: 1rem; }
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+                @keyframes popIn {
+                    0% { transform: scale(0.8); opacity: 0; }
+                    75% { transform: scale(1.05); opacity: 1; }
+                    100% { transform: scale(1); }
+                }
+            `}</style>
         </div>
     );
 };
 
 export default Civics;
+
