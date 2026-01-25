@@ -179,6 +179,11 @@ const Civics = ({ ageGroup }) => {
     const [simPriority, setSimPriority] = useState(null); // 'Education', 'Economy', 'Security'
     const [simStage, setSimStage] = useState(0);
 
+    // --- GAME STATES FOR POLISHED PILLARS ---
+    const [lawStep, setLawStep] = useState(0);
+    const [projStep, setProjStep] = useState(0);
+    const [toolStep, setToolStep] = useState(0);
+
     const pillars = [
         { id: 1, title: "1. Govt Functions 🏛️", color: "#9C27B0" },
         { id: 2, title: "2. Your Rights ⚖️", color: "#2196F3" },
@@ -329,98 +334,147 @@ const Civics = ({ ageGroup }) => {
     );
 
 
+    const lawScenarios = [
+        { q: "A LASTMA/Police officer stops you and asks for your license. You have it. What is your right?", a: "Show it politely", options: ["Show it politely", "Argue & Shout", "Run away"], hint: "Cooperation and knowing your rights prevents unnecessary conflict." },
+        { q: "Your landlord enters your apartment without notice or permission. Is this legal?", a: "No", options: ["Yes", "No", "Maybe"], hint: "In most places, a tenant has a right to 'Quiet Enjoyment' and notice before entry." },
+        { q: "You bought a phone that stopped working after 1 day. The shop says 'No Refund'. Help?", a: "Consumer Rights Act", options: ["Consumer Rights Act", "Cry", "Break the shop glass"], hint: "The Consumer Protection Act protects you from faulty goods despite what some shops say." }
+    ];
+
     const renderLaw = () => (
         <div className="card" style={{ borderTop: '4px solid #FF9800' }}>
-            <h3>Simple Law 📜</h3>
-            <p style={{ fontStyle: 'italic', color: '#aaa' }}>"Ignorance of the law is no excuse."</p>
-            <div style={{ marginTop: '1.5rem' }}>
-                <p><strong>Common Everyday Laws:</strong></p>
-                <ul style={{ color: '#ccc', lineHeight: '1.8' }}>
-                    <li><strong>Traffic:</strong> Always wear a seatbelt. Drive on the right.</li>
-                    <li><strong>Tenancy:</strong> Both landlord and tenant have rights under the law.</li>
-                    <li><strong>Contracts:</strong> Any agreement you sign is legally binding. Read first!</li>
-                </ul>
-            </div>
-            <button
-                disabled={pillarTimer > 0 && !completedPillars.includes(4)}
-                onClick={() => handlePillarComplete(4)}
-                className="btn btn-primary"
-                style={{ width: '100%', marginTop: '1rem', backgroundColor: '#FF9800', opacity: (pillarTimer > 0 && !completedPillars.includes(4)) ? 0.5 : 1 }}
-            >
-                Understood! ✅ {(pillarTimer > 0 && !completedPillars.includes(4)) && `(${pillarTimer}s)`}
-            </button>
-        </div>
-    );
-
-    const renderProjects = () => (
-        <div className="card" style={{ borderTop: '4px solid #E91E63' }}>
-            <h3>Community Project Leader 🏗️</h3>
-            {!isKid ? (
-                <div style={{ textAlign: 'left' }}>
-                    <p>How to fix a problem in 6 steps:</p>
-                    <ol style={{ color: '#ccc', paddingLeft: '1.2rem', display: 'grid', gap: '0.8rem' }}>
-                        <li><strong>Identify:</strong> Name the problem (e.g., Dirty Street).</li>
-                        <li><strong>Gather:</strong> Find 3 friends to help.</li>
-                        <li><strong>Leaders:</strong> Talk to the Local Leader or <Term name="Councillor" />.</li>
-                        <li><strong>Propose:</strong> Write what you want to do.</li>
-                        <li><strong>Fund:</strong> Crowdfund {currency}2,000 for tools.</li>
-                        <li><strong>Execute:</strong> Do the work and show the results!</li>
-                    </ol>
-                    <button onClick={() => handlePillarComplete(5)} className="btn" style={{ backgroundColor: '#E91E63', width: '100%', marginTop: '1rem' }}>Start Leading 🚀</button>
+            <h3>Legal Eagle Challenge 🦅</h3>
+            {lawStep < 3 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{lawScenarios[lawStep].q}"</p>
+                    <div style={{ display: 'grid', gap: '1rem' }}>
+                        {lawScenarios[lawStep].options.map(opt => (
+                            <button
+                                key={opt}
+                                disabled={pillarTimer > 0 && !completedPillars.includes(4)}
+                                onClick={() => {
+                                    if (opt === lawScenarios[lawStep].a) {
+                                        showToast("Legal Mastery! ✅", 'success');
+                                        if (lawStep === 2) handlePillarComplete(4);
+                                        setLawStep(prev => prev + 1);
+                                    } else {
+                                        showToast(lawScenarios[lawStep].hint, 'warning');
+                                    }
+                                }}
+                                className="btn btn-outline"
+                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(4)) ? 0.5 : 1 }}
+                            >
+                                {opt} {(pillarTimer > 0 && !completedPillars.includes(4)) && ` (${pillarTimer}s)`}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             ) : (
                 <div style={{ textAlign: 'center' }}>
-                    <p>Help clean your school or help a neighbor today!</p>
-                    <button
-                        disabled={pillarTimer > 0 && !completedPillars.includes(5)}
-                        onClick={() => handlePillarComplete(5)}
-                        className="btn"
-                        style={{ backgroundColor: '#E91E63', opacity: (pillarTimer > 0 && !completedPillars.includes(5)) ? 0.5 : 1 }}
-                    >
-                        I Will Help! 🌟 {(pillarTimer > 0 && !completedPillars.includes(5)) && `(${pillarTimer}s)`}
-                    </button>
+                    <h4 style={{ color: '#FF9800' }}>Legal Eagle Certified! 🛡️</h4>
+                    <p>You know your rights and the law.</p>
+                    <button onClick={() => setLawStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-play 🔄</button>
                 </div>
             )}
         </div>
     );
 
-    const renderTools = () => {
-        const templates = [
-            { t: "Formal Complaint 📝", c: "To [Office Name],\nI am writing to report [Issue] at [Location]. Please investigate.\n- [Your Name]" },
-            { t: "Information Request 🕵️‍♂️", c: "Dear Public Officer,\nI request data on [Project Name] budget as per Freedom of Information Act.\n- Citizen" }
-        ];
-        return (
-            <div className="card" style={{ borderTop: '4px solid #607D8B' }}>
-                <h3>Civic Templates 🛠️</h3>
-                <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1.5rem' }}>Copy these templates to engage your leaders.</p>
-                <div style={{ display: 'grid', gap: '1rem' }}>
-                    {templates.map((tmp, i) => (
-                        <div key={i} style={{ backgroundColor: '#111', padding: '1rem', borderRadius: '15px', position: 'relative' }}>
-                            <pre style={{ fontSize: '0.8rem', whiteSpace: 'pre-wrap', color: '#00C851' }}>{tmp.c}</pre>
+
+    const projScenarios = [
+        { q: "Level 1: Audit - What is the most pressing issue in your street today?", options: ["Blocked Drains", "Littering", "Broken Street-lights"], icon: "🔍" },
+        { q: "Level 2: Mobilization - Who will you invite to your first meeting?", options: ["Neighbors & Friends", "Only Government officials", "Nobody, I'll do it alone"], icon: "🤝" },
+        { q: "Level 3: The Pitch - How will you present your solution to the Chairman?", options: ["Written Proposal & Data", "Shouting & Protests", "Ignore it"], icon: "📝" }
+    ];
+
+    const renderProjects = () => (
+        <div className="card" style={{ borderTop: '4px solid #E91E63' }}>
+            <h3>Village Hero Quest 🦸‍♂️</h3>
+            {projStep < 3 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{projScenarios[projStep].icon}</div>
+                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{projScenarios[projStep].q}</p>
+                    <div style={{ display: 'grid', gap: '0.8rem' }}>
+                        {projScenarios[projStep].options.map((opt, i) => (
                             <button
+                                key={opt}
+                                disabled={pillarTimer > 0 && !completedPillars.includes(5)}
                                 onClick={() => {
-                                    navigator.clipboard.writeText(tmp.c);
-                                    showToast("Copied to Clipboard!", 'success');
+                                    if (i === 0) { // Simple "correct" first choice for flow
+                                        showToast("Great Leadership! 🚀", 'success');
+                                        if (projStep === 2) handlePillarComplete(5);
+                                        setProjStep(prev => prev + 1);
+                                    } else {
+                                        showToast("Try a more collaborative approach!", 'warning');
+                                    }
                                 }}
-                                className="btn btn-sm"
-                                style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#444' }}
+                                className="btn btn-outline"
+                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(5)) ? 0.5 : 1 }}
                             >
-                                Copy {tmp.t}
+                                {opt} {(pillarTimer > 0 && !completedPillars.includes(5) && i === 0) && ` (${pillarTimer}s)`}
                             </button>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-                <button
-                    disabled={pillarTimer > 0 && !completedPillars.includes(6)}
-                    onClick={() => handlePillarComplete(6)}
-                    className="btn"
-                    style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#607D8B', opacity: (pillarTimer > 0 && !completedPillars.includes(6)) ? 0.5 : 1 }}
-                >
-                    Tools Ready ✅ {(pillarTimer > 0 && !completedPillars.includes(6)) && `(${pillarTimer}s)`}
-                </button>
-            </div>
-        );
-    };
+            ) : (
+                <div style={{ textAlign: 'center' }}>
+                    <h4 style={{ color: '#E91E63' }}>Village Hero Crowned! 👑</h4>
+                    <p>Your community is better because you led.</p>
+                    <button onClick={() => setProjStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Start New Project 🏗️</button>
+                </div>
+            )}
+        </div>
+    );
+
+
+    const toolScenarios = [
+        { t: "Level 1: The Letter 📝", d: "Draft a formal complaint about power outages.", c: "To the DISCO Manager, I report persistent outages at [My Area]...", icon: "✉️" },
+        { t: "Level 2: The Petition ✍️", d: "Learn to build a digital petition for new roads.", c: "We the residents of [Area] demand fixed roads. Sign below!", icon: "🖋️" },
+        { t: "Level 3: The Request 🕵️‍♂️", d: "Use the FOI Act to request project data.", c: "Under the FOI Act, I request the budget spent on [Project]...", icon: "📜" }
+    ];
+
+    const renderTools = () => (
+        <div className="card" style={{ borderTop: '4px solid #607D8B' }}>
+            <h3>Civic Power Workshop 🛠️</h3>
+            {toolStep < 3 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{toolScenarios[toolStep].icon}</div>
+                    <h4>{toolScenarios[toolStep].t}</h4>
+                    <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>{toolScenarios[toolStep].d}</p>
+                    <div style={{ backgroundColor: '#111', padding: '1rem', borderRadius: '15px', position: 'relative', border: '1px solid #444' }}>
+                        <pre style={{ fontSize: '0.8rem', whiteSpace: 'pre-wrap', color: '#00C851' }}>{toolScenarios[toolStep].c}</pre>
+                    </div>
+                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(toolScenarios[toolStep].c);
+                                showToast("Template Copied! 📋", 'success');
+                            }}
+                            className="btn btn-outline"
+                        >
+                            Copy to Clipboard 📋
+                        </button>
+                        <button
+                            disabled={pillarTimer > 0 && !completedPillars.includes(6)}
+                            onClick={() => {
+                                if (toolStep === 2) handlePillarComplete(6);
+                                setToolStep(prev => prev + 1);
+                            }}
+                            className="btn btn-primary"
+                            style={{ backgroundColor: '#607D8B', opacity: (pillarTimer > 0 && !completedPillars.includes(6)) ? 0.5 : 1 }}
+                        >
+                            Master Tool {toolStep + 1} {(pillarTimer > 0 && !completedPillars.includes(6)) && ` (${pillarTimer}s)`}
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div style={{ textAlign: 'center' }}>
+                    <h4 style={{ color: '#607D8B' }}>Workshop Complete! 🦾</h4>
+                    <p>You have the tools to hold any leader accountable.</p>
+                    <button onClick={() => setToolStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-visit Tools 🔄</button>
+                </div>
+            )}
+        </div>
+    );
+
 
 
     const renderBudget = () => (
