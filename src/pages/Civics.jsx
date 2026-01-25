@@ -53,7 +53,8 @@ const Civics = ({ ageGroup }) => {
         localStorage.setItem('civicsProgress', JSON.stringify(completedPillars));
     }, [completedPillars]);
 
-    const isComplete = completedPillars.length === 10;
+    const isComplete = completedPillars.length >= 10;
+    const isMaster = completedPillars.length === 11;
 
     // --- TIMER STATE ---
     const [pillarTimer, setPillarTimer] = useState(15);
@@ -111,11 +112,16 @@ const Civics = ({ ageGroup }) => {
     const handlePillarComplete = (id) => {
         if (!completedPillars.includes(id)) {
             setCompletedPillars([...completedPillars, id]);
-            addEarnings('civics', 200); // ₦200 per pillar
-            showToast(`Pillar Completed! +${currency}200 🗳️`, 'success');
+            if (id <= 10) {
+                addEarnings('civics', 200); // ₦200 per pillar for first 10
+                showToast(`Pillar Completed! +${currency}200 🗳️`, 'success');
+            } else {
+                showToast(`Final Mastery Revealed! 🏆`, 'success');
+            }
             triggerConfetti();
         }
     };
+
 
 
     const triggerConfetti = () => {
@@ -168,6 +174,10 @@ const Civics = ({ ageGroup }) => {
     const totalBudget = Object.values(budgetAllocation).reduce((a, b) => a + b, 0);
     const [showSelfReliance, setShowSelfReliance] = useState(false);
 
+    // --- PILLAR 11: STATECRAFT SIMULATOR ---
+    const [simRole, setSimRole] = useState(null); // 'President', 'Governor', 'Minister'
+    const [simPriority, setSimPriority] = useState(null); // 'Education', 'Economy', 'Security'
+    const [simStage, setSimStage] = useState(0);
 
     const pillars = [
         { id: 1, title: "1. Govt Functions 🏛️", color: "#9C27B0" },
@@ -179,8 +189,10 @@ const Civics = ({ ageGroup }) => {
         { id: 7, title: "7. Budget & Money 💰", color: "#FFEB3B" },
         { id: 8, title: "8. Ethics & Integrity 💎", color: "#00BCD4" },
         { id: 9, title: "9. Leadership Mindset 🧠", color: "#795548" },
-        { id: 10, title: "10. Local Governance 🏘️", color: "#3F51B5" }
+        { id: 10, title: "10. Local Governance 🏘️", color: "#3F51B5" },
+        { id: 11, title: "11. Statecraft Simulator 🏆", color: "#FFD700" }
     ];
+
 
     const renderGovtGame = () => (
         <div className="card" style={{ borderTop: '4px solid #9C27B0' }}>
@@ -225,11 +237,11 @@ const Civics = ({ ageGroup }) => {
         </div>
     );
 
+
     const renderRights = () => (
         <div className="card" style={{ borderTop: '4px solid #2196F3' }}>
             <h3>{rightsLevels[rightsStage].title}</h3>
             <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>{rightsLevels[rightsStage].desc}</p>
-
             <div style={{ display: 'grid', gap: '1.5rem', marginTop: '1rem' }}>
                 {rightsLevels[rightsStage].rights.map((r, i) => (
                     <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'center', backgroundColor: '#222', padding: '1rem', borderRadius: '15px', border: '1px solid rgba(33, 150, 243, 0.2)' }}>
@@ -241,7 +253,6 @@ const Civics = ({ ageGroup }) => {
                     </div>
                 ))}
             </div>
-
             <div style={{ marginTop: '2rem', textAlign: 'center' }}>
                 {rightsStage < 2 ? (
                     <button
@@ -269,31 +280,54 @@ const Civics = ({ ageGroup }) => {
                     </button>
                 )}
             </div>
-
         </div>
     );
 
+    const [respStep, setRespStep] = useState(0);
+    const respScenarios = [
+        { q: "You see litter on the street near your house. What do you do?", a: "Pick it up", options: ["Pick it up", "Wait for Govt", "Ignore it"], hint: "A clean community starts with individual responsibility." },
+        { q: "You witness a neighbor's property being vandalized. What do you do?", a: "Report it", options: ["Report it", "Join in", "Stay silent"], hint: "Protecting public and private property is a civic duty." },
+        { q: "It's election day in your neighborhood. You are 18+.", a: "Go Vote", options: ["Go Vote", "Stay home", "Go to a party"], hint: "Voting is both a right and a responsibility." }
+    ];
 
     const renderResponsibilities = () => (
         <div className="card" style={{ borderTop: '4px solid #4CAF50' }}>
-            <h3>Your Duty 🤝</h3>
-            <p>Rights come with duties. Are you a good citizen?</p>
-            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
-                {["Obey Laws 📜", "Pay Taxes 💰", "Vandalize No Property 🛑", "Report Crimes 📞", "Vote 🗳️"].map(d => (
-                    <div key={d} style={{ backgroundColor: '#222', padding: '1rem', textAlign: 'center', borderRadius: '12px', border: '1px solid #444' }}>{d}</div>
-                ))}
-            </div>
-            <button
-                disabled={pillarTimer > 0 && !completedPillars.includes(3)}
-                onClick={() => handlePillarComplete(3)}
-                className="btn btn-primary"
-                style={{ width: '100%', marginTop: '2rem', opacity: (pillarTimer > 0 && !completedPillars.includes(3)) ? 0.5 : 1 }}
-            >
-                I Accept My Duties 🤝 {(pillarTimer > 0 && !completedPillars.includes(3)) && `(${pillarTimer}s)`}
-            </button>
-
+            <h3>The Good Citizen Test 🤝</h3>
+            {respStep < 3 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{respScenarios[respStep].q}"</p>
+                    <div style={{ display: 'grid', gap: '0.8rem' }}>
+                        {respScenarios[respStep].options.map(opt => (
+                            <button
+                                key={opt}
+                                disabled={pillarTimer > 0 && !completedPillars.includes(3)}
+                                onClick={() => {
+                                    if (opt === respScenarios[respStep].a) {
+                                        showToast("Responsible Choice! ✅", 'success');
+                                        if (respStep === 2) handlePillarComplete(3);
+                                        setRespStep(prev => prev + 1);
+                                    } else {
+                                        showToast(respScenarios[respStep].hint, 'warning');
+                                    }
+                                }}
+                                className="btn btn-outline"
+                                style={{ textAlign: 'left', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(3)) ? 0.5 : 1 }}
+                            >
+                                {opt} {(pillarTimer > 0 && !completedPillars.includes(3)) && ` (${pillarTimer}s)`}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div style={{ textAlign: 'center' }}>
+                    <h4 style={{ color: '#00C851' }}>Duty Accepted! 🏆</h4>
+                    <p>You are ready to build the nation.</p>
+                    <button onClick={() => setRespStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-test 🔄</button>
+                </div>
+            )}
         </div>
     );
+
 
     const renderLaw = () => (
         <div className="card" style={{ borderTop: '4px solid #FF9800' }}>
@@ -315,7 +349,6 @@ const Civics = ({ ageGroup }) => {
             >
                 Understood! ✅ {(pillarTimer > 0 && !completedPillars.includes(4)) && `(${pillarTimer}s)`}
             </button>
-
         </div>
     );
 
@@ -336,7 +369,6 @@ const Civics = ({ ageGroup }) => {
                     <button onClick={() => handlePillarComplete(5)} className="btn" style={{ backgroundColor: '#E91E63', width: '100%', marginTop: '1rem' }}>Start Leading 🚀</button>
                 </div>
             ) : (
-
                 <div style={{ textAlign: 'center' }}>
                     <p>Help clean your school or help a neighbor today!</p>
                     <button
@@ -348,7 +380,6 @@ const Civics = ({ ageGroup }) => {
                         I Will Help! 🌟 {(pillarTimer > 0 && !completedPillars.includes(5)) && `(${pillarTimer}s)`}
                     </button>
                 </div>
-
             )}
         </div>
     );
@@ -358,7 +389,6 @@ const Civics = ({ ageGroup }) => {
             { t: "Formal Complaint 📝", c: "To [Office Name],\nI am writing to report [Issue] at [Location]. Please investigate.\n- [Your Name]" },
             { t: "Information Request 🕵️‍♂️", c: "Dear Public Officer,\nI request data on [Project Name] budget as per Freedom of Information Act.\n- Citizen" }
         ];
-
         return (
             <div className="card" style={{ borderTop: '4px solid #607D8B' }}>
                 <h3>Civic Templates 🛠️</h3>
@@ -388,19 +418,17 @@ const Civics = ({ ageGroup }) => {
                 >
                     Tools Ready ✅ {(pillarTimer > 0 && !completedPillars.includes(6)) && `(${pillarTimer}s)`}
                 </button>
-
             </div>
         );
     };
 
+
     const renderBudget = () => (
         <div className="card" style={{ borderTop: '4px solid #FFEB3B' }}>
             <h3 style={{ color: '#FFEB3B' }}>Governor for a Day 💰</h3>
-
             {!showSelfReliance ? (
                 <div>
                     <p>Spend 100% of your budget. Total: <span style={{ color: totalBudget === 100 ? '#00C851' : '#ff4444' }}>{totalBudget}%</span></p>
-
                     <div style={{ marginTop: '1.5rem', display: 'grid', gap: '1rem' }}>
                         {Object.keys(budgetAllocation).map(key => (
                             <div key={key}>
@@ -413,7 +441,6 @@ const Civics = ({ ageGroup }) => {
                             </div>
                         ))}
                     </div>
-
                     <button
                         disabled={totalBudget !== 100}
                         onClick={() => setShowSelfReliance(true)}
@@ -447,58 +474,83 @@ const Civics = ({ ageGroup }) => {
                     >
                         I Understand Self-Reliance ✅ {(pillarTimer > 0 && !completedPillars.includes(7)) && `(${pillarTimer}s)`}
                     </button>
-
                 </div>
             )}
         </div>
     );
 
+    const [ethicsStage, setEthicsStage] = useState(0);
     const renderEthics = () => (
         <div className="card" style={{ borderTop: '4px solid #00BCD4' }}>
-            <h3><Term name="Integrity" /> Check 💎</h3>
-            <p>"<Term name="Integrity" /> is doing the right thing when no one is watching."</p>
-            <div style={{ marginTop: '1.5rem', backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px' }}>
-                <p><strong>Scenario:</strong> You find ₦1,000 on correctly marked school property.</p>
-                <div className="grid-cols" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-                    <button onClick={() => { showToast("Wrong choice!", 'error'); }} className="btn btn-outline" style={{ color: '#ff4444' }}>Keep It 🦊</button>
+            <h3><Term name="Integrity" /> Simulation 💎</h3>
+            {ethicsStage === 0 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p><strong>Whistleblower Scenario:</strong> You discover a senior official is diverting funds meant for a new primary school in your {currentCountryData.name === "Nigeria" ? "LGA" : "district"}.</p>
+                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                        <button onClick={() => setEthicsStage(1)} className="btn btn-outline" style={{ color: '#00C851' }}>Report anonymously 📞</button>
+                        <button onClick={() => showToast("Silence helps corruption grow.", 'error')} className="btn btn-outline" style={{ color: '#ff4444' }}>Stay silent 🤐</button>
+                        <button onClick={() => showToast("Bribery is a crime!", 'error')} className="btn btn-outline" style={{ color: '#FFD700' }}>Ask for a cut 💰</button>
+                    </div>
+                </div>
+            ) : ethicsStage === 1 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p>The official offers you {currency}500,000 to delete the evidence. What do you do?</p>
+                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                        <button onClick={() => setEthicsStage(2)} className="btn btn-outline" style={{ color: '#00C851' }}>Reject & Expose 💎</button>
+                        <button onClick={() => { setEthicsStage(0); showToast("Integrity Lost! Try again.", 'error'); }} className="btn btn-outline" style={{ color: '#ff4444' }}>Take the money ❌</button>
+                    </div>
+                </div>
+            ) : (
+                <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💎</div>
+                    <h4 style={{ color: '#00BCD4' }}>Man of Integrity!</h4>
+                    <p>You protected the future of {countryName}'s children.</p>
                     <button
                         disabled={pillarTimer > 0 && !completedPillars.includes(8)}
-                        onClick={() => { showToast("Correct! Virtue is reward.", 'success'); handlePillarComplete(8); }}
-                        className="btn btn-outline"
-                        style={{ color: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(8)) ? 0.5 : 1 }}
+                        onClick={() => handlePillarComplete(8)}
+                        className="btn"
+                        style={{ backgroundColor: '#00BCD4', width: '100%', marginTop: '1.5rem', opacity: (pillarTimer > 0 && !completedPillars.includes(8)) ? 0.5 : 1 }}
                     >
-                        Report It 💎 {(pillarTimer > 0 && !completedPillars.includes(8)) && `(${pillarTimer}s)`}
+                        Complete Pillar 8 {(pillarTimer > 0 && !completedPillars.includes(8)) && ` (${pillarTimer}s)`}
                     </button>
                 </div>
-
-            </div>
+            )}
         </div>
     );
 
 
+    const [leadStep, setLeadStep] = useState(0);
     const renderLeadership = () => (
         <div className="card" style={{ borderTop: '4px solid #795548' }}>
-            <h3>Leadership Mindset 🧠</h3>
-            <p>"You don't need a title to lead."</p>
-            <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                {[
-                    "Listen before you speak 👂",
-                    "Organize without violence 🕊️",
-                    "Include everyone 🌍",
-                    "Stay calm under pressure 🌊"
-                ].map(l => (
-                    <div key={l} style={{ padding: '0.8rem', backgroundColor: '#333', borderRadius: '10px' }}>{l}</div>
-                ))}
-            </div>
-            <button
-                disabled={pillarTimer > 0 && !completedPillars.includes(9)}
-                onClick={() => handlePillarComplete(9)}
-                className="btn"
-                style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#795548', opacity: (pillarTimer > 0 && !completedPillars.includes(9)) ? 0.5 : 1 }}
-            >
-                I Am A Leader! 🧠 {(pillarTimer > 0 && !completedPillars.includes(9)) && `(${pillarTimer}s)`}
-            </button>
-
+            <h3>Leadership Mastery 🧠</h3>
+            {leadStep === 0 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p>"Real leadership is about service, not power."</p>
+                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                        <div style={{ padding: '1rem', backgroundColor: '#333', borderRadius: '12px' }}>
+                            <strong>Trait 1: Empathy 👂</strong>
+                            <p style={{ fontSize: '0.85rem', margin: '0.5rem 0', color: '#aaa' }}>Listen to your people before making big decisions.</p>
+                        </div>
+                        <div style={{ padding: '1rem', backgroundColor: '#333', borderRadius: '12px' }}>
+                            <strong>Trait 2: Peace 🕊️</strong>
+                            <p style={{ fontSize: '0.85rem', margin: '0.5rem 0', color: '#aaa' }}>Organize and solve problems without violence.</p>
+                        </div>
+                        <button onClick={() => setLeadStep(1)} className="btn" style={{ backgroundColor: '#795548' }}>Next Leadership Lesson →</button>
+                    </div>
+                </div>
+            ) : (
+                <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
+                    <p style={{ marginBottom: '1.5rem' }}>"Are you ready to lead by serving others?"</p>
+                    <button
+                        disabled={pillarTimer > 0 && !completedPillars.includes(9)}
+                        onClick={() => handlePillarComplete(9)}
+                        className="btn"
+                        style={{ width: '100%', backgroundColor: '#795548', opacity: (pillarTimer > 0 && !completedPillars.includes(9)) ? 0.5 : 1 }}
+                    >
+                        I Accept the Lead ✅ {(pillarTimer > 0 && !completedPillars.includes(9)) && ` (${pillarTimer}s)`}
+                    </button>
+                </div>
+            )}
         </div>
     );
 
@@ -522,10 +574,90 @@ const Civics = ({ ageGroup }) => {
             >
                 Engage Locally ✅ {(pillarTimer > 0 && !completedPillars.includes(10)) && `(${pillarTimer}s)`}
             </button>
-
         </div>
     );
 
+
+    const [simStep, setSimStep] = useState(0);
+
+    const renderSimulator = () => {
+        const roles = [
+            { t: 'President', color: '#FFD700', d: 'Lead the entire nation and manage federal resources.' },
+            { t: 'Governor', color: '#00C851', d: 'Manage a state and focus on local infrastructure and education.' },
+            { t: 'Minister', color: '#2196F3', d: 'Advise the President and execute specialized policies.' }
+        ];
+
+        const priorities = [
+            { t: 'Education', icon: '📚', d: 'Focus on schools, teachers, and student welfare.' },
+            { t: 'Economy', icon: '📈', d: 'Focus on business growth, jobs, and inflation control.' },
+            { t: 'Security', icon: '🛡️', d: 'Focus on safety, community policing, and ending crime.' }
+        ];
+
+        return (
+            <div className="card" style={{ borderTop: '4px solid #FFD700' }}>
+                <h3 style={{ color: '#FFD700' }}>Statecraft Simulator 🏆</h3>
+                {simStep === 0 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p>Choose your leadership role to begin:</p>
+                        <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                            {roles.map(r => (
+                                <button
+                                    key={r.t}
+                                    onClick={() => { setSimRole(r.t); setSimStep(1); }}
+                                    className="btn btn-outline"
+                                    style={{ textAlign: 'left', padding: '1rem', borderColor: r.color }}
+                                >
+                                    <strong style={{ color: r.color }}>{r.t}</strong>
+                                    <p style={{ fontSize: '0.8rem', margin: '0.3rem 0', color: '#aaa' }}>{r.d}</p>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : simStep === 1 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p>As **{simRole}**, what is your #1 national priority?</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
+                            {priorities.map(p => (
+                                <button
+                                    key={p.t}
+                                    onClick={() => { setSimPriority(p.t); setSimStep(2); }}
+                                    className="btn btn-outline"
+                                    style={{ height: '120px' }}
+                                >
+                                    <span style={{ fontSize: '2rem' }}>{p.icon}</span><br />
+                                    <strong>{p.t}</strong>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : simStep === 2 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p><strong>🚨 NATIONAL CRISIS:</strong> A major strike has broken out in the **{simPriority}** sector! Citizens are losing patience.</p>
+                        <p style={{ fontSize: '0.9rem', color: '#aaa', marginTop: '0.5rem' }}>How do you resolve it?</p>
+                        <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                            <button onClick={() => setSimStep(3)} className="btn btn-outline" style={{ color: '#00C851' }}>Dialog & Compromise 🤝</button>
+                            <button onClick={() => { setSimStep(0); showToast("Citizens are unhappy with force!", 'error'); }} className="btn btn-outline" style={{ color: '#ff4444' }}>Force & Arrests ❌</button>
+                            <button onClick={() => { setSimStep(0); showToast("Silence makes it worse!", 'error'); }} className="btn btn-outline" style={{ color: '#FFD700' }}>Ignore & Hope it goes away 🤐</button>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
+                        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>👑</div>
+                        <h4 style={{ color: '#FFD700' }}>Leadership Mastery: Complete!</h4>
+                        <p>You led with wisdom as **{simRole}**. Your legacy of **{simPriority}** is secure.</p>
+                        <button
+                            disabled={pillarTimer > 0 && !completedPillars.includes(11)}
+                            onClick={() => handlePillarComplete(11)}
+                            className="btn"
+                            style={{ backgroundColor: '#FFD700', color: 'black', width: '100%', marginTop: '1.5rem', opacity: (pillarTimer > 0 && !completedPillars.includes(11)) ? 0.5 : 1 }}
+                        >
+                            Claim Your Legacy 🏆 {(pillarTimer > 0 && !completedPillars.includes(11)) && ` (${pillarTimer}s)`}
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     const activePillarData = pillars.find(p => p.id === activePillar);
 
@@ -550,9 +682,10 @@ const Civics = ({ ageGroup }) => {
                     marginTop: '1rem', padding: '0.5rem 1.5rem', backgroundColor: 'rgba(156, 39, 176, 0.1)',
                     borderRadius: '30px', display: 'inline-block', border: '1px solid #9C27B0'
                 }}>
-                    Total Earned: <strong>{currency}{completedPillars.length * 200}</strong> / {currency}2,000
+                    Progress: <strong>{completedPillars.length} / 11</strong> | Earnings: <strong>{currency}{(completedPillars.filter(id => id <= 10).length) * 200}</strong>
                 </div>
             </header>
+
 
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                 {/* PILLAR NAVIGATION */}
@@ -604,9 +737,10 @@ const Civics = ({ ageGroup }) => {
                         {activePillar === 8 && renderEthics()}
                         {activePillar === 9 && renderLeadership()}
                         {activePillar === 10 && renderLocal()}
+                        {activePillar === 11 && renderSimulator()}
 
                         {/* MASTERY AWARD BUTTON */}
-                        {isComplete && (
+                        {isMaster && (
                             <div style={{
                                 marginTop: '3rem', padding: '2rem', backgroundColor: 'rgba(156, 39, 176, 0.1)',
                                 borderRadius: '20px', border: '2px dashed #9C27B0', textAlign: 'center',
@@ -614,7 +748,7 @@ const Civics = ({ ageGroup }) => {
                             }}>
                                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
                                 <h3 style={{ color: '#9C27B0' }}>Mastery Achieved!</h3>
-                                <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>You have successfully completed all 10 pillars of Civic Mastery.</p>
+                                <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>You have successfully completed all 11 pillars of Civic Mastery.</p>
                                 <button
                                     onClick={() => setShowCertificate(true)}
                                     className="btn btn-primary"
@@ -628,142 +762,149 @@ const Civics = ({ ageGroup }) => {
                 </div>
             </div>
 
+
             {/* CIVIC FACT MODAL */}
-            {activeFact && (
-                <div
-                    onClick={() => setActiveFact(null)}
-                    style={{
-                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                        backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center',
-                        alignItems: 'center', zIndex: 10000, padding: '1rem'
-                    }}
-                >
+            {
+                activeFact && (
                     <div
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={() => setActiveFact(null)}
                         style={{
-                            backgroundColor: '#1E1E1E', padding: '2rem', borderRadius: '24px',
-                            width: '90%', maxWidth: '400px', border: '2px solid #FFD700',
-                            textAlign: 'center', boxShadow: '0 0 30px rgba(255,215,0,0.2)',
-                            animation: 'popIn 0.3s'
+                            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                            backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center',
+                            alignItems: 'center', zIndex: 10000, padding: '1rem'
                         }}
                     >
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
-                        <h2 style={{ color: '#FFD700', marginTop: 0 }}>{activeFact.term}</h2>
-                        <p style={{ fontSize: '1.2rem', lineHeight: '1.6', color: '#fff' }}>{activeFact.fact}</p>
-                        <button
-                            onClick={() => setActiveFact(null)}
-                            className="btn"
-                            style={{ marginTop: '2rem', width: '100%', backgroundColor: '#FFD700', color: 'black' }}
-                        >
-                            Got it! 👑
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* CERTIFICATE AWARD MODAL */}
-            {showCertificate && (
-                <div
-                    onClick={() => setShowCertificate(false)}
-                    style={{
-                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                        backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center',
-                        alignItems: 'center', zIndex: 10001, padding: '1rem'
-                    }}
-                >
-                    <div
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                            backgroundColor: '#fff', padding: '3rem', borderRadius: '15px',
-                            maxWidth: '650px', width: '100%', textAlign: 'center', color: '#1a1a1a',
-                            border: '15px solid #9C27B0', boxShadow: '0 0 50px rgba(156, 39, 176, 0.4)',
-                            fontFamily: 'serif', position: 'relative'
-                        }}
-                    >
-                        <div style={{ position: 'absolute', top: '10px', right: '10px', cursor: 'pointer', fontSize: '1.5rem', color: '#333' }} onClick={() => setShowCertificate(false)}>×</div>
-                        <h1 style={{ color: '#9C27B0', fontSize: '2.5rem', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Certificate of Mastery</h1>
-                        <p style={{ fontSize: '1.2rem', color: '#555', margin: '1rem 0' }}>This is to certify that</p>
-                        <h2 style={{ fontSize: '3rem', margin: '0.5rem 0', color: '#000', borderBottom: '2px solid #eee', display: 'inline-block', padding: '0 2rem' }}>{userName || "Valued Citizen"}</h2>
-                        <p style={{ fontSize: '1.1rem', color: '#555', margin: '1.5rem 0' }}>
-                            has successfully completed the 10 Pillars of <br />
-                            <strong>Civics & Leadership Certification</strong><br />
-                            representing the great nation of <strong>{countryName}</strong>.
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '3rem' }}>
-                            <div style={{ textAlign: 'center', borderTop: '1px solid #333', width: '150px', padding: '0.5rem' }}>
-                                <p style={{ fontSize: '0.9rem', margin: 0 }}>MindNest Hub</p>
-                                <small style={{ color: '#888' }}>Issuer</small>
-                            </div>
-                            <div style={{ fontSize: '4rem', opacity: 0.1 }}>🏆</div>
-                            <div style={{ textAlign: 'center', borderTop: '1px solid #333', width: '150px', padding: '0.5rem' }}>
-                                <p style={{ fontSize: '0.9rem', margin: 0 }}>{new Date().toLocaleDateString()}</p>
-                                <small style={{ color: '#888' }}>Date</small>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => window.print()}
-                            className="btn"
-                            style={{ marginTop: '2.5rem', width: '100%', backgroundColor: '#9C27B0', color: 'white', fontFamily: 'sans-serif' }}
-                        >
-                            Download / Print Certificate 🎓
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* MODULE SETUP MODAL */}
-            {showSetup && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center',
-                    alignItems: 'center', zIndex: 10005, padding: '1.5rem'
-                }}>
-                    <div style={{
-                        backgroundColor: '#1a1a1a', padding: '2.5rem', borderRadius: '30px',
-                        maxWidth: '450px', width: '100%', border: '2px solid #9C27B0', textAlign: 'center',
-                        animation: 'fadeIn 0.5s'
-                    }}>
-                        <h2 style={{ color: '#9C27B0', fontSize: '2rem', marginBottom: '1rem' }}>Module Setup 🏢</h2>
-                        <p style={{ color: '#aaa', marginBottom: '2rem' }}>Please provide your details to personalize your civic learning experience.</p>
-
-                        <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
-                            <label style={{ color: '#eee', fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Your Full Name</label>
-                            <input
-                                type="text"
-                                value={userName}
-                                onChange={(e) => setUserName(e.target.value)}
-                                placeholder="E.g. Kofi Mensah"
-                                style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #333', backgroundColor: '#000', color: '#fff' }}
-                            />
-                        </div>
-
-                        <div style={{ textAlign: 'left', marginBottom: '2.5rem' }}>
-                            <label style={{ color: '#eee', fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Your Country</label>
-                            <select
-                                value={selectedCountry}
-                                onChange={(e) => setSelectedCountry(e.target.value)}
-                                style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #333', backgroundColor: '#000', color: '#fff' }}
-                            >
-                                <option value="">Select Country</option>
-                                {countries.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                            </select>
-                        </div>
-
-                        <button
-                            disabled={!userName || !selectedCountry}
-                            onClick={() => setShowSetup(false)}
-                            className="btn"
+                        <div
+                            onClick={(e) => e.stopPropagation()}
                             style={{
-                                width: '100%', backgroundColor: '#9C27B0', color: 'white',
-                                padding: '1rem', borderRadius: '15px', fontWeight: 'bold',
-                                opacity: (!userName || !selectedCountry) ? 0.5 : 1
+                                backgroundColor: '#1E1E1E', padding: '2rem', borderRadius: '24px',
+                                width: '90%', maxWidth: '400px', border: '2px solid #FFD700',
+                                textAlign: 'center', boxShadow: '0 0 30px rgba(255,215,0,0.2)',
+                                animation: 'popIn 0.3s'
                             }}
                         >
-                            Start Learning 🚀
-                        </button>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
+                            <h2 style={{ color: '#FFD700', marginTop: 0 }}>{activeFact.term}</h2>
+                            <p style={{ fontSize: '1.2rem', lineHeight: '1.6', color: '#fff' }}>{activeFact.fact}</p>
+                            <button
+                                onClick={() => setActiveFact(null)}
+                                className="btn"
+                                style={{ marginTop: '2rem', width: '100%', backgroundColor: '#FFD700', color: 'black' }}
+                            >
+                                Got it! 👑
+                            </button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
+
+            {/* CERTIFICATE AWARD MODAL */}
+            {
+                showCertificate && (
+                    <div
+                        onClick={() => setShowCertificate(false)}
+                        style={{
+                            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                            backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center',
+                            alignItems: 'center', zIndex: 10001, padding: '1rem'
+                        }}
+                    >
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                backgroundColor: '#fff', padding: '3rem', borderRadius: '15px',
+                                maxWidth: '650px', width: '100%', textAlign: 'center', color: '#1a1a1a',
+                                border: '15px solid #9C27B0', boxShadow: '0 0 50px rgba(156, 39, 176, 0.4)',
+                                fontFamily: 'serif', position: 'relative'
+                            }}
+                        >
+                            <div style={{ position: 'absolute', top: '10px', right: '10px', cursor: 'pointer', fontSize: '1.5rem', color: '#333' }} onClick={() => setShowCertificate(false)}>×</div>
+                            <h1 style={{ color: '#9C27B0', fontSize: '2.5rem', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Certificate of Mastery</h1>
+                            <p style={{ fontSize: '1.2rem', color: '#555', margin: '1rem 0' }}>This is to certify that</p>
+                            <h2 style={{ fontSize: '3rem', margin: '0.5rem 0', color: '#000', borderBottom: '2px solid #eee', display: 'inline-block', padding: '0 2rem' }}>{userName || "Valued Citizen"}</h2>
+                            <p style={{ fontSize: '1.1rem', color: '#555', margin: '1.5rem 0' }}>
+                                has successfully completed the 10 Pillars of <br />
+                                <strong>Civics & Leadership Certification</strong><br />
+                                representing the great nation of <strong>{countryName}</strong>.
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '3rem' }}>
+                                <div style={{ textAlign: 'center', borderTop: '1px solid #333', width: '150px', padding: '0.5rem' }}>
+                                    <p style={{ fontSize: '0.9rem', margin: 0 }}>MindNest Hub</p>
+                                    <small style={{ color: '#888' }}>Issuer</small>
+                                </div>
+                                <div style={{ fontSize: '4rem', opacity: 0.1 }}>🏆</div>
+                                <div style={{ textAlign: 'center', borderTop: '1px solid #333', width: '150px', padding: '0.5rem' }}>
+                                    <p style={{ fontSize: '0.9rem', margin: 0 }}>{new Date().toLocaleDateString()}</p>
+                                    <small style={{ color: '#888' }}>Date</small>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => window.print()}
+                                className="btn"
+                                style={{ marginTop: '2.5rem', width: '100%', backgroundColor: '#9C27B0', color: 'white', fontFamily: 'sans-serif' }}
+                            >
+                                Download / Print Certificate 🎓
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* MODULE SETUP MODAL */}
+            {
+                showSetup && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center',
+                        alignItems: 'center', zIndex: 10005, padding: '1.5rem'
+                    }}>
+                        <div style={{
+                            backgroundColor: '#1a1a1a', padding: '2.5rem', borderRadius: '30px',
+                            maxWidth: '450px', width: '100%', border: '2px solid #9C27B0', textAlign: 'center',
+                            animation: 'fadeIn 0.5s'
+                        }}>
+                            <h2 style={{ color: '#9C27B0', fontSize: '2rem', marginBottom: '1rem' }}>Module Setup 🏢</h2>
+                            <p style={{ color: '#aaa', marginBottom: '2rem' }}>Please provide your details to personalize your civic learning experience.</p>
+
+                            <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+                                <label style={{ color: '#eee', fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Your Full Name</label>
+                                <input
+                                    type="text"
+                                    value={userName}
+                                    onChange={(e) => setUserName(e.target.value)}
+                                    placeholder="E.g. Kofi Mensah"
+                                    style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #333', backgroundColor: '#000', color: '#fff' }}
+                                />
+                            </div>
+
+                            <div style={{ textAlign: 'left', marginBottom: '2.5rem' }}>
+                                <label style={{ color: '#eee', fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Your Country</label>
+                                <select
+                                    value={selectedCountry}
+                                    onChange={(e) => setSelectedCountry(e.target.value)}
+                                    style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #333', backgroundColor: '#000', color: '#fff' }}
+                                >
+                                    <option value="">Select Country</option>
+                                    {countries.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                                </select>
+                            </div>
+
+                            <button
+                                disabled={!userName || !selectedCountry}
+                                onClick={() => setShowSetup(false)}
+                                className="btn"
+                                style={{
+                                    width: '100%', backgroundColor: '#9C27B0', color: 'white',
+                                    padding: '1rem', borderRadius: '15px', fontWeight: 'bold',
+                                    opacity: (!userName || !selectedCountry) ? 0.5 : 1
+                                }}
+                            >
+                                Start Learning 🚀
+                            </button>
+                        </div>
+                    </div>
+                )
+            }
 
             <style>{`
                 .btn-back { background: none; border: none; color: #9C27B0; font-size: 1.2rem; cursor: pointer; margin-bottom: 1rem; }
@@ -780,7 +921,6 @@ const Civics = ({ ageGroup }) => {
                     100% { opacity: 1; transform: scale(1); }
                 }
             `}</style>
-
         </div>
     );
 };
