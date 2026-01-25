@@ -51,9 +51,11 @@ const Civics = ({ ageGroup }) => {
         { q: "Someone stole a cow and needs to be judged. Who handles this?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary interprets laws & settles disputes." }
     ];
 
-    // --- PILLAR 7: BUDGET SIMULATOR ---
+    // --- PILLAR 7: BUDGET & SELF-RELIANCE ---
     const [budgetAllocation, setBudgetAllocation] = useState({ education: 25, health: 25, roads: 25, security: 25 });
     const totalBudget = Object.values(budgetAllocation).reduce((a, b) => a + b, 0);
+    const [showSelfReliance, setShowSelfReliance] = useState(false);
+
 
     const pillars = [
         { id: 1, title: "1. Govt Functions 🏛️", color: "#9C27B0" },
@@ -218,29 +220,58 @@ const Civics = ({ ageGroup }) => {
     const renderBudget = () => (
         <div className="card" style={{ borderTop: '4px solid #FFEB3B' }}>
             <h3 style={{ color: '#FFEB3B' }}>Governor for a Day 💰</h3>
-            <p>Spend 100% of your budget. Total: <span style={{ color: totalBudget === 100 ? '#00C851' : '#ff4444' }}>{totalBudget}%</span></p>
 
-            <div style={{ marginTop: '1.5rem', display: 'grid', gap: '1rem' }}>
-                {Object.keys(budgetAllocation).map(key => (
-                    <div key={key}>
-                        <label style={{ textTransform: 'capitalize' }}>{key}: {budgetAllocation[key]}%</label>
-                        <input
-                            type="range" min="0" max="100" value={budgetAllocation[key]}
-                            onChange={(e) => setBudgetAllocation({ ...budgetAllocation, [key]: Number(e.target.value) })}
-                            style={{ width: '100%', accentColor: '#FFEB3B' }}
-                        />
+            {!showSelfReliance ? (
+                <div>
+                    <p>Spend 100% of your budget. Total: <span style={{ color: totalBudget === 100 ? '#00C851' : '#ff4444' }}>{totalBudget}%</span></p>
+
+                    <div style={{ marginTop: '1.5rem', display: 'grid', gap: '1rem' }}>
+                        {Object.keys(budgetAllocation).map(key => (
+                            <div key={key}>
+                                <label style={{ textTransform: 'capitalize' }}>{key}: {budgetAllocation[key]}%</label>
+                                <input
+                                    type="range" min="0" max="100" value={budgetAllocation[key]}
+                                    onChange={(e) => setBudgetAllocation({ ...budgetAllocation, [key]: Number(e.target.value) })}
+                                    style={{ width: '100%', accentColor: '#FFEB3B' }}
+                                />
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
 
-            <button
-                disabled={totalBudget !== 100}
-                onClick={() => handlePillarComplete(7)}
-                className="btn"
-                style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#FFEB3B', color: 'black' }}
-            >
-                {totalBudget === 100 ? "Submit Budget ✅" : `Needs ${100 - totalBudget}% more`}
-            </button>
+                    <button
+                        disabled={totalBudget !== 100}
+                        onClick={() => setShowSelfReliance(true)}
+                        className="btn"
+                        style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#FFEB3B', color: 'black' }}
+                    >
+                        {totalBudget === 100 ? "Submit Budget & Learn Self-Reliance 📜" : `Needs ${100 - totalBudget}% more`}
+                    </button>
+                </div>
+            ) : (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <h4 style={{ color: '#FFD700' }}>Lesson: National Self-Reliance 🇳🇬</h4>
+                    <p style={{ fontSize: '0.9rem', lineHeight: '1.6', color: '#ccc', textAlign: 'justify' }}>
+                        "Independence means <strong>self-reliance</strong>. It cannot be real if a nation depends upon gifts and loans for its development.
+                        Gifts which weaken our own efforts should not be accepted. Loans are better, but they must be used <strong>profitably</strong> to ensure repayment.
+                        Burdening poor citizens with big loans that do not benefit the majority is not help—it is suffering."
+                    </p>
+                    <div style={{ backgroundColor: '#222', padding: '1rem', borderRadius: '10px', marginTop: '1rem', borderLeft: '4px solid #FFEB3B' }}>
+                        <p style={{ fontSize: '0.85rem', margin: 0 }}>
+                            <strong>Takeaway:</strong> Real independence comes from our own efforts and wise use of resources, not just external assistance.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => {
+                            handlePillarComplete(7);
+                            setShowSelfReliance(false);
+                        }}
+                        className="btn"
+                        style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#00C851' }}
+                    >
+                        I Understand Self-Reliance ✅
+                    </button>
+                </div>
+            )}
         </div>
     );
 
