@@ -687,9 +687,9 @@ const Civics = ({ ageGroup }) => {
             </header>
 
 
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+            <div className="civics-layout-wrapper">
                 {/* PILLAR NAVIGATION */}
-                <div style={{ flex: '1 1 300px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="pillar-nav-grid">
                     {pillars.map((p, idx) => {
                         const isUnlocked = idx === 0 || completedPillars.includes(pillars[idx - 1].id);
                         const isDone = completedPillars.includes(p.id);
@@ -718,7 +718,7 @@ const Civics = ({ ageGroup }) => {
                 </div>
 
                 {/* PILLAR CONTENT */}
-                <div style={{ flex: '2 1 400px', minHeight: '400px', position: 'relative' }}>
+                <div className="pillar-content-area">
                     {pillarTimer > 0 && !completedPillars.includes(activePillar) && (
                         <div style={{ position: 'absolute', top: '-30px', right: 0, backgroundColor: '#9C27B0', padding: '0.2rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', animation: 'pulse 1s infinite' }}>
                             📖 Reading: {pillarTimer}s
@@ -920,7 +920,50 @@ const Civics = ({ ageGroup }) => {
                     50% { opacity: 0.8; transform: scale(0.95); }
                     100% { opacity: 1; transform: scale(1); }
                 }
+
+                .civics-layout-wrapper {
+                    display: flex;
+                    gap: 2rem;
+                    flex-wrap: wrap;
+                    align-items: flex-start;
+                }
+                .pillar-nav-grid {
+                    flex: 1 1 300px;
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                    gap: 0.75rem;
+                }
+                .pillar-content-area {
+                    flex: 2 1 450px;
+                    min-height: 400px;
+                    position: relative;
+                }
+
+                @media (max-width: 768px) {
+                    .civics-layout-wrapper {
+                        flex-direction: column;
+                    }
+                    .pillar-nav-grid {
+                        width: 100%;
+                        order: 2; /* Put nav below content on small mobile if desired, or keep 1 */
+                    }
+                    .pillar-content-area {
+                        width: 100%;
+                        order: 1;
+                        min-height: auto;
+                        margin-bottom: 2rem;
+                    }
+                    .pillar-nav-grid {
+                         grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+                @media (max-width: 480px) {
+                    .pillar-nav-grid {
+                         grid-template-columns: 1fr;
+                    }
+                }
             `}</style>
+
         </div>
     );
 };
