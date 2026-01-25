@@ -39,6 +39,10 @@ const Finance = ({ ageGroup }) => {
   const [showBadge, setShowBadge] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem('financeLevel', currentLevel);
   }, [currentLevel]);
 

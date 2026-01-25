@@ -226,6 +226,11 @@ const CriticalThinking = ({ ageGroup }) => {
     ];
 
     // --- MARKET DAY STATE ---
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    const [currentProblem, setCurrentProblem] = useState(0);
     const [marketScore, setMarketScore] = useState(0);
     const [marketIndex, setMarketIndex] = useState(() => Number(localStorage.getItem('marketIndex')) || 0);
 

@@ -15,6 +15,10 @@ const Tech = () => {
   const [activeTab, setActiveTab] = useState('coding');
   const [toast, setToast] = useState(null);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const showToast = (message, type = 'info') => {
     setToast({ message, type });
   };

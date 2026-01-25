@@ -21,6 +21,10 @@ const History = ({ ageGroup }) => {
     // --- RESOURCE GAME STATE ---
     const [gameScore, setGameScore] = useState(0);
     const [showConfetti, setShowConfetti] = useState(false);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const [toast, setToast] = useState(null);
 
     const showToast = (message, type = 'info', duration = 5000) => {

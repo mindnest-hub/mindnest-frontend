@@ -52,11 +52,16 @@ const Agripreneurship = () => {
         5: { title: "Agri-Tycoon 🤴", next: "You are a Master of Agriculture!" }
     };
 
+    // Scroll to top on component mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     // Persistence
     useEffect(() => {
-        localStorage.setItem('agriHarvestCount', harvestCount);
+        localStorage.setItem('agriLevel', level); // Assuming 'currentLevel' refers to 'level'
         localStorage.setItem('agriSoldFlakes', soldFlakes);
-    }, [harvestCount, soldFlakes]);
+    }, [level, soldFlakes]); // Changed dependencies to reflect 'level'
 
     // Simulation tick
     useEffect(() => {

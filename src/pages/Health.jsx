@@ -26,6 +26,11 @@ const Health = () => {
     ];
 
     // --- MOVE STATE (Daily Move) ---
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    const [toast, setToast] = useState(null);
     const [moveStep, setMoveStep] = useState(0);
     const moves = [
         { name: "Jumping Jacks 🏃‍♂️", duration: "30s", emoji: "🏃‍♂️" },

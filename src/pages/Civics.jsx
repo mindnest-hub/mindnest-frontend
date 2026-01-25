@@ -38,6 +38,10 @@ const Civics = ({ ageGroup }) => {
 
     const [activePillar, setActivePillar] = useState(1);
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const [toast, setToast] = useState(null);
     const [showConfetti, setShowConfetti] = useState(false);
     const [activeFact, setActiveFact] = useState(null); // { term, fact }
@@ -731,7 +735,13 @@ const Civics = ({ ageGroup }) => {
 
             <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
                 <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', color: '#9C27B0' }}>Civics & Leadership {currentCountryData.name === "Nigeria" ? "🇳🇬" : "🌍"}</h1>
-                <p style={{ color: '#aaa' }}>Complete all 10 pillars to become a Master Citizen of {countryName}.</p>
+
+                <div style={{ maxWidth: '800px', margin: '0 auto 2rem auto', textAlign: 'center', animation: 'fadeIn 0.8s' }}>
+                    <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: '#ccc', fontStyle: 'italic' }}>
+                        "Welcome to the Civics & Leadership Module. Here, we build the foundation of a great nation by understanding our duties, protecting our rights, and mastering the tools of governance. Whether you are a student, a professional, or a community leader, this journey will equip you to make a meaningful impact in <strong>{countryName}</strong>."
+                    </p>
+                </div>
+
                 <div style={{
                     marginTop: '1rem', padding: '0.5rem 1.5rem', backgroundColor: 'rgba(156, 39, 176, 0.1)',
                     borderRadius: '30px', display: 'inline-block', border: '1px solid #9C27B0'
