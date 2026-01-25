@@ -110,6 +110,36 @@ const Civics = ({ ageGroup }) => {
         { q: "Someone stole a cow and needs to be judged. Who handles this?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary interprets laws & settles disputes." }
     ];
 
+    // --- PILLAR 2: KNOW YOUR RIGHTS (3 LEVELS) ---
+    const [rightsStage, setRightsStage] = useState(0);
+    const rightsLevels = [
+        {
+            title: "Level 1: Basic Human Rights 🌱",
+            desc: "These are the rights you are born with.",
+            rights: [
+                { t: "Right to Life", d: "No one can take your life away.", icon: "🌱" },
+                { t: "Freedom of Movement", d: "You can travel anywhere safely.", icon: "🚶" }
+            ]
+        },
+        {
+            title: "Level 2: Civic Power 🗳️",
+            desc: "Your power as a citizen of the nation.",
+            rights: [
+                { t: "Right to Vote", d: "You choose who leads at 18.", icon: "🗳️" },
+                { t: "Freedom of Speech", d: "You can speak your truth respectfully.", icon: "🗣️" }
+            ]
+        },
+        {
+            title: "Level 3: Extra Protection 🛡️",
+            desc: "Rights that protect kids and consumers.",
+            rights: [
+                { t: "Children's Rights", d: "Right to play and be protected from work.", icon: "🪁" },
+                { t: "Consumer Rights", d: "Right to get what you paid for (Quality).", icon: "🏷️" }
+            ]
+        }
+    ];
+
+
 
 
     // --- PILLAR 7: BUDGET & SELF-RELIANCE ---
@@ -173,14 +203,12 @@ const Civics = ({ ageGroup }) => {
 
     const renderRights = () => (
         <div className="card" style={{ borderTop: '4px solid #2196F3' }}>
-            <h3>Know Your Power ⚖️</h3>
+            <h3>{rightsLevels[rightsStage].title}</h3>
+            <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>{rightsLevels[rightsStage].desc}</p>
+
             <div style={{ display: 'grid', gap: '1.5rem', marginTop: '1rem' }}>
-                {[
-                    { t: "Right to Life", d: "The most basic right for every human.", icon: "🌱" },
-                    { t: "Right to Vote", d: "Your power to choose your leaders at 18.", icon: "🗳️" },
-                    { t: "Right to Education", d: "Every child deserves to learn.", icon: "📚" }
-                ].map((r, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'center', backgroundColor: '#222', padding: '1rem', borderRadius: '15px' }}>
+                {rightsLevels[rightsStage].rights.map((r, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'center', backgroundColor: '#222', padding: '1rem', borderRadius: '15px', border: '1px solid rgba(33, 150, 243, 0.2)' }}>
                         <span style={{ fontSize: '2rem' }}>{r.icon}</span>
                         <div>
                             <strong style={{ display: 'block', color: '#2196F3' }}>{r.t}</strong>
@@ -188,10 +216,36 @@ const Civics = ({ ageGroup }) => {
                         </div>
                     </div>
                 ))}
-                <button onClick={() => handlePillarComplete(2)} className="btn btn-primary" style={{ marginTop: '1rem' }}>I Know My Rights! ✅</button>
+            </div>
+
+            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                {rightsStage < 2 ? (
+                    <button
+                        onClick={() => {
+                            showToast(`Level ${rightsStage + 1} Complete! Next...`, 'success');
+                            setRightsStage(prev => prev + 1);
+                        }}
+                        className="btn btn-primary"
+                        style={{ width: '100%', backgroundColor: '#2196F3' }}
+                    >
+                        Learn More Power ⚡
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => {
+                            handlePillarComplete(2);
+                            setRightsStage(0);
+                        }}
+                        className="btn btn-primary"
+                        style={{ width: '100%', backgroundColor: '#00C851' }}
+                    >
+                        I Mastered my Rights! ✅
+                    </button>
+                )}
             </div>
         </div>
     );
+
 
     const renderResponsibilities = () => (
         <div className="card" style={{ borderTop: '4px solid #4CAF50' }}>
@@ -396,7 +450,6 @@ const Civics = ({ ageGroup }) => {
 
             {showConfetti && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 999 }}>
-                    {/* Confetti simulation (simplified) */}
                     <div style={{ textAlign: 'center', marginTop: '20%' }}>
                         <h1 style={{ fontSize: '5rem', animation: 'bounce 1s infinite' }}>🎉</h1>
                     </div>
@@ -416,26 +469,34 @@ const Civics = ({ ageGroup }) => {
                 </div>
             </header>
 
-
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                 {/* PILLAR NAVIGATION */}
                 <div style={{ flex: '1 1 300px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                    {pillars.map(p => (
-                        <button
-                            key={p.id}
-                            onClick={() => setActivePillar(p.id)}
-                            className={`btn ${activePillar === p.id ? 'active' : ''}`}
-                            style={{
-                                backgroundColor: activePillar === p.id ? p.color : '#222',
-                                color: activePillar === p.id ? 'black' : (completedPillars.includes(p.id) ? '#00C851' : 'white'),
-                                border: `1px solid ${completedPillars.includes(p.id) ? '#00C851' : '#444'}`,
-                                padding: '1rem', borderRadius: '15px', fontSize: '0.8rem', position: 'relative'
-                            }}
-                        >
-                            {p.title}
-                            {completedPillars.includes(p.id) && <span style={{ position: 'absolute', top: '5px', right: '5px' }}>✅</span>}
-                        </button>
-                    ))}
+                    {pillars.map((p, idx) => {
+                        const isUnlocked = idx === 0 || completedPillars.includes(pillars[idx - 1].id);
+                        const isDone = completedPillars.includes(p.id);
+
+                        return (
+                            <button
+                                key={p.id}
+                                disabled={!isUnlocked}
+                                onClick={() => setActivePillar(p.id)}
+                                className={`btn ${activePillar === p.id ? 'active' : ''}`}
+                                style={{
+                                    backgroundColor: activePillar === p.id ? p.color : '#222',
+                                    color: activePillar === p.id ? 'black' : (isDone ? '#00C851' : (isUnlocked ? 'white' : '#555')),
+                                    border: `1px solid ${isDone ? '#00C851' : (isUnlocked ? '#444' : '#222')}`,
+                                    padding: '1rem', borderRadius: '15px', fontSize: '0.8rem', position: 'relative',
+                                    cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                                    opacity: isUnlocked ? 1 : 0.6
+                                }}
+                            >
+                                {!isUnlocked && <span style={{ marginRight: '0.5rem' }}>🔒</span>}
+                                {p.title}
+                                {isDone && <span style={{ position: 'absolute', top: '5px', right: '5px' }}>✅</span>}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* PILLAR CONTENT */}
@@ -510,7 +571,6 @@ const Civics = ({ ageGroup }) => {
             )}
 
             {/* CERTIFICATE AWARD MODAL */}
-
             {showCertificate && (
                 <div
                     onClick={() => setShowCertificate(false)}
@@ -615,7 +675,6 @@ const Civics = ({ ageGroup }) => {
             )}
 
             <style>{`
-
                 .btn-back { background: none; border: none; color: #9C27B0; font-size: 1.2rem; cursor: pointer; margin-bottom: 1rem; }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
@@ -630,4 +689,5 @@ const Civics = ({ ageGroup }) => {
 };
 
 export default Civics;
+
 
