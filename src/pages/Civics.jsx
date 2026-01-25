@@ -11,10 +11,40 @@ const Civics = ({ ageGroup }) => {
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
     const isAdult = !isKid && !isTeen;
 
+    // --- LOCALIZATION & IDENTITY ---
+    const [userName, setUserName] = useState(() => localStorage.getItem('civicsUserName') || "");
+    const [selectedCountry, setSelectedCountry] = useState(() => localStorage.getItem('civicsCountry') || "");
+    const [showSetup, setShowSetup] = useState(!localStorage.getItem('civicsCountry'));
+
+    const countries = [
+        { name: "Nigeria", currency: "₦", parliament: "National Assembly" },
+        { name: "Kenya", currency: "KSh", parliament: "Parliament" },
+        { name: "Ghana", currency: "GH₵", parliament: "Parliament" },
+        { name: "South Africa", currency: "R", parliament: "National Assembly" },
+        { name: "USA", currency: "$", parliament: "Congress" },
+        { name: "United Kingdom", currency: "£", parliament: "Parliament" },
+        { name: "Other", currency: "¤", parliament: "Legislature" }
+    ];
+
+    const currentCountryData = countries.find(c => c.name === selectedCountry) || countries[0];
+    const countryName = selectedCountry || "Nigeria";
+    const currency = currentCountryData.currency;
+    const parliament = currentCountryData.parliament;
+
+    useEffect(() => {
+        if (userName) localStorage.setItem('civicsUserName', userName);
+        if (selectedCountry) localStorage.setItem('civicsCountry', selectedCountry);
+    }, [userName, selectedCountry]);
+
     const [activePillar, setActivePillar] = useState(1);
+
     const [toast, setToast] = useState(null);
     const [showConfetti, setShowConfetti] = useState(false);
     const [activeFact, setActiveFact] = useState(null); // { term, fact }
+    const [showCertificate, setShowCertificate] = useState(false);
+
+    const isComplete = completedPillars.length === 10;
+
 
     const civicFacts = {
         "Executive": "The Executive branch (President/Governor) is like the 'Pilot' of the country. They make sure the engines are running and follow the flight plan!",
@@ -61,10 +91,11 @@ const Civics = ({ ageGroup }) => {
         if (!completedPillars.includes(id)) {
             setCompletedPillars([...completedPillars, id]);
             addEarnings('civics', 200); // ₦200 per pillar
-            showToast("Pillar Completed! +₦200 🗳️", 'success');
+            showToast(`Pillar Completed! +${currency}200 🗳️`, 'success');
             triggerConfetti();
         }
     };
+
 
     const triggerConfetti = () => {
         setShowConfetti(true);
@@ -74,10 +105,11 @@ const Civics = ({ ageGroup }) => {
     // --- PILLAR 1: GOVT FUNCTIONS ---
     const [govtStep, setGovtStep] = useState(0);
     const govtScenarios = [
-        { q: "The local road is full of potholes. Who should fix it?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: "The Executive runs the government & builds infrastructure." },
-        { q: "A new law is needed to protect children. Who makes it?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "The Legislative branch makes the laws." },
+        { q: "The local road is full of potholes. Who should fix it?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: `The Executive runs the ${countryName} government & builds infrastructure.` },
+        { q: "A new law is needed to protect children. Who makes it?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: `The Legislative branch (like our ${parliament}) makes the laws.` },
         { q: "Someone stole a cow and needs to be judged. Who handles this?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary interprets laws & settles disputes." }
     ];
+
 
 
     // --- PILLAR 7: BUDGET & SELF-RELIANCE ---
@@ -199,14 +231,15 @@ const Civics = ({ ageGroup }) => {
                     <ol style={{ color: '#ccc', paddingLeft: '1.2rem', display: 'grid', gap: '0.8rem' }}>
                         <li><strong>Identify:</strong> Name the problem (e.g., Dirty Street).</li>
                         <li><strong>Gather:</strong> Find 3 friends to help.</li>
-                        <li><strong>Leaders:</strong> Talk to the Baale or Ward Councillor.</li>
+                        <li><strong>Leaders:</strong> Talk to the Local Leader or <Term name="Councillor" />.</li>
                         <li><strong>Propose:</strong> Write what you want to do.</li>
-                        <li><strong>Fund:</strong> Crowdfund ₦2k for brooms/bins.</li>
+                        <li><strong>Fund:</strong> Crowdfund {currency}2,000 for tools.</li>
                         <li><strong>Execute:</strong> Do the work and show the results!</li>
                     </ol>
                     <button onClick={() => handlePillarComplete(5)} className="btn" style={{ backgroundColor: '#E91E63', width: '100%', marginTop: '1rem' }}>Start Leading 🚀</button>
                 </div>
             ) : (
+
                 <div style={{ textAlign: 'center' }}>
                     <p>Help clean your school or help a neighbor today!</p>
                     <button onClick={() => handlePillarComplete(5)} className="btn" style={{ backgroundColor: '#E91E63' }}>I Will Help! 🌟</button>
@@ -279,15 +312,15 @@ const Civics = ({ ageGroup }) => {
                 </div>
             ) : (
                 <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <h4 style={{ color: '#FFD700' }}>Lesson: National Self-Reliance 🇳🇬</h4>
+                    <h4 style={{ color: '#FFD700' }}>Lesson: National Self-Reliance for {countryName} 🏛️</h4>
                     <p style={{ fontSize: '0.9rem', lineHeight: '1.6', color: '#ccc', textAlign: 'justify' }}>
-                        "Independence means <strong>self-reliance</strong>. It cannot be real if a nation depends upon gifts and loans for its development.
+                        "Independence means <strong>self-reliance</strong>. It cannot be real if {countryName} depends upon gifts and loans for its development.
                         Gifts which weaken our own efforts should not be accepted. Loans are better, but they must be used <strong>profitably</strong> to ensure repayment.
-                        Burdening poor citizens with big loans that do not benefit the majority is not help—it is suffering."
+                        Burdening citizens with big loans that do not benefit the majority is not help—it is suffering."
                     </p>
                     <div style={{ backgroundColor: '#222', padding: '1rem', borderRadius: '10px', marginTop: '1rem', borderLeft: '4px solid #FFEB3B' }}>
                         <p style={{ fontSize: '0.85rem', margin: 0 }}>
-                            <strong>Takeaway:</strong> Real independence comes from our own efforts and wise use of resources, not just external assistance.
+                            <strong>Takeaway:</strong> Real independence for {countryName} comes from our own efforts and wise use of resources, not just external assistance.
                         </p>
                     </div>
                     <button
@@ -373,15 +406,16 @@ const Civics = ({ ageGroup }) => {
             <button onClick={() => navigate('/')} className="btn-back">← Hub</button>
 
             <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', color: '#9C27B0' }}>Civics & Leadership 🇳🇬</h1>
-                <p style={{ color: '#aaa' }}>Complete all 10 pillars to become a Master Citizen.</p>
+                <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', color: '#9C27B0' }}>Civics & Leadership {currentCountryData.name === "Nigeria" ? "🇳🇬" : "🌍"}</h1>
+                <p style={{ color: '#aaa' }}>Complete all 10 pillars to become a Master Citizen of {countryName}.</p>
                 <div style={{
                     marginTop: '1rem', padding: '0.5rem 1.5rem', backgroundColor: 'rgba(156, 39, 176, 0.1)',
                     borderRadius: '30px', display: 'inline-block', border: '1px solid #9C27B0'
                 }}>
-                    Total Earned: <strong>₦{completedPillars.length * 200}</strong> / ₦2,000
+                    Total Earned: <strong>{currency}{completedPillars.length * 200}</strong> / {currency}2,000
                 </div>
             </header>
+
 
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                 {/* PILLAR NAVIGATION */}
@@ -418,6 +452,26 @@ const Civics = ({ ageGroup }) => {
                         {activePillar === 8 && renderEthics()}
                         {activePillar === 9 && renderLeadership()}
                         {activePillar === 10 && renderLocal()}
+
+                        {/* MASTERY AWARD BUTTON */}
+                        {isComplete && (
+                            <div style={{
+                                marginTop: '3rem', padding: '2rem', backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                                borderRadius: '20px', border: '2px dashed #9C27B0', textAlign: 'center',
+                                animation: 'fadeIn 1s'
+                            }}>
+                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
+                                <h3 style={{ color: '#9C27B0' }}>Mastery Achieved!</h3>
+                                <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>You have successfully completed all 10 pillars of Civic Mastery.</p>
+                                <button
+                                    onClick={() => setShowCertificate(true)}
+                                    className="btn btn-primary"
+                                    style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', backgroundColor: '#9C27B0' }}
+                                >
+                                    Claim Your Certificate 📜
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -455,7 +509,113 @@ const Civics = ({ ageGroup }) => {
                 </div>
             )}
 
+            {/* CERTIFICATE AWARD MODAL */}
+
+            {showCertificate && (
+                <div
+                    onClick={() => setShowCertificate(false)}
+                    style={{
+                        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                        backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', justifyContent: 'center',
+                        alignItems: 'center', zIndex: 10001, padding: '1rem'
+                    }}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            backgroundColor: '#fff', padding: '3rem', borderRadius: '15px',
+                            maxWidth: '650px', width: '100%', textAlign: 'center', color: '#1a1a1a',
+                            border: '15px solid #9C27B0', boxShadow: '0 0 50px rgba(156, 39, 176, 0.4)',
+                            fontFamily: 'serif', position: 'relative'
+                        }}
+                    >
+                        <div style={{ position: 'absolute', top: '10px', right: '10px', cursor: 'pointer', fontSize: '1.5rem', color: '#333' }} onClick={() => setShowCertificate(false)}>×</div>
+                        <h1 style={{ color: '#9C27B0', fontSize: '2.5rem', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Certificate of Mastery</h1>
+                        <p style={{ fontSize: '1.2rem', color: '#555', margin: '1rem 0' }}>This is to certify that</p>
+                        <h2 style={{ fontSize: '3rem', margin: '0.5rem 0', color: '#000', borderBottom: '2px solid #eee', display: 'inline-block', padding: '0 2rem' }}>{userName || "Valued Citizen"}</h2>
+                        <p style={{ fontSize: '1.1rem', color: '#555', margin: '1.5rem 0' }}>
+                            has successfully completed the 10 Pillars of <br />
+                            <strong>Civics & Leadership Certification</strong><br />
+                            representing the great nation of <strong>{countryName}</strong>.
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '3rem' }}>
+                            <div style={{ textAlign: 'center', borderTop: '1px solid #333', width: '150px', padding: '0.5rem' }}>
+                                <p style={{ fontSize: '0.9rem', margin: 0 }}>MindNest Hub</p>
+                                <small style={{ color: '#888' }}>Issuer</small>
+                            </div>
+                            <div style={{ fontSize: '4rem', opacity: 0.1 }}>🏆</div>
+                            <div style={{ textAlign: 'center', borderTop: '1px solid #333', width: '150px', padding: '0.5rem' }}>
+                                <p style={{ fontSize: '0.9rem', margin: 0 }}>{new Date().toLocaleDateString()}</p>
+                                <small style={{ color: '#888' }}>Date</small>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => window.print()}
+                            className="btn"
+                            style={{ marginTop: '2.5rem', width: '100%', backgroundColor: '#9C27B0', color: 'white', fontFamily: 'sans-serif' }}
+                        >
+                            Download / Print Certificate 🎓
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* MODULE SETUP MODAL */}
+            {showSetup && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.95)', display: 'flex', justifyContent: 'center',
+                    alignItems: 'center', zIndex: 10005, padding: '1.5rem'
+                }}>
+                    <div style={{
+                        backgroundColor: '#1a1a1a', padding: '2.5rem', borderRadius: '30px',
+                        maxWidth: '450px', width: '100%', border: '2px solid #9C27B0', textAlign: 'center',
+                        animation: 'fadeIn 0.5s'
+                    }}>
+                        <h2 style={{ color: '#9C27B0', fontSize: '2rem', marginBottom: '1rem' }}>Module Setup 🏢</h2>
+                        <p style={{ color: '#aaa', marginBottom: '2rem' }}>Please provide your details to personalize your civic learning experience.</p>
+
+                        <div style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+                            <label style={{ color: '#eee', fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Your Full Name</label>
+                            <input
+                                type="text"
+                                value={userName}
+                                onChange={(e) => setUserName(e.target.value)}
+                                placeholder="E.g. Kofi Mensah"
+                                style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #333', backgroundColor: '#000', color: '#fff' }}
+                            />
+                        </div>
+
+                        <div style={{ textAlign: 'left', marginBottom: '2.5rem' }}>
+                            <label style={{ color: '#eee', fontSize: '0.9rem', display: 'block', marginBottom: '0.5rem' }}>Your Country</label>
+                            <select
+                                value={selectedCountry}
+                                onChange={(e) => setSelectedCountry(e.target.value)}
+                                style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #333', backgroundColor: '#000', color: '#fff' }}
+                            >
+                                <option value="">Select Country</option>
+                                {countries.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                            </select>
+                        </div>
+
+                        <button
+                            disabled={!userName || !selectedCountry}
+                            onClick={() => setShowSetup(false)}
+                            className="btn"
+                            style={{
+                                width: '100%', backgroundColor: '#9C27B0', color: 'white',
+                                padding: '1rem', borderRadius: '15px', fontWeight: 'bold',
+                                opacity: (!userName || !selectedCountry) ? 0.5 : 1
+                            }}
+                        >
+                            Start Learning 🚀
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <style>{`
+
                 .btn-back { background: none; border: none; color: #9C27B0; font-size: 1.2rem; cursor: pointer; margin-bottom: 1rem; }
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
