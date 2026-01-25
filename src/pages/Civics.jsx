@@ -187,6 +187,9 @@ const Civics = ({ ageGroup }) => {
     const [lawStep, setLawStep] = useState(0);
     const [projStep, setProjStep] = useState(0);
     const [toolStep, setToolStep] = useState(0);
+    const [budgetStep, setBudgetStep] = useState(0);
+    const [leadStep, setLeadStep] = useState(0);
+    const [localStep, setLocalStep] = useState(0);
 
     const pillars = [
         { id: 1, title: "1. Govt Functions 🏛️", color: "#9C27B0" },
@@ -358,6 +361,7 @@ const Civics = ({ ageGroup }) => {
                                 onClick={() => {
                                     if (opt === lawScenarios[lawStep].a) {
                                         showToast("Legal Mastery! ✅", 'success');
+                                        setActiveFact({ term: "Legal Wisdom ⚖️", fact: lawScenarios[lawStep].hint });
                                         if (lawStep === 2) handlePillarComplete(4);
                                         setLawStep(prev => prev + 1);
                                     } else {
@@ -404,6 +408,7 @@ const Civics = ({ ageGroup }) => {
                                 onClick={() => {
                                     if (i === 0) { // Simple "correct" first choice for flow
                                         showToast("Great Leadership! 🚀", 'success');
+                                        setActiveFact({ term: "Civic Action Fact 🏗️", fact: "Collaboration is the key to sustainable community development." });
                                         if (projStep === 2) handlePillarComplete(5);
                                         setProjStep(prev => prev + 1);
                                     } else {
@@ -459,6 +464,7 @@ const Civics = ({ ageGroup }) => {
                         <button
                             disabled={pillarTimer > 0 && !completedPillars.includes(6)}
                             onClick={() => {
+                                setActiveFact({ term: "Civic Tool Insight 🛠️", fact: "Official correspondence and petitions are the DNA of democracy." });
                                 if (toolStep === 2) handlePillarComplete(6);
                                 setToolStep(prev => prev + 1);
                             }}
@@ -480,58 +486,46 @@ const Civics = ({ ageGroup }) => {
     );
 
 
+    const budgetScenarios = [
+        { q: "Level 1: The Audit - Where does most of our national tax money go?", options: ["Public Services (Health/Edu)", "Private Luxury", "Hidden accounts"], a: 0, fact: "Taxes fund the infrastructure we all use—like roads and hospitals." },
+        { q: "Level 2: Allocation - You have ₦100. How do you split it fairly?", options: ["Spread across all sectors", "Give it all to one friend", "Keep it in a safe"], a: 0, fact: "A balanced budget ensures no sector of society is left behind." },
+        { q: "Level 3: Revenue - Where does the government get money to build?", options: ["Taxes & Resources", "It's free", "Borrowing only"], a: 0, fact: "Citizen taxes and natural resources are the primary fuel for development." }
+    ];
 
     const renderBudget = () => (
         <div className="card" style={{ borderTop: '4px solid #FFEB3B' }}>
-            <h3 style={{ color: '#FFEB3B' }}>Governor for a Day 💰</h3>
-            {!showSelfReliance ? (
-                <div>
-                    <p>Spend 100% of your budget. Total: <span style={{ color: totalBudget === 100 ? '#00C851' : '#ff4444' }}>{totalBudget}%</span></p>
-                    <div style={{ marginTop: '1.5rem', display: 'grid', gap: '1rem' }}>
-                        {Object.keys(budgetAllocation).map(key => (
-                            <div key={key}>
-                                <label style={{ textTransform: 'capitalize' }}>{key}: {budgetAllocation[key]}%</label>
-                                <input
-                                    type="range" min="0" max="100" value={budgetAllocation[key]}
-                                    onChange={(e) => setBudgetAllocation({ ...budgetAllocation, [key]: Number(e.target.value) })}
-                                    style={{ width: '100%', accentColor: '#FFEB3B' }}
-                                />
-                            </div>
+            <h3 style={{ color: '#FFEB3B' }}>National Budget Master 💰</h3>
+            {budgetStep < 3 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{budgetScenarios[budgetStep].q}</p>
+                    <div style={{ display: 'grid', gap: '0.8rem' }}>
+                        {budgetScenarios[budgetStep].options.map((opt, i) => (
+                            <button
+                                key={opt}
+                                disabled={pillarTimer > 0 && !completedPillars.includes(7)}
+                                onClick={() => {
+                                    if (i === budgetScenarios[budgetStep].a) {
+                                        showToast(budgetScenarios[budgetStep].fact, 'success');
+                                        setActiveFact({ term: "Budgeting Fact 🎓", fact: budgetScenarios[budgetStep].fact });
+                                        if (budgetStep === 2) handlePillarComplete(7);
+                                        setBudgetStep(prev => prev + 1);
+                                    } else {
+                                        showToast("Try a more sustainable choice!", 'warning');
+                                    }
+                                }}
+                                className="btn btn-outline"
+                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(7)) ? 0.5 : 1 }}
+                            >
+                                {opt} {(pillarTimer > 0 && !completedPillars.includes(7) && i === 0) && ` (${pillarTimer}s)`}
+                            </button>
                         ))}
                     </div>
-                    <button
-                        disabled={totalBudget !== 100}
-                        onClick={() => setShowSelfReliance(true)}
-                        className="btn"
-                        style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#FFEB3B', color: 'black' }}
-                    >
-                        {totalBudget === 100 ? "Submit Budget & Learn Self-Reliance 📜" : `Needs ${100 - totalBudget}% more`}
-                    </button>
                 </div>
             ) : (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <h4 style={{ color: '#FFD700' }}>Lesson: National Self-Reliance for {countryName} 🏛️</h4>
-                    <p style={{ fontSize: '0.9rem', lineHeight: '1.6', color: '#ccc', textAlign: 'justify' }}>
-                        "Independence means <strong>self-reliance</strong>. It cannot be real if {countryName} depends upon gifts and loans for its development.
-                        Gifts which weaken our own efforts should not be accepted. Loans are better, but they must be used <strong>profitably</strong> to ensure repayment.
-                        Burdening citizens with big loans that do not benefit the majority is not help—it is suffering."
-                    </p>
-                    <div style={{ backgroundColor: '#222', padding: '1rem', borderRadius: '10px', marginTop: '1rem', borderLeft: '4px solid #FFEB3B' }}>
-                        <p style={{ fontSize: '0.85rem', margin: 0 }}>
-                            <strong>Takeaway:</strong> Real independence for {countryName} comes from our own efforts and wise use of resources, not just external assistance.
-                        </p>
-                    </div>
-                    <button
-                        disabled={pillarTimer > 0 && !completedPillars.includes(7)}
-                        onClick={() => {
-                            handlePillarComplete(7);
-                            setShowSelfReliance(false);
-                        }}
-                        className="btn"
-                        style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(7)) ? 0.5 : 1 }}
-                    >
-                        I Understand Self-Reliance ✅ {(pillarTimer > 0 && !completedPillars.includes(7)) && `(${pillarTimer}s)`}
-                    </button>
+                <div style={{ textAlign: 'center' }}>
+                    <h4 style={{ color: '#FFEB3B' }}>Financial Freedom Master! 🏆</h4>
+                    <p>You understand the flow of national wealth.</p>
+                    <button onClick={() => setBudgetStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Audit Again 🔄</button>
                 </div>
             )}
         </div>
@@ -577,61 +571,93 @@ const Civics = ({ ageGroup }) => {
     );
 
 
-    const [leadStep, setLeadStep] = useState(0);
+    const leadershipScenarios = [
+        { q: "Level 1: Empathy - A citizen says, 'I can't afford the new toll.' Your response?", options: ["Listen & seek alternatives", "Tell them to pay or leave", "Ignore them"], a: 0, fact: "A leader's first duty is to hear the heart of the people." },
+        { q: "Level 2: Conflict - Two market groups are fighting over space. Action?", options: ["Mediate a fair rotation", "Side with the richer group", "Ban both groups"], a: 0, fact: "Peaceful mediation is stronger than forceful command." },
+        { q: "Level 3: Integrity - You have extra budget. How do you use it?", options: ["Public water projects", "Vacation for yourself", "Hide it for later"], a: 0, fact: "Integrity is doing the right work when nobody is watching." }
+    ];
+
     const renderLeadership = () => (
         <div className="card" style={{ borderTop: '4px solid #795548' }}>
-            <h3>Leadership Mastery 🧠</h3>
-            {leadStep === 0 ? (
+            <h3>Service-First Leadership 🧠</h3>
+            {leadStep < 3 ? (
                 <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p>"Real leadership is about service, not power."</p>
-                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                        <div style={{ padding: '1rem', backgroundColor: '#333', borderRadius: '12px' }}>
-                            <strong>Trait 1: Empathy 👂</strong>
-                            <p style={{ fontSize: '0.85rem', margin: '0.5rem 0', color: '#aaa' }}>Listen to your people before making big decisions.</p>
-                        </div>
-                        <div style={{ padding: '1rem', backgroundColor: '#333', borderRadius: '12px' }}>
-                            <strong>Trait 2: Peace 🕊️</strong>
-                            <p style={{ fontSize: '0.85rem', margin: '0.5rem 0', color: '#aaa' }}>Organize and solve problems without violence.</p>
-                        </div>
-                        <button onClick={() => setLeadStep(1)} className="btn" style={{ backgroundColor: '#795548' }}>Next Leadership Lesson →</button>
+                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{leadershipScenarios[leadStep].q}</p>
+                    <div style={{ display: 'grid', gap: '0.8rem' }}>
+                        {leadershipScenarios[leadStep].options.map((opt, i) => (
+                            <button
+                                key={opt}
+                                disabled={pillarTimer > 0 && !completedPillars.includes(9)}
+                                onClick={() => {
+                                    if (i === 0) {
+                                        showToast(leadershipScenarios[leadStep].fact, 'success');
+                                        setActiveFact({ term: "Leadership Fact 🎓", fact: leadershipScenarios[leadStep].fact });
+                                        if (leadStep === 2) handlePillarComplete(9);
+                                        setLeadStep(prev => prev + 1);
+                                    } else {
+                                        showToast("Leaders must prioritize the people!", 'warning');
+                                    }
+                                }}
+                                className="btn btn-outline"
+                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(9)) ? 0.5 : 1 }}
+                            >
+                                {opt} {(pillarTimer > 0 && !completedPillars.includes(9) && i === 0) && ` (${pillarTimer}s)`}
+                            </button>
+                        ))}
                     </div>
                 </div>
             ) : (
-                <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
-                    <p style={{ marginBottom: '1.5rem' }}>"Are you ready to lead by serving others?"</p>
-                    <button
-                        disabled={pillarTimer > 0 && !completedPillars.includes(9)}
-                        onClick={() => handlePillarComplete(9)}
-                        className="btn"
-                        style={{ width: '100%', backgroundColor: '#795548', opacity: (pillarTimer > 0 && !completedPillars.includes(9)) ? 0.5 : 1 }}
-                    >
-                        I Accept the Lead ✅ {(pillarTimer > 0 && !completedPillars.includes(9)) && ` (${pillarTimer}s)`}
-                    </button>
+                <div style={{ textAlign: 'center' }}>
+                    <h4 style={{ color: '#795548' }}>Servant Leader Confirmed! 🕊️</h4>
+                    <p>You lead to build, not just to rule.</p>
+                    <button onClick={() => setLeadStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-lead 🔄</button>
                 </div>
             )}
         </div>
     );
 
+    const localScenarios = [
+        { q: "Level 1: Who's Who - My local primary school needs new desks. Who should I call first?", options: ["LGA Chairman / Councillor", "The President", "The Army"], a: 0, fact: "Local government is the closest tier to the people's immediate needs." },
+        { q: "Level 2: Townhall - How do we decide which street gets water first?", options: ["Open community meeting", "Pick your cousins street", "Wait for Abuja"], a: 0, fact: "Transparency in local decisions builds community trust." },
+        { q: "Level 3: Engagement - You want to follow up on a project. Best way?", options: ["Write to your Ward Rep", "Shout on the highway", "Do nothing"], a: 0, fact: "Formal engagement with your Ward Representative is the most effective path for local change." }
+    ];
+
     const renderLocal = () => (
         <div className="card" style={{ borderTop: '4px solid #3F51B5' }}>
-            <h3>Local Power 🏘️</h3>
-            <p>Abuja is far. Your <Term name="Councillor" /> is near.</p>
-            <div style={{ marginTop: '1.5rem' }}>
-                <p><strong>Who is around you?</strong></p>
-                <ul style={{ color: '#ccc', display: 'grid', gap: '0.8rem' }}>
-                    <li><strong><Term name="Ward" /> Rep:</strong> Fixes local street lights and drainage.</li>
-                    <li><strong><Term name="Councillor" />:</strong> Represents you at the Local Govt level.</li>
-                    <li><strong>Chairman:</strong> Heads the whole Local Government Area (LGA).</li>
-                </ul>
-            </div>
-            <button
-                disabled={pillarTimer > 0 && !completedPillars.includes(10)}
-                onClick={() => handlePillarComplete(10)}
-                className="btn"
-                style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#3F51B5', opacity: (pillarTimer > 0 && !completedPillars.includes(10)) ? 0.5 : 1 }}
-            >
-                Engage Locally ✅ {(pillarTimer > 0 && !completedPillars.includes(10)) && `(${pillarTimer}s)`}
-            </button>
+            <h3>LGA Hero Quest 🏘️</h3>
+            {localStep < 3 ? (
+                <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{localScenarios[localStep].q}</p>
+                    <div style={{ display: 'grid', gap: '0.8rem' }}>
+                        {localScenarios[localStep].options.map((opt, i) => (
+                            <button
+                                key={opt}
+                                disabled={pillarTimer > 0 && !completedPillars.includes(10)}
+                                onClick={() => {
+                                    if (i === 0) {
+                                        showToast(localScenarios[localStep].fact, 'success');
+                                        setActiveFact({ term: "Local Govt Fact 🎓", fact: localScenarios[localStep].fact });
+                                        if (localStep === 2) handlePillarComplete(10);
+                                        setLocalStep(prev => prev + 1);
+                                    } else {
+                                        showToast("Engage your most local representatives first!", 'warning');
+                                    }
+                                }}
+                                className="btn btn-outline"
+                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(10)) ? 0.5 : 1 }}
+                            >
+                                {opt} {(pillarTimer > 0 && !completedPillars.includes(10) && i === 0) && ` (${pillarTimer}s)`}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div style={{ textAlign: 'center' }}>
+                    <h4 style={{ color: '#3F51B5' }}>LGA Hero Certified! 🏘️</h4>
+                    <p>You are an active partner in local progress.</p>
+                    <button onClick={() => setLocalStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-engage 🔄</button>
+                </div>
+            )}
         </div>
     );
 
@@ -652,7 +678,7 @@ const Civics = ({ ageGroup }) => {
         ];
 
         return (
-            <div className="card" style={{ borderTop: '4px solid #FFD700' }}>
+            <div className="card" style={{ borderTop: '4px solid #FFD700', maxWidth: '600px', margin: '0 auto' }}>
                 <h3 style={{ color: '#FFD700' }}>Statecraft Simulator 🏆</h3>
                 {simStep === 0 ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
@@ -987,36 +1013,27 @@ const Civics = ({ ageGroup }) => {
 
                 .civics-layout-wrapper {
                     display: flex;
+                    flex-direction: column;
                     gap: 2rem;
-                    flex-wrap: wrap;
-                    align-items: flex-start;
+                    align-items: center;
                 }
                 .pillar-nav-grid {
-                    flex: 1 1 300px;
+                    width: 100%;
+                    max-width: 1000px;
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
                     gap: 0.75rem;
+                    order: 1;
                 }
                 .pillar-content-area {
-                    flex: 2 1 450px;
+                    width: 100%;
+                    max-width: 800px;
                     min-height: 400px;
                     position: relative;
+                    order: 2;
                 }
 
                 @media (max-width: 768px) {
-                    .civics-layout-wrapper {
-                        flex-direction: column;
-                    }
-                    .pillar-nav-grid {
-                        width: 100%;
-                        order: 2; /* Put nav below content on small mobile if desired, or keep 1 */
-                    }
-                    .pillar-content-area {
-                        width: 100%;
-                        order: 1;
-                        min-height: auto;
-                        margin-bottom: 2rem;
-                    }
                     .pillar-nav-grid {
                          grid-template-columns: repeat(2, 1fr);
                     }
