@@ -43,7 +43,38 @@ const Civics = ({ ageGroup }) => {
     const [activeFact, setActiveFact] = useState(null); // { term, fact }
     const [showCertificate, setShowCertificate] = useState(false);
 
+    // --- PERSISTENCE ---
+    const [completedPillars, setCompletedPillars] = useState(() => {
+        const saved = localStorage.getItem('civicsProgress');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem('civicsProgress', JSON.stringify(completedPillars));
+    }, [completedPillars]);
+
     const isComplete = completedPillars.length === 10;
+
+    // --- TIMER STATE ---
+    const [pillarTimer, setPillarTimer] = useState(15);
+
+    useEffect(() => {
+        let interval = null;
+        if (pillarTimer > 0 && !completedPillars.includes(activePillar)) {
+            interval = setInterval(() => {
+                setPillarTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [pillarTimer, activePillar, completedPillars]);
+
+    useEffect(() => {
+        if (!completedPillars.includes(activePillar)) {
+            setPillarTimer(15);
+        } else {
+            setPillarTimer(0);
+        }
+    }, [activePillar, completedPillars]);
 
 
     const civicFacts = {
@@ -76,16 +107,6 @@ const Civics = ({ ageGroup }) => {
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
     };
-
-    // --- PERSISTENCE ---
-    const [completedPillars, setCompletedPillars] = useState(() => {
-        const saved = localStorage.getItem('civicsProgress');
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    useEffect(() => {
-        localStorage.setItem('civicsProgress', JSON.stringify(completedPillars));
-    }, [completedPillars]);
 
     const handlePillarComplete = (id) => {
         if (!completedPillars.includes(id)) {
@@ -173,6 +194,7 @@ const Civics = ({ ageGroup }) => {
                         {govtScenarios[govtStep].options.map(opt => (
                             <button
                                 key={opt}
+                                disabled={pillarTimer > 0 && !completedPillars.includes(1)}
                                 onClick={() => {
                                     if (opt === govtScenarios[govtStep].a) {
                                         showToast("Correct!", 'success');
@@ -183,10 +205,12 @@ const Civics = ({ ageGroup }) => {
                                     }
                                 }}
                                 className="btn btn-outline"
-                                style={{ height: '80px', textTransform: 'none' }}
+                                style={{ height: '80px', textTransform: 'none', opacity: (pillarTimer > 0 && !completedPillars.includes(1)) ? 0.5 : 1 }}
                             >
                                 <Term name={opt} />
+                                {(pillarTimer > 0 && !completedPillars.includes(1)) && ` (${pillarTimer}s)`}
                             </button>
+
                         ))}
                     </div>
                 </div>
@@ -221,28 +245,31 @@ const Civics = ({ ageGroup }) => {
             <div style={{ marginTop: '2rem', textAlign: 'center' }}>
                 {rightsStage < 2 ? (
                     <button
+                        disabled={pillarTimer > 0 && !completedPillars.includes(2)}
                         onClick={() => {
                             showToast(`Level ${rightsStage + 1} Complete! Next...`, 'success');
                             setRightsStage(prev => prev + 1);
                         }}
                         className="btn btn-primary"
-                        style={{ width: '100%', backgroundColor: '#2196F3' }}
+                        style={{ width: '100%', backgroundColor: '#2196F3', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
                     >
-                        Learn More Power ⚡
+                        Learn More Power ⚡ {(pillarTimer > 0 && !completedPillars.includes(2)) && `(${pillarTimer}s)`}
                     </button>
                 ) : (
                     <button
+                        disabled={pillarTimer > 0 && !completedPillars.includes(2)}
                         onClick={() => {
                             handlePillarComplete(2);
                             setRightsStage(0);
                         }}
                         className="btn btn-primary"
-                        style={{ width: '100%', backgroundColor: '#00C851' }}
+                        style={{ width: '100%', backgroundColor: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
                     >
-                        I Mastered my Rights! ✅
+                        I Mastered my Rights! ✅ {(pillarTimer > 0 && !completedPillars.includes(2)) && `(${pillarTimer}s)`}
                     </button>
                 )}
             </div>
+
         </div>
     );
 
@@ -256,7 +283,15 @@ const Civics = ({ ageGroup }) => {
                     <div key={d} style={{ backgroundColor: '#222', padding: '1rem', textAlign: 'center', borderRadius: '12px', border: '1px solid #444' }}>{d}</div>
                 ))}
             </div>
-            <button onClick={() => handlePillarComplete(3)} className="btn btn-primary" style={{ marginTop: '2rem', width: '100%' }}>I Accept My Duties 🤝</button>
+            <button
+                disabled={pillarTimer > 0 && !completedPillars.includes(3)}
+                onClick={() => handlePillarComplete(3)}
+                className="btn btn-primary"
+                style={{ width: '100%', marginTop: '2rem', opacity: (pillarTimer > 0 && !completedPillars.includes(3)) ? 0.5 : 1 }}
+            >
+                I Accept My Duties 🤝 {(pillarTimer > 0 && !completedPillars.includes(3)) && `(${pillarTimer}s)`}
+            </button>
+
         </div>
     );
 
@@ -272,7 +307,15 @@ const Civics = ({ ageGroup }) => {
                     <li><strong>Contracts:</strong> Any agreement you sign is legally binding. Read first!</li>
                 </ul>
             </div>
-            <button onClick={() => handlePillarComplete(4)} className="btn btn-primary" style={{ marginTop: '1rem', width: '100%', backgroundColor: '#FF9800' }}>Understood! ✅</button>
+            <button
+                disabled={pillarTimer > 0 && !completedPillars.includes(4)}
+                onClick={() => handlePillarComplete(4)}
+                className="btn btn-primary"
+                style={{ width: '100%', marginTop: '1rem', backgroundColor: '#FF9800', opacity: (pillarTimer > 0 && !completedPillars.includes(4)) ? 0.5 : 1 }}
+            >
+                Understood! ✅ {(pillarTimer > 0 && !completedPillars.includes(4)) && `(${pillarTimer}s)`}
+            </button>
+
         </div>
     );
 
@@ -296,8 +339,16 @@ const Civics = ({ ageGroup }) => {
 
                 <div style={{ textAlign: 'center' }}>
                     <p>Help clean your school or help a neighbor today!</p>
-                    <button onClick={() => handlePillarComplete(5)} className="btn" style={{ backgroundColor: '#E91E63' }}>I Will Help! 🌟</button>
+                    <button
+                        disabled={pillarTimer > 0 && !completedPillars.includes(5)}
+                        onClick={() => handlePillarComplete(5)}
+                        className="btn"
+                        style={{ backgroundColor: '#E91E63', opacity: (pillarTimer > 0 && !completedPillars.includes(5)) ? 0.5 : 1 }}
+                    >
+                        I Will Help! 🌟 {(pillarTimer > 0 && !completedPillars.includes(5)) && `(${pillarTimer}s)`}
+                    </button>
                 </div>
+
             )}
         </div>
     );
@@ -329,7 +380,15 @@ const Civics = ({ ageGroup }) => {
                         </div>
                     ))}
                 </div>
-                <button onClick={() => handlePillarComplete(6)} className="btn" style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#607D8B' }}>Tools Ready ✅</button>
+                <button
+                    disabled={pillarTimer > 0 && !completedPillars.includes(6)}
+                    onClick={() => handlePillarComplete(6)}
+                    className="btn"
+                    style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#607D8B', opacity: (pillarTimer > 0 && !completedPillars.includes(6)) ? 0.5 : 1 }}
+                >
+                    Tools Ready ✅ {(pillarTimer > 0 && !completedPillars.includes(6)) && `(${pillarTimer}s)`}
+                </button>
+
             </div>
         );
     };
@@ -378,15 +437,17 @@ const Civics = ({ ageGroup }) => {
                         </p>
                     </div>
                     <button
+                        disabled={pillarTimer > 0 && !completedPillars.includes(7)}
                         onClick={() => {
                             handlePillarComplete(7);
                             setShowSelfReliance(false);
                         }}
                         className="btn"
-                        style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#00C851' }}
+                        style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(7)) ? 0.5 : 1 }}
                     >
-                        I Understand Self-Reliance ✅
+                        I Understand Self-Reliance ✅ {(pillarTimer > 0 && !completedPillars.includes(7)) && `(${pillarTimer}s)`}
                     </button>
+
                 </div>
             )}
         </div>
@@ -400,8 +461,16 @@ const Civics = ({ ageGroup }) => {
                 <p><strong>Scenario:</strong> You find ₦1,000 on correctly marked school property.</p>
                 <div className="grid-cols" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
                     <button onClick={() => { showToast("Wrong choice!", 'error'); }} className="btn btn-outline" style={{ color: '#ff4444' }}>Keep It 🦊</button>
-                    <button onClick={() => { showToast("Correct! Virtue is reward.", 'success'); handlePillarComplete(8); }} className="btn btn-outline" style={{ color: '#00C851' }}>Report It 💎</button>
+                    <button
+                        disabled={pillarTimer > 0 && !completedPillars.includes(8)}
+                        onClick={() => { showToast("Correct! Virtue is reward.", 'success'); handlePillarComplete(8); }}
+                        className="btn btn-outline"
+                        style={{ color: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(8)) ? 0.5 : 1 }}
+                    >
+                        Report It 💎 {(pillarTimer > 0 && !completedPillars.includes(8)) && `(${pillarTimer}s)`}
+                    </button>
                 </div>
+
             </div>
         </div>
     );
@@ -421,7 +490,15 @@ const Civics = ({ ageGroup }) => {
                     <div key={l} style={{ padding: '0.8rem', backgroundColor: '#333', borderRadius: '10px' }}>{l}</div>
                 ))}
             </div>
-            <button onClick={() => handlePillarComplete(9)} className="btn" style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#795548' }}>I Am A Leader! 🧠</button>
+            <button
+                disabled={pillarTimer > 0 && !completedPillars.includes(9)}
+                onClick={() => handlePillarComplete(9)}
+                className="btn"
+                style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#795548', opacity: (pillarTimer > 0 && !completedPillars.includes(9)) ? 0.5 : 1 }}
+            >
+                I Am A Leader! 🧠 {(pillarTimer > 0 && !completedPillars.includes(9)) && `(${pillarTimer}s)`}
+            </button>
+
         </div>
     );
 
@@ -437,7 +514,15 @@ const Civics = ({ ageGroup }) => {
                     <li><strong>Chairman:</strong> Heads the whole Local Government Area (LGA).</li>
                 </ul>
             </div>
-            <button onClick={() => handlePillarComplete(10)} className="btn" style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#3F51B5' }}>Engage Locally ✅</button>
+            <button
+                disabled={pillarTimer > 0 && !completedPillars.includes(10)}
+                onClick={() => handlePillarComplete(10)}
+                className="btn"
+                style={{ width: '100%', marginTop: '1.5rem', backgroundColor: '#3F51B5', opacity: (pillarTimer > 0 && !completedPillars.includes(10)) ? 0.5 : 1 }}
+            >
+                Engage Locally ✅ {(pillarTimer > 0 && !completedPillars.includes(10)) && `(${pillarTimer}s)`}
+            </button>
+
         </div>
     );
 
@@ -500,9 +585,15 @@ const Civics = ({ ageGroup }) => {
                 </div>
 
                 {/* PILLAR CONTENT */}
-                <div style={{ flex: '2 1 400px', minHeight: '400px' }}>
+                <div style={{ flex: '2 1 400px', minHeight: '400px', position: 'relative' }}>
+                    {pillarTimer > 0 && !completedPillars.includes(activePillar) && (
+                        <div style={{ position: 'absolute', top: '-30px', right: 0, backgroundColor: '#9C27B0', padding: '0.2rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', animation: 'pulse 1s infinite' }}>
+                            📖 Reading: {pillarTimer}s
+                        </div>
+                    )}
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <h2 style={{ color: activePillarData.color, marginBottom: '1.5rem' }}>{activePillarData.title}</h2>
+
                         {activePillar === 1 && renderGovtGame()}
                         {activePillar === 2 && renderRights()}
                         {activePillar === 3 && renderResponsibilities()}
@@ -683,7 +774,13 @@ const Civics = ({ ageGroup }) => {
                     75% { transform: scale(1.05); opacity: 1; }
                     100% { transform: scale(1); }
                 }
+                @keyframes pulse {
+                    0% { opacity: 1; transform: scale(1); }
+                    50% { opacity: 0.8; transform: scale(0.95); }
+                    100% { opacity: 1; transform: scale(1); }
+                }
             `}</style>
+
         </div>
     );
 };
