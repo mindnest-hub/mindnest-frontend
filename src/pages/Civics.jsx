@@ -222,6 +222,7 @@ const Civics = ({ ageGroup }) => {
                                 onClick={() => {
                                     if (opt === govtScenarios[govtStep].a) {
                                         showToast("Correct!", 'success');
+                                        setActiveFact({ term: "Govt Function Fact 🎓", fact: govtScenarios[govtStep].hint });
                                         if (govtStep === 2) handlePillarComplete(1);
                                         setGovtStep(prev => prev + 1);
                                     } else {
@@ -271,6 +272,12 @@ const Civics = ({ ageGroup }) => {
                         disabled={pillarTimer > 0 && !completedPillars.includes(2)}
                         onClick={() => {
                             showToast(`Level ${rightsStage + 1} Complete! Next...`, 'success');
+                            const rightsFacts = [
+                                "Your fundamental rights are the core shield that protects your dignity as a human being.",
+                                "Civic rights, like voting, are the tools you use to shape the leadership of your country.",
+                                "Special protections exist for children and consumers to ensure the most vulnerable are safe."
+                            ];
+                            setActiveFact({ term: "Rights Insight ⚖️", fact: rightsFacts[rightsStage] });
                             setRightsStage(prev => prev + 1);
                         }}
                         className="btn btn-primary"
@@ -316,6 +323,7 @@ const Civics = ({ ageGroup }) => {
                                 onClick={() => {
                                     if (opt === respScenarios[respStep].a) {
                                         showToast("Responsible Choice! ✅", 'success');
+                                        setActiveFact({ term: "Responsibility Fact 🤝", fact: respScenarios[respStep].hint });
                                         if (respStep === 2) handlePillarComplete(3);
                                         setRespStep(prev => prev + 1);
                                     } else {
@@ -539,7 +547,10 @@ const Civics = ({ ageGroup }) => {
                 <div style={{ animation: 'fadeIn 0.5s' }}>
                     <p><strong>Whistleblower Scenario:</strong> You discover a senior official is diverting funds meant for a new primary school in your {currentCountryData.name === "Nigeria" ? "LGA" : "district"}.</p>
                     <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button onClick={() => setEthicsStage(1)} className="btn btn-outline" style={{ color: '#00C851' }}>Report anonymously 📞</button>
+                        <button onClick={() => {
+                            setActiveFact({ term: "Integrity Secret 💎", fact: "Integrity means doing the right thing for the community, even when it's difficult." });
+                            setEthicsStage(1);
+                        }} className="btn btn-outline" style={{ color: '#00C851' }}>Report anonymously 📞</button>
                         <button onClick={() => showToast("Silence helps corruption grow.", 'error')} className="btn btn-outline" style={{ color: '#ff4444' }}>Stay silent 🤐</button>
                         <button onClick={() => showToast("Bribery is a crime!", 'error')} className="btn btn-outline" style={{ color: '#FFD700' }}>Ask for a cut 💰</button>
                     </div>
@@ -548,7 +559,10 @@ const Civics = ({ ageGroup }) => {
                 <div style={{ animation: 'fadeIn 0.5s' }}>
                     <p>The official offers you {currency}500,000 to delete the evidence. What do you do?</p>
                     <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button onClick={() => setEthicsStage(2)} className="btn btn-outline" style={{ color: '#00C851' }}>Reject & Expose 💎</button>
+                        <button onClick={() => {
+                            setActiveFact({ term: "Patriotism Fact 💎", fact: "Rejecting corruption is the greatest act of patriotism a citizen can perform." });
+                            setEthicsStage(2);
+                        }} className="btn btn-outline" style={{ color: '#00C851' }}>Reject & Expose 💎</button>
                         <button onClick={() => { setEthicsStage(0); showToast("Integrity Lost! Try again.", 'error'); }} className="btn btn-outline" style={{ color: '#ff4444' }}>Take the money ❌</button>
                     </div>
                 </div>
@@ -731,7 +745,10 @@ const Civics = ({ ageGroup }) => {
                         <p>You led with wisdom as **{simRole}**. Your legacy of **{simPriority}** is secure.</p>
                         <button
                             disabled={pillarTimer > 0 && !completedPillars.includes(11)}
-                            onClick={() => handlePillarComplete(11)}
+                            onClick={() => {
+                                setActiveFact({ term: "Leadership Legacy 👑", fact: "True leadership is about leaving a legacy of service that outlasts your time in office." });
+                                handlePillarComplete(11);
+                            }}
                             className="btn"
                             style={{ backgroundColor: '#FFD700', color: 'black', width: '100%', marginTop: '1.5rem', opacity: (pillarTimer > 0 && !completedPillars.includes(11)) ? 0.5 : 1 }}
                         >
