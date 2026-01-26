@@ -530,10 +530,29 @@ const Civics = ({ ageGroup }) => {
                     </div>
                 </div>
             ) : (
-                <div style={{ textAlign: 'center' }}>
+                <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
                     <h4 style={{ color: '#FFEB3B' }}>Financial Freedom Master! 🏆</h4>
-                    <p>You understand the flow of national wealth.</p>
-                    <button onClick={() => setBudgetStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Audit Again 🔄</button>
+
+                    <div style={{ backgroundColor: 'rgba(255, 235, 59, 0.1)', padding: '1.2rem', borderRadius: '15px', margin: '1rem 0', borderLeft: '4px solid #FFEB3B', textAlign: 'left' }}>
+                        <p style={{ fontStyle: 'italic', marginBottom: '0.5rem', color: '#fff', fontSize: '1rem' }}>
+                            "External support is not evil. It becomes harmful only when it replaces local effort instead of strengthening it."
+                        </p>
+                        <p style={{ fontSize: '0.85rem', color: '#aaa' }}>This is the core of true independence and national growth.</p>
+                    </div>
+
+                    <div style={{ backgroundColor: '#111', padding: '1.5rem', borderRadius: '20px', border: '1px dashed #444', marginTop: '1.5rem', textAlign: 'left' }}>
+                        <h5 style={{ color: '#FFEB3B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span>📝</span> Habit Building Reflection
+                        </h5>
+                        <p style={{ fontSize: '0.95rem', color: '#ccc', marginBottom: '1rem', lineHeight: '1.5' }}>
+                            <strong>1.</strong> Name one problem in your community that can be resolved <strong>without</strong> waiting for government, donors, or loans.
+                        </p>
+                        <p style={{ fontSize: '0.95rem', color: '#ccc', lineHeight: '1.5' }}>
+                            <strong>2.</strong> If your community received ₦1m today, what would ensure it creates <strong>lasting value</strong> instead of dependency?
+                        </p>
+                    </div>
+
+                    <button onClick={() => setBudgetStep(0)} className="btn btn-sm" style={{ marginTop: '2rem' }}>Re-study Budget 🔄</button>
                 </div>
             )}
         </div>
