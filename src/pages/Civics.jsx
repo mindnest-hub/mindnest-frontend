@@ -133,42 +133,49 @@ const Civics = ({ ageGroup }) => {
         setTimeout(() => setShowConfetti(false), 3000);
     };
 
-    // --- PILLAR 1: GOVT FUNCTIONS ---
+    // --- PILLAR 1: GOVT FUNCTIONS (Advanced) ---
     const [govtStep, setGovtStep] = useState(0);
-    const govtScenarios = [
+    const kidGovtScenarios = [
         { q: "The local road is full of potholes. Who should fix it?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: `The Executive runs the ${countryName} government & builds infrastructure.` },
         { q: "A new law is needed to protect children. Who makes it?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: `The Legislative branch (like our ${parliament}) makes the laws.` },
         { q: "Someone stole a cow and needs to be judged. Who handles this?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary interprets laws & settles disputes." }
     ];
 
-    // --- PILLAR 2: KNOW YOUR RIGHTS (3 LEVELS) ---
-    const [rightsStage, setRightsStage] = useState(0);
-    const rightsLevels = [
-        {
-            title: "Level 1: Basic Human Rights 🌱",
-            desc: "These are the rights you are born with.",
-            rights: [
-                { t: "Right to Life", d: "No one can take your life away.", icon: "🌱" },
-                { t: "Freedom of Movement", d: "You can travel anywhere safely.", icon: "🚶" }
-            ]
-        },
-        {
-            title: "Level 2: Civic Power 🗳️",
-            desc: "Your power as a citizen of the nation.",
-            rights: [
-                { t: "Right to Vote", d: "You choose who leads at 18.", icon: "🗳️" },
-                { t: "Freedom of Speech", d: "You can speak your truth respectfully.", icon: "🗣️" }
-            ]
-        },
-        {
-            title: "Level 3: Extra Protection 🛡️",
-            desc: "Rights that protect kids and consumers.",
-            rights: [
-                { t: "Children's Rights", d: "Right to play and be protected from work.", icon: "🪁" },
-                { t: "Consumer Rights", d: "Right to get what you paid for (Quality).", icon: "🏷️" }
-            ]
-        }
+    const teenGovtScenarios = [
+        { q: "Headline: 'President vetos new environmental bill.' Which branch exercised power?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: "The President (Executive) can veto bills passed by the Legislature." },
+        { q: "Headline: 'Court rules new digital tax is unconstitutional.' Which branch decided?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary reviews the constitutionality of laws." },
+        { q: "Headline: 'National Assembly approves 2026 Budget.' Who made the decision?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "The Legislative branch has the 'Power of the Purse' to approve budgets." }
     ];
+
+    const adultGovtScenarios = [
+        { q: "Process: You want to propose a 'Small Business Grant' law. Where does it start?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "Laws begin as Bills in the Legislative branch." },
+        { q: "Process: The Bill is passed but the Governor refuses to sign. What is this called?", a: "Veto", options: ["Veto", "Impeachment", "Recess"], hint: "A Veto is when the head of the Executive branch rejects a bill." },
+        { q: "Process: The law is enacted but citizens claim it violates their privacy. Who settles this?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary protects citizen rights against government overreach." }
+    ];
+
+    const govtScenarios = isKid ? kidGovtScenarios : (isTeen ? teenGovtScenarios : adultGovtScenarios);
+
+    // --- PILLAR 2: KNOW YOUR RIGHTS (Advanced) ---
+    const [rightsStage, setRightsStage] = useState(0);
+    const kidRightsLevels = [
+        { title: "Level 1: Basic Human Rights 🌱", desc: "These are the rights you are born with.", rights: [{ t: "Right to Life", d: "No one can take your life away.", icon: "🌱" }, { t: "Freedom of Movement", d: "You can travel anywhere safely.", icon: "🚶" }] },
+        { title: "Level 2: Civic Power 🗳️", desc: "Your power as a citizen of the nation.", rights: [{ t: "Right to Vote", d: "You choose who leads at 18.", icon: "🗳️" }, { t: "Freedom of Speech", d: "You can speak your truth respectfully.", icon: "🗣️" }] },
+        { title: "Level 3: Extra Protection 🛡️", desc: "Rights that protect kids and consumers.", rights: [{ t: "Children's Rights", d: "Right to play and be protected from work.", icon: "🪁" }, { t: "Consumer Rights", d: "Right to get what you paid for (Quality).", icon: "🏷️" }] }
+    ];
+
+    const teenRightsLevels = [
+        { title: "Level 1: Digital Rights 📱", desc: "Protecting your presence online.", rights: [{ t: "Data Privacy", d: "Companies must protect your info.", icon: "🔐" }, { t: "Digital Speech", d: "Right to express online without illegal censorship.", icon: "📡" }] },
+        { title: "Level 2: Equality & Justice 🤝", desc: "The pillar of a fair society.", rights: [{ t: "Non-Discrimination", d: "Equal treatment regardless of tribe or gender.", icon: "🌈" }, { t: "Fair Hearing", d: "The right to explain yourself in court.", icon: "⚖️" }] },
+        { title: "Level 3: Right to Education 📚", desc: "The engine of progress.", rights: [{ t: "Quality Learning", d: "Access to standard schools and materials.", icon: "🏢" }, { t: "Scientific Freedom", d: "Right to research and innovate.", icon: "🧪" }] }
+    ];
+
+    const adultRightsLevels = [
+        { title: "Level 1: Professional Rights 💼", desc: "Rights in the workplace and business.", rights: [{ t: "Fair Wages", d: "Equal pay for equal work.", icon: "💰" }, { t: "Safe Conditions", d: "Protection from work hazards.", icon: "👷" }] },
+        { title: "Level 2: Legal Precedence 📜", desc: "Advanced constitutional rights.", rights: [{ t: "Habeas Corpus", d: "Protection from illegal detention.", icon: "⛓️" }, { t: "Presumption of Innocence", d: "Innocent until proven guilty.", icon: "🕊️" }] },
+        { title: "Level 3: Consumer Protection 🛡️", desc: "Defending economic rights.", rights: [{ t: "Product Liability", d: "Companies are liable for harmful goods.", icon: "⚠️" }, { t: "Truth in Advertising", d: "Right to honest marketing.", icon: "📢" }] }
+    ];
+
+    const rightsLevels = isKid ? kidRightsLevels : (isTeen ? teenRightsLevels : adultRightsLevels);
 
 
 
@@ -184,12 +191,15 @@ const Civics = ({ ageGroup }) => {
     const [simStage, setSimStage] = useState(0);
 
     // --- GAME STATES FOR POLISHED PILLARS ---
+    const [respStep, setRespStep] = useState(0);
     const [lawStep, setLawStep] = useState(0);
     const [projStep, setProjStep] = useState(0);
     const [toolStep, setToolStep] = useState(0);
     const [budgetStep, setBudgetStep] = useState(0);
+    const [ethicsStage, setEthicsStage] = useState(0);
     const [leadStep, setLeadStep] = useState(0);
     const [localStep, setLocalStep] = useState(0);
+    const [simStep, setSimStep] = useState(0);
 
     const pillars = [
         { id: 1, title: "1. Govt Functions 🏛️", color: "#9C27B0" },
@@ -206,240 +216,317 @@ const Civics = ({ ageGroup }) => {
     ];
 
 
-    const renderGovtGame = () => (
-        <div className="card" style={{ borderTop: '4px solid #9C27B0' }}>
-            <h3>Who Should Fix This? 🏛️</h3>
-            <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>Match the problem to the branch of government.</p>
+    const renderGovtGame = () => {
+        const scenarios = isKid ? kidGovtScenarios : (isTeen ? teenGovtScenarios : adultGovtScenarios);
+        return (
+            <div className="card" style={{ borderTop: '4px solid #9C27B0' }}>
+                <h3>{isKid ? 'Who Should Fix This?' : (isTeen ? 'Constitutional Watchdog' : 'The Legislative Path')} 🏛️</h3>
+                <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>
+                    {isKid ? 'Match the problem to the branch of government.' : (isTeen ? 'Analyze the news and identify the branch involved.' : 'Navigate the complex process of governance.')}
+                </p>
 
-            {govtStep < 3 ? (
-                <div>
-                    <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem' }}>"{govtScenarios[govtStep].q}"</p>
-                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
-                        {govtScenarios[govtStep].options.map(opt => (
-                            <button
-                                key={opt}
-                                disabled={pillarTimer > 0 && !completedPillars.includes(1)}
-                                onClick={() => {
-                                    if (opt === govtScenarios[govtStep].a) {
-                                        showToast("Correct!", 'success');
-                                        setActiveFact({ term: "Govt Function Fact 🎓", fact: govtScenarios[govtStep].hint });
-                                        if (govtStep === 2) handlePillarComplete(1);
-                                        setGovtStep(prev => prev + 1);
-                                    } else {
-                                        showToast(govtScenarios[govtStep].hint, 'warning');
-                                    }
-                                }}
-                                className="btn btn-outline"
-                                style={{ height: '80px', textTransform: 'none', opacity: (pillarTimer > 0 && !completedPillars.includes(1)) ? 0.5 : 1 }}
-                            >
-                                <Term name={opt} />
-                                {(pillarTimer > 0 && !completedPillars.includes(1)) && ` (${pillarTimer}s)`}
-                            </button>
-
-                        ))}
-                    </div>
-                </div>
-
-            ) : (
-                <div style={{ textAlign: 'center', color: '#00C851' }}>
-                    <h4>Mastery Achieved! 🏆</h4>
-                    <p>You now know who to hold accountable.</p>
-                    <button onClick={() => setGovtStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Play Again</button>
-                </div>
-            )}
-        </div>
-    );
-
-
-    const renderRights = () => (
-        <div className="card" style={{ borderTop: '4px solid #2196F3' }}>
-            <h3>{rightsLevels[rightsStage].title}</h3>
-            <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>{rightsLevels[rightsStage].desc}</p>
-            <div style={{ display: 'grid', gap: '1.5rem', marginTop: '1rem' }}>
-                {rightsLevels[rightsStage].rights.map((r, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'center', backgroundColor: '#222', padding: '1rem', borderRadius: '15px', border: '1px solid rgba(33, 150, 243, 0.2)' }}>
-                        <span style={{ fontSize: '2rem' }}>{r.icon}</span>
-                        <div>
-                            <strong style={{ display: 'block', color: '#2196F3' }}>{r.t}</strong>
-                            <small style={{ color: '#888' }}>{r.d}</small>
+                {govtStep < 3 ? (
+                    <div>
+                        <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem' }}>"{scenarios[govtStep].q}"</p>
+                        <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
+                            {scenarios[govtStep].options.map(opt => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(1)}
+                                    onClick={() => {
+                                        if (opt === scenarios[govtStep].a) {
+                                            showToast("Correct!", 'success');
+                                            setActiveFact({ term: "Governance Fact 🎓", fact: scenarios[govtStep].hint });
+                                            if (govtStep === 2) handlePillarComplete(1);
+                                            setGovtStep(prev => prev + 1);
+                                        } else {
+                                            showToast(scenarios[govtStep].hint, 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(1)) ? 0.5 : 1 }}
+                                >
+                                    <Term name={opt} />
+                                    {(pillarTimer > 0 && !completedPillars.includes(1)) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
                         </div>
                     </div>
-                ))}
-            </div>
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                {rightsStage < 2 ? (
-                    <button
-                        disabled={pillarTimer > 0 && !completedPillars.includes(2)}
-                        onClick={() => {
-                            showToast(`Level ${rightsStage + 1} Complete! Next...`, 'success');
-                            const rightsFacts = [
-                                "Your fundamental rights are the core shield that protects your dignity as a human being.",
-                                "Civic rights, like voting, are the tools you use to shape the leadership of your country.",
-                                "Special protections exist for children and consumers to ensure the most vulnerable are safe."
-                            ];
-                            setActiveFact({ term: "Rights Insight ⚖️", fact: rightsFacts[rightsStage] });
-                            setRightsStage(prev => prev + 1);
-                        }}
-                        className="btn btn-primary"
-                        style={{ width: '100%', backgroundColor: '#2196F3', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
-                    >
-                        Learn More Power ⚡ {(pillarTimer > 0 && !completedPillars.includes(2)) && `(${pillarTimer}s)`}
-                    </button>
                 ) : (
-                    <button
-                        disabled={pillarTimer > 0 && !completedPillars.includes(2)}
-                        onClick={() => {
-                            handlePillarComplete(2);
-                            setRightsStage(0);
-                        }}
-                        className="btn btn-primary"
-                        style={{ width: '100%', backgroundColor: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
-                    >
-                        I Mastered my Rights! ✅ {(pillarTimer > 0 && !completedPillars.includes(2)) && `(${pillarTimer}s)`}
-                    </button>
+                    <div style={{ textAlign: 'center', color: '#00C851' }}>
+                        <h4>{isKid ? 'Mastery Achieved!' : 'System Mastered!'} 🏆</h4>
+                        <p>{isKid ? 'You now know who to hold accountable.' : 'You understand the checks and balances of your nation.'}</p>
+                        <button onClick={() => setGovtStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Play Again</button>
+                    </div>
                 )}
             </div>
-        </div>
-    );
+        );
+    };
 
-    const [respStep, setRespStep] = useState(0);
-    const respScenarios = [
+
+    const renderRights = () => {
+        const levels = isKid ? kidRightsLevels : (isTeen ? teenRightsLevels : adultRightsLevels);
+        return (
+            <div className="card" style={{ borderTop: '4px solid #2196F3' }}>
+                <h3>{levels[rightsStage].title}</h3>
+                <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>{levels[rightsStage].desc}</p>
+                <div style={{ display: 'grid', gap: '1.5rem', marginTop: '1rem' }}>
+                    {levels[rightsStage].rights.map((r, i) => (
+                        <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'center', backgroundColor: '#222', padding: '1rem', borderRadius: '15px', border: '1px solid rgba(33, 150, 243, 0.2)' }}>
+                            <span style={{ fontSize: '2rem' }}>{r.icon}</span>
+                            <div>
+                                <strong style={{ display: 'block', color: '#2196F3' }}>{r.t}</strong>
+                                <small style={{ color: '#888' }}>{r.d}</small>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                    {rightsStage < 2 ? (
+                        <button
+                            disabled={pillarTimer > 0 && !completedPillars.includes(2)}
+                            onClick={() => {
+                                showToast(`Level ${rightsStage + 1} Complete! Next...`, 'success');
+                                const rightsFacts = [
+                                    "Your fundamental rights are the core shield that protects your dignity as a human being.",
+                                    "Civic rights, like voting, are the tools you use to shape the leadership of your country.",
+                                    "Special protections exist for children and consumers to ensure the most vulnerable are safe."
+                                ];
+                                setActiveFact({ term: "Rights Insight ⚖️", fact: rightsFacts[rightsStage] });
+                                setRightsStage(prev => prev + 1);
+                            }}
+                            className="btn btn-primary"
+                            style={{ width: '100%', height: 'auto', whiteSpace: 'normal', backgroundColor: '#2196F3', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
+                        >
+                            Learn More Power ⚡ {(pillarTimer > 0 && !completedPillars.includes(2)) && `(${pillarTimer}s)`}
+                        </button>
+                    ) : (
+                        <button
+                            disabled={pillarTimer > 0 && !completedPillars.includes(2)}
+                            onClick={() => {
+                                handlePillarComplete(2);
+                                setRightsStage(0);
+                            }}
+                            className="btn btn-primary"
+                            style={{ width: '100%', height: 'auto', whiteSpace: 'normal', backgroundColor: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
+                        >
+                            I Mastered my Rights! ✅ {(pillarTimer > 0 && !completedPillars.includes(2)) && `(${pillarTimer}s)`}
+                        </button>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    // --- PILLAR 3: RESPONSIBILITIES (Advanced) ---
+    const kidRespScenarios = [
         { q: "You see litter on the street near your house. What do you do?", a: "Pick it up", options: ["Pick it up", "Wait for Govt", "Ignore it"], hint: "A clean community starts with individual responsibility." },
         { q: "You witness a neighbor's property being vandalized. What do you do?", a: "Report it", options: ["Report it", "Join in", "Stay silent"], hint: "Protecting public and private property is a civic duty." },
         { q: "It's election day in your neighborhood. You are 18+.", a: "Go Vote", options: ["Go Vote", "Stay home", "Go to a party"], hint: "Voting is both a right and a responsibility." }
     ];
 
-    const renderResponsibilities = () => (
-        <div className="card" style={{ borderTop: '4px solid #4CAF50' }}>
-            <h3>The Good Citizen Test 🤝</h3>
-            {respStep < 3 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{respScenarios[respStep].q}"</p>
-                    <div style={{ display: 'grid', gap: '0.8rem' }}>
-                        {respScenarios[respStep].options.map(opt => (
-                            <button
-                                key={opt}
-                                disabled={pillarTimer > 0 && !completedPillars.includes(3)}
-                                onClick={() => {
-                                    if (opt === respScenarios[respStep].a) {
-                                        showToast("Responsible Choice! ✅", 'success');
-                                        setActiveFact({ term: "Responsibility Fact 🤝", fact: respScenarios[respStep].hint });
-                                        if (respStep === 2) handlePillarComplete(3);
-                                        setRespStep(prev => prev + 1);
-                                    } else {
-                                        showToast(respScenarios[respStep].hint, 'warning');
-                                    }
-                                }}
-                                className="btn btn-outline"
-                                style={{ textAlign: 'left', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(3)) ? 0.5 : 1 }}
-                            >
-                                {opt} {(pillarTimer > 0 && !completedPillars.includes(3)) && ` (${pillarTimer}s)`}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center' }}>
-                    <h4 style={{ color: '#00C851' }}>Duty Accepted! 🏆</h4>
-                    <p>You are ready to build the nation.</p>
-                    <button onClick={() => setRespStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-test 🔄</button>
-                </div>
-            )}
-        </div>
-    );
+    const teenRespScenarios = [
+        { q: "You see a classmate being bullied online. What is your civic duty?", a: "Report & Support", options: ["Report & Support", "Laugh along", "Ignore it"], hint: "Digital citizenship means standing up for others in online spaces." },
+        { q: "A protest is happening for a cause you believe in. How do you lead?", a: "Peaceful Action", options: ["Peaceful Action", "Violent Protest", "Doing nothing"], hint: "The right to protest is protected, but keeping it peaceful is a responsibility." },
+        { q: "You discover a way to save water in your school. What do you do?", a: "Propose a plan", options: ["Propose a plan", "Keep it secret", "Waste more"], hint: "Innovation for the common good is a mark of a responsible citizen." }
+    ];
 
+    const adultRespScenarios = [
+        { q: "You notice a government project in your ward is stalled. Action?", a: "Audit & Petition", options: ["Audit & Petition", "Complain on FB", "Do nothing"], hint: "Citizens should track local projects and use formal channels for accountability." },
+        { q: "You are called for community oversight or townhall. Response?", a: "Attend & Speak", options: ["Attend & Speak", "Stay home", "Send a representative"], hint: "Active participation in local governance is the core of a thriving democracy." },
+        { q: "You witness a professional colleague accepting a bribe. Action?", a: "Report to authorities", options: ["Report to authorities", "Ask for a share", "Keep quiet"], hint: "Integrity in the workplace is essential for national development." }
+    ];
 
-    const lawScenarios = [
+    const respScenarios = isKid ? kidRespScenarios : (isTeen ? teenRespScenarios : adultRespScenarios);
+
+    // --- PILLAR 4: EVERYDAY LAW (Advanced) ---
+    const [lawStep, setLawStep] = useState(0);
+    const kidLawScenarios = [
         { q: "A LASTMA/Police officer stops you and asks for your license. You have it. What is your right?", a: "Show it politely", options: ["Show it politely", "Argue & Shout", "Run away"], hint: "Cooperation and knowing your rights prevents unnecessary conflict." },
         { q: "Your landlord enters your apartment without notice or permission. Is this legal?", a: "No", options: ["Yes", "No", "Maybe"], hint: "In most places, a tenant has a right to 'Quiet Enjoyment' and notice before entry." },
         { q: "You bought a phone that stopped working after 1 day. The shop says 'No Refund'. Help?", a: "Consumer Rights Act", options: ["Consumer Rights Act", "Cry", "Break the shop glass"], hint: "The Consumer Protection Act protects you from faulty goods despite what some shops say." }
     ];
 
-    const renderLaw = () => (
-        <div className="card" style={{ borderTop: '4px solid #FF9800' }}>
-            <h3>Legal Eagle Challenge 🦅</h3>
-            {lawStep < 3 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{lawScenarios[lawStep].q}"</p>
-                    <div style={{ display: 'grid', gap: '1rem' }}>
-                        {lawScenarios[lawStep].options.map(opt => (
-                            <button
-                                key={opt}
-                                disabled={pillarTimer > 0 && !completedPillars.includes(4)}
-                                onClick={() => {
-                                    if (opt === lawScenarios[lawStep].a) {
-                                        showToast("Legal Mastery! ✅", 'success');
-                                        setActiveFact({ term: "Legal Wisdom ⚖️", fact: lawScenarios[lawStep].hint });
-                                        if (lawStep === 2) handlePillarComplete(4);
-                                        setLawStep(prev => prev + 1);
-                                    } else {
-                                        showToast(lawScenarios[lawStep].hint, 'warning');
-                                    }
-                                }}
-                                className="btn btn-outline"
-                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(4)) ? 0.5 : 1 }}
-                            >
-                                {opt} {(pillarTimer > 0 && !completedPillars.includes(4)) && ` (${pillarTimer}s)`}
-                            </button>
-                        ))}
+    const teenLawScenarios = [
+        { q: "You want to sign an 'End User License' for an app. What should you do?", a: "Read the Privacy section", options: ["Read the Privacy section", "Click accept immediately", "Delete app"], hint: "Digital literacy includes understanding what data you are giving away." },
+        { q: "You are starting a small side-hustle. What is a 'Contract'?", a: "A binding agreement", options: ["A binding agreement", "A friendly promise", "A type of tax"], hint: "Contracts protect both parties in a business transaction." },
+        { q: "Is taking a photo of someone without permission in public legal?", a: "Generally Yes", options: ["Generally Yes", "Always No", "Only if they are rich"], hint: "Laws vary, but public spaces usually have lower privacy expectations than private ones." }
+    ];
+
+    const adultLawScenarios = [
+        { q: "You are dealing with a property dispute. What is the first step?", a: "Mediation/Legal Review", options: ["Mediation/Legal Review", "Self-help/Force", "Social media rant"], hint: "Legal disputes should be settled through formal mediation or the court system." },
+        { q: "What is the consequence of tax evasion for a business?", a: "Heavy Fines/Jail", options: ["Heavy Fines/Jail", "Nothing", "A small pat on back"], hint: "Paying taxes is a legal requirement that funds the nation's infrastructure." },
+        { q: "What is 'Intellectual Property' (IP) protection used for?", a: "Protecting inventions", options: ["Protecting inventions", "Owning people", "Buying land"], hint: "IP laws allow creators to own and profit from their original ideas." }
+    ];
+
+    const lawScenarios = isKid ? kidLawScenarios : (isTeen ? teenLawScenarios : adultLawScenarios);
+
+    const renderResponsibilities = () => {
+        const scenarios = isKid ? kidRespScenarios : (isTeen ? teenRespScenarios : adultRespScenarios);
+        return (
+            <div className="card" style={{ borderTop: '4px solid #4CAF50' }}>
+                <h3>{isKid ? 'The Good Citizen Test' : (isTeen ? 'Digital & Civic Duty' : 'The Sentinel Test')} 🤝</h3>
+                {respStep < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{scenarios[respStep].q}"</p>
+                        <div style={{ display: 'grid', gap: '0.8rem' }}>
+                            {scenarios[respStep].options.map(opt => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(3)}
+                                    onClick={() => {
+                                        if (opt === scenarios[respStep].a) {
+                                            showToast("Responsible Choice! ✅", 'success');
+                                            setActiveFact({ term: "Responsibility Fact 🤝", fact: scenarios[respStep].hint });
+                                            if (respStep === 2) handlePillarComplete(3);
+                                            setRespStep(prev => prev + 1);
+                                        } else {
+                                            showToast(scenarios[respStep].hint, 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ textAlign: 'left', padding: '1rem', whiteSpace: 'normal', height: 'auto', opacity: (pillarTimer > 0 && !completedPillars.includes(3)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(3)) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center' }}>
-                    <h4 style={{ color: '#FF9800' }}>Legal Eagle Certified! 🛡️</h4>
-                    <p>You know your rights and the law.</p>
-                    <button onClick={() => setLawStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-play 🔄</button>
-                </div>
-            )}
-        </div>
-    );
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <h4 style={{ color: '#00C851' }}>Duty Accepted! 🏆</h4>
+                        <p>{isKid ? 'You are ready to build the nation.' : 'Your integrity strengthens the foundation of society.'}</p>
+                        <button onClick={() => setRespStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-test 🔄</button>
+                    </div>
+                )}
+            </div>
+        );
+    };
 
+    const renderLaw = () => {
+        const scenarios = isKid ? kidLawScenarios : (isTeen ? teenLawScenarios : adultLawScenarios);
+        return (
+            <div className="card" style={{ borderTop: '4px solid #FF9800' }}>
+                <h3>{isKid ? 'Legal Eagle Challenge' : (isTeen ? 'Contract & Digital Literacy' : 'The Law & The Professional')} 🦅</h3>
+                {lawStep < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{scenarios[lawStep].q}"</p>
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {scenarios[lawStep].options.map(opt => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(4)}
+                                    onClick={() => {
+                                        if (opt === scenarios[lawStep].a) {
+                                            showToast("Legal Mastery! ✅", 'success');
+                                            setActiveFact({ term: "Legal Wisdom ⚖️", fact: scenarios[lawStep].hint });
+                                            if (lawStep === 2) handlePillarComplete(4);
+                                            setLawStep(prev => prev + 1);
+                                        } else {
+                                            showToast(scenarios[lawStep].hint, 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(4)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(4)) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <h4 style={{ color: '#FF9800' }}>{isKid ? 'Legal Eagle Certified!' : 'Jurisprudence Mastery Achieved!'} 🛡️</h4>
+                        <p>{isKid ? 'You know your rights and the law.' : 'You are equipped to navigate the legal complexities of society.'}</p>
+                        <button onClick={() => setLawStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-play 🔄</button>
+                    </div>
+                )}
+            </div>
+        );
+    };
 
-    const projScenarios = [
+    // --- PILLAR 5: COMMUNITY PROJECTS (Advanced) ---
+    const [projStep, setProjStep] = useState(0);
+    const kidProjScenarios = [
         { q: "Level 1: Audit - What is the most pressing issue in your street today?", options: ["Blocked Drains", "Littering", "Broken Street-lights"], icon: "🔍" },
         { q: "Level 2: Mobilization - Who will you invite to your first meeting?", options: ["Neighbors & Friends", "Only Government officials", "Nobody, I'll do it alone"], icon: "🤝" },
         { q: "Level 3: The Pitch - How will you present your solution to the Chairman?", options: ["Written Proposal & Data", "Shouting & Protests", "Ignore it"], icon: "📝" }
     ];
 
-    const renderProjects = () => (
-        <div className="card" style={{ borderTop: '4px solid #E91E63' }}>
-            <h3>Village Hero Quest 🦸‍♂️</h3>
-            {projStep < 3 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{projScenarios[projStep].icon}</div>
-                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{projScenarios[projStep].q}</p>
-                    <div style={{ display: 'grid', gap: '0.8rem' }}>
-                        {projScenarios[projStep].options.map((opt, i) => (
-                            <button
-                                key={opt}
-                                disabled={pillarTimer > 0 && !completedPillars.includes(5)}
-                                onClick={() => {
-                                    if (i === 0) { // Simple "correct" first choice for flow
-                                        showToast("Great Leadership! 🚀", 'success');
-                                        setActiveFact({ term: "Civic Action Fact 🏗️", fact: "Collaboration is the key to sustainable community development." });
-                                        if (projStep === 2) handlePillarComplete(5);
-                                        setProjStep(prev => prev + 1);
-                                    } else {
-                                        showToast("Try a more collaborative approach!", 'warning');
-                                    }
-                                }}
-                                className="btn btn-outline"
-                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(5)) ? 0.5 : 1 }}
-                            >
-                                {opt} {(pillarTimer > 0 && !completedPillars.includes(5) && i === 0) && ` (${pillarTimer}s)`}
-                            </button>
-                        ))}
+    const teenProjScenarios = [
+        { q: "Level 1: Youth Mobilization - How do you attract volunteers for a park cleanup?", options: ["Social Media & Peer impact", "Pay them a small fee", "Wait for teachers"], icon: "📢" },
+        { q: "Level 2: Resource Mapping - Where can you find tools and support?", options: ["Local businesses & PTA", "Steal from the store", "Buy everything brand new"], icon: "🗺️" },
+        { q: "Level 3: Impact Pitch - How do you convince the Principal to support your club?", options: ["Presentation of Benefits", "Demand it as a right", "Quit school"], icon: "💡" }
+    ];
+
+    const adultProjScenarios = [
+        { q: "Level 1: Needs Assessment - How do you validate a community project idea?", options: ["Surveys & Townhall data", "Personal opinion", "Asking the Oracle"], icon: "📊" },
+        { q: "Level 2: Grant Writing - What is the most critical part of a funding proposal?", options: ["Measurable Outcomes & Budget", "Poetic descriptions", "Threatening to stop working"], icon: "🖋️" },
+        { q: "Level 3: Public-Private Partnership - How do you engage corporate CSR?", options: ["Align with their ESG goals", "Beg for charity", "Force them via laws"], icon: "🤝" }
+    ];
+
+    const renderProjects = () => {
+        const scenarios = isKid ? kidProjScenarios : (isTeen ? teenProjScenarios : adultProjScenarios);
+        return (
+            <div className="card" style={{ borderTop: '4px solid #E91E63' }}>
+                <h3>{isKid ? 'Village Hero Quest' : (isTeen ? 'Youth Impact Catalyst' : 'Community Solutions Architect')} 🦸‍♂️</h3>
+                {projStep < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{scenarios[projStep].icon}</div>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{scenarios[projStep].q}</p>
+                        <div style={{ display: 'grid', gap: '0.8rem' }}>
+                            {scenarios[projStep].options.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(5)}
+                                    onClick={() => {
+                                        if (i === 0) {
+                                            showToast("Great Leadership! 🚀", 'success');
+                                            setActiveFact({ term: "Civic Action Fact 🏗️", fact: "Collaboration is the key to sustainable community development." });
+                                            if (projStep === 2) handlePillarComplete(5);
+                                            setProjStep(prev => prev + 1);
+                                        } else {
+                                            showToast("Try a more collaborative approach!", 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(5)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(5) && i === 0) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center' }}>
-                    <h4 style={{ color: '#E91E63' }}>Village Hero Crowned! 👑</h4>
-                    <p>Your community is better because you led.</p>
-                    <button onClick={() => setProjStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Start New Project 🏗️</button>
-                </div>
-            )}
-        </div>
-    );
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <h4 style={{ color: '#E91E63' }}>{isKid ? 'Village Hero Crowned!' : 'Impact Catalyst Optimized!'} 👑</h4>
+                        <p>{isKid ? 'Your community is better because you led.' : 'You have the tools to transform your environment.'}</p>
+                        <button onClick={() => setProjStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Start New Project 🏗️</button>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // --- PILLAR 6: CIVIC TOOLS (Advanced) ---
+    const [toolStep, setToolStep] = useState(0);
+    const kidToolScenarios = [
+        { q: "Level 1: Verification - You get a WhatsApp message saying 'Click here for free money'. Do you click?", options: ["Delete & Ignore", "Click & Share", "Forward to friends"], icon: "📱" },
+        { q: "Level 2: Mapping - Where do you find the layout of your Local Government?", options: ["Official State Website", "Ask on Street", "Wait for election"], icon: "🗺️" },
+        { q: "Level 3: Reporting - You see a transformer sparking. Who do you call first?", options: ["Electric Co. / Emergency", "Nobody", "Call your friend"], icon: "📞" }
+    ];
+
+    const teenToolScenarios = [
+        { q: "Level 1: Freedom of Information (FOI) - How do you ask a school board for their budget?", options: ["Formal FOI Request", "Shouting in the hall", "Wait until graduation"], icon: "📂" },
+        { q: "Level 2: Digital Fact-Checking - Which tool helps verify a suspicious viral video?", options: ["Reverse Image Search", "Just believing it", "Sharing it to check"], icon: "🔍" },
+        { q: "Level 3: Online Petitions - What makes a petition more effective for change?", options: ["Specific ask & Evidence", "A lot of emojis", "Angry language"], icon: "🖋️" }
+    ];
+
+    const adultToolScenarios = [
+        { q: "Level 1: Administrative Law - How do you appeal a wrong tax assessment?", options: ["Tax Appeal Tribunal", "Not paying it", "Hiding your assets"], icon: "⚖️" },
+        { q: "Level 2: Lobbying - How do you influence high-level legislative change?", options: ["Professional Advocacy/Lobbying", "Bribery", "Twitter hashtags only"], icon: "🏛️" },
+        { q: "Level 3: Investigative Journalism - How do you support accountability?", options: ["Supporting credible media", "Ignoring news", "Spreading rumors"], icon: "🗞️" }
+    ];
 
 
     const toolScenarios = [
@@ -448,331 +535,414 @@ const Civics = ({ ageGroup }) => {
         { t: "Level 3: The Request 🕵️‍♂️", d: "Use the FOI Act to request project data.", c: "Under the FOI Act, I request the budget spent on [Project]...", icon: "📜" }
     ];
 
-    const renderTools = () => (
-        <div className="card" style={{ borderTop: '4px solid #607D8B' }}>
-            <h3>Civic Power Workshop 🛠️</h3>
-            {toolStep < 3 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{toolScenarios[toolStep].icon}</div>
-                    <h4>{toolScenarios[toolStep].t}</h4>
-                    <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>{toolScenarios[toolStep].d}</p>
-                    <div style={{ backgroundColor: '#111', padding: '1rem', borderRadius: '15px', position: 'relative', border: '1px solid #444' }}>
-                        <pre style={{ fontSize: '0.8rem', whiteSpace: 'pre-wrap', color: '#00C851' }}>{toolScenarios[toolStep].c}</pre>
+    const renderTools = () => {
+        const scenarios = isKid ? kidToolScenarios : (isTeen ? teenToolScenarios : adultToolScenarios);
+        const legacyScenarios = [ // Fallback for old render logic if needed, but better use age-based
+            { t: "Level 1: The Letter 📝", d: "Draft a formal complaint about power outages.", c: "To the DISCO Manager, I report persistent outages at [My Area]...", icon: "✉️" },
+            { t: "Level 2: The Petition ✍️", d: "Learn to build a digital petition for new roads.", c: "We the residents of [Area] demand fixed roads. Sign below!", icon: "🖋️" },
+            { t: "Level 3: The Request 🕵️‍♂️", d: "Use the FOI Act to request project data.", c: "Under the FOI Act, I request the budget spent on [Project]...", icon: "📜" }
+        ];
+
+        return (
+            <div className="card" style={{ borderTop: '4px solid #607D8B' }}>
+                <h3>{isKid ? 'Civic Helper Workshop' : (isTeen ? 'Digital Advocacy Hub' : 'The Professional Activist')} 🛠️</h3>
+                {toolStep < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{scenarios[toolStep].icon}</div>
+                        <h4>{scenarios[toolStep].q}</h4>
+                        <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                            {scenarios[toolStep].options.map(opt => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(6)}
+                                    onClick={() => {
+                                        // Simple logic: first option is best for flow
+                                        showToast("Tool Mastered! ✅", 'success');
+                                        setActiveFact({ term: "Civic Tool Insight 🛠️", fact: "Knowledge is the greatest tool for civic empowerment." });
+                                        if (toolStep === 2) handlePillarComplete(6);
+                                        setToolStep(prev => prev + 1);
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(6)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(6)) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button
-                            onClick={() => {
-                                navigator.clipboard.writeText(toolScenarios[toolStep].c);
-                                showToast("Template Copied! 📋", 'success');
-                            }}
-                            className="btn btn-outline"
-                        >
-                            Copy to Clipboard 📋
-                        </button>
-                        <button
-                            disabled={pillarTimer > 0 && !completedPillars.includes(6)}
-                            onClick={() => {
-                                setActiveFact({ term: "Civic Tool Insight 🛠️", fact: "Official correspondence and petitions are the DNA of democracy." });
-                                if (toolStep === 2) handlePillarComplete(6);
-                                setToolStep(prev => prev + 1);
-                            }}
-                            className="btn btn-primary"
-                            style={{ backgroundColor: '#607D8B', opacity: (pillarTimer > 0 && !completedPillars.includes(6)) ? 0.5 : 1 }}
-                        >
-                            Master Tool {toolStep + 1} {(pillarTimer > 0 && !completedPillars.includes(6)) && ` (${pillarTimer}s)`}
-                        </button>
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <h4 style={{ color: '#607D8B' }}>Workshop Complete! 🦾</h4>
+                        <p>You have the tools to hold any leader accountable.</p>
+                        <button onClick={() => setToolStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-visit Tools 🔄</button>
                     </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center' }}>
-                    <h4 style={{ color: '#607D8B' }}>Workshop Complete! 🦾</h4>
-                    <p>You have the tools to hold any leader accountable.</p>
-                    <button onClick={() => setToolStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-visit Tools 🔄</button>
-                </div>
-            )}
-        </div>
-    );
+                )}
+            </div>
+        );
+    };
 
 
-    const budgetScenarios = [
+    // --- PILLAR 7: BUDGET & MONEY (Advanced) ---
+    const [budgetStep, setBudgetStep] = useState(0);
+    const kidBudgetScenarios = [
         { q: "Level 1: The Audit - Where does most of our national tax money go?", options: ["Public Services (Health/Edu)", "Private Luxury", "Hidden accounts"], a: 0, fact: "Taxes fund the infrastructure we all use—like roads and hospitals." },
         { q: "Level 2: Allocation - You have ₦100. How do you split it fairly?", options: ["Spread across all sectors", "Give it all to one friend", "Keep it in a safe"], a: 0, fact: "A balanced budget ensures no sector of society is left behind." },
         { q: "Level 3: Revenue - Where does the government get money to build?", options: ["Taxes & Resources", "It's free", "Borrowing only"], a: 0, fact: "Citizen taxes and natural resources are the primary fuel for development." }
     ];
 
-    const renderBudget = () => (
-        <div className="card" style={{ borderTop: '4px solid #FFEB3B' }}>
-            <h3 style={{ color: '#FFEB3B' }}>National Budget Master 💰</h3>
-            {budgetStep < 3 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{budgetScenarios[budgetStep].q}</p>
-                    <div style={{ display: 'grid', gap: '0.8rem' }}>
-                        {budgetScenarios[budgetStep].options.map((opt, i) => (
-                            <button
-                                key={opt}
-                                disabled={pillarTimer > 0 && !completedPillars.includes(7)}
-                                onClick={() => {
-                                    if (i === budgetScenarios[budgetStep].a) {
-                                        showToast(budgetScenarios[budgetStep].fact, 'success');
-                                        setActiveFact({ term: "Budgeting Fact 🎓", fact: budgetScenarios[budgetStep].fact });
-                                        if (budgetStep === 2) handlePillarComplete(7);
-                                        setBudgetStep(prev => prev + 1);
-                                    } else {
-                                        showToast("Try a more sustainable choice!", 'warning');
-                                    }
-                                }}
-                                className="btn btn-outline"
-                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(7)) ? 0.5 : 1 }}
-                            >
-                                {opt} {(pillarTimer > 0 && !completedPillars.includes(7) && i === 0) && ` (${pillarTimer}s)`}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
-                    <h4 style={{ color: '#FFEB3B' }}>Financial Freedom Master! 🏆</h4>
-
-                    <div style={{ backgroundColor: 'rgba(255, 235, 59, 0.1)', padding: '1.2rem', borderRadius: '15px', margin: '1rem 0', borderLeft: '4px solid #FFEB3B', textAlign: 'left' }}>
-                        <p style={{ fontStyle: 'italic', marginBottom: '0.5rem', color: '#fff', fontSize: '1rem' }}>
-                            "External support is not evil. It becomes harmful only when it replaces local effort instead of strengthening it."
-                        </p>
-                        <p style={{ fontSize: '0.85rem', color: '#aaa' }}>This is the core of true independence and national growth.</p>
-                    </div>
-
-                    <div style={{ backgroundColor: '#111', padding: '1.5rem', borderRadius: '20px', border: '1px dashed #444', marginTop: '1.5rem', textAlign: 'left' }}>
-                        <h5 style={{ color: '#FFEB3B', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span>📝</span> Habit Building Reflection
-                        </h5>
-                        <p style={{ fontSize: '0.95rem', color: '#ccc', marginBottom: '1rem', lineHeight: '1.5' }}>
-                            <strong>1.</strong> Name one problem in your community that can be resolved <strong>without</strong> waiting for government, donors, or loans.
-                        </p>
-                        <p style={{ fontSize: '0.95rem', color: '#ccc', lineHeight: '1.5' }}>
-                            <strong>2.</strong> If your community received ₦1m today, what would ensure it creates <strong>lasting value</strong> instead of dependency?
-                        </p>
-                    </div>
-
-                    <button onClick={() => setBudgetStep(0)} className="btn btn-sm" style={{ marginTop: '2rem' }}>Re-study Budget 🔄</button>
-                </div>
-            )}
-        </div>
-    );
-
-    const [ethicsStage, setEthicsStage] = useState(0);
-    const renderEthics = () => (
-        <div className="card" style={{ borderTop: '4px solid #00BCD4' }}>
-            <h3><Term name="Integrity" /> Simulation 💎</h3>
-            {ethicsStage === 0 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p><strong>Whistleblower Scenario:</strong> You discover a senior official is diverting funds meant for a new primary school in your {currentCountryData.name === "Nigeria" ? "LGA" : "district"}.</p>
-                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button onClick={() => {
-                            setActiveFact({ term: "Integrity Secret 💎", fact: "Integrity means doing the right thing for the community, even when it's difficult." });
-                            setEthicsStage(1);
-                        }} className="btn btn-outline" style={{ color: '#00C851' }}>Report anonymously 📞</button>
-                        <button onClick={() => showToast("Silence helps corruption grow.", 'error')} className="btn btn-outline" style={{ color: '#ff4444' }}>Stay silent 🤐</button>
-                        <button onClick={() => showToast("Bribery is a crime!", 'error')} className="btn btn-outline" style={{ color: '#FFD700' }}>Ask for a cut 💰</button>
-                    </div>
-                </div>
-            ) : ethicsStage === 1 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p>The official offers you {currency}500,000 to delete the evidence. What do you do?</p>
-                    <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                        <button onClick={() => {
-                            setActiveFact({ term: "Patriotism Fact 💎", fact: "Rejecting corruption is the greatest act of patriotism a citizen can perform." });
-                            setEthicsStage(2);
-                        }} className="btn btn-outline" style={{ color: '#00C851' }}>Reject & Expose 💎</button>
-                        <button onClick={() => { setEthicsStage(0); showToast("Integrity Lost! Try again.", 'error'); }} className="btn btn-outline" style={{ color: '#ff4444' }}>Take the money ❌</button>
-                    </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💎</div>
-                    <h4 style={{ color: '#00BCD4' }}>Man of Integrity!</h4>
-                    <p>You protected the future of {countryName}'s children.</p>
-                    <button
-                        disabled={pillarTimer > 0 && !completedPillars.includes(8)}
-                        onClick={() => handlePillarComplete(8)}
-                        className="btn"
-                        style={{ backgroundColor: '#00BCD4', width: '100%', marginTop: '1.5rem', opacity: (pillarTimer > 0 && !completedPillars.includes(8)) ? 0.5 : 1 }}
-                    >
-                        Complete Pillar 8 {(pillarTimer > 0 && !completedPillars.includes(8)) && ` (${pillarTimer}s)`}
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-
-
-    const leadershipScenarios = [
-        { q: "Level 1: Empathy - A citizen says, 'I can't afford the new toll.' Your response?", options: ["Listen & seek alternatives", "Tell them to pay or leave", "Ignore them"], a: 0, fact: "A leader's first duty is to hear the heart of the people." },
-        { q: "Level 2: Conflict - Two market groups are fighting over space. Action?", options: ["Mediate a fair rotation", "Side with the richer group", "Ban both groups"], a: 0, fact: "Peaceful mediation is stronger than forceful command." },
-        { q: "Level 3: Integrity - You have extra budget. How do you use it?", options: ["Public water projects", "Vacation for yourself", "Hide it for later"], a: 0, fact: "Integrity is doing the right work when nobody is watching." }
+    const teenBudgetScenarios = [
+        { q: "Level 1: Transparency - What is the 'Power of the Purse'?", options: ["Legislature's power to approve spending", "Having a lot of money", "Secret spending"], a: 0, fact: "The Legislature must approve every cent the Executive spends." },
+        { q: "Level 2: National Debt - When is borrowing money by a country okay?", options: ["To build lasting infrastructure", "To pay salaries", "To buy luxury cars"], a: 0, fact: "Debt should only be used for investments that create future wealth." },
+        { q: "Level 3: Fiscal Responsibility - Why should a country save in a 'Rainy Day' fund?", options: ["For economic emergencies", "To hide money from citizens", "Because it's a trend"], a: 0, fact: "Sovereign Wealth Funds protect countries during global financial crises." }
     ];
 
-    const renderLeadership = () => (
-        <div className="card" style={{ borderTop: '4px solid #795548' }}>
-            <h3>Service-First Leadership 🧠</h3>
-            {leadStep < 3 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{leadershipScenarios[leadStep].q}</p>
-                    <div style={{ display: 'grid', gap: '0.8rem' }}>
-                        {leadershipScenarios[leadStep].options.map((opt, i) => (
-                            <button
-                                key={opt}
-                                disabled={pillarTimer > 0 && !completedPillars.includes(9)}
-                                onClick={() => {
-                                    if (i === 0) {
-                                        showToast(leadershipScenarios[leadStep].fact, 'success');
-                                        setActiveFact({ term: "Leadership Fact 🎓", fact: leadershipScenarios[leadStep].fact });
-                                        if (leadStep === 2) handlePillarComplete(9);
-                                        setLeadStep(prev => prev + 1);
-                                    } else {
-                                        showToast("Leaders must prioritize the people!", 'warning');
-                                    }
-                                }}
-                                className="btn btn-outline"
-                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(9)) ? 0.5 : 1 }}
-                            >
-                                {opt} {(pillarTimer > 0 && !completedPillars.includes(9) && i === 0) && ` (${pillarTimer}s)`}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center' }}>
-                    <h4 style={{ color: '#795548' }}>Servant Leader Confirmed! 🕊️</h4>
-                    <p>You lead to build, not just to rule.</p>
-                    <button onClick={() => setLeadStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-lead 🔄</button>
-                </div>
-            )}
-        </div>
-    );
-
-    const localScenarios = [
-        { q: "Level 1: Who's Who - My local primary school needs new desks. Who should I call first?", options: ["LGA Chairman / Councillor", "The President", "The Army"], a: 0, fact: "Local government is the closest tier to the people's immediate needs." },
-        { q: "Level 2: Townhall - How do we decide which street gets water first?", options: ["Open community meeting", "Pick your cousins street", "Wait for Abuja"], a: 0, fact: "Transparency in local decisions builds community trust." },
-        { q: "Level 3: Engagement - You want to follow up on a project. Best way?", options: ["Write to your Ward Rep", "Shout on the highway", "Do nothing"], a: 0, fact: "Formal engagement with your Ward Representative is the most effective path for local change." }
+    const adultBudgetScenarios = [
+        { q: "Level 1: Macroeconomics - What is the difference between a Deficit and a Surplus?", options: ["Deficit: Spending > Revenue", "Surplus: Spending > Revenue", "They are the same"], a: 0, fact: "Managing a deficit is a key part of fiscal policy." },
+        { q: "Level 2: Resource Management - What is the 'Natural Resource Curse'?", options: ["Dependence on one export (like oil)", "Resources disappearing", "Ghost stories"], a: 0, fact: "Diversifying the economy is essential to avoid the resource curse." },
+        { q: "Level 3: Social Auditing - How can citizens track local budget performance?", options: ["Reviewing Open Budget portals", "Waiting for news", "Asking the neighbor"], a: 0, fact: "Many governments now publish open data for citizen oversight." }
     ];
 
-    const renderLocal = () => (
-        <div className="card" style={{ borderTop: '4px solid #3F51B5' }}>
-            <h3>LGA Hero Quest 🏘️</h3>
-            {localStep < 3 ? (
-                <div style={{ animation: 'fadeIn 0.5s' }}>
-                    <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{localScenarios[localStep].q}</p>
-                    <div style={{ display: 'grid', gap: '0.8rem' }}>
-                        {localScenarios[localStep].options.map((opt, i) => (
-                            <button
-                                key={opt}
-                                disabled={pillarTimer > 0 && !completedPillars.includes(10)}
-                                onClick={() => {
-                                    if (i === 0) {
-                                        showToast(localScenarios[localStep].fact, 'success');
-                                        setActiveFact({ term: "Local Govt Fact 🎓", fact: localScenarios[localStep].fact });
-                                        if (localStep === 2) handlePillarComplete(10);
-                                        setLocalStep(prev => prev + 1);
-                                    } else {
-                                        showToast("Engage your most local representatives first!", 'warning');
-                                    }
-                                }}
-                                className="btn btn-outline"
-                                style={{ opacity: (pillarTimer > 0 && !completedPillars.includes(10)) ? 0.5 : 1 }}
-                            >
-                                {opt} {(pillarTimer > 0 && !completedPillars.includes(10) && i === 0) && ` (${pillarTimer}s)`}
-                            </button>
-                        ))}
+    const renderBudget = () => {
+        const scenarios = isKid ? kidBudgetScenarios : (isTeen ? teenBudgetScenarios : adultBudgetScenarios);
+        return (
+            <div className="card" style={{ borderTop: '4px solid #FFEB3B' }}>
+                <h3 style={{ color: '#FFEB3B' }}>{isKid ? 'National Budget Master' : (isTeen ? 'Fiscal Navigator' : 'The Wealth of Nations')} 💰</h3>
+                {budgetStep < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{scenarios[budgetStep].q}</p>
+                        <div style={{ display: 'grid', gap: '0.8rem' }}>
+                            {scenarios[budgetStep].options.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(7)}
+                                    onClick={() => {
+                                        if (i === scenarios[budgetStep].a) {
+                                            showToast(scenarios[budgetStep].fact, 'success');
+                                            setActiveFact({ term: "Budgeting Fact 🎓", fact: scenarios[budgetStep].fact });
+                                            if (budgetStep === 2) handlePillarComplete(7);
+                                            setBudgetStep(prev => prev + 1);
+                                        } else {
+                                            showToast("Try a more sustainable choice!", 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(7)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(7) && i === 0) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <div style={{ textAlign: 'center' }}>
-                    <h4 style={{ color: '#3F51B5' }}>LGA Hero Certified! 🏘️</h4>
-                    <p>You are an active partner in local progress.</p>
-                    <button onClick={() => setLocalStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-engage 🔄</button>
-                </div>
-            )}
-        </div>
-    );
+                ) : (
+                    <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
+                        <h4 style={{ color: '#FFEB3B' }}>Financial Freedom Master! 🏆</h4>
+                        <div style={{ backgroundColor: 'rgba(255, 235, 59, 0.1)', padding: '1.2rem', borderRadius: '15px', margin: '1rem 0', borderLeft: '4px solid #FFEB3B', textAlign: 'left' }}>
+                            <p style={{ fontStyle: 'italic', marginBottom: '0.5rem', color: '#fff', fontSize: '1rem' }}>
+                                "External support is not evil. It becomes harmful only when it replaces local effort instead of strengthening it."
+                            </p>
+                        </div>
+                        <button onClick={() => setBudgetStep(0)} className="btn btn-sm" style={{ marginTop: '2rem' }}>Re-study Budget 🔄</button>
+                    </div>
+                )}
+            </div>
+        );
+    };
 
-
-    const [simStep, setSimStep] = useState(0);
-
-    const renderSimulator = () => {
-        const roles = [
-            { t: 'President', color: '#FFD700', d: 'Lead the entire nation and manage federal resources.' },
-            { t: 'Governor', color: '#00C851', d: 'Manage a state and focus on local infrastructure and education.' },
-            { t: 'Minister', color: '#2196F3', d: 'Advise the President and execute specialized policies.' }
-        ];
-
-        const priorities = [
-            { t: 'Education', icon: '📚', d: 'Focus on schools, teachers, and student welfare.' },
-            { t: 'Economy', icon: '📈', d: 'Focus on business growth, jobs, and inflation control.' },
-            { t: 'Security', icon: '🛡️', d: 'Focus on safety, community policing, and ending crime.' }
+    // --- PILLAR 8: ETHICS (Advanced) ---
+    const renderEthics = () => {
+        const scenarios = isKid ? [
+            { q: "You found ₦50 on the playground. What's the right thing to do?", options: ["Give to teacher to find owner", "Keep it for candy", "Give to your best friend"], a: 0, hint: "Honesty build a better school for everyone." },
+            { q: "A friend asks you to lie to their parents about where they were.", options: ["Refuse politely", "Help them lie", "Tell everyone"], a: 0, hint: "Integrity is about being truthful even when it's hard." },
+            { q: "You broke a window while playing. Do you admit it?", options: ["Yes, and offer to help fix it", "Run away", "Blame someone else"], a: 0, hint: "Taking responsibility is the mark of a hero." }
+        ] : isTeen ? [
+            { q: "Academic Integrity: A friend offers you the answers to the math test.", options: ["Refuse and study harder", "Accept them to pass", "Report the friend immediately"], a: 0, hint: "Cheating devalues your education and your character." },
+            { q: "Peer Pressure: Everyone is sharing a private photo of a classmate.", options: ["Delete it and don't share", "Share it to feel included", "Show it to your parents"], a: 0, hint: "Respecting others' privacy is a digital responsibility." },
+            { q: "Social Ethics: You see someone being treated unfairly because of their tribe.", options: ["Stand up for them", "Join in the teasing", "Stay silent"], a: 0, hint: "A leader stands up for justice, even when they are alone." }
+        ] : [
+            { q: "Corporate Integrity: You discover your company is dumping waste illegally.", options: ["Report to environmental agency", "Keep quiet for your bonus", "Quit without saying anything"], a: 0, hint: "Professional ethics protect the health of the entire nation." },
+            { q: "Anti-Corruption: A contractor offers you a kickback to win a bid.", options: ["Report the bribe attempt", "Take it once 'for charity'", "Ignore it and award them anyway"], a: 0, hint: "Corruption is the biggest obstacle to our national progress." },
+            { q: "Public Office: You have the power to hire a relative who is unqualified.", options: ["Hiring based on merit only", "Give them the job", "Create a fake position"], a: 0, hint: "Meritocracy ensures the best people serve the people." }
         ];
 
         return (
-            <div className="card" style={{ borderTop: '4px solid #FFD700', maxWidth: '600px', margin: '0 auto' }}>
-                <h3 style={{ color: '#FFD700' }}>Statecraft Simulator 🏆</h3>
+            <div className="card" style={{ borderTop: '4px solid #00BCD4' }}>
+                <h3>{isKid ? 'The Integrity Shield' : (isTeen ? 'Ethics & Peer Power' : 'The Pillar of Integrity')} 💎</h3>
+                {ethicsStage < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>"{scenarios[ethicsStage].q}"</p>
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {scenarios[ethicsStage].options.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(8)}
+                                    onClick={() => {
+                                        if (i === 0) {
+                                            showToast("Integrity Upheld! 💎", 'success');
+                                            setActiveFact({ term: "Ethics Fact 💎", fact: scenarios[ethicsStage].hint });
+                                            if (ethicsStage === 2) handlePillarComplete(8);
+                                            setEthicsStage(prev => prev + 1);
+                                        } else {
+                                            showToast("Think about the long-term character!", 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(8)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(8) && i === 0) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <h4 style={{ color: '#00BCD4' }}>Man of Integrity! 🛡️</h4>
+                        <p>{isKid ? 'You protected your heart.' : 'Your character is a beacon for the nation.'}</p>
+                        <button onClick={() => setEthicsStage(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-study Ethics 🔄</button>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+
+    // --- PILLAR 9: LEADERSHIP (Advanced) ---
+    const renderLeadership = () => {
+        const scenarios = isKid ? [
+            { q: "Level 1: Kindness - A citizen is hungry. Your response?", options: ["Share food & resources", "Tell them to work harder", "Ignore them"], a: 0, fact: "Kindness is the first step of a great leader." },
+            { q: "Level 2: Teamwork - Your community needs to build a well. Action?", options: ["Call everyone to help", "Do it all alone", "Wait for someone else"], a: 0, fact: "True leaders bring people together." },
+            { q: "Level 3: Honesty - You found a bag of money. What now?", options: ["Report to Authorities", "Keep it for toys", "Give to friends"], a: 0, fact: "Honesty build trust." }
+        ] : isTeen ? [
+            { q: "Level 1: Vision - Your school needs a green club. How do you start?", options: ["Present a 1-year plan", "Demand it from Principal", "Hope someone else does it"], a: 0, fact: "Vision is seeing the future clearly." },
+            { q: "Level 2: Crisis - A flash flood hits the neighborhood. Your role?", options: ["Organize emergency help", "Panic and run", "Wait for news"], a: 0, fact: "Leadership is calm during the storm." },
+            { q: "Level 3: Ethics - A friend asks you to leak exam questions. Response?", options: ["Refuse and explain why", "Do it to 'help' them", "Keep quiet but do it"], a: 0, fact: "Ethics is the compass of power." }
+        ] : [
+            { q: "Level 1: Strategy - The national power grid is failing. First step?", options: ["Diversify energy sources", "Blame the previous team", "Ignore the data"], a: 0, fact: "Strategic thinking solves root causes." },
+            { q: "Level 2: Diplomacy - Two neighboring states are in a border dispute.", options: ["Negotiate a trade deal", "Send the military", "Ignore the conflict"], a: 0, fact: "Diplomacy is the highest form of leadership." },
+            { q: "Level 3: Legacy - How do you want to be remembered after 4 years?", options: ["By the institutions built", "By the wealth acquired", "By the enemies defeated"], a: 0, fact: "Legacy is what lives after the leader leaves." }
+        ];
+
+        return (
+            <div className="card" style={{ borderTop: '4px solid #795548' }}>
+                <h3>{isKid ? 'Kind Leader Academy' : (isTeen ? 'Visionary Leadership' : 'The Statesman\'s Path')} 🧠</h3>
+                {leadStep < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>"{scenarios[leadStep].q}"</p>
+                        <div style={{ display: 'grid', gap: '0.8rem' }}>
+                            {scenarios[leadStep].options.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(9)}
+                                    onClick={() => {
+                                        if (i === 0) {
+                                            showToast("Visionary Leadership! 🚀", 'success');
+                                            setActiveFact({ term: "Leadership Fact 🧠", fact: scenarios[leadStep].fact });
+                                            if (leadStep === 2) handlePillarComplete(9);
+                                            setLeadStep(prev => prev + 1);
+                                        } else {
+                                            showToast("Think about the common good!", 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(9)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(9) && i === 0) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <h4 style={{ color: '#795548' }}>{isKid ? 'Hero Leader!' : 'Statesman Recognized!'} 👑</h4>
+                        <p>{isKid ? 'You led with your heart.' : 'You have the strategic mind to lead a nation.'}</p>
+                        <button onClick={() => setLeadStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-study Leadership 🔄</button>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // --- PILLAR 10: LOCAL GOVERNANCE (Advanced) ---
+    const renderLocal = () => {
+        const scenarios = isKid ? [
+            { q: "Who is the leader closest to your home?", options: ["The Councillor", "The President", "The King"], a: 0, fact: "Councillors manage your immediate Ward." },
+            { q: "Where do you go to report 1 broken street light?", options: ["LGA Office", "The Hospital", "The School"], a: 0, fact: "The Local Government Area (LGA) handles local maintenance." },
+            { q: "What is a 'Townhall' meeting?", options: ["Where neighbours discuss issues", "A party", "A type of school"], a: 0, fact: "Townhalls are the heartbeat of local democracy." }
+        ] : isTeen ? [
+            { q: "How can a student influence local government?", options: ["Organizing a Youth Townhall", "Voting (but I'm under 18)", "Doing nothing"], a: 0, fact: "Youth organizations have a powerful voice at the local level." },
+            { q: "Why is the Ward Councillor's phone number important?", options: ["To report community issues", "To ask for money", "For prank calls"], a: 0, fact: "Direct communication is vital for local accountability." },
+            { q: "What is a community 'Bylaw'?", options: ["A local rule made by the LGA", "A national law", "A secret code"], a: 0, fact: "LGAs have the power to make specific rules for their area." }
+        ] : [
+            { q: "Public Hearing: A new market development is proposed. Action?", options: ["Review plans and submit feedback", "Wait for it to be built", "Complain after it's done"], a: 0, fact: "Public hearings are legal requirements for community input." },
+            { q: "Budget Defense: Your LGA chairman presents a project list.", options: ["Verify project survival & cost", "Clap for chairman", "Ignore it"], a: 0, fact: "Citizen oversight ensures local funds are used properly." },
+            { q: "Local Taxation: Why pay land rates to the LGA?", options: ["To fund local waste & roads", "To make chairman rich", "Because it's a gift"], a: 0, fact: "Local taxes fund the services in your immediate area." }
+        ];
+
+        return (
+            <div className="card" style={{ borderTop: '4px solid #3F51B5' }}>
+                <h3>{isKid ? 'LGA Hero Quest' : (isTeen ? 'Local Impact Lab' : 'Municipal Oversight')} 🏘️</h3>
+                {localStep < 3 ? (
+                    <div style={{ animation: 'fadeIn 0.5s' }}>
+                        <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem', textAlign: 'center' }}>Step {localStep + 1}</p>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>"{scenarios[localStep].q}"</p>
+                        <div style={{ display: 'grid', gap: '0.8rem' }}>
+                            {scenarios[localStep].options.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    disabled={pillarTimer > 0 && !completedPillars.includes(10)}
+                                    onClick={() => {
+                                        if (i === scenarios[localStep].a) {
+                                            showToast("Local Insight Gained! 🏘️", 'success');
+                                            setActiveFact({ term: "Local Gov Fact 🏗️", fact: scenarios[localStep].fact });
+                                            if (localStep === 2) handlePillarComplete(10);
+                                            setLocalStep(prev => prev + 1);
+                                        } else {
+                                            showToast("Think about local accountability!", 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{ height: 'auto', whiteSpace: 'normal', padding: '1rem', opacity: (pillarTimer > 0 && !completedPillars.includes(10)) ? 0.5 : 1 }}
+                                >
+                                    {opt} {(pillarTimer > 0 && !completedPillars.includes(10) && i === 0) && ` (${pillarTimer}s)`}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ textAlign: 'center' }}>
+                        <h4 style={{ color: '#3F51B5' }}>Local Governance Master! 🎖️</h4>
+                        <p>You are an active partner in local progress.</p>
+                        <button onClick={() => setLocalStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Re-engage 🔄</button>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // --- PILLAR 11: STATECRAFT SIMULATOR (Advanced) ---
+    const renderSimulator = () => {
+        const roles = [
+            { t: 'President', color: '#FFD700', d: isKid ? 'Lead the whole country' : 'Federal Policy & Resources' },
+            { t: 'Governor/Senator', color: '#00C851', d: isKid ? 'Lead your state' : 'Legislative & State Oversight' },
+            { t: 'Strategic Minister', color: '#2196F3', d: isKid ? 'Help the President' : 'Institutional Innovation' }
+        ];
+
+        const priorities = isKid ? [
+            { t: 'Education', icon: '📚', d: 'Schools & Teachers' },
+            { t: 'Economy', icon: '📈', d: 'Helping people earn money' },
+            { t: 'Security', icon: '🛡️', d: 'Keeping everyone safe' }
+        ] : [
+            { t: 'Human Capital', icon: '🧠', d: 'Education, Health & R&D' },
+            { t: 'Infrastructural Surplus', icon: '🏗️', d: 'Energy, Rails & Digital' },
+            { t: 'Systemic Transparency', icon: '⚖️', d: 'Anti-Corruption & Rule of Law' }
+        ];
+
+        const scenarios = isAdult ? [
+            { q: "Fiscal Policy Crisis: Inflation is rising. Your move?", options: ["Restrict spending & hike interest", "Print more money", "Fix prices manually"], a: 0, fact: "Macroeconomic stability requires painful but necessary fiscal discipline." },
+            { q: "Diplomatic Strain: A neighbor is violating trade treaties.", options: ["Negotiate via Regional Bloc", "Declare immediate war", "Do nothing"], a: 0, fact: "Multilateral diplomacy is the engine of regional prosperity." },
+            { q: "Institutional Reform: Civil service is slow and corrupt.", options: ["Digitize & Merit-based hiring", "Hire more relatives", "Blame the citizens"], a: 0, fact: "Technology and meritocracy are the cures for bureaucratic stagnation." }
+        ] : (isTeen ? [
+            { q: "Budget Choice: You have extra revenue. Where does it go?", options: ["Youth Entrepreneurship Fund", "Buying new SUVs for staff", "Building another statue"], a: 0, fact: "Investing in youth is the highest ROI for any nation." },
+            { q: "Media Crisis: Fake news is causing a panic.", options: ["Fact-check & Public address", "Ban social media", "Ignore it"], a: 0, fact: "A leader must communicate truth in the face of chaos." },
+            { q: "Pollution Incident: A factory is polluting the river.", options: ["Heavy fines & Remediation", "Take a bribe to hide it", "Close the factory forever"], a: 0, fact: "Balance economic growth with environmental sustainability." }
+        ] : [
+            { q: "Crisis: The playground is broken.", options: ["Organize a repair day", "Cry", "Blame the principal"], a: 0, fact: "Leaders take action to solve problems." },
+            { q: "Teamwork: Everyone is arguing over the ball.", options: ["Set up a fair rotation", "Take the ball away", "Join the fight"], a: 0, fact: "Peace is better for everyone." },
+            { q: "Honesty: You find a phone on the chair.", options: ["Give to Lost & Found", "Keep it", "Tell a friend"], a: 0, fact: "Doing the right thing build trust." }
+        ]);
+
+        return (
+            <div className="card" style={{ borderTop: '4px solid #FFD700' }}>
+                <h3 style={{ color: '#FFD700' }}>{isKid ? 'Hero Simulator' : 'Statecraft Excellence'} 🏆</h3>
                 {simStep === 0 ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
-                        <p>Choose your leadership role to begin:</p>
+                        <p>Select your leadership role:</p>
                         <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
                             {roles.map(r => (
                                 <button
                                     key={r.t}
                                     onClick={() => { setSimRole(r.t); setSimStep(1); }}
                                     className="btn btn-outline"
-                                    style={{ textAlign: 'left', padding: '1rem', borderColor: r.color }}
+                                    style={{
+                                        borderColor: r.color,
+                                        height: 'auto',
+                                        whiteSpace: 'normal',
+                                        flexDirection: 'column',
+                                        padding: '1.2rem',
+                                        textAlign: 'center',
+                                        width: '100%',
+                                        display: 'flex',
+                                        wordBreak: 'break-word'
+                                    }}
                                 >
-                                    <strong style={{ color: r.color }}>{r.t}</strong>
-                                    <p style={{ fontSize: '0.8rem', margin: '0.3rem 0', color: '#aaa' }}>{r.d}</p>
+                                    <strong style={{ color: r.color, display: 'block', marginBottom: '0.5rem' }}>{r.t}</strong>
+                                    <p style={{ fontSize: '0.85rem', color: '#aaa', margin: 0, lineHeight: '1.4' }}>{r.d}</p>
                                 </button>
                             ))}
                         </div>
                     </div>
                 ) : simStep === 1 ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
-                        <p>As **{simRole}**, what is your #1 national priority?</p>
+                        <p>Define your core strategic pillar:</p>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
                             {priorities.map(p => (
                                 <button
                                     key={p.t}
                                     onClick={() => { setSimPriority(p.t); setSimStep(2); }}
                                     className="btn btn-outline"
-                                    style={{ height: '120px' }}
+                                    style={{
+                                        height: 'auto',
+                                        whiteSpace: 'normal',
+                                        flexDirection: 'column',
+                                        padding: '1.2rem',
+                                        width: '100%',
+                                        display: 'flex',
+                                        wordBreak: 'break-word'
+                                    }}
                                 >
-                                    <span style={{ fontSize: '2rem' }}>{p.icon}</span><br />
-                                    <strong>{p.t}</strong>
+                                    <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>{p.icon}</span>
+                                    <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{p.t}</strong>
+                                    <p style={{ fontSize: '0.75rem', color: '#aaa', margin: 0 }}>{p.d}</p>
                                 </button>
                             ))}
                         </div>
                     </div>
-                ) : simStep === 2 ? (
+                ) : simStep < 5 ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
-                        <p><strong>🚨 NATIONAL CRISIS:</strong> A major strike has broken out in the **{simPriority}** sector! Citizens are losing patience.</p>
-                        <p style={{ fontSize: '0.9rem', color: '#aaa', marginTop: '0.5rem' }}>How do you resolve it?</p>
+                        <p><strong>🚨 Challenge {simStep - 1}:</strong> {scenarios[simStep - 2].q}</p>
                         <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
-                            <button onClick={() => setSimStep(3)} className="btn btn-outline" style={{ color: '#00C851' }}>Dialog & Compromise 🤝</button>
-                            <button onClick={() => { setSimStep(0); showToast("Citizens are unhappy with force!", 'error'); }} className="btn btn-outline" style={{ color: '#ff4444' }}>Force & Arrests ❌</button>
-                            <button onClick={() => { setSimStep(0); showToast("Silence makes it worse!", 'error'); }} className="btn btn-outline" style={{ color: '#FFD700' }}>Ignore & Hope it goes away 🤐</button>
+                            {scenarios[simStep - 2].options.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    onClick={() => {
+                                        if (i === 0) {
+                                            showToast("Statecraft Insight Gained!", 'success');
+                                            if (simStep === 4) handlePillarComplete(11);
+                                            setSimStep(prev => prev + 1);
+                                        } else {
+                                            showToast(scenarios[simStep - 2].fact, 'warning');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                    style={{
+                                        height: 'auto',
+                                        whiteSpace: 'normal',
+                                        padding: '1rem 1.5rem',
+                                        width: '100%',
+                                        display: 'flex',
+                                        wordBreak: 'break-word'
+                                    }}
+                                >
+                                    {opt}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 ) : (
-                    <div style={{ textAlign: 'center', animation: 'fadeIn 0.5s' }}>
-                        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>👑</div>
-                        <h4 style={{ color: '#FFD700' }}>Leadership Mastery: Complete!</h4>
-                        <p>You led with wisdom as **{simRole}**. Your legacy of **{simPriority}** is secure.</p>
-                        <button
-                            disabled={pillarTimer > 0 && !completedPillars.includes(11)}
-                            onClick={() => {
-                                setActiveFact({ term: "Leadership Legacy 👑", fact: "True leadership is about leaving a legacy of service that outlasts your time in office." });
-                                handlePillarComplete(11);
-                            }}
-                            className="btn"
-                            style={{ backgroundColor: '#FFD700', color: 'black', width: '100%', marginTop: '1.5rem', opacity: (pillarTimer > 0 && !completedPillars.includes(11)) ? 0.5 : 1 }}
-                        >
-                            Claim Your Legacy 🏆 {(pillarTimer > 0 && !completedPillars.includes(11)) && ` (${pillarTimer}s)`}
-                        </button>
+                    <div style={{ textAlign: 'center', animation: 'fadeIn 1s' }}>
+                        <div style={{ fontSize: '4rem' }}>👑</div>
+                        <h4>Legacy Confirmed!</h4>
+                        <p>Your leadership has strengthened the foundations of the nation.</p>
+                        <button onClick={() => setSimStep(0)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Lead Again 🔄</button>
                     </div>
                 )}
             </div>
@@ -886,7 +1056,7 @@ const Civics = ({ ageGroup }) => {
                         )}
                     </div>
                 </div>
-            </div>
+            </div >
 
 
             {/* CIVIC FACT MODAL */}
@@ -1081,7 +1251,7 @@ const Civics = ({ ageGroup }) => {
                 }
             `}</style>
 
-        </div>
+        </div >
     );
 };
 
