@@ -21,6 +21,14 @@ const Agripreneurship = () => {
     const [weather, setWeather] = useState('Sunny ☀️');
     const [activeTab, setActiveTab] = useState('farm'); // farm, soil, business, future
     const [toast, setToast] = useState(null);
+    const [showTechQuiz, setShowTechQuiz] = useState(false);
+    const [pendingUpgrade, setPendingUpgrade] = useState(null);
+
+    const techQuizzes = {
+        solar: { q: "Why is solar irrigation better for climate resilience?", options: ["It depends on rain", "It provides constant energy without fuel costs", "It makes the crops taste like sun"], a: 1 },
+        seeds: { q: "What is the main benefit of drought-resistant seeds?", options: ["They need more water", "They can survive heatwaves", "They grow into giant trees"], a: 1 },
+        vertical: { q: "How does vertical farming improve sustainability?", options: ["It uses more land", "It saves space and uses 90% less water", "It's closer to the clouds"], a: 1 }
+    };
 
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
@@ -154,15 +162,23 @@ const Agripreneurship = () => {
             return;
         }
         if (money >= cost && !upgrades[type]) {
-            setMoney(prev => prev - cost);
-            setUpgrades(prev => ({ ...prev, [type]: true }));
-            setClimateResilience(prev => prev + resilienceBoost);
-            showToast(`${type.toUpperCase()} Upgrade Installed! Resilience +${resilienceBoost}% 🌍`, 'success');
+            setPendingUpgrade({ type, cost, resilienceBoost });
+            setShowTechQuiz(true);
         } else if (upgrades[type]) {
             showToast("Already owned!", 'info');
         } else {
             showToast(`Insufficient funds. Need ₦${cost.toLocaleString()}.`, 'error');
         }
+    };
+
+    const confirmUpgrade = () => {
+        const { type, cost, resilienceBoost } = pendingUpgrade;
+        setMoney(prev => prev - cost);
+        setUpgrades(prev => ({ ...prev, [type]: true }));
+        setClimateResilience(prev => prev + resilienceBoost);
+        showToast(`${type.toUpperCase()} Upgrade Installed! Resilience +${resilienceBoost}% 🌍`, 'success');
+        setShowTechQuiz(false);
+        setPendingUpgrade(null);
     };
 
     const handleLabComplete = (score) => {
@@ -525,6 +541,37 @@ const Agripreneurship = () => {
                     </div>
                 )
             }
+            {/* TECH QUIZ MODAL */}
+            {showTechQuiz && pendingUpgrade && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center',
+                    alignItems: 'center', zIndex: 10000, padding: '1rem'
+                }}>
+                    <div className="card" style={{ maxWidth: '400px', backgroundColor: '#1E1E1E', border: '2px solid #FF8800', textAlign: 'center' }}>
+                        <h3 style={{ color: '#FF8800' }}>Tech-Check Challenge 🧠</h3>
+                        <p style={{ margin: '1.5rem 0', fontSize: '1.1rem' }}>{techQuizzes[pendingUpgrade.type].q}</p>
+                        <div style={{ display: 'grid', gap: '0.8rem' }}>
+                            {techQuizzes[pendingUpgrade.type].options.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    onClick={() => {
+                                        if (i === techQuizzes[pendingUpgrade.type].a) {
+                                            confirmUpgrade();
+                                        } else {
+                                            showToast("Incorrect! Think about sustainability.", 'error');
+                                        }
+                                    }}
+                                    className="btn btn-outline"
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                        <button onClick={() => setShowTechQuiz(false)} className="btn btn-sm" style={{ marginTop: '1.5rem', color: '#ff4444' }}>Cancel Upgrade ❌</button>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

@@ -30,13 +30,19 @@ const History = ({ ageGroup }) => {
     const showToast = (message, type = 'info', duration = 5000) => {
         setToast({ message, type, duration });
     };
+    // --- RESOURCE GAME STATE ---
+    const [gameScore, setGameScore] = useState(0);
+    const [showConfetti, setShowConfetti] = useState(false);
     const [wrongAttempts, setWrongAttempts] = useState(0);
-
-    // Game Logic State
     const [showGame, setShowGame] = useState(false);
     const [shuffledQuestions, setShuffledQuestions] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [currentQuestion, setCurrentQuestion] = useState(null);
+
+    // --- TIMELINE QUIZ STATE ---
+    const [showTimelineQuest, setShowTimelineQuest] = useState(false);
+    const [timelineScore, setTimelineScore] = useState(0);
+    const [shuffledTimeline, setShuffledTimeline] = useState([]);
 
     // --- TTS STATE ---
     const [isReading, setIsReading] = useState(false);
@@ -548,6 +554,58 @@ const History = ({ ageGroup }) => {
                             )}
                         </div>
                     ))}
+
+                    {!showTimelineQuest ? (
+                        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                            <button
+                                onClick={() => {
+                                    const shuffled = [...events].sort(() => Math.random() - 0.5).slice(0, 3);
+                                    setShuffledTimeline(shuffled);
+                                    setShowTimelineQuest(true);
+                                    setTimelineScore(0);
+                                }}
+                                className="btn"
+                                style={{ backgroundColor: 'var(--color-secondary)' }}
+                            >
+                                Challenge the Timeline Quest ⏳
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="card" style={{ marginTop: '2rem', animation: 'fadeIn 0.5s', border: '2px solid var(--color-secondary)' }}>
+                            <h3 style={{ color: 'var(--color-secondary)' }}>Timeline Mastery Quiz {timelineScore + 1}/3</h3>
+                            {timelineScore < shuffledTimeline.length ? (
+                                <div>
+                                    <p style={{ fontSize: '1.2rem', margin: '1rem 0' }}>"{shuffledTimeline[timelineScore].desc}" - **What year did this happen?**</p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                                        {[shuffledTimeline[timelineScore].year, "1500 BC", "1994", "1884"].sort(() => Math.random() - 0.5).map(yr => (
+                                            <button
+                                                key={yr}
+                                                onClick={() => {
+                                                    if (yr === shuffledTimeline[timelineScore].year) {
+                                                        showToast("Historian! 📜", 'success');
+                                                        setTimelineScore(prev => prev + 1);
+                                                        addEarnings('history', 150);
+                                                    } else {
+                                                        showToast("Check the timeline above!", 'error');
+                                                    }
+                                                }}
+                                                className="btn btn-outline"
+                                            >
+                                                {yr}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '4rem' }}>📜</div>
+                                    <h4 style={{ color: 'var(--color-secondary)' }}>Timeline Mastery Complete!</h4>
+                                    <p>You have reclaimed the narrative of the past.</p>
+                                    <button onClick={() => setShowTimelineQuest(false)} className="btn btn-sm" style={{ marginTop: '1rem' }}>Finish Quest</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </section>
 
