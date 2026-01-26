@@ -851,12 +851,12 @@ const Civics = ({ ageGroup }) => {
         ]);
 
         return (
-            <div className="card" style={{ borderTop: '4px solid #FFD700' }}>
-                <h3 style={{ color: '#FFD700' }}>{isKid ? 'Hero Simulator' : 'Statecraft Excellence'} 🏆</h3>
+            <div className="card" style={{ borderTop: '4px solid #FFD700', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
+                <h3 style={{ color: '#FFD700', wordBreak: 'break-word' }}>{isKid ? 'Hero Simulator' : 'Statecraft Excellence'} 🏆</h3>
                 {simStep === 0 ? (
-                    <div style={{ animation: 'fadeIn 0.5s' }}>
-                        <p>Select your leadership role:</p>
-                        <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                    <div style={{ animation: 'fadeIn 0.5s', width: '100%' }}>
+                        <p style={{ wordBreak: 'break-word' }}>Select your leadership role:</p>
+                        <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem', width: '100%' }}>
                             {roles.map(r => (
                                 <button
                                     key={r.t}
@@ -871,19 +871,20 @@ const Civics = ({ ageGroup }) => {
                                         textAlign: 'center',
                                         width: '100%',
                                         display: 'flex',
-                                        wordBreak: 'break-word'
+                                        wordBreak: 'break-word',
+                                        boxSizing: 'border-box'
                                     }}
                                 >
-                                    <strong style={{ color: r.color, display: 'block', marginBottom: '0.5rem' }}>{r.t}</strong>
-                                    <p style={{ fontSize: '0.85rem', color: '#aaa', margin: 0, lineHeight: '1.4' }}>{r.d}</p>
+                                    <strong style={{ color: r.color, display: 'block', marginBottom: '0.5rem', width: '100%' }}>{r.t}</strong>
+                                    <p style={{ fontSize: '0.85rem', color: '#aaa', margin: 0, lineHeight: '1.4', width: '100%' }}>{r.d}</p>
                                 </button>
                             ))}
                         </div>
                     </div>
                 ) : simStep === 1 ? (
-                    <div style={{ animation: 'fadeIn 0.5s' }}>
-                        <p>Define your core strategic pillar:</p>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
+                    <div style={{ animation: 'fadeIn 0.5s', width: '100%' }}>
+                        <p style={{ wordBreak: 'break-word' }}>Define your core strategic pillar:</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 130px), 1fr))', gap: '1rem', marginTop: '1.5rem', width: '100%' }}>
                             {priorities.map(p => (
                                 <button
                                     key={p.t}
@@ -896,20 +897,21 @@ const Civics = ({ ageGroup }) => {
                                         padding: '1.2rem',
                                         width: '100%',
                                         display: 'flex',
-                                        wordBreak: 'break-word'
+                                        wordBreak: 'break-word',
+                                        boxSizing: 'border-box'
                                     }}
                                 >
                                     <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}>{p.icon}</span>
-                                    <strong style={{ display: 'block', marginBottom: '0.3rem' }}>{p.t}</strong>
-                                    <p style={{ fontSize: '0.75rem', color: '#aaa', margin: 0 }}>{p.d}</p>
+                                    <strong style={{ display: 'block', marginBottom: '0.3rem', width: '100%' }}>{p.t}</strong>
+                                    <p style={{ fontSize: '0.75rem', color: '#aaa', margin: 0, width: '100%' }}>{p.d}</p>
                                 </button>
                             ))}
                         </div>
                     </div>
                 ) : simStep < 5 ? (
-                    <div style={{ animation: 'fadeIn 0.5s' }}>
-                        <p><strong>🚨 Challenge {simStep - 1}:</strong> {scenarios[simStep - 2].q}</p>
-                        <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem' }}>
+                    <div style={{ animation: 'fadeIn 0.5s', width: '100%' }}>
+                        <p style={{ wordBreak: 'break-word' }}><strong>🚨 Challenge {simStep - 1}:</strong> {scenarios[simStep - 2].q}</p>
+                        <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem', width: '100%' }}>
                             {scenarios[simStep - 2].options.map((opt, i) => (
                                 <button
                                     key={opt}
@@ -928,8 +930,10 @@ const Civics = ({ ageGroup }) => {
                                         whiteSpace: 'normal',
                                         padding: '1rem 1.5rem',
                                         width: '100%',
-                                        display: 'flex',
-                                        wordBreak: 'break-word'
+                                        display: 'block',
+                                        wordBreak: 'break-word',
+                                        textAlign: 'center',
+                                        boxSizing: 'border-box'
                                     }}
                                 >
                                     {opt}
