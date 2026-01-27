@@ -24,6 +24,14 @@ const Agripreneurship = () => {
     const [showTechQuiz, setShowTechQuiz] = useState(false);
     const [pendingUpgrade, setPendingUpgrade] = useState(null);
 
+    // Climate and upgrades state
+    const [climateResilience, setClimateResilience] = useState(() => Number(localStorage.getItem('agriResilience')) || 0);
+    const [upgrades, setUpgrades] = useState({
+        solar: false,
+        seeds: false,
+        vertical: false
+    });
+
     const techQuizzes = {
         solar: { q: "Why is solar irrigation better for climate resilience?", options: ["It depends on rain", "It provides constant energy without fuel costs", "It makes the crops taste like sun"], a: 1 },
         seeds: { q: "What is the main benefit of drought-resistant seeds?", options: ["They need more water", "They can survive heatwaves", "They grow into giant trees"], a: 1 },
@@ -67,9 +75,10 @@ const Agripreneurship = () => {
 
     // Persistence
     useEffect(() => {
-        localStorage.setItem('agriLevel', level); // Assuming 'currentLevel' refers to 'level'
+        localStorage.setItem('agriLevel', level);
         localStorage.setItem('agriSoldFlakes', soldFlakes);
-    }, [level, soldFlakes]); // Changed dependencies to reflect 'level'
+        localStorage.setItem('agriResilience', climateResilience);
+    }, [level, soldFlakes, climateResilience]);
 
     // Simulation tick
     useEffect(() => {
