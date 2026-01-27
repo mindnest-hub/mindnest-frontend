@@ -30,9 +30,7 @@ const History = ({ ageGroup }) => {
     const showToast = (message, type = 'info', duration = 5000) => {
         setToast({ message, type, duration });
     };
-    // --- RESOURCE GAME STATE ---
-    const [gameScore, setGameScore] = useState(0);
-    const [showConfetti, setShowConfetti] = useState(false);
+
     const [wrongAttempts, setWrongAttempts] = useState(0);
     const [showGame, setShowGame] = useState(false);
     const [shuffledQuestions, setShuffledQuestions] = useState([]);
