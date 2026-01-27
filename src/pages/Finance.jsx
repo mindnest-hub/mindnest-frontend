@@ -138,9 +138,33 @@ const Finance = ({ ageGroup }) => {
   const [pieSlices, setPieSlices] = useState({ needs: 50, wants: 30, savings: 20 });
   const [pieFeedback, setPieFeedback] = useState("");
   const budgetScenarios = [
-    { role: "Student 🎓", income: 1000, desc: "Manage your pocket money." },
-    { role: "Worker 👷", income: 50000, desc: "Pay rent and buy food." },
-    { role: "Family 👨‍👩‍👧", income: 200000, desc: "Save for school fees." }
+    {
+      role: "Chioma (Student) 🎓",
+      name: "Chioma",
+      income: 5000,
+      desc: "Weekly allowance for a secondary student",
+      needs: ["Transport (okada)", "Lunch", "Textbooks"],
+      wants: ["Snacks", "Phone credit", "Cinema"],
+      savingsGoal: "Class contribution fund"
+    },
+    {
+      role: "Emeka (Young Worker) 👷",
+      name: "Emeka",
+      income: 50000,
+      desc: "First salary as a junior developer in Lagos",
+      needs: ["Rent (₦15k)", "Food (₦10k)", "Transport (₦5k)"],
+      wants: ["Weekend hangouts", "New clothes", "DSTV"],
+      savingsGoal: "Emergency fund"
+    },
+    {
+      role: "Mensah Family 👨‍👩‍👧",
+      name: "the Mensahs",
+      income: 200000,
+      desc: "Monthly household budget with 2 kids",
+      needs: ["Rent (₦60k)", "School fees", "Food", "Bills"],
+      wants: ["Weekend jollof", "DSTV", "New furniture"],
+      savingsGoal: "Children's university fund"
+    }
   ];
 
   // Level 4: Supermarket Sweep
@@ -345,13 +369,15 @@ const Finance = ({ ageGroup }) => {
         if (newScore >= target) {
           setIsCoinGameActive(false);
           const reward = subStage === 2 ? 40 : 30;
-          showToast(`Jar Full! +₦${reward} 💰`, 'success');
+          showToast(`Kolo Full! +₦${reward} 💰`, 'success');
           handleStageComplete(2, reward);
         }
         return newScore;
       });
     } else {
+      // Penalty for clicking temptations (candy/temptation/etc.)
       setCoinScore(prev => Math.max(0, prev - 1));
+      showToast('Ah! Avoid temptations! Save your money! 💸', 'warning');
     }
   };
 
@@ -921,1137 +947,1590 @@ const Finance = ({ ageGroup }) => {
     },
     {
       id: 2,
-      title: "The Savings Jar: Coin Catcher 🏺",
-      desc: "Catch coins, avoid spenders!",
+      title: "Kolo Bank 🏺",
+      desc: "Save money in Mama's traditional pot!",
       content: (
         <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Save {coinTargets[Math.min(subStage, 2)] || 10} coins.</p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <span>Score: {coinScore}/{coinTargets[Math.min(subStage, 2)] || 10}</span>
-            {!isCoinGameActive && coinScore < (coinTargets[Math.min(subStage, 2)] || 10) && (
-              <button onClick={startCoinGame} className="btn btn-sm" style={{ backgroundColor: '#00C851' }}>Start Game</button>
+          {/* Stage-Specific Header */}
+          <div style={{
+            background: subStage === 0 ? 'linear-gradient(135deg, #4A2C2A 0%, #6B3E3E 100%)' :
+              subStage === 1 ? 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)' :
+                'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+            padding: '1.25rem',
+            borderRadius: '12px',
+            marginBottom: '1.25rem',
+            border: '2px solid rgba(255,255,255,0.15)',
+            transition: 'all 0.5s',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+          }}>
+            <h3 style={{ margin: 0, marginBottom: '0.5rem', fontSize: '1.3rem', fontWeight: 'bold' }}>
+              {subStage === 0 && '🏠 Level 1: Mama\'s Clay Kolo'}
+              {subStage === 1 && '🏪 Level 2: Ajo Society Pot'}
+              {subStage === 2 && '🏦 Level 3: Bank Account'}
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.95 }}>
+              {subStage === 0 && 'Save ₦ at home in the traditional clay pot'}
+              {subStage === 1 && 'Contribute to the community savings group'}
+              {subStage === 2 && 'Professional banking - the modern way!'}
+            </p>
+          </div>
+
+          {/* Score Display */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1.25rem',
+            flexWrap: 'wrap',
+            gap: '0.75rem'
+          }}>
+            <div style={{
+              backgroundColor: '#1a1a1a',
+              padding: '0.85rem 1.35rem',
+              borderRadius: '10px',
+              border: '2px solid #00C851',
+              flex: '1 1 150px',
+              boxShadow: '0 2px 10px rgba(0,200,81,0.2)'
+            }}>
+              <div style={{ fontSize: '0.7rem', color: '#aaa', marginBottom: '0.2rem', fontWeight: '600' }}>💰 SAVINGS</div>
+              <div style={{ fontSize: '1.6rem', fontWeight: 'bold', color: '#00C851' }}>
+                {coinScore}/{coinTargets[Math.min(subStage, 2)] || 10}
+              </div>
+            </div>
+
+            {coinScore >= 3 && isCoinGameActive && (
+              <div style={{
+                backgroundColor: '#FFD700',
+                color: '#000',
+                padding: '0.65rem 1.15rem',
+                borderRadius: '10px',
+                fontWeight: 'bold',
+                animation: 'pulse 0.6s ease-in-out infinite',
+                flex: '0 1 auto',
+                boxShadow: '0 4px 15px rgba(255,215,0,0.4)'
+              }}>
+                🔥 SAVING STREAK!
+              </div>
             )}
           </div>
 
+          {/* Start Button */}
+          {!isCoinGameActive && coinScore < (coinTargets[Math.min(subStage, 2)] || 10) && (
+            <button
+              onClick={startCoinGame}
+              className="btn"
+              style={{
+                width: '100%',
+                background: subStage === 0 ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
+                  subStage === 1 ? 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)' :
+                    'linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)',
+                fontSize: '1.15rem',
+                padding: '1.1rem',
+                marginBottom: '1.25rem',
+                fontWeight: 'bold',
+                border: 'none',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                transition: 'transform 0.2s'
+              }}
+            >
+              {subStage === 0 && '🏺 Open Kolo Pot'}
+              {subStage === 1 && '💰 Join Ajo Meeting'}
+              {subStage === 2 && '🏦 Access Bank Vault'}
+            </button>
+          )}
+
+          {/* Game Area */}
           {isCoinGameActive && (
             <div style={{
-              height: '200px', border: '2px dashed #555', borderRadius: '10px', position: 'relative', overflow: 'hidden',
-              backgroundColor: '#222'
+              position: 'relative',
+              height: '340px',
+              border: '4px solid ' + (subStage === 0 ? '#8B4513' : subStage === 1 ? '#D97706' : '#1E40AF'),
+              borderRadius: '20px',
+              overflow: 'hidden',
+              background: subStage === 0 ? 'linear-gradient(180deg, #2C1810 0%, #1a0f08 100%)' :
+                subStage === 1 ? 'linear-gradient(180deg, #7C2D12 0%, #451A03 100%)' :
+                  'linear-gradient(180deg, #1E3A8A 0%, #0F172A 100%)',
+              marginBottom: '1.25rem',
+              boxShadow: 'inset 0 2px 20px rgba(0,0,0,0.5)'
             }}>
-              <p style={{ textAlign: 'center', color: '#aaa', marginTop: '4rem' }}>Tap the Coins! 🪙</p>
-              {/* Simulated Game Area - In a real app, use Canvas or proper animation loop */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-                <button onClick={() => handleCoinClick('coin')} style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1s infinite' }}>🪙</button>
-                <button onClick={() => handleCoinClick('candy')} style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.5s infinite' }}>🍬</button>
-                <button onClick={() => handleCoinClick('coin')} style={{ fontSize: '2rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.2s infinite' }}>🪙</button>
+              {/* Instructions */}
+              <div style={{
+                position: 'absolute',
+                top: '1.25rem',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                textAlign: 'center',
+                zIndex: 5,
+                backgroundColor: 'rgba(0,0,0,0.85)',
+                padding: '0.65rem 1.35rem',
+                borderRadius: '10px',
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                border: '1px solid rgba(255,255,255,0.2)',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+              }}>
+                💰 Tap MONEY | ❌ Avoid TEMPTATIONS
+              </div>
+
+              {/* Falling Items */}
+              <div style={{
+                position: 'absolute',
+                bottom: '22%',
+                left: 0,
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'space-around',
+                padding: '0 1rem',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+                zIndex: 2
+              }}>
+                <button onClick={() => handleCoinClick('coin')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1s infinite', filter: 'drop-shadow(0 0 10px rgba(0,200,81,0.6))', transition: 'transform 0.15s' }}>🪙</button>
+                <button onClick={() => handleCoinClick('coin')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.35s infinite', filter: 'drop-shadow(0 0 10px rgba(0,200,81,0.6))' }}>💵</button>
+                {subStage >= 1 && <button onClick={() => handleCoinClick('coin')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.15s infinite', filter: 'drop-shadow(0 0 10px rgba(0,200,81,0.6))' }} title="Mobile money">📱</button>}
+                <button onClick={() => handleCoinClick('temptation')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.75s infinite', filter: 'drop-shadow(0 0 10px rgba(255,68,68,0.6))' }} title="Suya!">🍖</button>
+                <button onClick={() => handleCoinClick('temptation')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.5s infinite', filter: 'drop-shadow(0 0 10px rgba(255,68,68,0.6))' }} title="Gala!">🌮</button>
+                {subStage >= 1 && <button onClick={() => handleCoinClick('temptation')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.65s infinite', filter: 'drop-shadow(0 0 10px rgba(255,68,68,0.6))' }} title="Betting slip!">🎰</button>}
+                {subStage >= 2 && <button onClick={() => handleCoinClick('temptation')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.9s infinite', filter: 'drop-shadow(0 0 10px rgba(255,68,68,0.6))' }} title="Unnecessary airtime!">📞</button>}
+                <button onClick={() => handleCoinClick('coin')} style={{ fontSize: '2.8rem', background: 'none', border: 'none', cursor: 'pointer', animation: 'bounce 1.25s infinite', filter: 'drop-shadow(0 0 10px rgba(0,200,81,0.6))' }}>🪙</button>
+              </div>
+
+              {/* Kolo Pot */}
+              <div style={{
+                position: 'absolute',
+                bottom: '1.5rem',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontSize: '4.5rem',
+                animation: coinScore >= 3 ? 'shake 0.5s' : 'none',
+                filter: coinScore >= (coinTargets[Math.min(subStage, 2)] || 10) * 0.7 ? 'drop-shadow(0 0 20px #FFD700)' : 'none',
+                zIndex: 1
+              }}>
+                {subStage === 0 && '🏺'}
+                {subStage === 1 && '💰'}
+                {subStage === 2 && '🏦'}
               </div>
             </div>
           )}
 
-          {coinScore >= 10 && (
-            <button onClick={() => completeLevel(2)} className="btn" style={{ marginTop: '1rem', width: '100%' }} disabled={currentLevel > 2}>
-              {currentLevel > 2 ? "Jar Full! ✅" : "Bank It! (+₦130)"}
-            </button>
+          {/* Progress Messages */}
+          {coinScore > 0 && coinScore < (coinTargets[Math.min(subStage, 2)] || 10) && isCoinGameActive && (
+            <div style={{
+              textAlign: 'center',
+              padding: '0.95rem',
+              backgroundColor: 'rgba(0,200,81,0.15)',
+              borderRadius: '10px',
+              border: '2px solid #00C851',
+              marginBottom: '1.25rem',
+              animation: 'fadeIn 0.3s'
+            }}>
+              <div style={{ fontSize: '0.95rem', color: '#00C851', fontWeight: '600' }}>
+                {subStage === 0 && coinScore >= 3 && '🎉 Mama is proud of you!'}
+                {subStage === 1 && coinScore >= 5 && '👏 The Ajo chairlady approves!'}
+                {subStage === 2 && coinScore >= 7 && '⭐ You\'re banking like a pro!'}
+                {coinScore < 3 && 'Keep saving! Every naira counts! 💪'}
+              </div>
+            </div>
           )}
+
+          {/* Completion */}
+          {coinScore >= (coinTargets[Math.min(subStage, 2)] || 10) && (
+            <div style={{
+              textAlign: 'center',
+              padding: '1.75rem',
+              background: 'linear-gradient(135deg, rgba(0,200,81,0.2) 0%, rgba(0,200,81,0.3) 100%)',
+              borderRadius: '15px',
+              border: '3px solid #00C851',
+              animation: 'popIn 0.5s',
+              boxShadow: '0 4px 20px rgba(0,200,81,0.3)'
+            }}>
+              <div style={{ fontSize: '3.5rem', marginBottom: '0.75rem' }}>
+                {subStage === 0 && '🏺✨'}
+                {subStage === 1 && '💰🎉'}
+                {subStage === 2 && '🏦🏆'}
+              </div>
+              <h3 style={{ color: '#00C851', margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
+                {subStage === 0 && 'Kolo Full!'}
+                {subStage === 1 && 'Ajo Complete!'}
+                {subStage === 2 && 'Bank Balance Growing!'}
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.95rem', opacity: 0.9 }}>
+                You\'ve mastered this level! Ready for the next? 🚀
+              </p>
+            </div>
+          )}
+
+          <style>{`
+            @keyframes bounce {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-25px); }
+            }
+            @keyframes shake {
+              0%, 100% { transform: translateX(-50%) rotate(0deg); }
+              25% { transform: translateX(-50%) rotate(-6deg); }
+              75% { transform: translateX(-50%) rotate(6deg); }
+            }
+            @keyframes popIn {
+              0% { transform: scale(0.85); opacity: 0; }
+              50% { transform: scale(1.05); }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.08); }
+            }
+          `}</style>
         </div>
       )
     },
     {
       id: 3,
-      title: "Budgeting Boss: Slice the Pie 🍕",
-      desc: "Balance your needs and wants.",
+      title: "Family Budget Challenge 👨‍👩‍👧💰",
+      desc: "Master real-life Nigerian budgeting!",
       content: (
         <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> {budgetScenarios[Math.min(subStage, 2)].role}</p>
-          <p>{budgetScenarios[Math.min(subStage, 2)].desc} (Income: ₦{budgetScenarios[Math.min(subStage, 2)].income})</p>
-          <p><strong>Rule:</strong> 50% Needs, 30% Wants, 20% Savings. Total must be 100%.</p>
-
-          <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Needs (Rent, Food): {pieSlices.needs}%</label>
-              <input
-                type="range" min="0" max="100" value={pieSlices.needs}
-                onChange={(e) => setPieSlices({ ...pieSlices, needs: Number(e.target.value) })}
-                style={{ width: '100%', accentColor: '#4285F4' }}
-              />
+          {/* Character Card */}
+          <div style={{
+            background: subStage === 0 ? 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)' :
+              subStage === 1 ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)' :
+                'linear-gradient(135deg, #DC2626 0%, #F87171 100%)',
+            padding: '1.5rem',
+            borderRadius: '15px',
+            marginBottom: '1.5rem',
+            border: '3px solid rgba(255,255,255,0.2)',
+            boxShadow: '0 8px 25px rgba(0,0,0,0.3)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1rem' }}>
+              {/* Character Avatar with Expression */}
+              <div style={{
+                fontSize: '4rem',
+                filter: pieSlices.savings >= 20 ? 'drop-shadow(0 0 15px #FFD700)' : 'none',
+                transition: 'all 0.3s'
+              }}>
+                {subStage === 0 && (pieSlices.savings >= 20 ? '😄' : '😐')}
+                {subStage === 1 && (pieSlices.savings >= 20 ? '😎' : '😟')}
+                {subStage === 2 && (pieSlices.savings >= 20 ? '🥳' : '😰')}
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ margin: 0, marginBottom: '0.5rem', fontSize: '1.4rem', fontWeight: 'bold' }}>
+                  {budgetScenarios[Math.min(subStage, 2)].role}
+                </h3>
+                <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.95 }}>
+                  {budgetScenarios[Math.min(subStage, 2)].desc}
+                </p>
+                <div style={{
+                  marginTop: '0.75rem',
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  color: '#FFD700',
+                  textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+                }}>
+                  Income: ₦{budgetScenarios[Math.min(subStage, 2)].income.toLocaleString()}
+                </div>
+              </div>
             </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Wants (Toys, Movies): {pieSlices.wants}%</label>
-              <input
-                type="range" min="0" max="100" value={pieSlices.wants}
-                onChange={(e) => setPieSlices({ ...pieSlices, wants: Number(e.target.value) })}
-                style={{ width: '100%', accentColor: '#EA4335' }}
-              />
+          </div>
+
+          {/* Financial Wisdom Tip */}
+          <div style={{
+            backgroundColor: 'rgba(59,130,246,0.1)',
+            border: '2px solid #3B82F6',
+            borderRadius: '10px',
+            padding: '1rem',
+            marginBottom: '1.5rem',
+            display: 'flex',
+            alignItems: 'start',
+            gap: '0.75rem'
+          }}>
+            <div style={{ fontSize: '1.5rem' }}>💡</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.25rem', color: '#3B82F6' }}>Nigerian Budget Rule</div>
+              <div style={{ fontSize: '0.85rem', opacity: 0.9 }}>50% Needs | 30% Wants | 20% Savings</div>
             </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <label>Savings (Future): {pieSlices.savings}%</label>
-              <input
-                type="range" min="0" max="100" value={pieSlices.savings}
-                onChange={(e) => setPieSlices({ ...pieSlices, savings: Number(e.target.value) })}
-                style={{ width: '100%', accentColor: '#34A853' }}
-              />
+          </div>
+
+          {/* Visual Pie Chart */}
+          <div style={{
+            backgroundColor: '#1a1a1a',
+            padding: '1.5rem',
+            borderRadius: '15px',
+            marginBottom: '1.5rem',
+            border: '2px solid #333'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+              <h4 style={{ margin: 0, marginBottom: '1rem', color: '#fff' }}>Your Budget Breakdown</h4>
+
+              {/* Pie Chart Visualization */}
+              <div style={{
+                width: '200px',
+                height: '200px',
+                borderRadius: '50%',
+                margin: '0 auto 1.5rem',
+                background: `conic-gradient(
+                  #4285F4 0% ${pieSlices.needs}%,
+                  #EA4335 ${pieSlices.needs}% ${pieSlices.needs + pieSlices.wants}%,
+                  #34A853 ${pieSlices.needs + pieSlices.wants}% 100%
+                )`,
+                boxShadow: '0 8px 30px rgba(0,0,0,0.5), inset 0 0 0 15px rgba(0,0,0,0.3)',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'transparent'
+                }}>
+                  <div style={{
+                    backgroundColor: '#1a1a1a',
+                    width: '120px',
+                    height: '120px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '3px solid #333'
+                  }}>
+                    <div style={{ fontSize: '0.7rem', color: '#aaa' }}>TOTAL</div>
+                    <div style={{
+                      fontSize: '2rem',
+                      fontWeight: 'bold',
+                      color: (pieSlices.needs + pieSlices.wants + pieSlices.savings) === 100 ? '#00C851' : '#ff4444'
+                    }}>
+                      {pieSlices.needs + pieSlices.wants + pieSlices.savings}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', fontSize: '0.85rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ width: '12px', height: '12px', backgroundColor: '#4285F4', borderRadius: '3px' }}></div>
+                  <span>Needs: {pieSlices.needs}%</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ width: '12px', height: '12px', backgroundColor: '#EA4335', borderRadius: '3px' }}></div>
+                  <span>Wants: {pieSlices.wants}%</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ width: '12px', height: '12px', backgroundColor: '#34A853', borderRadius: '3px' }}></div>
+                  <span>Savings: {pieSlices.savings}%</span>
+                </div>
+              </div>
             </div>
 
-            <div style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '1rem' }}>
-              Total: <span style={{ color: (pieSlices.needs + pieSlices.wants + pieSlices.savings) === 100 ? '#00C851' : '#ff4444' }}>
-                {pieSlices.needs + pieSlices.wants + pieSlices.savings}%
-              </span>
+            {/* Sliders */}
+            <div style={{ marginTop: '1.5rem' }}>
+              {/* Needs Slider */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <label style={{ fontWeight: '600', color: '#4285F4' }}>🏚️ Needs</label>
+                  <span style={{ color: '#4285F4', fontWeight: 'bold' }}>{pieSlices.needs}%</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>
+                  {budgetScenarios[Math.min(subStage, 2)].needs.join(', ')}
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={pieSlices.needs}
+                  onChange={(e) => setPieSlices({ ...pieSlices, needs: Number(e.target.value) })}
+                  style={{
+                    width: '100%',
+                    accentColor: '#4285F4',
+                    height: '8px',
+                    borderRadius: '5px'
+                  }}
+                />
+              </div>
+
+              {/* Wants Slider */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <label style={{ fontWeight: '600', color: '#EA4335' }}>🎉 Wants</label>
+                  <span style={{ color: '#EA4335', fontWeight: 'bold' }}>{pieSlices.wants}%</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>
+                  {budgetScenarios[Math.min(subStage, 2)].wants.join(', ')}
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={pieSlices.wants}
+                  onChange=(e) => setPieSlices({...pieSlices, wants: Number(e.target.value) })}
+                style={{
+                  width: '100%',
+                  accentColor: '#EA4335',
+                  height: '8px',
+                  borderRadius: '5px'
+                }}
+                />
+              </div>
+
+              {/* Savings Slider */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <label style={{ fontWeight: '600', color: '#34A853' }}>💰 Savings</label>
+                  <span style={{ color: '#34A853', fontWeight: 'bold' }}>{pieSlices.savings}%</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>
+                  Goal: {budgetScenarios[Math.min(subStage, 2)].savingsGoal}
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={pieSlices.savings}
+                  onChange={(e) => setPieSlices({ ...pieSlices, savings: Number(e.target.value) })}
+                  style={{
+                    width: '100%',
+                    accentColor: '#34A853',
+                    height: '8px',
+                    borderRadius: '5px'
+                  }}
+                />
+              </div>
             </div>
 
-            <button className="btn" onClick={handleBudgetCheck} style={{ width: '100%' }}>Check Budget</button>
+            {/* Check Budget Button */}
+            <button
+              className="btn"
+              onClick={handleBudgetCheck}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #00C851 0%, #00E676 100%)',
+                fontSize: '1.15rem',
+                padding: '1.1rem',
+                fontWeight: 'bold',
+                border: 'none',
+                boxShadow: '0 4px 15px rgba(0,200,81,0.3)',
+                marginTop: '0.5rem'
+              }}
+            >
+              ✅ Check My Budget
+            </button>
 
+            {/* Feedback */}
             {pieFeedback && (
-              <p style={{ marginTop: '0.5rem', textAlign: 'center', color: pieFeedback.includes('✅') ? '#00C851' : '#ff4444' }}>
-                {pieFeedback}
-              </p>
+              <div style={{
+                marginTop: '1.25rem',
+                padding: '1.25rem',
+                borderRadius: '12px',
+                background: pieFeedback.includes('✅') ? 'linear-gradient(135deg, rgba(0,200,81,0.15) 0%, rgba(0,200,81,0.25) 100%)' : 'linear-gradient(135deg, rgba(255,68,68,0.15) 0%, rgba(255,68,68,0.25) 100%)',
+                border: `3px solid ${pieFeedback.includes('✅') ? '#00C851' : '#ff4444'}`,
+                animation: 'popIn 0.5s',
+                boxShadow: pieFeedback.includes('✅') ? '0 4px 20px rgba(0,200,81,0.3)' : '0 4px 20px rgba(255,68,68,0.3)'
+              }}>
+                {/* Star Rating */}
+                {pieFeedback.includes('✅') && (
+                  <div style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '0.75rem' }}>
+                    {pieSlices.savings >= 25 && '⭐⭐⭐'}
+                    {pieSlices.savings >= 20 && pieSlices.savings < 25 && '⭐⭐'}
+                    {pieSlices.savings < 20 && '⭐'}
+                  </div>
+                )}
+                <p style={{
+                  margin: 0,
+                  textAlign: 'center',
+                  color: pieFeedback.includes('✅') ? '#00C851' : '#ff4444',
+                  fontWeight: 'bold',
+                  fontSize: '1.05rem'
+                }}>
+                  {pieFeedback}
+                </p>
+                {pieFeedback.includes('✅') && pieSlices.savings >= 25 && (
+                  <p style={{ margin: '0.75rem 0 0 0', textAlign: 'center', fontSize: '0.85rem', opacity: 0.9 }}>
+                    🏆 Excellent! {budgetScenarios[Math.min(subStage, 2)].name}'s future is secure!
+                  </p>
+                )}
+              </div>
             )}
           </div>
-        </div>
-      )
-    },
-    {
-      id: 4,
-      title: "Smart Shopper: Supermarket Sweep 🛒",
-      desc: "Find the best value.",
-      content: (
-        <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Which option is the better value?</p>
-          <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-            {shopScenarios[Math.min(subStage, 2)].map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleShopChoice(item)}
-                className="card"
-                style={{
-                  padding: '1rem', border: '2px solid var(--color-border)',
-                  backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
-                }}
-              >
-                <span style={{ fontSize: '2rem' }}>{idx === 0 ? '📦' : '📦📦'}</span>
-                <strong>{item.name}</strong>
-                <span style={{ color: 'var(--color-primary)' }}>₦{item.price}</span>
-              </button>
-            ))}
+
+          {/* Contextual Tips */}
+          <div style={{
+            backgroundColor: 'rgba(255,193,7,0.1)',
+            border: '2px dashed #FFC107',
+            borderRadius: '10px',
+            padding: '1rem',
+            fontSize: '0.85rem',
+            color: '#FFC107'
+          }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>📚 Pro Tip:</div>
+            <div style={{ opacity: 0.95 }}>
+              {subStage === 0 && 'Students: Save at least 20% for unexpected school expenses!'}
+              {subStage === 1 && 'Young workers: Build an emergency fund of 3-6 months expenses before splurging!'}
+              {subStage === 2 && 'Families: Prioritize children\'s education savings - it\'s the best investment!'}
+            </div>
           </div>
+
+          <style>{`
+            @keyframes popIn {
+              0% { transform: scale(0.85); opacity: 0; }
+              50% { transform: scale(1.05); }
+              100% { transform: scale(1); opacity: 1; }
+            }
+          `}</style>
         </div>
+              </p >
+            )}
+          </div >
+        </div >
       )
     },
-    {
-      id: 5,
-      title: "Bank Accounts: Safe Keeper 🏦",
-      desc: "Sort items to the right place.",
-      content: (
-        <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Sort 5 items correctly.</p>
-
-          {!safeGameActive && safeScore < 5 ? (
-            <button onClick={startSafeGame} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#9C27B0' }}>Start Sorting</button>
-          ) : safeScore >= 5 ? (
-            <div style={{ textAlign: 'center', color: '#00C851' }}>
-              <h3>Round Complete! 🔒</h3>
-              <p>Get ready for the next batch...</p>
-              {subStage < 3 && (
-                <button onClick={startSafeGame} className="btn" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>Start Next Round 🚀</button>
-              )}
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'popIn 0.5s' }}>{currentSafeItem?.name}</div>
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <button onClick={() => handleSafeSort('bank')} className="btn btn-primary" style={{ flex: '1 1 120px' }}>Bank 🏦</button>
-                <button onClick={() => handleSafeSort('mattress')} className="btn btn-outline" style={{ flex: '1 1 120px' }}>Home 🏠</button>
-              </div>
-              <p style={{ marginTop: '1rem' }}>Score: {safeScore}/5</p>
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      id: 6,
-      title: "Earning Power: Career Ladder 🪜",
-      desc: "Skills = Money.",
-      content: (
-        <div>
-          <p><strong>Stage {careerStep + 1}/3:</strong> {careerLevels[careerStep].title}</p>
-          <p>{careerLevels[careerStep].desc}</p>
-          <p><strong>Goal:</strong> {careerLevels[careerStep].task}</p>
-
-          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-            <div style={{ flex: '1 1 150px', borderRight: '1px solid var(--color-border)', textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>{careerStep === 0 ? '☕' : careerStep === 1 ? '👔' : '🚀'}</div>
-              <p>Current: {careerLevels[careerStep].title.split(' ')[0]}</p>
-            </div>
-            <div style={{ flex: '2 1 200px' }}>
-              <p style={{ marginBottom: '1rem' }}>Choose your action:</p>
-              {careerLevels[careerStep].options.map((opt, idx) => (
+{
+  id: 4,
+    title: "Smart Shopper: Supermarket Sweep 🛒",
+      desc: "Find the best value.",
+        content: (
+          <div>
+            <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Which option is the better value?</p>
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+              {shopScenarios[Math.min(subStage, 2)].map((item, idx) => (
                 <button
                   key={idx}
-                  onClick={() => handleCareerChoice(opt.type)}
-                  className="btn btn-outline"
-                  style={{ width: '100%', marginBottom: '0.75rem' }}
+                  onClick={() => handleShopChoice(item)}
+                  className="card"
+                  style={{
+                    padding: '1rem', border: '2px solid var(--color-border)',
+                    backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                  }}
                 >
-                  {opt.txt}
+                  <span style={{ fontSize: '2rem' }}>{idx === 0 ? '📦' : '📦📦'}</span>
+                  <strong>{item.name}</strong>
+                  <span style={{ color: 'var(--color-primary)' }}>₦{item.price}</span>
                 </button>
               ))}
             </div>
           </div>
-          <div style={{ fontSize: '0.8rem', color: '#aaa', maxHeight: '60px', overflowY: 'auto', marginTop: '1rem', borderTop: '1px solid #333', paddingTop: '0.5rem' }}>
-            {careerHistory.map((h, i) => <div key={i}>{h}</div>)}
+        )
+},
+{
+  id: 5,
+    title: "Bank Accounts: Safe Keeper 🏦",
+      desc: "Sort items to the right place.",
+        content: (
+          <div>
+            <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Sort 5 items correctly.</p>
+
+            {!safeGameActive && safeScore < 5 ? (
+              <button onClick={startSafeGame} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#9C27B0' }}>Start Sorting</button>
+            ) : safeScore >= 5 ? (
+              <div style={{ textAlign: 'center', color: '#00C851' }}>
+                <h3>Round Complete! 🔒</h3>
+                <p>Get ready for the next batch...</p>
+                {subStage < 3 && (
+                  <button onClick={startSafeGame} className="btn" style={{ marginTop: '1rem', backgroundColor: '#00C851' }}>Start Next Round 🚀</button>
+                )}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'popIn 0.5s' }}>{currentSafeItem?.name}</div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <button onClick={() => handleSafeSort('bank')} className="btn btn-primary" style={{ flex: '1 1 120px' }}>Bank 🏦</button>
+                  <button onClick={() => handleSafeSort('mattress')} className="btn btn-outline" style={{ flex: '1 1 120px' }}>Home 🏠</button>
+                </div>
+                <p style={{ marginTop: '1rem' }}>Score: {safeScore}/5</p>
+              </div>
+            )}
           </div>
-        </div>
-      )
-    },
-    {
-      id: 7,
-      title: "Investing 101: The Garden 🌳",
+        )
+},
+{
+  id: 6,
+    title: "Earning Power: Career Ladder 🪜",
+      desc: "Skills = Money.",
+        content: (
+          <div>
+            <p><strong>Stage {careerStep + 1}/3:</strong> {careerLevels[careerStep].title}</p>
+            <p>{careerLevels[careerStep].desc}</p>
+            <p><strong>Goal:</strong> {careerLevels[careerStep].task}</p>
+
+            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1 1 150px', borderRight: '1px solid var(--color-border)', textAlign: 'center', padding: '1rem' }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>{careerStep === 0 ? '☕' : careerStep === 1 ? '👔' : '🚀'}</div>
+                <p>Current: {careerLevels[careerStep].title.split(' ')[0]}</p>
+              </div>
+              <div style={{ flex: '2 1 200px' }}>
+                <p style={{ marginBottom: '1rem' }}>Choose your action:</p>
+                {careerLevels[careerStep].options.map((opt, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleCareerChoice(opt.type)}
+                    className="btn btn-outline"
+                    style={{ width: '100%', marginBottom: '0.75rem' }}
+                  >
+                    {opt.txt}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#aaa', maxHeight: '60px', overflowY: 'auto', marginTop: '1rem', borderTop: '1px solid #333', paddingTop: '0.5rem' }}>
+              {careerHistory.map((h, i) => <div key={i}>{h}</div>)}
+            </div>
+          </div>
+        )
+},
+{
+  id: 7,
+    title: "Investing 101: The Garden 🌳",
       desc: "Make money work for you.",
-      content: (
-        <div className={isGrowing ? "pulse-animation" : ""}>
-          <style>{`
+        content: (
+          <div className={isGrowing ? "pulse-animation" : ""}>
+            <style>{`
             .pulse-animation { animation: pulse 0.5s ease-in-out; }
             @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); box-shadow: 0 0 20px #00C851; } 100% { transform: scale(1); } }
           `}</style >
-          <p><strong>Stage {investYear + 1}/3:</strong> {investStages[investYear].title}</p>
-          <p><em>{investStages[investYear].desc}</em></p>
+            <p><strong>Stage {investYear + 1}/3:</strong> {investStages[investYear].title}</p>
+            <p><em>{investStages[investYear].desc}</em></p>
 
-          <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid var(--color-primary)' }}>
-            <h4 style={{ color: 'var(--color-primary)', marginTop: 0 }}>Year {investStages[investYear].year} Strategy 🌳</h4>
+            <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid var(--color-primary)' }}>
+              <h4 style={{ color: 'var(--color-primary)', marginTop: 0 }}>Year {investStages[investYear].year} Strategy 🌳</h4>
 
-            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-              {investStages[investYear].options
-                .filter(opt => !(isKid && opt.name === "Tech Stock 💻")) // Filter out for kids
-                .map((opt, idx) => (
+              <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                {investStages[investYear].options
+                  .filter(opt => !(isKid && opt.name === "Tech Stock 💻")) // Filter out for kids
+                  .map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleInvestChoice(opt.risk)}
+                      className="card"
+                      style={{
+                        padding: '1rem', border: '1px solid var(--color-border)',
+                        backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                      }}
+                    >
+                      <span style={{ fontSize: '1.5rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
+                      <strong>{opt.name}</strong>
+                    </button>
+                  ))}
+              </div>
+
+              <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#aaa' }}>Choose wisely to grow your garden!</p>
+            </div>
+          </div >
+        )
+},
+{
+  id: 8,
+    title: "Risk & Reward: The Choice ⚖️",
+      desc: "Balance risk and safety.",
+        content: (
+          <div>
+            <p><strong>Scenario {riskChoiceLevel + 1}/3:</strong> Which risk is right for you?</p>
+
+            <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid #FF9800' }}>
+              <h4 style={{ color: '#FF9800', marginTop: 0 }}>The Big Decision</h4>
+              <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Choose the option that matches your goals.</p>
+
+              <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                {riskChoiceStages.map((opt, idx) => (
                   <button
                     key={idx}
-                    onClick={() => handleInvestChoice(opt.risk)}
+                    onClick={() => handleRiskChoiceHander(opt)}
                     className="card"
+                    disabled={riskChoiceFeedback !== ""}
                     style={{
-                      padding: '1rem', border: '1px solid var(--color-border)',
+                      padding: '1rem', border: '2px solid var(--color-border)',
                       backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                      opacity: riskChoiceFeedback !== "" && !riskChoiceFeedback.includes(opt.name) ? 0.5 : 1
                     }}
                   >
                     <span style={{ fontSize: '1.5rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
                     <strong>{opt.name}</strong>
                   </button>
                 ))}
+              </div>
+
+              {riskChoiceFeedback && (
+                <div style={{
+                  marginTop: '1rem', padding: '1rem', borderRadius: '8px',
+                  backgroundColor: 'rgba(255,152,0,0.1)', border: '1px solid #FF9800',
+                  animation: 'popIn 0.3s'
+                }}>
+                  <p style={{ margin: 0, fontWeight: 'bold' }}>{riskChoiceFeedback}</p>
+                </div>
+              )}
             </div>
-
-            <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#aaa' }}>Choose wisely to grow your garden!</p>
           </div>
-        </div >
-      )
-    },
-    {
-      id: 8,
-      title: "Risk & Reward: The Choice ⚖️",
-      desc: "Balance risk and safety.",
-      content: (
-        <div>
-          <p><strong>Scenario {riskChoiceLevel + 1}/3:</strong> Which risk is right for you?</p>
+        )
+},
+{
+  id: 9,
+    title: "Good vs Bad Debt: Credit Ninja 💳",
+      desc: "Slash the bad debt!",
+        content: (
+          <div>
+            <p><strong>Stage {debtStage + 1}/3:</strong> {debtStages[debtStage].title}</p>
+            <p>Sharpen your sword! Slash <strong>{debtStages[debtStage].target === 'bad' ? 'BAD DEBT' : 'BAD DEBT'}</strong>.</p>
 
-          <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid #FF9800' }}>
-            <h4 style={{ color: '#FF9800', marginTop: 0 }}>The Big Decision</h4>
-            <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Choose the option that matches your goals.</p>
-
-            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-              {riskChoiceStages.map((opt, idx) => (
+            <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+              {debtStages[debtStage].items.map((item, idx) => (
                 <button
                   key={idx}
-                  onClick={() => handleRiskChoiceHander(opt)}
-                  className="card"
-                  disabled={riskChoiceFeedback !== ""}
+                  onClick={() => handleDebtAction(item.type)}
+                  className="btn"
                   style={{
-                    padding: '1rem', border: '2px solid var(--color-border)',
-                    backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-                    opacity: riskChoiceFeedback !== "" && !riskChoiceFeedback.includes(opt.name) ? 0.5 : 1
+                    minHeight: '140px',
+                    padding: '1rem',
+                    fontSize: '1rem',
+                    lineHeight: '1.2',
+                    backgroundColor: '#333',
+                    border: '2px solid #555',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    textAlign: 'center'
                   }}
                 >
-                  <span style={{ fontSize: '1.5rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
-                  <strong>{opt.name}</strong>
+                  <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{item.name.split(' ').pop()}</div>
+                  <div style={{ fontWeight: 'bold' }}>{item.name.replace(item.name.split(' ').pop(), '')}</div>
                 </button>
               ))}
             </div>
+            <p style={{ marginTop: '1rem', textAlign: 'center', color: '#aaa', fontSize: '0.9rem' }}>
+              Hint: Slash anything that has high interest (e.g. Loans, Credit Cards). Keep assets.
+            </p>
+          </div>
+        )
+},
+{
+  id: 10,
+    title: "Insurance: Rainy Day ☂️",
+      desc: "Prepare for the storm.",
+        content: (
+          <div>
+            <p><strong>Stage {rainStage + 1}/3:</strong> {rainStages[rainStage].name}</p>
+            <p>The weather is changing. <strong>{rainStages[rainStage].need}</strong> needed!</p>
 
-            {riskChoiceFeedback && (
-              <div style={{
-                marginTop: '1rem', padding: '1rem', borderRadius: '8px',
-                backgroundColor: 'rgba(255,152,0,0.1)', border: '1px solid #FF9800',
-                animation: 'popIn 0.3s'
-              }}>
-                <p style={{ margin: 0, fontWeight: 'bold' }}>{riskChoiceFeedback}</p>
+            <div style={{
+              height: '200px',
+              backgroundColor: rainStages[rainStage].name.includes('Drizzle') ? '#90A4AE' : rainStages[rainStage].name.includes('Thunder') ? '#546E7A' : '#263238',
+              borderRadius: '10px',
+              transition: 'background-color 1s',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              position: 'relative', overflow: 'hidden',
+              border: '2px solid #555'
+            }}>
+              <div style={{ fontSize: '4rem', zIndex: 2 }}>{rainStages[rainStage].name.split(' ')[1]}</div>
+
+              {/* Visual Effects based on stage */}
+              {weatherStatus === 'raining' && <div className="rain-animation" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,255,0.1)' }}></div>}
+
+              <div style={{ marginTop: '1rem', fontWeight: 'bold', zIndex: 2, backgroundColor: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '5px' }}>
+                Wealth Protected: {protection ? 'YES ✅' : 'NO ❌'}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+              {rainStages[rainStage].options.map((opt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleRainChoice(opt)}
+                  className="btn"
+                  style={{ backgroundColor: '#444' }}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        )
+},
+{
+  id: 11,
+    title: "Scam Buster: Spot the Fake 🕵️‍♂️",
+      desc: "Spot the fakes.",
+        content: (
+          <div>
+            <p><strong>Stage {scamStep + 1}/3:</strong> {scamLevels[scamStep].title}</p>
+            <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
+              <p style={{ fontSize: '1.2rem', margin: '1rem 0', fontFamily: 'monospace' }}>"{scamLevels[scamStep].text}"</p>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button className="btn" style={{ flex: 1, backgroundColor: '#ff4444' }} onClick={() => handleScamGuess(true)}>Scam! ❌</button>
+                <button className="btn" style={{ flex: 1, backgroundColor: '#00C851' }} onClick={() => handleScamGuess(false)}>Safe ✅</button>
+              </div>
+            </div>
+          </div>
+        )
+},
+{
+  id: 12,
+    title: "Real Wealth: The Money Magnet 🧲",
+      desc: "Assets vs Liabilities.",
+        content: (
+          <div>
+            <p><strong>Stage {assetStage + 1}/3:</strong> {assetStages[assetStage].title}</p>
+            <p style={{ color: '#FFD700', fontWeight: 'bold' }}>Your Task: {assetStages[assetStage].task}</p>
+
+            <div style={{
+              border: '2px solid #00C851', borderRadius: '20px', overflow: 'hidden', padding: '1.5rem',
+              backgroundColor: 'rgba(0,200,81,0.05)', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem'
+            }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                {assetStages[assetStage].items.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleAssetAction(item)}
+                    className="card"
+                    style={{
+                      backgroundColor: '#333', border: '1px solid #555', padding: '1rem',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                      transition: 'transform 0.2s', minHeight: '120px'
+                    }}
+                  >
+                    <div style={{ fontSize: '2.5rem' }}>{typeof item === 'string' ? item.split(' ').pop() : item.name.split(' ').pop()}</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{typeof item === 'string' ? item.replace(item.split(' ').pop(), '') : item.name.replace(item.name.split(' ').pop(), '')}</div>
+                  </button>
+                ))}
+              </div>
+              <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888' }}>
+                Click on the items that make you rich! 💰
+              </p>
+            </div>
+          </div>
+        )
+},
+{
+  id: 13,
+    title: "Financial Freedom: The Path 🕊️",
+      desc: "The ultimate goal.",
+        content: (
+          <div>
+            <p><strong>Stage {freedomStep + 1}/3:</strong> {freedomStages[freedomStep].title}</p>
+            <p>{freedomStages[freedomStep].task}</p>
+
+            <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+              <div style={{ fontSize: '3rem' }}>{freedomStep === 0 ? '👷' : freedomStep === 1 ? '📈' : '🏖️'}</div>
+              <p>Goal: {freedomStages[freedomStep].goal}</p>
+              {freedomStep > 1 && <p style={{ color: '#00C851' }}>Passive Income: ₦{passiveIncome}</p>}
+            </div>
+
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
+              <button onClick={() => handleFreedomAction('work')} className="btn" style={{ backgroundColor: '#4285F4', opacity: freedomStep === 0 ? 1 : 0.5, border: '1px solid #fff' }}>Work 🔨</button>
+              <button onClick={() => handleFreedomAction('invest')} className="btn" style={{ backgroundColor: '#FF8800', opacity: freedomStep === 1 ? 1 : 0.5, border: '1px solid #fff' }}>Invest 🧠</button>
+              <button onClick={() => handleFreedomAction('relax')} className="btn" style={{ backgroundColor: '#00C851', opacity: freedomStep === 2 ? 1 : 0.5, border: '1px solid #fff' }}>Relax 🕊️</button>
+            </div>
+          </div>
+        )
+},
+{
+  id: 14,
+    title: "Community Pot: City Builder 🍲",
+      desc: "Why we pay taxes.",
+        content: (
+          <div>
+            <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Taxes build our community. Watch it grow!</p>
+            <div style={{
+              height: '150px', backgroundColor: '#222', borderRadius: '20px', border: '1px solid #555',
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '1rem', marginBottom: '1rem'
+            }}>
+              {cityBuildings.length === 0 && <p style={{ color: '#aaa', alignSelf: 'center' }}>Empty Land waiting for development...</p>}
+              {cityBuildings.map((b, i) => (
+                <div key={i} style={{ fontSize: '3rem', animation: 'popIn 0.5s' }}>{b.split(' ')[1]}</div>
+              ))}
+            </div>
+
+            <button
+              onClick={handlePayTax}
+              className="btn"
+              style={{
+                width: '100%',
+                backgroundColor: subStage >= 3 ? '#00C851' : '#4285F4',
+                color: '#fff',
+                fontSize: '1.1rem',
+                height: '50px'
+              }}
+              disabled={subStage >= 3}
+            >
+              {subStage >= 3 ? "Village Fully Built! 🌆✅" : `Pay Tax & Build ${['School', 'Road', 'Hospital'][subStage] || ''} 🏗️`}
+            </button>
+
+            {subStage >= 3 && (
+              <div style={{ textAlign: 'center', marginTop: '1rem', color: '#00C851' }}>
+                <h3>Community Thriving! 🌟</h3>
+                <p>Your taxes provided essential services.</p>
               </div>
             )}
           </div>
-        </div>
-      )
-    },
-    {
-      id: 9,
-      title: "Good vs Bad Debt: Credit Ninja 💳",
-      desc: "Slash the bad debt!",
-      content: (
-        <div>
-          <p><strong>Stage {debtStage + 1}/3:</strong> {debtStages[debtStage].title}</p>
-          <p>Sharpen your sword! Slash <strong>{debtStages[debtStage].target === 'bad' ? 'BAD DEBT' : 'BAD DEBT'}</strong>.</p>
+        )
+},
+{
+  id: 15,
+    title: "Risk Management: The Savvy Merchant 🌽",
+      desc: "Diversify to survive.",
+        content: (
+          <div>
+            <p><strong>Scenario {riskStage + 1}/3:</strong> {riskStages[riskStage].title}</p>
+            <p><em>{riskStages[riskStage].desc}</em></p>
 
-          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-            {debtStages[debtStage].items.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleDebtAction(item.type)}
-                className="btn"
-                style={{
-                  minHeight: '140px',
-                  padding: '1rem',
-                  fontSize: '1rem',
-                  lineHeight: '1.2',
-                  backgroundColor: '#333',
-                  border: '2px solid #555',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  textAlign: 'center'
-                }}
-              >
-                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{item.name.split(' ').pop()}</div>
-                <div style={{ fontWeight: 'bold' }}>{item.name.replace(item.name.split(' ').pop(), '')}</div>
-              </button>
-            ))}
-          </div>
-          <p style={{ marginTop: '1rem', textAlign: 'center', color: '#aaa', fontSize: '0.9rem' }}>
-            Hint: Slash anything that has high interest (e.g. Loans, Credit Cards). Keep assets.
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 10,
-      title: "Insurance: Rainy Day ☂️",
-      desc: "Prepare for the storm.",
-      content: (
-        <div>
-          <p><strong>Stage {rainStage + 1}/3:</strong> {rainStages[rainStage].name}</p>
-          <p>The weather is changing. <strong>{rainStages[rainStage].need}</strong> needed!</p>
-
-          <div style={{
-            height: '200px',
-            backgroundColor: rainStages[rainStage].name.includes('Drizzle') ? '#90A4AE' : rainStages[rainStage].name.includes('Thunder') ? '#546E7A' : '#263238',
-            borderRadius: '10px',
-            transition: 'background-color 1s',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            position: 'relative', overflow: 'hidden',
-            border: '2px solid #555'
-          }}>
-            <div style={{ fontSize: '4rem', zIndex: 2 }}>{rainStages[rainStage].name.split(' ')[1]}</div>
-
-            {/* Visual Effects based on stage */}
-            {weatherStatus === 'raining' && <div className="rain-animation" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,255,0.1)' }}></div>}
-
-            <div style={{ marginTop: '1rem', fontWeight: 'bold', zIndex: 2, backgroundColor: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '5px' }}>
-              Wealth Protected: {protection ? 'YES ✅' : 'NO ❌'}
-            </div>
-          </div>
-
-          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
-            {rainStages[rainStage].options.map((opt, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleRainChoice(opt)}
-                className="btn"
-                style={{ backgroundColor: '#444' }}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 11,
-      title: "Scam Buster: Spot the Fake 🕵️‍♂️",
-      desc: "Spot the fakes.",
-      content: (
-        <div>
-          <p><strong>Stage {scamStep + 1}/3:</strong> {scamLevels[scamStep].title}</p>
-          <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
-            <p style={{ fontSize: '1.2rem', margin: '1rem 0', fontFamily: 'monospace' }}>"{scamLevels[scamStep].text}"</p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <button className="btn" style={{ flex: 1, backgroundColor: '#ff4444' }} onClick={() => handleScamGuess(true)}>Scam! ❌</button>
-              <button className="btn" style={{ flex: 1, backgroundColor: '#00C851' }} onClick={() => handleScamGuess(false)}>Safe ✅</button>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 12,
-      title: "Real Wealth: The Money Magnet 🧲",
-      desc: "Assets vs Liabilities.",
-      content: (
-        <div>
-          <p><strong>Stage {assetStage + 1}/3:</strong> {assetStages[assetStage].title}</p>
-          <p style={{ color: '#FFD700', fontWeight: 'bold' }}>Your Task: {assetStages[assetStage].task}</p>
-
-          <div style={{
-            border: '2px solid #00C851', borderRadius: '20px', overflow: 'hidden', padding: '1.5rem',
-            backgroundColor: 'rgba(0,200,81,0.05)', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem'
-          }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-              {assetStages[assetStage].items.map((item, idx) => (
+            <div style={{ margin: '1.5rem 0' }}>
+              <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
                 <button
-                  key={idx}
-                  onClick={() => handleAssetAction(item)}
+                  onClick={() => handleRiskAction('single')}
                   className="card"
+                  disabled={riskFeedback !== ""}
                   style={{
-                    backgroundColor: '#333', border: '1px solid #555', padding: '1rem',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-                    transition: 'transform 0.2s', minHeight: '120px'
+                    padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
+                    flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
+                    opacity: riskFeedback.includes('Poor harvest') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
                   }}
                 >
-                  <div style={{ fontSize: '2.5rem' }}>{typeof item === 'string' ? item.split(' ').pop() : item.name.split(' ').pop()}</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{typeof item === 'string' ? item.replace(item.split(' ').pop(), '') : item.name.replace(item.name.split(' ').pop(), '')}</div>
+                  <div style={{ fontSize: '3rem' }}>🌽</div>
+                  <strong>Sell Only Corn</strong>
                 </button>
+                <button
+                  onClick={() => handleRiskAction('diverse')}
+                  className="card"
+                  disabled={riskFeedback !== ""}
+                  style={{
+                    padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
+                    flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
+                    opacity: riskFeedback.includes('Safe') || riskFeedback.includes('Survival') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
+                  }}
+                >
+                  <div style={{ fontSize: '3rem' }}>🛍️</div>
+                  <strong>Mixed Goods</strong>
+                </button>
+              </div>
+            </div>
+
+            {riskFeedback && (
+              <div style={{
+                padding: '1rem', borderRadius: '12px',
+                backgroundColor: riskFeedback.includes('Poor') ? 'rgba(255,68,68,0.1)' : 'rgba(0,200,81,0.1)',
+                border: `1px solid ${riskFeedback.includes('Poor') ? '#ff4444' : '#00C851'}`,
+                animation: 'popIn 0.3s'
+              }}>
+                <p style={{ margin: 0, fontWeight: 'bold', textAlign: 'center' }}>{riskFeedback}</p>
+              </div>
+            )}
+          </div>
+        )
+},
+{
+  id: 16,
+    title: "Wealth Engine: Diversified Choice 🌍",
+      desc: "Invest to earn passive income.",
+        content: (
+          <div>
+            <p><strong>Stage {cryptoStage + 1}/3:</strong> Build your wealth engine.</p>
+            <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1rem' }}>
+              Hold assets to earn money automatically every 5 seconds! 💸
+            </p>
+
+            {/* TOTAL WEALTH CARD */}
+            <div style={{
+              backgroundColor: '#007E33', padding: '1.5rem', borderRadius: '20px',
+              color: 'white', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.2)',
+              boxShadow: '0 8px 32px rgba(0,200,81,0.2)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>Available Cash</p>
+                  <h3 style={{ margin: 0, fontSize: '1.8rem' }}>₦{Math.round(portfolio.cash)}</h3>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>Income Pulse</p>
+                  <h3 style={{ margin: 0, color: '#00C851' }}>+₦{
+                    (portfolio.realEstate * 50) + (portfolio.stocks * 5) + (portfolio.bankFixed * 10)
+                  }/5s</h3>
+                </div>
+              </div>
+              <p style={{ fontSize: '0.75rem', marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
+                Target to Mastery: <strong>₦{cryptoStages[cryptoStage].target}</strong>
+              </p>
+            </div>
+
+            {/* ASSET GRID */}
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
+              {wealthAssets.map((asset) => (
+                <div key={asset.id} style={{
+                  backgroundColor: '#2c2c2c', padding: '1rem', borderRadius: '15px',
+                  border: `1px solid ${asset.color}`, display: 'flex', flexDirection: 'column', gap: '0.5rem'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                    <span style={{ fontSize: '1.2rem' }}>{asset.name}</span>
+                    <span style={{ fontSize: '0.7rem', color: '#aaa' }}>{asset.yieldDesc}</span>
+                  </div>
+                  <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>₦{prices[asset.id].toLocaleString()}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#888' }}>
+                    Owned: {portfolio[asset.id].toFixed(2)}
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <button onClick={() => handleCryptoTrade(asset.id, 'buy')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#00C851', fontSize: '0.7rem', padding: '0.4rem' }}>Buy ₦100</button>
+                    <button onClick={() => handleCryptoTrade(asset.id, 'sell')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#ff4444', fontSize: '0.7rem', padding: '0.4rem' }}>Sell All</button>
+                  </div>
+                </div>
               ))}
             </div>
-            <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#888' }}>
-              Click on the items that make you rich! 💰
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 13,
-      title: "Financial Freedom: The Path 🕊️",
-      desc: "The ultimate goal.",
-      content: (
-        <div>
-          <p><strong>Stage {freedomStep + 1}/3:</strong> {freedomStages[freedomStep].title}</p>
-          <p>{freedomStages[freedomStep].task}</p>
 
-          <div style={{ textAlign: 'center', margin: '1rem 0' }}>
-            <div style={{ fontSize: '3rem' }}>{freedomStep === 0 ? '👷' : freedomStep === 1 ? '📈' : '🏖️'}</div>
-            <p>Goal: {freedomStages[freedomStep].goal}</p>
-            {freedomStep > 1 && <p style={{ color: '#00C851' }}>Passive Income: ₦{passiveIncome}</p>}
-          </div>
-
-          <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
-            <button onClick={() => handleFreedomAction('work')} className="btn" style={{ backgroundColor: '#4285F4', opacity: freedomStep === 0 ? 1 : 0.5, border: '1px solid #fff' }}>Work 🔨</button>
-            <button onClick={() => handleFreedomAction('invest')} className="btn" style={{ backgroundColor: '#FF8800', opacity: freedomStep === 1 ? 1 : 0.5, border: '1px solid #fff' }}>Invest 🧠</button>
-            <button onClick={() => handleFreedomAction('relax')} className="btn" style={{ backgroundColor: '#00C851', opacity: freedomStep === 2 ? 1 : 0.5, border: '1px solid #fff' }}>Relax 🕊️</button>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 14,
-      title: "Community Pot: City Builder 🍲",
-      desc: "Why we pay taxes.",
-      content: (
-        <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Taxes build our community. Watch it grow!</p>
-          <div style={{
-            height: '150px', backgroundColor: '#222', borderRadius: '20px', border: '1px solid #555',
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '1rem', marginBottom: '1rem'
-          }}>
-            {cityBuildings.length === 0 && <p style={{ color: '#aaa', alignSelf: 'center' }}>Empty Land waiting for development...</p>}
-            {cityBuildings.map((b, i) => (
-              <div key={i} style={{ fontSize: '3rem', animation: 'popIn 0.5s' }}>{b.split(' ')[1]}</div>
-            ))}
-          </div>
-
-          <button
-            onClick={handlePayTax}
-            className="btn"
-            style={{
-              width: '100%',
-              backgroundColor: subStage >= 3 ? '#00C851' : '#4285F4',
-              color: '#fff',
-              fontSize: '1.1rem',
-              height: '50px'
-            }}
-            disabled={subStage >= 3}
-          >
-            {subStage >= 3 ? "Village Fully Built! 🌆✅" : `Pay Tax & Build ${['School', 'Road', 'Hospital'][subStage] || ''} 🏗️`}
-          </button>
-
-          {subStage >= 3 && (
-            <div style={{ textAlign: 'center', marginTop: '1rem', color: '#00C851' }}>
-              <h3>Community Thriving! 🌟</h3>
-              <p>Your taxes provided essential services.</p>
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      id: 15,
-      title: "Risk Management: The Savvy Merchant 🌽",
-      desc: "Diversify to survive.",
-      content: (
-        <div>
-          <p><strong>Scenario {riskStage + 1}/3:</strong> {riskStages[riskStage].title}</p>
-          <p><em>{riskStages[riskStage].desc}</em></p>
-
-          <div style={{ margin: '1.5rem 0' }}>
-            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
-              <button
-                onClick={() => handleRiskAction('single')}
-                className="card"
-                disabled={riskFeedback !== ""}
-                style={{
-                  padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
-                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
-                  opacity: riskFeedback.includes('Poor harvest') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
-                }}
-              >
-                <div style={{ fontSize: '3rem' }}>🌽</div>
-                <strong>Sell Only Corn</strong>
-              </button>
-              <button
-                onClick={() => handleRiskAction('diverse')}
-                className="card"
-                disabled={riskFeedback !== ""}
-                style={{
-                  padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
-                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
-                  opacity: riskFeedback.includes('Safe') || riskFeedback.includes('Survival') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
-                }}
-              >
-                <div style={{ fontSize: '3rem' }}>🛍️</div>
-                <strong>Mixed Goods</strong>
-              </button>
+            <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+              <button onClick={checkCryptoProgress} className="btn btn-primary" style={{ width: '100%' }}>Check Progress ✅</button>
+              <p style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                Mastery rule: Only investors can withdraw funds from this module.
+              </p>
             </div>
           </div>
-
-          {riskFeedback && (
-            <div style={{
-              padding: '1rem', borderRadius: '12px',
-              backgroundColor: riskFeedback.includes('Poor') ? 'rgba(255,68,68,0.1)' : 'rgba(0,200,81,0.1)',
-              border: `1px solid ${riskFeedback.includes('Poor') ? '#ff4444' : '#00C851'}`,
-              animation: 'popIn 0.3s'
-            }}>
-              <p style={{ margin: 0, fontWeight: 'bold', textAlign: 'center' }}>{riskFeedback}</p>
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      id: 16,
-      title: "Wealth Engine: Diversified Choice 🌍",
-      desc: "Invest to earn passive income.",
-      content: (
-        <div>
-          <p><strong>Stage {cryptoStage + 1}/3:</strong> Build your wealth engine.</p>
-          <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1rem' }}>
-            Hold assets to earn money automatically every 5 seconds! 💸
-          </p>
-
-          {/* TOTAL WEALTH CARD */}
-          <div style={{
-            backgroundColor: '#007E33', padding: '1.5rem', borderRadius: '20px',
-            color: 'white', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.2)',
-            boxShadow: '0 8px 32px rgba(0,200,81,0.2)'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>Available Cash</p>
-                <h3 style={{ margin: 0, fontSize: '1.8rem' }}>₦{Math.round(portfolio.cash)}</h3>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>Income Pulse</p>
-                <h3 style={{ margin: 0, color: '#00C851' }}>+₦{
-                  (portfolio.realEstate * 50) + (portfolio.stocks * 5) + (portfolio.bankFixed * 10)
-                }/5s</h3>
-              </div>
-            </div>
-            <p style={{ fontSize: '0.75rem', marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.5rem' }}>
-              Target to Mastery: <strong>₦{cryptoStages[cryptoStage].target}</strong>
-            </p>
-          </div>
-
-          {/* ASSET GRID */}
-          <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-            {wealthAssets.map((asset) => (
-              <div key={asset.id} style={{
-                backgroundColor: '#2c2c2c', padding: '1rem', borderRadius: '15px',
-                border: `1px solid ${asset.color}`, display: 'flex', flexDirection: 'column', gap: '0.5rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <span style={{ fontSize: '1.2rem' }}>{asset.name}</span>
-                  <span style={{ fontSize: '0.7rem', color: '#aaa' }}>{asset.yieldDesc}</span>
-                </div>
-                <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>₦{prices[asset.id].toLocaleString()}</div>
-                <div style={{ fontSize: '0.75rem', color: '#888' }}>
-                  Owned: {portfolio[asset.id].toFixed(2)}
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  <button onClick={() => handleCryptoTrade(asset.id, 'buy')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#00C851', fontSize: '0.7rem', padding: '0.4rem' }}>Buy ₦100</button>
-                  <button onClick={() => handleCryptoTrade(asset.id, 'sell')} className="btn btn-sm" style={{ flex: 1, backgroundColor: '#ff4444', fontSize: '0.7rem', padding: '0.4rem' }}>Sell All</button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-            <button onClick={checkCryptoProgress} className="btn btn-primary" style={{ width: '100%' }}>Check Progress ✅</button>
-            <p style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.5rem', fontStyle: 'italic' }}>
-              Mastery rule: Only investors can withdraw funds from this module.
-            </p>
-          </div>
-        </div>
-      )
-    }
+        )
+}
   ];
 
-  return (
-    <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
-      {/* MASTERY BADGE MODAL */}
-      {showBadge && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 10000,
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          padding: '1rem'
+return (
+  <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+    {/* MASTERY BADGE MODAL */}
+    {showBadge && (
+      <div style={{
+        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+        backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 10000,
+        display: 'flex', justifyContent: 'center', alignItems: 'center',
+        padding: '1rem'
+      }}>
+        <div className="card" style={{
+          maxWidth: '400px', width: '100%', textAlign: 'center',
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #333 100%)',
+          border: '2px solid #FFD700', borderRadius: '24px', padding: '2.5rem',
+          boxShadow: '0 0 30px rgba(255, 215, 0, 0.3)',
+          animation: 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
         }}>
-          <div className="card" style={{
-            maxWidth: '400px', width: '100%', textAlign: 'center',
-            background: 'linear-gradient(135deg, #1a1a1a 0%, #333 100%)',
-            border: '2px solid #FFD700', borderRadius: '24px', padding: '2.5rem',
-            boxShadow: '0 0 30px rgba(255, 215, 0, 0.3)',
-            animation: 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          <div style={{ fontSize: '5rem', marginBottom: '1.5rem' }}>🏅</div>
+          <h2 style={{ color: '#FFD700', marginBottom: '0.5rem' }}>FINANCE MASTER!</h2>
+          <p style={{ color: '#fff', marginBottom: '1.5rem' }}>
+            Congratulations! You've unlocked all 16 levels of Financial Literacy.
+            You are now a certified Wealth Builder! 👑
+          </p>
+          <div style={{
+            backgroundColor: 'rgba(255,215,0,0.1)', border: '1px dashed #FFD700',
+            padding: '1rem', borderRadius: '12px', marginBottom: '2rem'
           }}>
-            <div style={{ fontSize: '5rem', marginBottom: '1.5rem' }}>🏅</div>
-            <h2 style={{ color: '#FFD700', marginBottom: '0.5rem' }}>FINANCE MASTER!</h2>
-            <p style={{ color: '#fff', marginBottom: '1.5rem' }}>
-              Congratulations! You've unlocked all 16 levels of Financial Literacy.
-              You are now a certified Wealth Builder! 👑
-            </p>
-            <div style={{
-              backgroundColor: 'rgba(255,215,0,0.1)', border: '1px dashed #FFD700',
-              padding: '1rem', borderRadius: '12px', marginBottom: '2rem'
-            }}>
-              <span style={{ fontSize: '0.8rem', color: '#FFD700' }}>RANK EARNED</span>
-              <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }}>Village Treasurer 💰</div>
-            </div>
-            <button
-              onClick={() => setShowBadge(false)}
-              className="btn"
-              style={{ width: '100%', backgroundColor: '#FFD700', color: '#000', fontWeight: 'bold' }}
-            >
-              SHOW OFF MY BADGE! 🚀
-            </button>
+            <span style={{ fontSize: '0.8rem', color: '#FFD700' }}>RANK EARNED</span>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }}>Village Treasurer 💰</div>
           </div>
+          <button
+            onClick={() => setShowBadge(false)}
+            className="btn"
+            style={{ width: '100%', backgroundColor: '#FFD700', color: '#000', fontWeight: 'bold' }}
+          >
+            SHOW OFF MY BADGE! 🚀
+          </button>
         </div>
-      )}
+      </div>
+    )}
 
-      {/* CONFETTI */}
-      {showConfetti && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9999,
-          background: 'radial-gradient(circle, transparent 20%, transparent 20%, transparent 80%, transparent 80%, transparent 100%), radial-gradient(circle, transparent 20%, transparent 20%, transparent 80%, transparent 80%, transparent 100%)',
-          backgroundSize: '10px 10px',
-          animation: 'confetti 1s infinite'
-        }}></div>
-      )}
-      <style>{`
+    {/* CONFETTI */}
+    {showConfetti && (
+      <div style={{
+        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9999,
+        background: 'radial-gradient(circle, transparent 20%, transparent 20%, transparent 80%, transparent 80%, transparent 100%), radial-gradient(circle, transparent 20%, transparent 20%, transparent 80%, transparent 80%, transparent 100%)',
+        backgroundSize: '10px 10px',
+        animation: 'confetti 1s infinite'
+      }}></div>
+    )}
+    <style>{`
                 @keyframes confetti {
                     0% { background-position: 0 0, 10px 10px; opacity: 1; }
                     100% { background-position: 0 100px, 10px 110px; opacity: 0; }
                 }
             `}</style>
 
-      <button
-        onClick={() => navigate('/')}
-        style={{
-          background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '2rem',
-          display: 'flex', alignItems: 'center', gap: '0.5rem'
-        }}
-      >
-        ← Back to Hub
-      </button>
+    <button
+      onClick={() => navigate('/')}
+      style={{
+        background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '2rem',
+        display: 'flex', alignItems: 'center', gap: '0.5rem'
+      }}
+    >
+      ← Back to Hub
+    </button>
 
-      <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '800px', margin: '0 auto 3rem auto' }}>
-        <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
-          {isKid || isTeen ? "Path to Wealth 🚀" : "Financial Literacy 💰"}
-        </h1>
-        <p style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', color: 'var(--color-text-muted)' }}>
-          {isKid || isTeen ? "Level Up & Earn Real Cash!" : "Master the Rules of Money"}
-        </p>
-        <div style={{ display: 'inline-block', padding: '0.4rem 1rem', border: '1px solid var(--color-primary)', borderRadius: '20px', marginTop: '1rem', color: 'var(--color-primary)', fontSize: '0.9rem' }}>
-          Mode: {ageGroup || 'Adults'}
+    <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '800px', margin: '0 auto 3rem auto' }}>
+      <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
+        {isKid || isTeen ? "Path to Wealth 🚀" : "Financial Literacy 💰"}
+      </h1>
+      <p style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', color: 'var(--color-text-muted)' }}>
+        {isKid || isTeen ? "Level Up & Earn Real Cash!" : "Master the Rules of Money"}
+      </p>
+      <div style={{ display: 'inline-block', padding: '0.4rem 1rem', border: '1px solid var(--color-primary)', borderRadius: '20px', marginTop: '1rem', color: 'var(--color-primary)', fontSize: '0.9rem' }}>
+        Mode: {ageGroup || 'Adults'}
+      </div>
+    </header>
+    {(isKid || isTeen) ? (
+      <>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
+          <div style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-secondary)', borderRadius: '20px', color: 'var(--color-secondary)' }}>
+            Module Earning: ₦{moduleEarnings.finance || 0} / ₦{MODULE_CAP}
+          </div>
+          <div style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-accent)', borderRadius: '20px', color: 'var(--color-accent)' }}>
+            Finance Balance: ₦{moduleBalances.finance || 0}
+          </div>
         </div>
-      </header>
-      {(isKid || isTeen) ? (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
-            <div style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-secondary)', borderRadius: '20px', color: 'var(--color-secondary)' }}>
-              Module Earning: ₦{moduleEarnings.finance || 0} / ₦{MODULE_CAP}
-            </div>
-            <div style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-accent)', borderRadius: '20px', color: 'var(--color-accent)' }}>
-              Finance Balance: ₦{moduleBalances.finance || 0}
-            </div>
+
+
+
+        {/* DREAM GOAL TRACKER */}
+        <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '20px', margin: '2rem 0', border: '1px solid #444' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h3 style={{ margin: 0, color: '#FFBB33' }}>🎯 My Dream Goal</h3>
+            <button onClick={() => setShowGoalInput(!showGoalInput)} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}>⚙️ Edit</button>
           </div>
 
-
-
-          {/* DREAM GOAL TRACKER */}
-          <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '20px', margin: '2rem 0', border: '1px solid #444' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ margin: 0, color: '#FFBB33' }}>🎯 My Dream Goal</h3>
-              <button onClick={() => setShowGoalInput(!showGoalInput)} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}>⚙️ Edit</button>
+          {showGoalInput ? (
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              <input type="text" placeholder="Goal (e.g. Bicycle)" value={dreamGoal} onChange={(e) => setDreamGoal(e.target.value)} style={{ flex: '1 1 200px', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#333', color: 'white', border: '1px solid #444' }} />
+              <input type="number" placeholder="Cost (₦)" value={dreamCost} onChange={(e) => setDreamCost(Number(e.target.value))} style={{ flex: '1 1 120px', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#333', color: 'white', border: '1px solid #444' }} />
+              <button onClick={() => setShowGoalInput(false)} className="btn btn-primary" style={{ flex: '1 1 100%', padding: '0.8rem' }}>Save Goal</button>
             </div>
+          ) : (
+            <div style={{ textAlign: 'center' }}>
+              <h2 style={{ margin: '0 0 0.5rem 0' }}>{dreamGoal || "Set a Goal!"}</h2>
+              <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Target: ₦{dreamCost.toLocaleString()}</p>
+            </div>
+          )}
 
-            {showGoalInput ? (
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-                <input type="text" placeholder="Goal (e.g. Bicycle)" value={dreamGoal} onChange={(e) => setDreamGoal(e.target.value)} style={{ flex: '1 1 200px', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#333', color: 'white', border: '1px solid #444' }} />
-                <input type="number" placeholder="Cost (₦)" value={dreamCost} onChange={(e) => setDreamCost(Number(e.target.value))} style={{ flex: '1 1 120px', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#333', color: 'white', border: '1px solid #444' }} />
-                <button onClick={() => setShowGoalInput(false)} className="btn btn-primary" style={{ flex: '1 1 100%', padding: '0.8rem' }}>Save Goal</button>
+          {/* Progress Bar */}
+          <div style={{ width: '100%', height: '20px', backgroundColor: '#444', borderRadius: '10px', overflow: 'hidden', marginTop: '0.5rem' }}>
+            <div style={{
+              width: `${Math.min(((moduleBalances.finance || 0) / (dreamCost || 1)) * 100, 100)}%`,
+              height: '100%',
+              backgroundColor: (moduleBalances.finance || 0) >= dreamCost ? '#00C851' : '#FFBB33',
+              transition: 'width 1s ease-in-out'
+            }}></div>
+          </div>
+          <p style={{ textAlign: 'right', fontSize: '0.8rem', marginTop: '0.5rem', color: '#aaa' }}>
+            {dreamCost > 0 ? `${Math.round(((moduleBalances.finance || 0) / dreamCost) * 100)}% Reached` : "0%"}
+          </p>
+        </div>
+
+        {/* TROPHY CASE */}
+        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '2rem', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '15px' }}>
+          <div style={{ textAlign: 'center', opacity: currentLevel > 3 ? 1 : 0.3, filter: currentLevel > 3 ? 'none' : 'grayscale(1)' }}>
+            <div style={{ fontSize: '2.5rem' }}>🥉</div>
+            <p style={{ fontSize: '0.8rem', margin: 0 }}>Saver Scout</p>
+          </div>
+          <div style={{ textAlign: 'center', opacity: currentLevel > 7 ? 1 : 0.3, filter: currentLevel > 7 ? 'none' : 'grayscale(1)' }}>
+            <div style={{ fontSize: '2.5rem' }}>🥈</div>
+            <p style={{ fontSize: '0.8rem', margin: 0 }}>Smart Investor</p>
+          </div>
+          <div style={{ textAlign: 'center', opacity: currentLevel > 11 ? 1 : 0.3, filter: currentLevel > 11 ? 'none' : 'grayscale(1)' }}>
+            <div style={{ fontSize: '2.5rem' }}>🥇</div>
+            <p style={{ fontSize: '0.8rem', margin: 0 }}>Scam Buster</p>
+          </div>
+        </div>
+        {/* WALLET CARD */}
+        <div style={{
+          background: 'linear-gradient(135deg, #00C851 0%, #007E33 100%)',
+          padding: '2rem', borderRadius: '24px', color: 'white', marginBottom: '2rem',
+          boxShadow: '0 10px 30px rgba(0,200,81,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          flexWrap: 'wrap', gap: '1.5rem'
+        }}>
+          <div>
+            <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Finance Wallet Balance</p>
+            <h2 style={{ fontSize: '2.5rem', margin: 0 }}>₦{moduleBalances.finance || 0}</h2>
+            <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Goal: ₦{WITHDRAWAL_LIMIT}</p>
+          </div>
+          <button
+            onClick={() => setShowWithdrawModal(true)}
+            disabled={(moduleBalances.finance || 0) < WITHDRAWAL_LIMIT}
+            style={{
+              backgroundColor: 'white', color: '#007E33', border: 'none', padding: '0.8rem 1.5rem',
+              borderRadius: '30px', fontWeight: 'bold', cursor: (moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? 'pointer' : 'not-allowed',
+              opacity: (moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? 1 : 0.5
+            }}
+          >
+            {(moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? "Withdraw 🏦" : "Locked 🔒"}
+          </button>
+        </div>
+
+        {/* WITHDRAW MODAL */}
+        {
+          showWithdrawModal && (
+            <div style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)',
+              display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10000
+            }}>
+              <div style={{ backgroundColor: '#222', padding: '2rem', borderRadius: '20px', width: '90%', maxWidth: '400px', border: '2px solid #00C851', textAlign: 'center' }}>
+                <h2 style={{ color: '#00C851', marginTop: 0 }}>Withdraw ₦{WITHDRAWAL_LIMIT}</h2>
+
+                {!verificationStatus || verificationStatus === 'idle' ? (
+                  <>
+                    <p>To ensure secure transactions, we must verify your identity and wealth records.</p>
+                    <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', margin: '1rem 0', textAlign: 'left' }}>
+                      <p style={{ margin: '0.4rem 0' }}>📋 <strong>Requirement 1:</strong> Balance ≥ ₦{WITHDRAWAL_LIMIT} ✅</p>
+                      <p style={{ margin: '0.4rem 0' }}>📜 <strong>Requirement 2:</strong> History Wallet ≥ ₦2,000 {moduleBalances.history >= 2000 ? '✅' : '❌'}</p>
+                      <p style={{ margin: '0.4rem 0' }}>🏗️ <strong>Requirement 3:</strong> Active Investments {(portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0) ? '✅' : '❌'}</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button
+                        onClick={() => {
+                          const hasInvestments = portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0;
+                          if (hasInvestments && (moduleBalances.history || 0) >= 2000) {
+                            setVerificationStatus('verifying');
+                            setTimeout(() => setVerificationStatus('success'), 3000);
+                          } else {
+                            setVerificationStatus('failed');
+                          }
+                        }}
+                        className="btn"
+                        style={{ backgroundColor: '#00C851', flex: 1 }}
+                      >
+                        Start Verification 🕵️‍♂️
+                      </button>
+                      <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Cancel</button>
+                    </div>
+                  </>
+
+                ) : verificationStatus === 'verifying' ? (
+                  <div style={{ padding: '2rem' }}>
+                    <div className="spinner" style={{ width: '50px', height: '50px', border: '5px solid #333', borderTop: '5px solid #00C851', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem auto' }}></div>
+                    <p>Verifying Identity...</p>
+                    <p style={{ fontSize: '0.8rem', color: '#aaa' }}>Checking History Module Records...</p>
+                    <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+                  </div>
+                ) : verificationStatus === 'failed' ? (
+                  <div>
+                    <h3 style={{ color: '#ff4444' }}>Verification Failed ❌</h3>
+                    <p>Your History Wallet balance is too low.</p>
+                    <p>You need at least <strong>₦2,000</strong> in your History Wallet to prove you understand our roots before building wealth.</p>
+                    <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#333', marginTop: '1rem' }}>Close & Go Earn</button>
+                  </div>
+                ) : (
+                  // SUCCESS - SHOW FORM
+                  <div style={{ animation: 'fadeIn 0.5s' }}>
+                    <p style={{ color: '#00C851', fontWeight: 'bold' }}>Verification Successful! ✅</p>
+                    <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Enter your Nigerian Bank Account details.</p>
+                    <input type="text" placeholder="Bank Name (e.g. GTBank)" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
+                    <input type="text" placeholder="Account Number" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
+                    <input type="text" placeholder="Account Name" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button onClick={() => showToast("Withdrawal Request Sent! 🚀 (This is a demo)", 'success')} className="btn" style={{ backgroundColor: '#00C851', flex: 1 }}>Confirm</button>
+                      <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Cancel</button>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div style={{ textAlign: 'center' }}>
-                <h2 style={{ margin: '0 0 0.5rem 0' }}>{dreamGoal || "Set a Goal!"}</h2>
-                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Target: ₦{dreamCost.toLocaleString()}</p>
-              </div>
-            )}
+            </div>
+          )
+        }
 
-            {/* Progress Bar */}
-            <div style={{ width: '100%', height: '20px', backgroundColor: '#444', borderRadius: '10px', overflow: 'hidden', marginTop: '0.5rem' }}>
-              <div style={{
-                width: `${Math.min(((moduleBalances.finance || 0) / (dreamCost || 1)) * 100, 100)}%`,
-                height: '100%',
-                backgroundColor: (moduleBalances.finance || 0) >= dreamCost ? '#00C851' : '#FFBB33',
-                transition: 'width 1s ease-in-out'
-              }}></div>
-            </div>
-            <p style={{ textAlign: 'right', fontSize: '0.8rem', marginTop: '0.5rem', color: '#aaa' }}>
-              {dreamCost > 0 ? `${Math.round(((moduleBalances.finance || 0) / dreamCost) * 100)}% Reached` : "0%"}
-            </p>
-          </div>
-
-          {/* TROPHY CASE */}
-          <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '2rem', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '15px' }}>
-            <div style={{ textAlign: 'center', opacity: currentLevel > 3 ? 1 : 0.3, filter: currentLevel > 3 ? 'none' : 'grayscale(1)' }}>
-              <div style={{ fontSize: '2.5rem' }}>🥉</div>
-              <p style={{ fontSize: '0.8rem', margin: 0 }}>Saver Scout</p>
-            </div>
-            <div style={{ textAlign: 'center', opacity: currentLevel > 7 ? 1 : 0.3, filter: currentLevel > 7 ? 'none' : 'grayscale(1)' }}>
-              <div style={{ fontSize: '2.5rem' }}>🥈</div>
-              <p style={{ fontSize: '0.8rem', margin: 0 }}>Smart Investor</p>
-            </div>
-            <div style={{ textAlign: 'center', opacity: currentLevel > 11 ? 1 : 0.3, filter: currentLevel > 11 ? 'none' : 'grayscale(1)' }}>
-              <div style={{ fontSize: '2.5rem' }}>🥇</div>
-              <p style={{ fontSize: '0.8rem', margin: 0 }}>Scam Buster</p>
-            </div>
-          </div>
-          {/* WALLET CARD */}
-          <div style={{
-            background: 'linear-gradient(135deg, #00C851 0%, #007E33 100%)',
-            padding: '2rem', borderRadius: '24px', color: 'white', marginBottom: '2rem',
-            boxShadow: '0 10px 30px rgba(0,200,81,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            flexWrap: 'wrap', gap: '1.5rem'
-          }}>
-            <div>
-              <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Finance Wallet Balance</p>
-              <h2 style={{ fontSize: '2.5rem', margin: 0 }}>₦{moduleBalances.finance || 0}</h2>
-              <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Goal: ₦{WITHDRAWAL_LIMIT}</p>
-            </div>
+        {/* CERTIFICATE BUTTON */}
+        {currentLevel > 14 && (
+          <div style={{ textAlign: 'center', marginBottom: '2rem', animation: 'fadeIn 1s' }}>
+            <h2 style={{ color: '#FFD700' }}>🎉 Congratulations! 🎉</h2>
+            <p>You have mastered the Finance Module!</p>
             <button
-              onClick={() => setShowWithdrawModal(true)}
-              disabled={(moduleBalances.finance || 0) < WITHDRAWAL_LIMIT}
+              onClick={() => setShowCertificate(true)}
+              className="btn"
               style={{
-                backgroundColor: 'white', color: '#007E33', border: 'none', padding: '0.8rem 1.5rem',
-                borderRadius: '30px', fontWeight: 'bold', cursor: (moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? 'pointer' : 'not-allowed',
-                opacity: (moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? 1 : 0.5
+                backgroundColor: '#FFD700', color: 'black', fontWeight: 'bold',
+                padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '30px',
+                boxShadow: '0 0 20px rgba(255, 215, 0, 0.5)', border: 'none', cursor: 'pointer'
               }}
             >
-              {(moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? "Withdraw 🏦" : "Locked 🔒"}
+              🎓 View Your Certificate
             </button>
           </div>
+        )}
 
-          {/* WITHDRAW MODAL */}
-          {
-            showWithdrawModal && (
-              <div style={{
-                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.8)',
-                display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10000
+        {/* CERTIFICATE MODAL */}
+        {showCertificate && (
+          <div style={{
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.9)',
+            display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10001
+          }}>
+            <div style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '10px', maxWidth: '600px', width: '90%', textAlign: 'center', color: 'black' }}>
+              <h2 style={{ color: '#007E33', fontFamily: 'serif', fontSize: '2.5rem', marginBottom: '0.5rem' }}>Certificate of Completion</h2>
+              <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>Awarded to</p>
+
+              {/* INPUTS */}
+              <div style={{ marginBottom: '2rem' }}>
+                <input
+                  type="text"
+                  placeholder="Enter Your Full Name"
+                  value={userNameInput}
+                  onChange={(e) => setUserNameInput(e.target.value)}
+                  style={{ padding: '0.5rem', width: '70%', marginRight: '0.5rem', border: '1px solid #ccc', borderRadius: '5px' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Country"
+                  value={userCountryInput}
+                  onChange={(e) => setUserCountryInput(e.target.value)}
+                  style={{ padding: '0.5rem', width: '25%', border: '1px solid #ccc', borderRadius: '5px' }}
+                />
+                <button
+                  onClick={() => {
+                    setUserName(userNameInput);
+                    setUserCountry(userCountryInput);
+                  }}
+                  style={{ display: 'block', margin: '1rem auto', padding: '0.5rem 1rem', backgroundColor: '#007E33', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                >
+                  Update Name
+                </button>
+              </div>
+
+              {/* PREVIEW AREA */}
+              <div id="certificate-preview" style={{
+                border: '10px solid #FFD700', padding: '2rem', position: 'relative',
+                backgroundImage: 'linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url("https://www.transparenttextures.com/patterns/cubes.png")',
+                marginBottom: '2rem'
               }}>
-                <div style={{ backgroundColor: '#222', padding: '2rem', borderRadius: '20px', width: '90%', maxWidth: '400px', border: '2px solid #00C851', textAlign: 'center' }}>
-                  <h2 style={{ color: '#00C851', marginTop: 0 }}>Withdraw ₦{WITHDRAWAL_LIMIT}</h2>
-
-                  {!verificationStatus || verificationStatus === 'idle' ? (
-                    <>
-                      <p>To ensure secure transactions, we must verify your identity and wealth records.</p>
-                      <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', margin: '1rem 0', textAlign: 'left' }}>
-                        <p style={{ margin: '0.4rem 0' }}>📋 <strong>Requirement 1:</strong> Balance ≥ ₦{WITHDRAWAL_LIMIT} ✅</p>
-                        <p style={{ margin: '0.4rem 0' }}>📜 <strong>Requirement 2:</strong> History Wallet ≥ ₦2,000 {moduleBalances.history >= 2000 ? '✅' : '❌'}</p>
-                        <p style={{ margin: '0.4rem 0' }}>🏗️ <strong>Requirement 3:</strong> Active Investments {(portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0) ? '✅' : '❌'}</p>
-                      </div>
-                      <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button
-                          onClick={() => {
-                            const hasInvestments = portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0;
-                            if (hasInvestments && (moduleBalances.history || 0) >= 2000) {
-                              setVerificationStatus('verifying');
-                              setTimeout(() => setVerificationStatus('success'), 3000);
-                            } else {
-                              setVerificationStatus('failed');
-                            }
-                          }}
-                          className="btn"
-                          style={{ backgroundColor: '#00C851', flex: 1 }}
-                        >
-                          Start Verification 🕵️‍♂️
-                        </button>
-                        <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Cancel</button>
-                      </div>
-                    </>
-
-                  ) : verificationStatus === 'verifying' ? (
-                    <div style={{ padding: '2rem' }}>
-                      <div className="spinner" style={{ width: '50px', height: '50px', border: '5px solid #333', borderTop: '5px solid #00C851', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem auto' }}></div>
-                      <p>Verifying Identity...</p>
-                      <p style={{ fontSize: '0.8rem', color: '#aaa' }}>Checking History Module Records...</p>
-                      <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-                    </div>
-                  ) : verificationStatus === 'failed' ? (
-                    <div>
-                      <h3 style={{ color: '#ff4444' }}>Verification Failed ❌</h3>
-                      <p>Your History Wallet balance is too low.</p>
-                      <p>You need at least <strong>₦2,000</strong> in your History Wallet to prove you understand our roots before building wealth.</p>
-                      <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#333', marginTop: '1rem' }}>Close & Go Earn</button>
-                    </div>
-                  ) : (
-                    // SUCCESS - SHOW FORM
-                    <div style={{ animation: 'fadeIn 0.5s' }}>
-                      <p style={{ color: '#00C851', fontWeight: 'bold' }}>Verification Successful! ✅</p>
-                      <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Enter your Nigerian Bank Account details.</p>
-                      <input type="text" placeholder="Bank Name (e.g. GTBank)" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
-                      <input type="text" placeholder="Account Number" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
-                      <input type="text" placeholder="Account Name" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
-                      <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button onClick={() => showToast("Withdrawal Request Sent! 🚀 (This is a demo)", 'success')} className="btn" style={{ backgroundColor: '#00C851', flex: 1 }}>Confirm</button>
-                        <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Cancel</button>
-                      </div>
-                    </div>
-                  )}
+                <h1 style={{ color: '#007E33', fontFamily: 'serif', margin: '1rem 0' }}>{userName || "Your Name Here"}</h1>
+                <p>Has successfully completed the</p>
+                <h3 style={{ color: '#000' }}>Financial Literacy Module</h3>
+                <p>at the African Education Hub</p>
+                <p style={{ marginTop: '2rem', fontWeight: 'bold' }}>{userCountry || "Africa"}</p>
+                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', borderTop: '1px solid #ccc', paddingTop: '1rem' }}>
+                  <span>Date: {new Date().toLocaleDateString()}</span>
+                  <span>Signature: Dr. Finance</span>
                 </div>
               </div>
-            )
-          }
 
-          {/* CERTIFICATE BUTTON */}
-          {currentLevel > 14 && (
-            <div style={{ textAlign: 'center', marginBottom: '2rem', animation: 'fadeIn 1s' }}>
-              <h2 style={{ color: '#FFD700' }}>🎉 Congratulations! 🎉</h2>
-              <p>You have mastered the Finance Module!</p>
-              <button
-                onClick={() => setShowCertificate(true)}
-                className="btn"
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <button
+                  onClick={() => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 800;
+                    canvas.height = 600;
+                    const ctx = canvas.getContext('2d');
+
+                    // Background
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, 800, 600);
+
+                    // Border
+                    ctx.strokeStyle = '#FFD700';
+                    ctx.lineWidth = 20;
+                    ctx.strokeRect(10, 10, 780, 580);
+
+                    // Text
+                    ctx.textAlign = 'center';
+                    ctx.fillStyle = '#007E33';
+                    ctx.font = 'bold 40px serif';
+                    ctx.fillText('Certificate of Completion', 400, 100);
+
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '20px sans-serif';
+                    ctx.fillText('Awarded to', 400, 160);
+
+                    ctx.fillStyle = '#007E33';
+                    ctx.font = 'bold 60px serif';
+                    ctx.fillText(userName || "Student", 400, 250);
+
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '20px sans-serif';
+                    ctx.fillText('For successfully completing the', 400, 320);
+
+                    ctx.fillStyle = '#000000';
+                    ctx.font = 'bold 30px sans-serif';
+                    ctx.fillText('Financial Literacy Module', 400, 370);
+
+                    ctx.font = '20px sans-serif';
+                    ctx.fillText(`Country: ${userCountry || "Africa"}`, 400, 450);
+
+                    ctx.font = 'italic 15px sans-serif';
+                    ctx.fillText(`Date: ${new Date().toLocaleDateString()}`, 400, 550);
+
+                    // Download
+                    const link = document.createElement('a');
+                    link.download = 'Finance_Certificate.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                  }}
+                  className="btn"
+                  style={{ backgroundColor: '#007E33', color: 'white', border: 'none', padding: '0.5rem 1rem', cursor: 'pointer' }}
+                >
+                  Download Image 📥
+                </button>
+                <button onClick={() => setShowCertificate(false)} className="btn" style={{ backgroundColor: '#ff4444', color: 'white', border: 'none', padding: '0.5rem 1rem', cursor: 'pointer' }}>Close</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* LEVELS LIST */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {modules.map((module) => {
+            const isLocked = module.id > (currentLevel || 1);
+            const isCompleted = module.id < currentLevel;
+            return (
+              <div
+                key={module.id}
+                className="card"
                 style={{
-                  backgroundColor: '#FFD700', color: 'black', fontWeight: 'bold',
-                  padding: '1rem 2rem', fontSize: '1.2rem', borderRadius: '30px',
-                  boxShadow: '0 0 20px rgba(255, 215, 0, 0.5)', border: 'none', cursor: 'pointer'
+                  padding: '0', overflow: 'hidden',
+                  borderLeft: isCompleted ? '4px solid #00C851' : (isLocked ? '4px solid #555' : '4px solid var(--color-primary)'),
+                  opacity: isLocked ? 0.5 : 1,
+                  filter: isLocked ? 'grayscale(1)' : 'none'
                 }}
               >
-                🎓 View Your Certificate
-              </button>
-            </div>
-          )}
-
-          {/* CERTIFICATE MODAL */}
-          {showCertificate && (
-            <div style={{
-              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.9)',
-              display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10001
-            }}>
-              <div style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '10px', maxWidth: '600px', width: '90%', textAlign: 'center', color: 'black' }}>
-                <h2 style={{ color: '#007E33', fontFamily: 'serif', fontSize: '2.5rem', marginBottom: '0.5rem' }}>Certificate of Completion</h2>
-                <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>Awarded to</p>
-
-                {/* INPUTS */}
-                <div style={{ marginBottom: '2rem' }}>
-                  <input
-                    type="text"
-                    placeholder="Enter Your Full Name"
-                    value={userNameInput}
-                    onChange={(e) => setUserNameInput(e.target.value)}
-                    style={{ padding: '0.5rem', width: '70%', marginRight: '0.5rem', border: '1px solid #ccc', borderRadius: '5px' }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Country"
-                    value={userCountryInput}
-                    onChange={(e) => setUserCountryInput(e.target.value)}
-                    style={{ padding: '0.5rem', width: '25%', border: '1px solid #ccc', borderRadius: '5px' }}
-                  />
-                  <button
-                    onClick={() => {
-                      setUserName(userNameInput);
-                      setUserCountry(userCountryInput);
-                    }}
-                    style={{ display: 'block', margin: '1rem auto', padding: '0.5rem 1rem', backgroundColor: '#007E33', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-                  >
-                    Update Name
-                  </button>
-                </div>
-
-                {/* PREVIEW AREA */}
-                <div id="certificate-preview" style={{
-                  border: '10px solid #FFD700', padding: '2rem', position: 'relative',
-                  backgroundImage: 'linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url("https://www.transparenttextures.com/patterns/cubes.png")',
-                  marginBottom: '2rem'
-                }}>
-                  <h1 style={{ color: '#007E33', fontFamily: 'serif', margin: '1rem 0' }}>{userName || "Your Name Here"}</h1>
-                  <p>Has successfully completed the</p>
-                  <h3 style={{ color: '#000' }}>Financial Literacy Module</h3>
-                  <p>at the African Education Hub</p>
-                  <p style={{ marginTop: '2rem', fontWeight: 'bold' }}>{userCountry || "Africa"}</p>
-                  <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', borderTop: '1px solid #ccc', paddingTop: '1rem' }}>
-                    <span>Date: {new Date().toLocaleDateString()}</span>
-                    <span>Signature: Dr. Finance</span>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                  <button
-                    onClick={() => {
-                      const canvas = document.createElement('canvas');
-                      canvas.width = 800;
-                      canvas.height = 600;
-                      const ctx = canvas.getContext('2d');
-
-                      // Background
-                      ctx.fillStyle = '#ffffff';
-                      ctx.fillRect(0, 0, 800, 600);
-
-                      // Border
-                      ctx.strokeStyle = '#FFD700';
-                      ctx.lineWidth = 20;
-                      ctx.strokeRect(10, 10, 780, 580);
-
-                      // Text
-                      ctx.textAlign = 'center';
-                      ctx.fillStyle = '#007E33';
-                      ctx.font = 'bold 40px serif';
-                      ctx.fillText('Certificate of Completion', 400, 100);
-
-                      ctx.fillStyle = '#000000';
-                      ctx.font = '20px sans-serif';
-                      ctx.fillText('Awarded to', 400, 160);
-
-                      ctx.fillStyle = '#007E33';
-                      ctx.font = 'bold 60px serif';
-                      ctx.fillText(userName || "Student", 400, 250);
-
-                      ctx.fillStyle = '#000000';
-                      ctx.font = '20px sans-serif';
-                      ctx.fillText('For successfully completing the', 400, 320);
-
-                      ctx.fillStyle = '#000000';
-                      ctx.font = 'bold 30px sans-serif';
-                      ctx.fillText('Financial Literacy Module', 400, 370);
-
-                      ctx.font = '20px sans-serif';
-                      ctx.fillText(`Country: ${userCountry || "Africa"}`, 400, 450);
-
-                      ctx.font = 'italic 15px sans-serif';
-                      ctx.fillText(`Date: ${new Date().toLocaleDateString()}`, 400, 550);
-
-                      // Download
-                      const link = document.createElement('a');
-                      link.download = 'Finance_Certificate.png';
-                      link.href = canvas.toDataURL();
-                      link.click();
-                    }}
-                    className="btn"
-                    style={{ backgroundColor: '#007E33', color: 'white', border: 'none', padding: '0.5rem 1rem', cursor: 'pointer' }}
-                  >
-                    Download Image 📥
-                  </button>
-                  <button onClick={() => setShowCertificate(false)} className="btn" style={{ backgroundColor: '#ff4444', color: 'white', border: 'none', padding: '0.5rem 1rem', cursor: 'pointer' }}>Close</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* LEVELS LIST */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {modules.map((module) => {
-              const isLocked = module.id > (currentLevel || 1);
-              const isCompleted = module.id < currentLevel;
-              return (
                 <div
-                  key={module.id}
-                  className="card"
+                  onClick={() => !isLocked && toggleModule(module.id)}
                   style={{
-                    padding: '0', overflow: 'hidden',
-                    borderLeft: isCompleted ? '4px solid #00C851' : (isLocked ? '4px solid #555' : '4px solid var(--color-primary)'),
-                    opacity: isLocked ? 0.5 : 1,
-                    filter: isLocked ? 'grayscale(1)' : 'none'
+                    padding: '1.5rem', cursor: isLocked ? 'not-allowed' : 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    backgroundColor: expandedModule === module.id ? 'rgba(255,255,255,0.05)' : 'transparent'
                   }}
                 >
-                  <div
-                    onClick={() => !isLocked && toggleModule(module.id)}
-                    style={{
-                      padding: '1.5rem', cursor: isLocked ? 'not-allowed' : 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      backgroundColor: expandedModule === module.id ? 'rgba(255,255,255,0.05)' : 'transparent'
-                    }}
-                  >
-                    <div>
-                      <h3 style={{ margin: 0, color: isCompleted ? '#00C851' : (isLocked ? '#888' : 'var(--color-primary)') }}>
-                        {module.id}. {module.title} {isCompleted && '✅'} {isLocked && '🔒'}
-                      </h3>
-                      <p style={{ margin: '0.5rem 0 0 0', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>{module.desc}</p>
-                    </div>
-                    {!isLocked && <span style={{ fontSize: '1.5rem', transform: expandedModule === module.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>▼</span>}
+                  <div>
+                    <h3 style={{ margin: 0, color: isCompleted ? '#00C851' : (isLocked ? '#888' : 'var(--color-primary)') }}>
+                      {module.id}. {module.title} {isCompleted && '✅'} {isLocked && '🔒'}
+                    </h3>
+                    <p style={{ margin: '0.5rem 0 0 0', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>{module.desc}</p>
                   </div>
-
-                  {expandedModule === module.id && (
-                    <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', animation: 'fadeIn 0.5s' }}>
-                      {module.content}
-                    </div>
-                  )}
+                  {!isLocked && <span style={{ fontSize: '1.5rem', transform: expandedModule === module.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>▼</span>}
                 </div>
-              );
-            })}
-          </div>
-          {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-        </>
-      ) : (
-        // --- ADULT VIEW (Advanced Content & Tools) ---
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-          {/* FINANCIAL TOOLS SECTION */}
-          <div className="grid-cols">
-            {/* LOAN CALCULATOR */}
-            <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', border: '1px solid #444' }}>
-              <h3 style={{ color: '#FFBB33', marginTop: 0 }}>🏦 Loan Calculator</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <input type="number" placeholder="Loan Amount (₦)" onChange={(e) => setLoanPrincipal(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
-                <input type="number" placeholder="Interest Rate (%)" onChange={(e) => setLoanRate(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
-                <input type="number" placeholder="Term (Years)" onChange={(e) => setLoanTerm(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
-                <button
-                  onClick={() => {
-                    const r = loanRate / 100 / 12;
-                    const n = loanTerm * 12;
-                    const p = (loanPrincipal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                    setLoanPayment(p.toFixed(2));
-                  }}
-                  className="btn btn-sm" style={{ backgroundColor: '#FFBB33', color: 'black' }}
-                >
-                  Calculate Payment
-                </button>
-                {loanPayment && (
-                  <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'rgba(255, 187, 51, 0.1)', borderRadius: '10px', border: '1px solid rgba(255, 187, 51, 0.3)' }}>
-                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Monthly Payment</p>
-                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#FFBB33' }}>₦{Number(loanPayment).toLocaleString()}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* WEALTH PROJECTOR (Marketing Tool) */}
-            <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', border: '1px solid #444' }}>
-              <h3 style={{ color: '#00C851', marginTop: 0 }}>🚀 Wealth Projector</h3>
-              <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1rem' }}>See the power of <strong>Compound Interest</strong> with our High-Yield Real Estate Plan.</p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <input type="number" placeholder="Monthly Savings (₦)" onChange={(e) => setMonthlySave(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
-                <input type="number" placeholder="Duration (Years)" value={investDuration} onChange={(e) => setInvestDuration(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
-
-                <button
-                  onClick={() => {
-                    const months = investDuration * 12;
-
-                    // Standard Bank Rate (10% APY)
-                    const rateStd = 0.10 / 12;
-                    const fvStd = monthlySave * ((Math.pow(1 + rateStd, months) - 1) / rateStd);
-                    setStandardResult(Math.round(fvStd));
-
-                    // Partner Real Estate Rate (30% APY)
-                    const ratePartner = 0.30 / 12;
-                    const fvPartner = monthlySave * ((Math.pow(1 + ratePartner, months) - 1) / ratePartner);
-                    setPartnerResult(Math.round(fvPartner));
-                  }}
-                  className="btn btn-sm" style={{ backgroundColor: '#00C851', color: 'white', fontWeight: 'bold' }}
-                >
-                  Calculate Growth 📈
-                </button>
-
-                {(standardResult && partnerResult) && (
-                  <div style={{ marginTop: '1rem', animation: 'fadeIn 0.5s' }}>
-                    <div style={{ marginBottom: '0.5rem', padding: '0.5rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '5px' }}>
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Regular Bank (10%)</p>
-                      <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>₦{Number(standardResult).toLocaleString()}</p>
-                    </div>
-                    <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'rgba(0, 200, 81, 0.2)', borderRadius: '10px', border: '1px solid #00C851' }}>
-                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#00C851' }}>✨ With Our Real Estate Plan (30%)</p>
-                      <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#fff' }}>₦{Number(partnerResult).toLocaleString()}</p>
-                      <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', fontStyle: 'italic' }}>
-                        You earn <strong>₦{(partnerResult - standardResult).toLocaleString()}</strong> more!
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => showToast("Redirecting to Real Estate Partner Page... (Demo)", 'info')}
-                      className="btn"
-                      style={{ width: '100%', backgroundColor: '#FFD700', color: 'black', fontWeight: 'bold' }}
-                    >
-                      Start Investing Now 🏆
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* BEGINNER SECTION (Foundations) */}
-          <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '24px', border: '1px solid var(--color-border)' }}>
-            <h2 style={{ color: '#FFBB33', borderBottom: '1px solid #333', paddingBottom: '0.75rem', marginTop: 0 }}>🔰 Financial Foundations</h2>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>New to finance? Start here to build a solid understanding.</p>
-            <div className="grid-cols">
-              {modules.slice(0, 6).map((module) => (
-                <div key={module.id} className="card" style={{ padding: '1rem', borderLeft: '4px solid #FFBB33' }}>
-                  <h4 style={{ color: '#FFBB33', margin: '0 0 0.5rem 0' }}>{module.title}</h4>
-                  <p style={{ fontSize: '0.9rem', color: '#ccc' }}>{module.desc}</p>
-                  <div style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: '#fff' }}>
+                {expandedModule === module.id && (
+                  <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', animation: 'fadeIn 0.5s' }}>
                     {module.content}
                   </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      </>
+    ) : (
+      // --- ADULT VIEW (Advanced Content & Tools) ---
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
+        {/* FINANCIAL TOOLS SECTION */}
+        <div className="grid-cols">
+          {/* LOAN CALCULATOR */}
+          <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', border: '1px solid #444' }}>
+            <h3 style={{ color: '#FFBB33', marginTop: 0 }}>🏦 Loan Calculator</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <input type="number" placeholder="Loan Amount (₦)" onChange={(e) => setLoanPrincipal(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
+              <input type="number" placeholder="Interest Rate (%)" onChange={(e) => setLoanRate(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
+              <input type="number" placeholder="Term (Years)" onChange={(e) => setLoanTerm(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
+              <button
+                onClick={() => {
+                  const r = loanRate / 100 / 12;
+                  const n = loanTerm * 12;
+                  const p = (loanPrincipal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                  setLoanPayment(p.toFixed(2));
+                }}
+                className="btn btn-sm" style={{ backgroundColor: '#FFBB33', color: 'black' }}
+              >
+                Calculate Payment
+              </button>
+              {loanPayment && (
+                <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'rgba(255, 187, 51, 0.1)', borderRadius: '10px', border: '1px solid rgba(255, 187, 51, 0.3)' }}>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Monthly Payment</p>
+                  <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#FFBB33' }}>₦{Number(loanPayment).toLocaleString()}</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
-          {/* ADULT MODULES LIST (Advanced) */}
-          <div style={{ marginTop: '3rem' }}>
-            <h2 style={{ color: '#00C851', borderBottom: '1px solid #333', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>🎓 Advanced Curriculum</h2>
-            <div className="grid-cols">
-              {[
-                { id: 1, title: "Inflation Hedging 🛡️", desc: "Protecting against devaluation.", content: "Store value in assets like Real Estate, Gold, or Stablecoins to beat inflation." },
-                { id: 2, title: "Emergency Funds 🚑", desc: "3-6 months of expenses.", content: "Keep this in a liquid account (like a Savings Account) for unexpected events." },
-                { id: 3, title: "Debt Management 💳", desc: "Snowball vs Avalanche.", content: "Snowball: Smallest debts first. Avalanche: Highest interest first." },
-                { id: 4, title: "Estate Planning 📜", desc: "Wills and Trusts.", content: "Protect your legacy. Ensure your assets go to loved ones without legal battles." },
-                { id: 5, title: "Retirement Savings Account 🇳🇬", desc: "Pension Reform.", content: "Ensure employer remissions. You can also make voluntary contributions." },
-                { id: 6, title: "Diversification 📊", desc: "Risk Management.", content: "Spread risk across Agriculture, Tech, Real Estate, and Bonds." },
-                { id: 7, title: "Taxation 101 🏛️", desc: "PAYE, VAT, and CIT.", content: "Value Added Tax (7.5%) and Company Income Tax are key for builders." },
-                { id: 8, title: "Risk Mitigation ⚠️", desc: "Financial Safety.", content: "Insurance and Emergency Funds are key to sleeping well at night." }
-              ].map((module) => (
-                <div key={module.id} className="card" style={{ padding: '1.5rem', borderLeft: '4px solid #00C851', height: '100%', minHeight: '200px' }}>
-                  <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>{module.title}</h4>
-                  <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1rem', fontStyle: 'italic' }}>{module.desc}</p>
-                  <p style={{ fontSize: '0.9rem' }}>{module.content}</p>
+          {/* WEALTH PROJECTOR (Marketing Tool) */}
+          <div style={{ backgroundColor: '#222', padding: '1.5rem', borderRadius: '15px', border: '1px solid #444' }}>
+            <h3 style={{ color: '#00C851', marginTop: 0 }}>🚀 Wealth Projector</h3>
+            <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1rem' }}>See the power of <strong>Compound Interest</strong> with our High-Yield Real Estate Plan.</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <input type="number" placeholder="Monthly Savings (₦)" onChange={(e) => setMonthlySave(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
+              <input type="number" placeholder="Duration (Years)" value={investDuration} onChange={(e) => setInvestDuration(Number(e.target.value))} style={{ padding: '0.5rem', borderRadius: '5px' }} />
+
+              <button
+                onClick={() => {
+                  const months = investDuration * 12;
+
+                  // Standard Bank Rate (10% APY)
+                  const rateStd = 0.10 / 12;
+                  const fvStd = monthlySave * ((Math.pow(1 + rateStd, months) - 1) / rateStd);
+                  setStandardResult(Math.round(fvStd));
+
+                  // Partner Real Estate Rate (30% APY)
+                  const ratePartner = 0.30 / 12;
+                  const fvPartner = monthlySave * ((Math.pow(1 + ratePartner, months) - 1) / ratePartner);
+                  setPartnerResult(Math.round(fvPartner));
+                }}
+                className="btn btn-sm" style={{ backgroundColor: '#00C851', color: 'white', fontWeight: 'bold' }}
+              >
+                Calculate Growth 📈
+              </button>
+
+              {(standardResult && partnerResult) && (
+                <div style={{ marginTop: '1rem', animation: 'fadeIn 0.5s' }}>
+                  <div style={{ marginBottom: '0.5rem', padding: '0.5rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '5px' }}>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#aaa' }}>Regular Bank (10%)</p>
+                    <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>₦{Number(standardResult).toLocaleString()}</p>
+                  </div>
+                  <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: 'rgba(0, 200, 81, 0.2)', borderRadius: '10px', border: '1px solid #00C851' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#00C851' }}>✨ With Our Real Estate Plan (30%)</p>
+                    <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold', color: '#fff' }}>₦{Number(partnerResult).toLocaleString()}</p>
+                    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                      You earn <strong>₦{(partnerResult - standardResult).toLocaleString()}</strong> more!
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => showToast("Redirecting to Real Estate Partner Page... (Demo)", 'info')}
+                    className="btn"
+                    style={{ width: '100%', backgroundColor: '#FFD700', color: 'black', fontWeight: 'bold' }}
+                  >
+                    Start Investing Now 🏆
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
-      )}
-    </div >
-  );
+
+        {/* BEGINNER SECTION (Foundations) */}
+        <div style={{ backgroundColor: 'rgba(255,255,255,0.02)', padding: '2rem', borderRadius: '24px', border: '1px solid var(--color-border)' }}>
+          <h2 style={{ color: '#FFBB33', borderBottom: '1px solid #333', paddingBottom: '0.75rem', marginTop: 0 }}>🔰 Financial Foundations</h2>
+          <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>New to finance? Start here to build a solid understanding.</p>
+          <div className="grid-cols">
+            {modules.slice(0, 6).map((module) => (
+              <div key={module.id} className="card" style={{ padding: '1rem', borderLeft: '4px solid #FFBB33' }}>
+                <h4 style={{ color: '#FFBB33', margin: '0 0 0.5rem 0' }}>{module.title}</h4>
+                <p style={{ fontSize: '0.9rem', color: '#ccc' }}>{module.desc}</p>
+                <div style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: '#fff' }}>
+                  {module.content}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ADULT MODULES LIST (Advanced) */}
+        <div style={{ marginTop: '3rem' }}>
+          <h2 style={{ color: '#00C851', borderBottom: '1px solid #333', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>🎓 Advanced Curriculum</h2>
+          <div className="grid-cols">
+            {[
+              { id: 1, title: "Inflation Hedging 🛡️", desc: "Protecting against devaluation.", content: "Store value in assets like Real Estate, Gold, or Stablecoins to beat inflation." },
+              { id: 2, title: "Emergency Funds 🚑", desc: "3-6 months of expenses.", content: "Keep this in a liquid account (like a Savings Account) for unexpected events." },
+              { id: 3, title: "Debt Management 💳", desc: "Snowball vs Avalanche.", content: "Snowball: Smallest debts first. Avalanche: Highest interest first." },
+              { id: 4, title: "Estate Planning 📜", desc: "Wills and Trusts.", content: "Protect your legacy. Ensure your assets go to loved ones without legal battles." },
+              { id: 5, title: "Retirement Savings Account 🇳🇬", desc: "Pension Reform.", content: "Ensure employer remissions. You can also make voluntary contributions." },
+              { id: 6, title: "Diversification 📊", desc: "Risk Management.", content: "Spread risk across Agriculture, Tech, Real Estate, and Bonds." },
+              { id: 7, title: "Taxation 101 🏛️", desc: "PAYE, VAT, and CIT.", content: "Value Added Tax (7.5%) and Company Income Tax are key for builders." },
+              { id: 8, title: "Risk Mitigation ⚠️", desc: "Financial Safety.", content: "Insurance and Emergency Funds are key to sleeping well at night." }
+            ].map((module) => (
+              <div key={module.id} className="card" style={{ padding: '1.5rem', borderLeft: '4px solid #00C851', height: '100%', minHeight: '200px' }}>
+                <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>{module.title}</h4>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '1rem', fontStyle: 'italic' }}>{module.desc}</p>
+                <p style={{ fontSize: '0.9rem' }}>{module.content}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+  </div >
+);
 };
 
 export default Finance;
