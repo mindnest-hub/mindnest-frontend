@@ -78,7 +78,9 @@ const Agripreneurship = () => {
         localStorage.setItem('agriLevel', level);
         localStorage.setItem('agriSoldFlakes', soldFlakes);
         localStorage.setItem('agriResilience', climateResilience);
-    }, [level, soldFlakes, climateResilience]);
+        localStorage.setItem('agriHasProcessing', hasProcessingUnit);
+        localStorage.setItem('agriProcessedStock', processedStock);
+    }, [level, soldFlakes, climateResilience, hasProcessingUnit, processedStock]);
 
     // Simulation tick
     useEffect(() => {
