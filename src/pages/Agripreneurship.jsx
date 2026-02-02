@@ -8,24 +8,44 @@ import { useWallet } from '../hooks/useWallet';
 
 const Agripreneurship = () => {
     const navigate = useNavigate();
-    const { addEarnings, deductGlobal, balance, getAgeGroup } = useWallet();
-    const ageGroup = getAgeGroup?.() || 'kids';
+    // Safe initialization helper
+    const safeInit = (key, defaultValue, type = 'number') => {
+        try {
+            const item = localStorage.getItem(key);
+            if (item === null || item === "undefined") return defaultValue;
+            if (type === 'boolean') return item === 'true';
+            return Number(item) || defaultValue;
+        } catch (e) {
+            console.warn(`Error reading ${key}`, e);
+            return defaultValue;
+        }
+    };
+
+    const { addEarnings, deductGlobal, balance, getAgeGroup } = useWallet() || {};
+    const safeGetAgeGroup = getAgeGroup || (() => 'kids');
+    const ageGroup = safeGetAgeGroup() || 'kids';
     const isAdult = ageGroup !== 'kids' && ageGroup !== 'teens';
+
+    // State with Safe Init
     const [isPremium, setIsPremium] = useState(false);
     const [soilMoisture, setSoilMoisture] = useState(80);
-    const [cropStage, setCropStage] = useState(0); // 0: Seed, 1: Sprout, 2: Mature, 3: Harvested
+    const [cropStage, setCropStage] = useState(0);
     const [money, setMoney] = useState(1000);
-    const [harvestCount, setHarvestCount] = useState(() => Number(localStorage.getItem('agriHarvestCount')) || 0);
+    const [harvestCount, setHarvestCount] = useState(() => safeInit('agriHarvestCount', 0));
     const [showBank, setShowBank] = useState(false);
     const [showCert, setShowCert] = useState(false);
     const [weather, setWeather] = useState('Sunny ☀️');
-    const [activeTab, setActiveTab] = useState('farm'); // farm, soil, business, future
+    const [activeTab, setActiveTab] = useState('farm');
     const [toast, setToast] = useState(null);
     const [showTechQuiz, setShowTechQuiz] = useState(false);
     const [pendingUpgrade, setPendingUpgrade] = useState(null);
 
+    // Processing state
+    const [hasProcessingUnit, setHasProcessingUnit] = useState(() => safeInit('agriHasProcessing', false, 'boolean'));
+    const [processedStock, setProcessedStock] = useState(() => safeInit('agriProcessedStock', 0));
+
     // Climate and upgrades state
-    const [climateResilience, setClimateResilience] = useState(() => Number(localStorage.getItem('agriResilience')) || 0);
+    const [climateResilience, setClimateResilience] = useState(() => safeInit('agriResilience', 0));
     const [upgrades, setUpgrades] = useState({
         solar: false,
         seeds: false,
@@ -43,7 +63,7 @@ const Agripreneurship = () => {
     };
 
     // Level State
-    const [soldFlakes, setSoldFlakes] = useState(() => Number(localStorage.getItem('agriSoldFlakes')) || 0);
+    const [soldFlakes, setSoldFlakes] = useState(() => safeInit('agriSoldFlakes', 0));
 
     // Level Logic
     // 1. Novice: Start
@@ -52,11 +72,13 @@ const Agripreneurship = () => {
     // 4. Tech Farmer: Sold Flakes >= 5
     // 5. Agri-Tycoon: Resilience >= 50
     const getLevel = () => {
-        if (climateResilience >= 50 && soldFlakes >= 5 && money >= 2000 && harvestCount >= 3) return 5;
-        if (soldFlakes >= 5 && money >= 2000 && harvestCount >= 3) return 4;
-        if (money >= 2000 && harvestCount >= 3) return 3;
-        if (harvestCount >= 3) return 2;
-        return 1;
+        try {
+            if ((climateResilience || 0) >= 50 && (soldFlakes || 0) >= 5 && (money || 0) >= 2000 && (harvestCount || 0) >= 3) return 5;
+            if ((soldFlakes || 0) >= 5 && (money || 0) >= 2000 && (harvestCount || 0) >= 3) return 4;
+            if ((money || 0) >= 2000 && (harvestCount || 0) >= 3) return 3;
+            if ((harvestCount || 0) >= 3) return 2;
+            return 1;
+        } catch (e) { return 1; }
     };
 
     const level = getLevel();
@@ -67,6 +89,9 @@ const Agripreneurship = () => {
         4: { title: "Tech Farmer ☀️", next: "Reach 50% Resilience to become a Tycoon!" },
         5: { title: "Agri-Tycoon 🤴", next: "You are a Master of Agriculture!" }
     };
+
+    // Safe Level Access
+    const currentLevelInfo = levelTitles[level] || levelTitles[1];
 
     // Scroll to top on component mount
     useEffect(() => {
@@ -245,13 +270,13 @@ const Agripreneurship = () => {
                 {/* CAREER STATUS BAR */}
                 <div style={{ marginTop: '1.5rem', padding: '1rem', backgroundColor: '#1a1a1a', borderRadius: '12px', border: '1px solid #FFD700', maxWidth: '600px', margin: '1.5rem auto' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                        <span style={{ color: '#FFD700', fontWeight: 'bold' }}>⭐ {levelTitles[level].title}</span>
+                        <span style={{ color: '#FFD700', fontWeight: 'bold' }}>⭐ {currentLevelInfo.title}</span>
                         <span style={{ fontSize: '0.9rem', color: '#aaa' }}>Level {level}/5</span>
                     </div>
                     <div style={{ width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px', marginBottom: '0.5rem', overflow: 'hidden' }}>
                         <div style={{ width: `${(level / 5) * 100}%`, height: '100%', backgroundColor: '#FFD700', transition: 'width 0.5s' }}></div>
                     </div>
-                    <p style={{ fontSize: '0.85rem', color: '#ccc', margin: 0 }}>Next Goal: {levelTitles[level].next}</p>
+                    <p style={{ fontSize: '0.85rem', color: '#ccc', margin: 0 }}>Next Goal: {currentLevelInfo.next}</p>
                 </div>
 
                 <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -553,7 +578,7 @@ const Agripreneurship = () => {
                 )
             }
             {/* TECH QUIZ MODAL */}
-            {showTechQuiz && pendingUpgrade && (
+            {showTechQuiz && pendingUpgrade && techQuizzes[pendingUpgrade.type] && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
                     backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center',
