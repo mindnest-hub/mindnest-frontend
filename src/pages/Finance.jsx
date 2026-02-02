@@ -1367,13 +1367,13 @@ const Finance = ({ ageGroup }) => {
                   min="0"
                   max="100"
                   value={pieSlices.wants}
-                  onChange=(e) => setPieSlices({...pieSlices, wants: Number(e.target.value) })}
-                style={{
-                  width: '100%',
-                  accentColor: '#EA4335',
-                  height: '8px',
-                  borderRadius: '5px'
-                }}
+                  onChange={(e) => setPieSlices({ ...pieSlices, wants: Number(e.target.value) })}
+                  style={{
+                    width: '100%',
+                    accentColor: '#EA4335',
+                    height: '8px',
+                    borderRadius: '5px'
+                  }}
                 />
               </div>
 
