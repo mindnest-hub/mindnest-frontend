@@ -6,22 +6,23 @@ import AgriBusinessPlanner from '../components/AgriBusinessPlanner';
 import InvestPitch from '../components/InvestPitch';
 import { useWallet } from '../hooks/useWallet';
 
+// Safe initialization helper
+const safeInit = (key, defaultValue, type = 'number') => {
+    try {
+        const item = localStorage.getItem(key);
+        if (item === null || item === "undefined") return defaultValue;
+        if (type === 'boolean') return item === 'true';
+        return Number(item) || defaultValue;
+    } catch (e) {
+        console.warn(`Error reading ${key}`, e);
+        return defaultValue;
+    }
+};
+
 const Agripreneurship = () => {
     const navigate = useNavigate();
-    // Safe initialization helper
-    const safeInit = (key, defaultValue, type = 'number') => {
-        try {
-            const item = localStorage.getItem(key);
-            if (item === null || item === "undefined") return defaultValue;
-            if (type === 'boolean') return item === 'true';
-            return Number(item) || defaultValue;
-        } catch (e) {
-            console.warn(`Error reading ${key}`, e);
-            return defaultValue;
-        }
-    };
 
-    const { addEarnings, deductGlobal, balance, getAgeGroup } = useWallet() || {};
+    const { addEarnings, deductGlobal, balance, getAgeGroup } = useWallet();
     const safeGetAgeGroup = getAgeGroup || (() => 'kids');
     const ageGroup = safeGetAgeGroup() || 'kids';
     const isAdult = ageGroup !== 'kids' && ageGroup !== 'teens';
