@@ -170,6 +170,13 @@ const NutritionModule = ({ onNext, showToast }) => {
         <div style={{ padding: '1rem' }}>
             <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem', textAlign: 'center' }}>Module 2: Nutrition 🍎</h2>
 
+            <div style={{ backgroundColor: 'rgba(0, 200, 81, 0.1)', padding: '1rem', borderRadius: '10px', marginBottom: '1.5rem', borderLeft: '4px solid #00C851' }}>
+                <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>✨ African Superfoods</h4>
+                <p style={{ fontSize: '0.9rem', margin: 0, color: '#ccc' }}>
+                    <strong>Baobab:</strong> High in Vitamin C. | <strong>Moringa:</strong> "The Miracle Tree" for energy. | <strong>Fonio:</strong> A gluten-free ancient grain.
+                </p>
+            </div>
+
             <div className="card" style={{ marginBottom: '2rem', backgroundColor: '#222' }}>
                 <h3>📅 Daily Meal Tracker</h3>
                 <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Log your balanced meals today.</p>
@@ -452,6 +459,9 @@ const MindsetModule = ({ onNext, showToast }) => {
     return (
         <div style={{ padding: '1rem', textAlign: 'center' }}>
             <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 8: Micro-Discipline 🧱</h2>
+            <div style={{ fontStyle: 'italic', color: 'var(--color-accent)', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                "He who climbs a good tree is always given a push." — African Proverb
+            </div>
             <p>Small habits build big futures.</p>
 
             <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
