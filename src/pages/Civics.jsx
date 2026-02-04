@@ -340,7 +340,6 @@ const Civics = ({ ageGroup }) => {
     const respScenarios = isKid ? kidRespScenarios : (isTeen ? teenRespScenarios : adultRespScenarios);
 
     // --- PILLAR 4: EVERYDAY LAW (Advanced) ---
-    const [lawStep, setLawStep] = useState(0);
     const kidLawScenarios = [
         { q: "A LASTMA/Police officer stops you and asks for your license. You have it. What is your right?", a: "Show it politely", options: ["Show it politely", "Argue & Shout", "Run away"], hint: "Cooperation and knowing your rights prevents unnecessary conflict." },
         { q: "Your landlord enters your apartment without notice or permission. Is this legal?", a: "No", options: ["Yes", "No", "Maybe"], hint: "In most places, a tenant has a right to 'Quiet Enjoyment' and notice before entry." },
@@ -446,7 +445,6 @@ const Civics = ({ ageGroup }) => {
     };
 
     // --- PILLAR 5: COMMUNITY PROJECTS (Advanced) ---
-    const [projStep, setProjStep] = useState(0);
     const kidProjScenarios = [
         { q: "Level 1: Audit - What is the most pressing issue in your street today?", options: ["Blocked Drains", "Littering", "Broken Street-lights"], icon: "🔍" },
         { q: "Level 2: Mobilization - Who will you invite to your first meeting?", options: ["Neighbors & Friends", "Only Government officials", "Nobody, I'll do it alone"], icon: "🤝" },
@@ -509,7 +507,6 @@ const Civics = ({ ageGroup }) => {
     };
 
     // --- PILLAR 6: CIVIC TOOLS (Advanced) ---
-    const [toolStep, setToolStep] = useState(0);
     const kidToolScenarios = [
         { q: "Level 1: Verification - You get a WhatsApp message saying 'Click here for free money'. Do you click?", options: ["Delete & Ignore", "Click & Share", "Forward to friends"], icon: "📱" },
         { q: "Level 2: Mapping - Where do you find the layout of your Local Government?", options: ["Official State Website", "Ask on Street", "Wait for election"], icon: "🗺️" },
@@ -583,7 +580,6 @@ const Civics = ({ ageGroup }) => {
 
 
     // --- PILLAR 7: BUDGET & MONEY (Advanced) ---
-    const [budgetStep, setBudgetStep] = useState(0);
     const kidBudgetScenarios = [
         { q: "Level 1: The Audit - Where does most of our national tax money go?", options: ["Public Services (Health/Edu)", "Private Luxury", "Hidden accounts"], a: 0, fact: "Taxes fund the infrastructure we all use—like roads and hospitals." },
         { q: "Level 2: Allocation - You have ₦100. How do you split it fairly?", options: ["Spread across all sectors", "Give it all to one friend", "Keep it in a safe"], a: 0, fact: "A balanced budget ensures no sector of society is left behind." },
