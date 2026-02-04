@@ -3,17 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import { useWallet } from '../hooks/useWallet';
 
-const Health = () => {
+const Health = ({ ageGroup }) => {
     const navigate = useNavigate();
-    const { addEarnings, deductPenalty, getModuleCap } = useWallet();
+    const { addEarnings, getModuleCap } = useWallet();
     const MODULE_CAP = getModuleCap('health');
 
+    const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
+
     const [activeModule, setActiveModule] = useState(() => {
-        return Number(localStorage.getItem('healthActiveModule')) || 0;
+        return Number(localStorage.getItem('healthActiveStep')) || 0;
     });
 
     const [completedModules, setCompletedModules] = useState(() => {
-        return JSON.parse(localStorage.getItem('healthCompletedModules')) || Array(10).fill(false);
+        return JSON.parse(localStorage.getItem('healthCompletedSteps')) || Array(4).fill(false);
     });
 
     const [toast, setToast] = useState(null);
@@ -23,8 +25,8 @@ const Health = () => {
     };
 
     useEffect(() => {
-        localStorage.setItem('healthActiveModule', activeModule);
-        localStorage.setItem('healthCompletedModules', JSON.stringify(completedModules));
+        localStorage.setItem('healthActiveStep', activeModule);
+        localStorage.setItem('healthCompletedSteps', JSON.stringify(completedModules));
         window.scrollTo(0, 0);
     }, [activeModule, completedModules]);
 
@@ -33,82 +35,62 @@ const Health = () => {
         if (!newCompleted[index]) {
             newCompleted[index] = true;
             setCompletedModules(newCompleted);
-            addEarnings('health', 150); // Reward for completing a module
-            showToast("Module Complete! +₦150", 'success');
+            addEarnings('health', 500); // Larger reward for consolidated modules
+            showToast("Pillar Mastered! +₦500 🏆", 'success');
         }
     };
 
-    const modules = [
-        "Intro", "Nutrition", "Fitness", "Mental Health", "Reproductive Health",
-        "Sleep & Recovery", "Digital Hygiene", "Mindset", "Community", "Certificate"
-    ];
+    const modules = ["Intro", "Nutrition", "Vitality", "Harmony", "Certificate"];
 
     const renderCurrentModule = () => {
         switch (activeModule) {
             case 0: return <IntroModule onNext={() => { markComplete(0); setActiveModule(1); }} />;
-            case 1: return <NutritionModule onNext={() => { markComplete(1); setActiveModule(2); }} showToast={showToast} />;
-            // Placeholders for now, will implement sequentially
-            case 2: return <FitnessModule onNext={() => { markComplete(2); setActiveModule(3); }} showToast={showToast} />;
-            case 3: return <MentalHealthModule onNext={() => { markComplete(3); setActiveModule(4); }} showToast={showToast} />;
-            case 4: return <ReproductiveHealthModule onNext={() => { markComplete(4); setActiveModule(5); }} showToast={showToast} />;
-            case 5: return <SleepModule onNext={() => { markComplete(5); setActiveModule(6); }} showToast={showToast} />;
-            case 6: return <DigitalHygieneModule onNext={() => { markComplete(6); setActiveModule(7); }} showToast={showToast} />;
-            case 7: return <MindsetModule onNext={() => { markComplete(7); setActiveModule(8); }} showToast={showToast} />;
-            case 8: return <CommunityModule onNext={() => { markComplete(8); setActiveModule(9); }} showToast={showToast} />;
-            case 9: return <CertificateModule onNext={() => navigate('/')} />;
+            case 1: return <NutritionPillar onNext={() => { markComplete(1); setActiveModule(2); }} showToast={showToast} isKid={isKid} />;
+            case 2: return <VitalityPillar onNext={() => { markComplete(2); setActiveModule(3); }} showToast={showToast} isKid={isKid} />;
+            case 3: return <HarmonyPillar onNext={() => { markComplete(3); setActiveModule(4); }} showToast={showToast} isKid={isKid} />;
+            case 4: return <CertificateModule onNext={() => navigate('/')} />;
             default: return <IntroModule onNext={() => setActiveModule(1)} />;
         }
     };
 
+    const progressPercent = Math.round((completedModules.filter(Boolean).length / 4) * 100);
+
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh' }}>
             {toast && <Toast message={toast.message} type={toast.type} duration={toast.duration} onClose={() => setToast(null)} />}
 
-            <button
-                onClick={() => navigate('/')}
-                style={{
-                    background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem',
-                    display: 'flex', alignItems: 'center', gap: '0.5rem', alignSelf: 'flex-start'
-                }}
-            >
-                ← Back to Hub
-            </button>
+            <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                <button
+                    onClick={() => navigate('/')}
+                    style={{
+                        background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem',
+                        display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto 1.5rem auto'
+                    }}
+                >
+                    ← Hub
+                </button>
+                <h1 style={{ color: 'var(--color-secondary)', marginBottom: '0.5rem' }}>Wellness & Mindset</h1>
+                <p style={{ color: '#aaa' }}>Build a Strong Body & A Focused Mind</p>
+            </header>
 
             {/* PROGRESS BAR */}
-            <div style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#aaa', fontSize: '0.8rem' }}>
-                    <span>Progress</span>
-                    <span>{Math.round((completedModules.filter(Boolean).length / 10) * 100)}%</span>
+            <div style={{ maxWidth: '800px', margin: '0 auto 3rem auto' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem', color: '#fff', fontWeight: 'bold' }}>
+                    <span>Module Journey</span>
+                    <span>{progressPercent}% Complete</span>
                 </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '12px', backgroundColor: '#222', borderRadius: '20px', overflow: 'hidden', border: '1px solid #333' }}>
                     <div style={{
-                        width: `${(activeModule / 9) * 100}%`,
+                        width: `${progressPercent}%`,
                         height: '100%',
                         backgroundColor: 'var(--color-secondary)',
-                        transition: 'width 0.3s ease'
+                        transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: '0 0 10px var(--color-secondary)'
                     }}></div>
-                </div>
-                <div style={{ display: 'flex', gap: '0.2rem', marginTop: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                    {modules.map((m, i) => (
-                        <div
-                            key={i}
-                            onClick={() => completedModules[i] || i <= activeModule ? setActiveModule(i) : null}
-                            style={{
-                                minWidth: '30px', height: '30px', borderRadius: '50%',
-                                backgroundColor: i === activeModule ? 'var(--color-secondary)' : completedModules[i] ? '#00C851' : '#333',
-                                color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '0.8rem', cursor: 'pointer', flexShrink: 0,
-                                border: i === activeModule ? '2px solid #fff' : 'none'
-                            }}
-                            title={m}
-                        >
-                            {i + 1}
-                        </div>
-                    ))}
                 </div>
             </div>
 
-            <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div className="card" style={{ maxWidth: '900px', margin: '0 auto', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
                 {renderCurrentModule()}
             </div>
         </div>
@@ -127,379 +109,315 @@ const IntroModule = ({ onNext }) => (
     </div>
 );
 
-const NutritionModule = ({ onNext, showToast }) => {
-    // Meal Tracker
-    const [meals, setMeals] = useState(() => JSON.parse(localStorage.getItem('healthMeals')) || { b: false, l: false, d: false });
+const NutritionPillar = ({ onNext, showToast, isKid }) => {
+    // Stage management: 1. Explore, 2. Game, 3. Log
+    const [step, setStep] = useState(0);
 
-    // Plate Game
-    const [plate, setPlate] = useState({ carbs: 0, protein: 0, veg: 0 });
-    const [gameWon, setGameWon] = useState(false);
+    // Pillar 1 Game: Kids (Sorting) vs Teens (Macros)
+    const [kidsScore, setKidsScore] = useState(0);
+    const [teensPlate, setTeensPlate] = useState({ protein: 0, carbs: 0, veg: 0, fats: 0 });
 
-    useEffect(() => {
-        localStorage.setItem('healthMeals', JSON.stringify(meals));
-    }, [meals]);
-
-    const toggleMeal = (type) => {
-        setMeals(prev => ({ ...prev, [type]: !prev[type] }));
-        if (!meals[type]) showToast("Meal logged! 🥗 Keep it up.", 'success');
-    };
-
-    const addToPlate = (type) => {
-        if (gameWon) return;
-        setPlate(prev => {
-            const newPlate = { ...prev, [type]: prev[type] + 1 };
-            checkWin(newPlate);
-            return newPlate;
-        });
-    };
-
-    const checkWin = (p) => {
-        // Win condition: roughly balanced (e.g., 1 carb, 1 protein, 2 veg)
-        if (p.carbs >= 1 && p.protein >= 1 && p.veg >= 2) {
-            setGameWon(true);
-            showToast("Perfect Plate! 🍽️ You know your nutrition.", 'success');
-        }
-    };
-
-    const resetPlate = () => {
-        setPlate({ carbs: 0, protein: 0, veg: 0 });
-        setGameWon(false);
-    };
-
-    return (
-        <div style={{ padding: '1rem' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem', textAlign: 'center' }}>Module 2: Nutrition 🍎</h2>
-
-            <div style={{ backgroundColor: 'rgba(0, 200, 81, 0.1)', padding: '1rem', borderRadius: '10px', marginBottom: '1.5rem', borderLeft: '4px solid #00C851' }}>
-                <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>✨ African Superfoods</h4>
-                <p style={{ fontSize: '0.9rem', margin: 0, color: '#ccc' }}>
-                    <strong>Baobab:</strong> High in Vitamin C. | <strong>Moringa:</strong> "The Miracle Tree" for energy. | <strong>Fonio:</strong> A gluten-free ancient grain.
-                </p>
-            </div>
-
-            <div className="card" style={{ marginBottom: '2rem', backgroundColor: '#222' }}>
-                <h3>📅 Daily Meal Tracker</h3>
-                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Log your balanced meals today.</p>
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
-                    {['Breakfast', 'Lunch', 'Dinner'].map((m) => {
-                        const key = m.charAt(0).toLowerCase();
-                        return (
-                            <button
-                                key={m}
-                                onClick={() => toggleMeal(key)}
-                                className={meals[key] ? "btn btn-primary" : "btn btn-outline"}
-                                style={{ minWidth: '100px' }}
-                            >
-                                {meals[key] ? `${m} ✅` : m}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            <div className="card" style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                <h3>🍽️ Build Your Healthy Plate</h3>
-                <p>Add items to create a balanced meal (1 Carb, 1 Protein, 2 Veggies).</p>
-
-                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', margin: '1rem 0' }}>
-                    <button onClick={() => addToPlate('carbs')} className="btn" style={{ backgroundColor: '#FFBB33', color: 'black' }}>Rice/Yam 🍚</button>
-                    <button onClick={() => addToPlate('protein')} className="btn" style={{ backgroundColor: '#FF4444', color: 'white' }}>Fish/Beans 🐟</button>
-                    <button onClick={() => addToPlate('veg')} className="btn" style={{ backgroundColor: '#00C851', color: 'white' }}>Greens/Okra 🥬</button>
-                </div>
-
-                <div style={{
-                    width: '200px', height: '200px', borderRadius: '50%', border: '4px solid #fff',
-                    margin: '1rem auto', position: 'relative', backgroundColor: '#fff', color: '#000',
-                    display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
-                }}>
-                    {plate.carbs > 0 && <span>🍚 x{plate.carbs}</span>}
-                    {plate.protein > 0 && <span>🐟 x{plate.protein}</span>}
-                    {plate.veg > 0 && <span>🥬 x{plate.veg}</span>}
-                    {plate.carbs === 0 && plate.protein === 0 && plate.veg === 0 && <span style={{ color: '#aaa' }}>Empty Plate</span>}
-
-                    {gameWon && <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', borderRadius: '50%', backgroundColor: 'rgba(0,200,81,0.8)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.5rem' }}>Delicious! 😋</div>}
-                </div>
-
-                <button onClick={resetPlate} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}>Reset Plate</button>
-            </div>
-
-            <button onClick={onNext} className="btn btn-primary" disabled={!gameWon} style={{ width: '100%', opacity: gameWon ? 1 : 0.5 }}>
-                {gameWon ? "Complete & Continue →" : "Finish Plate to Continue 🔒"}
-            </button>
-        </div>
-    );
-};
-
-const FitnessModule = ({ onNext, showToast }) => {
-    const [steps, setSteps] = useState(() => Number(localStorage.getItem('healthSteps')) || 0);
-    const GOAL = 5000;
-
-    useEffect(() => {
-        localStorage.setItem('healthSteps', steps);
-    }, [steps]);
-
-    const addSteps = (amount) => {
-        const newTotal = steps + amount;
-        setSteps(newTotal);
-        if (newTotal >= GOAL && steps < GOAL) {
-            showToast("Goal Reached! 🏃💨 You are unstoppable!", 'success');
-        }
-    };
-
-    return (
-        <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 3: Fitness 🏃</h2>
-            <p>Movement is medicine.</p>
-
-            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
-                <h3>👟 Step Challenge</h3>
-                <p>Goal: {GOAL.toLocaleString()} steps/day</p>
-
-                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: steps >= GOAL ? '#00C851' : '#fff', margin: '1rem 0' }}>
-                    {steps.toLocaleString()}
-                </div>
-
-                <div style={{ width: '100%', height: '10px', backgroundColor: '#333', borderRadius: '5px', marginBottom: '1.5rem' }}>
-                    <div style={{ width: `${Math.min(100, (steps / GOAL) * 100)}%`, height: '100%', backgroundColor: steps >= GOAL ? '#00C851' : 'var(--color-secondary)', borderRadius: '5px', transition: 'width 0.5s' }}></div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                    <button onClick={() => addSteps(100)} className="btn btn-outline">+100 Steps</button>
-                    <button onClick={() => addSteps(500)} className="btn btn-outline">+500 Steps</button>
-                    <button onClick={() => addSteps(1000)} className="btn btn-outline">+1,000 Steps</button>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '1rem' }}>(Log your real-world steps here!)</p>
-            </div>
-
-            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>Complete & Continue →</button>
-        </div>
-    );
-};
-
-const MentalHealthModule = ({ onNext, showToast }) => {
-    const [mood, setMood] = useState(localStorage.getItem('healthMood') || '');
-    const [journal, setJournal] = useState('');
-
-    const saveEntry = () => {
-        if (!mood) {
-            showToast("Please select a mood first.", 'error');
-            return;
-        }
-        localStorage.setItem('healthMood', mood);
-        // In a real app, save journal to DB or local array
-        showToast("Journal saved! 🧠 Feelings acknowledged.", 'success');
-        onNext();
-    };
-
-    const moods = ['😠', '😢', '😐', '🙂', '🤩'];
-
-    return (
-        <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 4: Mental Health 🧠</h2>
-            <p>Your mind matters. How are you feeling today?</p>
-
-            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
-                <h3>Mood Tracker</h3>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '2.5rem', margin: '1.5rem 0' }}>
-                    {moods.map(m => (
-                        <div
-                            key={m}
-                            onClick={() => setMood(m)}
-                            style={{
-                                cursor: 'pointer',
-                                transform: mood === m ? 'scale(1.3)' : 'scale(1)',
-                                transition: 'transform 0.2s',
-                                opacity: mood && mood !== m ? 0.3 : 1
-                            }}
-                        >
-                            {m}
-                        </div>
-                    ))}
-                </div>
-
-                <textarea
-                    placeholder="Why do you feel this way? (Optional)"
-                    value={journal}
-                    onChange={(e) => setJournal(e.target.value)}
-                    style={{
-                        width: '100%', minHeight: '100px', backgroundColor: '#333', color: '#fff',
-                        padding: '1rem', borderRadius: '10px', border: 'none', resize: 'vertical'
-                    }}
-                />
-            </div>
-
-            <button onClick={saveEntry} className="btn btn-primary" style={{ width: '100%' }}>Save & Continue →</button>
-        </div>
-    );
-};
-
-const ReproductiveHealthModule = ({ onNext, showToast }) => {
-    const [qIndex, setQIndex] = useState(0);
-    const [score, setScore] = useState(0);
-
-    const questions = [
-        { q: "What is consent?", options: ["Saying yes freely", "Being forced", "Silence"], a: 0 },
-        { q: "Puberty is...", options: ["Scary", "Normal body changes", "A sickness"], a: 1 },
-        { q: "If you feel unsafe, you should...", options: ["Tell a trusted adult", "Hide it", "Ignore it"], a: 0 }
+    const foodClasses = [
+        { name: "Yam/Rice", class: "Carbohydrate", icon: "🍚", fact: "Energy for your brain and body!" },
+        { name: "Beans/Fish", class: "Protein", icon: "🐟", fact: "Builds and repairs your muscles." },
+        { name: "Spinach/Okra", class: "Vitamin", icon: "🥬", fact: "Protects you from getting sick." },
+        { name: "Groundnut/Oil", class: "Fat", icon: "🥜", fact: "Helps your brain work better!" },
+        { name: "Water/Salt", class: "Mineral", icon: "💧", fact: "Essential for healthy blood and bones." }
     ];
 
-    const handleAnswer = (idx) => {
-        if (idx === questions[qIndex].a) {
-            setScore(score + 1);
-            showToast("Correct!", 'success');
-        } else {
-            showToast("Not quite. Safety first!", 'error');
-        }
+    const kidsQuest = [
+        { q: "Which one gives you energy for school?", a: "Carbohydrate", options: foodClasses },
+        { q: "Which one helps you grow big and strong?", a: "Protein", options: foodClasses },
+        { q: "Which one keeps you safe from the flu?", a: "Vitamin", options: foodClasses }
+    ];
 
-        if (qIndex < questions.length - 1) {
-            setQIndex(qIndex + 1);
+    const [questIdx, setQuestIdx] = useState(0);
+
+    const handleKidChoice = (choice) => {
+        if (choice === kidsQuest[questIdx].a) {
+            showToast("Correct! 🌟", 'success');
+            if (questIdx < kidsQuest.length - 1) {
+                setQuestIdx(prev => prev + 1);
+            } else {
+                setKidsScore(3);
+                showToast("Nutrition Hero! 🎖️", 'success');
+            }
         } else {
-            onNext();
+            showToast("Try again! Check the icons.", 'warning');
         }
     };
 
+    const handleTeenPlate = (type) => {
+        setTeensPlate(prev => ({ ...prev, [type]: Math.min(prev[type] + 1, 5) }));
+    };
+
+    const isTeenPlateBalanced = teensPlate.veg >= 2 && teensPlate.protein >= 1 && teensPlate.carbs >= 1;
+
     return (
-        <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 5: Reproductive Health 🏥</h2>
-            <p>Respect your body and others.</p>
+        <div style={{ padding: '1.5rem', animation: 'fadeIn 0.5s' }}>
+            <h2 style={{ color: 'var(--color-secondary)', textAlign: 'center', marginBottom: '1.5rem' }}>
+                Pillar 1: Nutrition & Fuel 🥗
+            </h2>
 
-            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
-                <h3>Scenario Quiz {qIndex + 1}/{questions.length}</h3>
-                <p style={{ fontSize: '1.2rem', margin: '1.5rem 0' }}>{questions[qIndex].q}</p>
+            {step === 0 && (
+                <div style={{ textAlign: 'center' }}>
+                    <h3>{isKid ? "Learn Your Food Classes" : "Macro & Micro Mastery"}</h3>
+                    <p style={{ marginBottom: '2rem' }}>
+                        {isKid ? "Every food has a job. Let's find out what they do!" : "Fueling your body requires more than just calories. It's about balance."}
+                    </p>
+                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+                        {foodClasses.map(f => (
+                            <div key={f.name} className="card" style={{ padding: '1rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.03)' }}>
+                                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{f.icon}</div>
+                                <strong style={{ color: 'var(--color-primary)' }}>{f.class}</strong>
+                                <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>{f.fact}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <button onClick={() => setStep(1)} className="btn btn-primary" style={{ marginTop: '2.5rem', width: '100%' }}>
+                        Start Challenge 🚀
+                    </button>
+                </div>
+            )}
 
-                <div style={{ display: 'grid', gap: '1rem' }}>
-                    {questions[qIndex].options.map((opt, i) => (
-                        <button
-                            key={i}
-                            onClick={() => handleAnswer(i)}
-                            className="btn btn-outline"
-                        >
-                            {opt}
+            {step === 1 && isKid && (
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-secondary)', marginBottom: '1rem' }}>
+                        Quest {questIdx + 1}/3
+                    </div>
+                    <h3 style={{ marginBottom: '2rem' }}>{kidsQuest[questIdx].q}</h3>
+                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
+                        {foodClasses.map(f => (
+                            <button
+                                key={f.class}
+                                onClick={() => handleKidChoice(f.class)}
+                                className="btn btn-outline"
+                                style={{ height: 'auto', padding: '1.5rem', flexDirection: 'column', gap: '0.5rem' }}
+                            >
+                                <span style={{ fontSize: '2rem' }}>{f.icon}</span>
+                                <span>{f.class}</span>
+                            </button>
+                        ))}
+                    </div>
+                    {kidsScore === 3 && (
+                        <button onClick={() => setStep(2)} className="btn btn-primary" style={{ marginTop: '2.5rem', width: '100%' }}>
+                            Complete Pillar →
                         </button>
-                    ))}
+                    )}
                 </div>
-            </div>
+            )}
+
+            {step === 1 && !isKid && (
+                <div style={{ textAlign: 'center' }}>
+                    <h3 style={{ marginBottom: '1rem' }}>Design a High-Performance Plate</h3>
+                    <p style={{ color: '#aaa', marginBottom: '2rem' }}>A balanced meal needs Fiber, Protein, and complex Carbs.</p>
+
+                    <div className="grid-cols" style={{ marginBottom: '2rem' }}>
+                        <div className="card" style={{ padding: '1.5rem', border: isTeenPlateBalanced ? '2px solid #00C851' : '1px solid #333' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', fontSize: '2rem', flexWrap: 'wrap', minHeight: '60px' }}>
+                                {[...Array(teensPlate.carbs)].map((_, i) => <span key={i}>🍚</span>)}
+                                {[...Array(teensPlate.protein)].map((_, i) => <span key={i}>🐟</span>)}
+                                {[...Array(teensPlate.veg)].map((_, i) => <span key={i}>🥬</span>)}
+                                {[...Array(teensPlate.fats)].map((_, i) => <span key={i}>🥜</span>)}
+                            </div>
+                            {isTeenPlateBalanced ? (
+                                <div style={{ color: '#00C851', marginTop: '1rem', fontWeight: 'bold' }}>✅ Optimized Balance!</div>
+                            ) : (
+                                <div style={{ color: '#aaa', marginTop: '1rem', fontSize: '0.9rem' }}>Aim for: 2x Veg, 1x Protein, 1x Carbs</div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                        <button onClick={() => handleTeenPlate('carbs')} className="btn btn-outline">Add Carbs 🍚</button>
+                        <button onClick={() => handleTeenPlate('protein')} className="btn btn-outline">Add Protein 🐟</button>
+                        <button onClick={() => handleTeenPlate('veg')} className="btn btn-outline">Add Veggies 🥬</button>
+                        <button onClick={() => handleTeenPlate('fats')} className="btn btn-outline">Add Fats 🥜</button>
+                        <button onClick={() => setTeensPlate({ protein: 0, carbs: 0, veg: 0, fats: 0 })} className="btn btn-sm" style={{ gridColumn: 'span 2', opacity: 0.6 }}>Reset Plate</button>
+                    </div>
+
+                    <button
+                        onClick={() => setStep(2)}
+                        className="btn btn-primary"
+                        disabled={!isTeenPlateBalanced}
+                        style={{ marginTop: '2.5rem', width: '100%', opacity: isTeenPlateBalanced ? 1 : 0.5 }}
+                    >
+                        Save & Continue →
+                    </button>
+                </div>
+            )}
+
+            {step === 2 && (
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🏅</div>
+                    <h3>Pillar 1 Complete!</h3>
+                    <div style={{ backgroundColor: 'rgba(0, 200, 81, 0.1)', padding: '1.5rem', borderRadius: '15px', margin: '1.5rem 0', textAlign: 'left', borderLeft: '4px solid #00C851' }}>
+                        <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>🌱 African Superfood Fact</h4>
+                        <p style={{ margin: 0, fontSize: '0.95rem' }}>
+                            Did you know? <strong>Baobab</strong> fruit has 6 times more Vitamin C than oranges! It keeps your immune system ready for anything.
+                        </p>
+                    </div>
+                    <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>
+                        Go to Pillar 2 ⚡
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
 
-const SleepModule = ({ onNext, showToast }) => {
-    const [hours, setHours] = useState(7);
+const VitalityPillar = ({ onNext, showToast, isKid }) => {
+    const [step, setStep] = useState(0);
+    const [habits, setHabits] = useState({ water: false, brush: false, sleep: false });
+    const [stats, setStats] = useState({ steps: 2000, sleep: 7, screen: 2 });
 
-    const checkSleep = () => {
-        if (hours < 7) {
-            showToast("Try to get at least 7-9 hours!", 'warning');
-        } else if (hours > 10) {
-            showToast("Oversleeping can make you groggy.", 'warning');
+    const toggleHabit = (h) => setHabits(prev => ({ ...prev, [h]: !prev[h] }));
+    const habitsDone = habits.water && habits.brush && habits.sleep;
+
+    return (
+        <div style={{ padding: '1.5rem', animation: 'fadeIn 0.5s' }}>
+            <h2 style={{ color: 'var(--color-secondary)', textAlign: 'center', marginBottom: '1.5rem' }}>
+                Pillar 2: Vitality & Energy ⚡
+            </h2>
+
+            {step === 0 && (
+                <div style={{ textAlign: 'center' }}>
+                    <h3>{isKid ? "Daily Power-Up Tasks" : "The Human Recovery Loop"}</h3>
+                    <p style={{ marginBottom: '2rem' }}>
+                        {isKid ? "Being a hero starts with small wins. Can you finish your daily mission?" : "Optimize your performance by balancing activity, rest, and digital load."}
+                    </p>
+
+                    {isKid ? (
+                        <div style={{ display: 'grid', gap: '1rem', maxWidth: '400px', margin: '0 auto' }}>
+                            <button onClick={() => toggleHabit('water')} className={habits.water ? "btn btn-primary" : "btn btn-outline"}>
+                                {habits.water ? "Drank Water ✅" : "Drink 5 Waters 💧"}
+                            </button>
+                            <button onClick={() => toggleHabit('brush')} className={habits.brush ? "btn btn-primary" : "btn btn-outline"}>
+                                {habits.brush ? "Brushed Teeth ✅" : "Brush Teeth 2x 🪥"}
+                            </button>
+                            <button onClick={() => toggleHabit('sleep')} className={habits.sleep ? "btn btn-primary" : "btn btn-outline"}>
+                                {habits.sleep ? "Slept 9 Hours ✅" : "Sleep 9 Hours 😴"}
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid-cols">
+                            <div className="card" style={{ padding: '1rem' }}>
+                                <strong>Steps</strong>
+                                <div style={{ fontSize: '2rem', margin: '0.5rem 0' }}>👟 {stats.steps}</div>
+                                <input type="range" min="0" max="10000" step="500" value={stats.steps} onChange={e => setStats({ ...stats, steps: e.target.value })} style={{ width: '100%' }} />
+                            </div>
+                            <div className="card" style={{ padding: '1rem' }}>
+                                <strong>Sleep</strong>
+                                <div style={{ fontSize: '2rem', margin: '0.5rem 0' }}>😴 {stats.sleep}h</div>
+                                <input type="range" min="0" max="12" step="0.5" value={stats.sleep} onChange={e => setStats({ ...stats, sleep: e.target.value })} style={{ width: '100%' }} />
+                            </div>
+                            <div className="card" style={{ padding: '1rem' }}>
+                                <strong>Screen Time</strong>
+                                <div style={{ fontSize: '2rem', margin: '0.5rem 0' }}>📵 {stats.screen}h</div>
+                                <input type="range" min="0" max="12" step="0.5" value={stats.screen} onChange={e => setStats({ ...stats, screen: e.target.value })} style={{ width: '100%' }} />
+                            </div>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={() => setStep(1)}
+                        className="btn btn-primary"
+                        disabled={isKid && !habitsDone}
+                        style={{ marginTop: '2.5rem', width: '100%', opacity: (isKid && !habitsDone) ? 0.5 : 1 }}
+                    >
+                        {isKid && !habitsDone ? "Complete Tasks to Continue 🔒" : "Save & Continue →"}
+                    </button>
+                </div>
+            )}
+
+            {step === 1 && (
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>⚡</div>
+                    <h3>System Optimized!</h3>
+                    <p>Consistency is the secret to greatness.</p>
+                    <button onClick={onNext} className="btn btn-primary" style={{ width: '100%', marginTop: '2rem' }}>
+                        Go to Pillar 3 🧘
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const HarmonyPillar = ({ onNext, showToast, isKid }) => {
+    const [step, setStep] = useState(0);
+    const [journal, setJournal] = useState("");
+
+    const scenarios = [
+        { q: "A friend is sad because they lost a game. What do you do?", a: "Cheer them up", options: ["Cheer them up", "Laugh at them", "Ignore them"] },
+        { q: "You found ₦20 that isn't yours. What is the hero choice?", a: "Find the owner", options: ["Keep it", "Find the owner", "Hide it"] }
+    ];
+    const [scenIdx, setScenIdx] = useState(0);
+
+    const handleScenChoice = (choice) => {
+        if (choice === scenarios[scenIdx].a) {
+            showToast("Kind Heart! ❤️", "success");
+            if (scenIdx < scenarios.length - 1) setScenIdx(prev => prev + 1);
+            else setStep(2);
         } else {
-            showToast("Perfect! Rest is recovery.", 'success');
+            showToast("Heroes are kind and honest. Try again!", "warning");
         }
-        onNext();
     };
 
     return (
-        <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 6: Sleep & Recovery 😴</h2>
-            <p>Sleep is when your brain learns.</p>
+        <div style={{ padding: '1.5rem', animation: 'fadeIn 0.5s' }}>
+            <h2 style={{ color: 'var(--color-secondary)', textAlign: 'center', marginBottom: '1.5rem' }}>
+                Pillar 3: Harmony & Mindset 🧘
+            </h2>
 
-            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
-                <h3>Sleep Tracker</h3>
-                <p>How many hours did you sleep last night?</p>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', margin: '2rem 0' }}>
-                    <button onClick={() => setHours(Math.max(0, hours - 0.5))} className="btn btn-sm">-</button>
-                    <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{hours} hrs</div>
-                    <button onClick={() => setHours(Math.min(24, hours + 0.5))} className="btn btn-sm">+</button>
+            {step === 0 && (
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontStyle: 'italic', color: 'var(--color-accent)', marginBottom: '1.5rem', fontSize: '1.2rem' }}>
+                        "He who climbs a good tree is always given a push." — African Proverb
+                    </div>
+                    {isKid ? (
+                        <div>
+                            <h3 style={{ marginBottom: '1.5rem' }}>The Kindness Quest</h3>
+                            <p style={{ marginBottom: '2rem' }}>{scenarios[scenIdx].q}</p>
+                            <div className="grid-cols" style={{ gridTemplateColumns: '1fr' }}>
+                                {scenarios[scenIdx].options.map(opt => (
+                                    <button key={opt} onClick={() => handleScenChoice(opt)} className="btn btn-outline" style={{ padding: '1rem' }}>{opt}</button>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            <h3>Reflective Wisdom</h3>
+                            <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>True health includes the state of your mind. Record one thing you are grateful for today.</p>
+                            <textarea
+                                value={journal}
+                                onChange={e => setJournal(e.target.value)}
+                                placeholder="Write your thoughts..."
+                                style={{ width: '100%', minHeight: '150px', padding: '1rem', backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#fff', borderRadius: '15px' }}
+                            />
+                            <button
+                                onClick={() => setStep(2)}
+                                className="btn btn-primary"
+                                disabled={journal.length < 5}
+                                style={{ width: '100%', marginTop: '2rem', opacity: journal.length < 5 ? 0.5 : 1 }}
+                            >
+                                Submit Journal →
+                            </button>
+                        </div>
+                    )}
                 </div>
-            </div>
+            )}
 
-            <button onClick={checkSleep} className="btn btn-primary" style={{ width: '100%' }}>Log Sleep & Continue →</button>
-        </div>
-    );
-};
-
-const DigitalHygieneModule = ({ onNext, showToast }) => {
-    const [screenTime, setScreenTime] = useState(0);
-
-    const handleLog = () => {
-        if (screenTime > 4) {
-            showToast("Whoa! Try to reduce that. 📱❌", 'warning');
-        } else {
-            showToast("Great balance! 📵✅", 'success');
-        }
-        onNext();
-    };
-
-    return (
-        <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 7: Digital Hygiene 📵</h2>
-            <p>Control your device, don't let it control you.</p>
-
-            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
-                <h3>Screen Time Check</h3>
-                <p>How many hours of "fun" screen time today?</p>
-                <input
-                    type="range" min="0" max="12" step="0.5"
-                    value={screenTime} onChange={(e) => setScreenTime(Number(e.target.value))}
-                    style={{ width: '80%', margin: '2rem 0', accentColor: 'var(--color-primary)' }}
-                />
-                <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>{screenTime} hrs</div>
-            </div>
-
-            <button onClick={handleLog} className="btn btn-primary" style={{ width: '100%' }}>Log & Continue →</button>
-        </div>
-    );
-};
-
-const MindsetModule = ({ onNext, showToast }) => {
-    const [habits, setHabits] = useState({ bed: false, water: false, read: false });
-
-    const toggle = (h) => setHabits(prev => ({ ...prev, [h]: !prev[h] }));
-
-    return (
-        <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 8: Micro-Discipline 🧱</h2>
-            <div style={{ fontStyle: 'italic', color: 'var(--color-accent)', marginBottom: '1rem', fontSize: '1.1rem' }}>
-                "He who climbs a good tree is always given a push." — African Proverb
-            </div>
-            <p>Small habits build big futures.</p>
-
-            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
-                <h3>Daily Win Tracker</h3>
-                <div style={{ display: 'grid', gap: '1rem', margin: '1.5rem 0' }}>
-                    <button onClick={() => toggle('bed')} className={habits.bed ? "btn btn-primary" : "btn btn-outline"}>
-                        {habits.bed ? "Made Bed ✅" : "Make Bed 🛏️"}
-                    </button>
-                    <button onClick={() => toggle('water')} className={habits.water ? "btn btn-primary" : "btn btn-outline"}>
-                        {habits.water ? "Drank Water ✅" : "Drink Water 💧"}
-                    </button>
-                    <button onClick={() => toggle('read')} className={habits.read ? "btn btn-primary" : "btn btn-outline"}>
-                        {habits.read ? "Read valid page ✅" : "Read 1 Page 📖"}
+            {step === 2 && (
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🛡️</div>
+                    <h3>Mindset of a Leader</h3>
+                    <p style={{ marginBottom: '2rem' }}>Your spirit is now aligned for greatness.</p>
+                    <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>
+                        Claim Certificate 📜
                     </button>
                 </div>
-            </div>
-
-            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>Complete & Continue →</button>
-        </div>
-    );
-};
-
-const CommunityModule = ({ onNext, showToast }) => {
-    return (
-        <div style={{ padding: '1rem', textAlign: 'center' }}>
-            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 9: Community 🤝</h2>
-            <p>We rise by lifting others.</p>
-
-            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
-                <h3>Today's Challenge</h3>
-                <div style={{ fontSize: '3rem', margin: '1rem' }}>🍲</div>
-                <p style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#FFD700' }}>
-                    "Cook one healthy meal for your family or friends."
-                </p>
-                <p style={{ marginTop: '1rem', color: '#aaa' }}>Take a picture and share it with your circle!</p>
-            </div>
-
-            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>I Accept the Challenge! →</button>
+            )}
         </div>
     );
 };
