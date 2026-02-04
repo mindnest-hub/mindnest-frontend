@@ -609,7 +609,7 @@ const Agripreneurship = () => {
                     </div>
                 </div>
             )}
-        </div >
+        </div>
     );
 };
 
