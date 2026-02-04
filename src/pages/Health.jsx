@@ -1,483 +1,521 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../components/Toast';
+import { useWallet } from '../hooks/useWallet';
 
-const Health = ({ ageGroup }) => {
+const Health = () => {
     const navigate = useNavigate();
-    const [stage, setStage] = useState(1); // 1 to 9
+    const { addEarnings, deductPenalty, getModuleCap } = useWallet();
+    const MODULE_CAP = getModuleCap('health');
+
+    const [activeModule, setActiveModule] = useState(() => {
+        return Number(localStorage.getItem('healthActiveModule')) || 0;
+    });
+
+    const [completedModules, setCompletedModules] = useState(() => {
+        return JSON.parse(localStorage.getItem('healthCompletedModules')) || Array(10).fill(false);
+    });
+
     const [toast, setToast] = useState(null);
 
-    const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
-    const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
-    const isAdult = !isKid && !isTeen;
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [stage]);
-
-    const showToast = (message, type = 'info') => {
-        setToast({ message, type });
-        setTimeout(() => setToast(null), 3000);
+    const showToast = (message, type = 'info', duration = 3000) => {
+        setToast({ message, type, duration });
     };
 
-    // --- STAGE COMPONENTS ---
+    useEffect(() => {
+        localStorage.setItem('healthActiveModule', activeModule);
+        localStorage.setItem('healthCompletedModules', JSON.stringify(completedModules));
+        window.scrollTo(0, 0);
+    }, [activeModule, completedModules]);
 
-    const IntroStage = () => (
-        <div style={{ animation: 'fadeIn 0.8s' }}>
-            <div style={{
-                position: 'relative',
-                height: '400px',
-                borderRadius: '24px',
-                overflow: 'hidden',
-                marginBottom: '2.5rem',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-                border: '1px solid var(--color-border)'
-            }}>
-                <img
-                    src="file:///C:/Users/USER/.gemini/antigravity/brain/69520f71-be61-458d-9cf6-8cdff8a237d4/health_intro_banner_1769388020713.png"
-                    alt="Health and Wellness"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    padding: '3rem 2rem',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
-                    color: 'white'
-                }}>
-                    <h1 style={{ fontSize: 'clamp(2rem, 8vw, 3.5rem)', margin: 0 }}>Health, Wellness & Mindset</h1>
-                </div>
-            </div>
+    const markComplete = (index) => {
+        const newCompleted = [...completedModules];
+        if (!newCompleted[index]) {
+            newCompleted[index] = true;
+            setCompletedModules(newCompleted);
+            addEarnings('health', 150); // Reward for completing a module
+            showToast("Module Complete! +₦150", 'success');
+        }
+    };
 
-            <p style={{
-                fontSize: '1.4rem',
-                lineHeight: '1.6',
-                color: 'var(--color-text-muted)',
-                maxWidth: '850px',
-                margin: '0 auto 3rem auto',
-                textAlign: 'center',
-                fontStyle: 'italic'
-            }}>
-                “Your body, mind, and habits shape your future. Learn to eat well, stay fit, manage your mind, and develop habits that make you strong, disciplined, and productive.”
-            </p>
+    const modules = [
+        "Intro", "Nutrition", "Fitness", "Mental Health", "Reproductive Health",
+        "Sleep & Recovery", "Digital Hygiene", "Mindset", "Community", "Certificate"
+    ];
 
-            <div className="grid-cols" style={{ marginBottom: '4rem' }}>
-                <div className="card" style={{ borderTop: '4px solid #C5A019' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🥗</div>
-                    <h3>Nutrition</h3>
-                    <p>Fuel your body with the right classes of food and ancient African wisdom.</p>
-                </div>
-                <div className="card" style={{ borderTop: '4px solid #006B3C' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>💪</div>
-                    <h3>Fitness</h3>
-                    <p>Move your body every day with home-friendly exercises and movement keys.</p>
-                </div>
-                <div className="card" style={{ borderTop: '4px solid #00BFFF' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🧠</div>
-                    <h3>Mindset</h3>
-                    <p>Master your inner world, manage stress, and build unshakable discipline.</p>
-                </div>
-            </div>
+    const renderCurrentModule = () => {
+        switch (activeModule) {
+            case 0: return <IntroModule onNext={() => { markComplete(0); setActiveModule(1); }} />;
+            case 1: return <NutritionModule onNext={() => { markComplete(1); setActiveModule(2); }} showToast={showToast} />;
+            // Placeholders for now, will implement sequentially
+            case 2: return <FitnessModule onNext={() => { markComplete(2); setActiveModule(3); }} showToast={showToast} />;
+            case 3: return <MentalHealthModule onNext={() => { markComplete(3); setActiveModule(4); }} showToast={showToast} />;
+            case 4: return <ReproductiveHealthModule onNext={() => { markComplete(4); setActiveModule(5); }} showToast={showToast} />;
+            case 5: return <SleepModule onNext={() => { markComplete(5); setActiveModule(6); }} showToast={showToast} />;
+            case 6: return <DigitalHygieneModule onNext={() => { markComplete(6); setActiveModule(7); }} showToast={showToast} />;
+            case 7: return <MindsetModule onNext={() => { markComplete(7); setActiveModule(8); }} showToast={showToast} />;
+            case 8: return <CommunityModule onNext={() => { markComplete(8); setActiveModule(9); }} showToast={showToast} />;
+            case 9: return <CertificateModule onNext={() => navigate('/')} />;
+            default: return <IntroModule onNext={() => setActiveModule(1)} />;
+        }
+    };
+
+    return (
+        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            {toast && <Toast message={toast.message} type={toast.type} duration={toast.duration} onClose={() => setToast(null)} />}
 
             <button
-                onClick={() => setStage(2)}
-                className="btn btn-primary"
+                onClick={() => navigate('/')}
                 style={{
-                    width: '100%',
-                    padding: '1.5rem',
-                    fontSize: '1.2rem',
-                    borderRadius: '16px'
+                    background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem',
+                    display: 'flex', alignItems: 'center', gap: '0.5rem', alignSelf: 'flex-start'
                 }}
             >
-                Begin Your Journey 🚀
+                ← Back to Hub
+            </button>
+
+            {/* PROGRESS BAR */}
+            <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', color: '#aaa', fontSize: '0.8rem' }}>
+                    <span>Progress</span>
+                    <span>{Math.round((completedModules.filter(Boolean).length / 10) * 100)}%</span>
+                </div>
+                <div style={{ width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{
+                        width: `${(activeModule / 9) * 100}%`,
+                        height: '100%',
+                        backgroundColor: 'var(--color-secondary)',
+                        transition: 'width 0.3s ease'
+                    }}></div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.2rem', marginTop: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                    {modules.map((m, i) => (
+                        <div
+                            key={i}
+                            onClick={() => completedModules[i] || i <= activeModule ? setActiveModule(i) : null}
+                            style={{
+                                minWidth: '30px', height: '30px', borderRadius: '50%',
+                                backgroundColor: i === activeModule ? 'var(--color-secondary)' : completedModules[i] ? '#00C851' : '#333',
+                                color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '0.8rem', cursor: 'pointer', flexShrink: 0,
+                                border: i === activeModule ? '2px solid #fff' : 'none'
+                            }}
+                            title={m}
+                        >
+                            {i + 1}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {renderCurrentModule()}
+            </div>
+        </div>
+    );
+};
+
+const IntroModule = ({ onNext }) => (
+    <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+        <h1 style={{ color: 'var(--color-secondary)', fontSize: '2.5rem', marginBottom: '1.5rem' }}>Health, Wellness & Mindset 🌿</h1>
+        <p style={{ fontSize: '1.2rem', lineHeight: '1.8', color: '#ccc', maxWidth: '600px', margin: '0 auto 2rem' }}>
+            Your body, mind, and habits shape your future. Learn to eat well, stay fit, manage your mind, and develop habits that make you strong, disciplined, and productive.
+        </p>
+        <button onClick={onNext} className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}>
+            Start Journey 🚀
+        </button>
+    </div>
+);
+
+const NutritionModule = ({ onNext, showToast }) => {
+    // Meal Tracker
+    const [meals, setMeals] = useState(() => JSON.parse(localStorage.getItem('healthMeals')) || { b: false, l: false, d: false });
+
+    // Plate Game
+    const [plate, setPlate] = useState({ carbs: 0, protein: 0, veg: 0 });
+    const [gameWon, setGameWon] = useState(false);
+
+    useEffect(() => {
+        localStorage.setItem('healthMeals', JSON.stringify(meals));
+    }, [meals]);
+
+    const toggleMeal = (type) => {
+        setMeals(prev => ({ ...prev, [type]: !prev[type] }));
+        if (!meals[type]) showToast("Meal logged! 🥗 Keep it up.", 'success');
+    };
+
+    const addToPlate = (type) => {
+        if (gameWon) return;
+        setPlate(prev => {
+            const newPlate = { ...prev, [type]: prev[type] + 1 };
+            checkWin(newPlate);
+            return newPlate;
+        });
+    };
+
+    const checkWin = (p) => {
+        // Win condition: roughly balanced (e.g., 1 carb, 1 protein, 2 veg)
+        if (p.carbs >= 1 && p.protein >= 1 && p.veg >= 2) {
+            setGameWon(true);
+            showToast("Perfect Plate! 🍽️ You know your nutrition.", 'success');
+        }
+    };
+
+    const resetPlate = () => {
+        setPlate({ carbs: 0, protein: 0, veg: 0 });
+        setGameWon(false);
+    };
+
+    return (
+        <div style={{ padding: '1rem' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem', textAlign: 'center' }}>Module 2: Nutrition 🍎</h2>
+
+            <div className="card" style={{ marginBottom: '2rem', backgroundColor: '#222' }}>
+                <h3>📅 Daily Meal Tracker</h3>
+                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>Log your balanced meals today.</p>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
+                    {['Breakfast', 'Lunch', 'Dinner'].map((m) => {
+                        const key = m.charAt(0).toLowerCase();
+                        return (
+                            <button
+                                key={m}
+                                onClick={() => toggleMeal(key)}
+                                className={meals[key] ? "btn btn-primary" : "btn btn-outline"}
+                                style={{ minWidth: '100px' }}
+                            >
+                                {meals[key] ? `${m} ✅` : m}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            <div className="card" style={{ marginBottom: '2rem', textAlign: 'center' }}>
+                <h3>🍽️ Build Your Healthy Plate</h3>
+                <p>Add items to create a balanced meal (1 Carb, 1 Protein, 2 Veggies).</p>
+
+                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', margin: '1rem 0' }}>
+                    <button onClick={() => addToPlate('carbs')} className="btn" style={{ backgroundColor: '#FFBB33', color: 'black' }}>Rice/Yam 🍚</button>
+                    <button onClick={() => addToPlate('protein')} className="btn" style={{ backgroundColor: '#FF4444', color: 'white' }}>Fish/Beans 🐟</button>
+                    <button onClick={() => addToPlate('veg')} className="btn" style={{ backgroundColor: '#00C851', color: 'white' }}>Greens/Okra 🥬</button>
+                </div>
+
+                <div style={{
+                    width: '200px', height: '200px', borderRadius: '50%', border: '4px solid #fff',
+                    margin: '1rem auto', position: 'relative', backgroundColor: '#fff', color: '#000',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'
+                }}>
+                    {plate.carbs > 0 && <span>🍚 x{plate.carbs}</span>}
+                    {plate.protein > 0 && <span>🐟 x{plate.protein}</span>}
+                    {plate.veg > 0 && <span>🥬 x{plate.veg}</span>}
+                    {plate.carbs === 0 && plate.protein === 0 && plate.veg === 0 && <span style={{ color: '#aaa' }}>Empty Plate</span>}
+
+                    {gameWon && <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', borderRadius: '50%', backgroundColor: 'rgba(0,200,81,0.8)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.5rem' }}>Delicious! 😋</div>}
+                </div>
+
+                <button onClick={resetPlate} style={{ background: 'none', border: 'none', color: '#aaa', cursor: 'pointer' }}>Reset Plate</button>
+            </div>
+
+            <button onClick={onNext} className="btn btn-primary" disabled={!gameWon} style={{ width: '100%', opacity: gameWon ? 1 : 0.5 }}>
+                {gameWon ? "Complete & Continue →" : "Finish Plate to Continue 🔒"}
             </button>
         </div>
     );
+};
 
-    const NutritionStage = () => {
-        const [quizStep, setQuizStep] = useState(0);
-        const foodClasses = [
-            { t: 'Carbohydrates', d: 'Energy source for your brain and body.', examples: 'Yam, Cassava, Rice, Millet', icon: '⚡' },
-            { t: 'Proteins', d: 'Builds and repairs tissues and muscles.', examples: 'Beans, Fish, Egg, Groundnut', icon: '🏗️' },
-            { t: 'Fats & Oils', d: 'Provides long-term energy and protects organs.', examples: 'Palm Oil, Coconut Oil, Avocado', icon: '🛡️' },
-            { t: 'Vitamins & Minerals', d: 'Boosts immunity and regulates body functions.', examples: 'Leafy Greens, Fruits, Moringa', icon: '🥦' }
-        ];
+const FitnessModule = ({ onNext, showToast }) => {
+    const [steps, setSteps] = useState(() => Number(localStorage.getItem('healthSteps')) || 0);
+    const GOAL = 5000;
 
-        return (
-            <div style={{ animation: 'fadeIn 0.5s' }}>
-                <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                    <h2 style={{ color: '#C5A019' }}>Phase 2: Nutrition Mastery 🥗</h2>
-                    <p style={{ color: 'var(--color-text-muted)' }}>Learn to fuel your vessel for maximum performance.</p>
-                </header>
+    useEffect(() => {
+        localStorage.setItem('healthSteps', steps);
+    }, [steps]);
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-                    {foodClasses.map(fc => (
-                        <div key={fc.t} className="card" style={{ border: '1px solid rgba(197, 160, 25, 0.2)', backgroundColor: 'rgba(197, 160, 25, 0.03)' }}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{fc.icon}</div>
-                            <h4>{fc.t}</h4>
-                            <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>{fc.d}</p>
-                            <div style={{
-                                padding: '0.75rem',
-                                background: 'rgba(255,255,255,0.05)',
-                                borderRadius: '12px',
-                                fontSize: '0.85rem'
-                            }}>
-                                <strong>Common Examples:</strong><br />
-                                {fc.examples}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="card" style={{ marginBottom: '3rem', background: 'linear-gradient(135deg, rgba(197, 160, 25, 0.1), transparent)' }}>
-                    <h3>Building a Balanced Plate 🍽️</h3>
-                    <ul style={{ listStyleType: 'none', padding: 0 }}>
-                        <li style={{ marginBottom: '1rem' }}>✓ <strong>Portion Control:</strong> Half your plate should be colorful vegetables.</li>
-                        <li style={{ marginBottom: '1rem' }}>✓ <strong>Hydration:</strong> Drink 2-3 liters of water daily. Skip the soda.</li>
-                        <li style={{ marginBottom: '1rem' }}>✓ <strong>Budget Hack:</strong> Buy local, seasonal fruits and vegetables for higher nutrients at lower cost.</li>
-                    </ul>
-                </div>
-
-                <div className="card" style={{ marginBottom: '3rem', border: '1px solid var(--color-primary)' }}>
-                    <h3>Knowledge Check 🧠</h3>
-                    <p>Which food class is primarily responsible for "building and repairing tissues"?</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '1rem' }}>
-                        <button onClick={() => showToast("Try again! (Energy)", 'warning')} className="btn btn-outline">Carbs</button>
-                        <button onClick={() => showToast("Correct! 🏗️", 'success')} className="btn btn-outline">Proteins</button>
-                        <button onClick={() => showToast("Try again! (Protection)", 'warning')} className="btn btn-outline">Fats</button>
-                        <button onClick={() => showToast("Try again! (Regulation)", 'warning')} className="btn btn-outline">Vitamins</button>
-                    </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button onClick={() => setStage(1)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                    <button onClick={() => setStage(3)} className="btn btn-primary" style={{ flex: 2 }}>Unlock Fitness ⚡</button>
-                </div>
-            </div>
-        );
+    const addSteps = (amount) => {
+        const newTotal = steps + amount;
+        setSteps(newTotal);
+        if (newTotal >= GOAL && steps < GOAL) {
+            showToast("Goal Reached! 🏃💨 You are unstoppable!", 'success');
+        }
     };
 
-    const FitnessStage = () => {
-        const exercises = [
-            { t: 'Daily Movement', d: 'The most important habit. 30 minutes of walking or dancing keeps the heart strong.', icon: '🚶' },
-            { t: 'Home Exercise', d: 'Bodyweight squats, push-ups, and planks. No equipment needed, just your dedication.', icon: '🏠' },
-            { t: 'Posture & Stretch', d: 'Open your chest and stretch your spine. Counter the effects of sitting.', icon: '🧘' }
-        ];
-
-        return (
-            <div style={{ animation: 'fadeIn 0.5s' }}>
-                <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                    <h2 style={{ color: '#006B3C' }}>Phase 3: Relentless Fitness 💪</h2>
-                    <p style={{ color: 'var(--color-text-muted)' }}>Strength is a choice. Make it daily.</p>
-                </header>
-
-                <div className="grid-cols" style={{ marginBottom: '3rem' }}>
-                    {exercises.map(ex => (
-                        <div key={ex.t} className="card" style={{ borderLeft: '4px solid #006B3C' }}>
-                            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{ex.icon}</div>
-                            <h4>{ex.t}</h4>
-                            <p>{ex.d}</p>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="card" style={{ marginBottom: '3rem', textAlign: 'center', border: '2px dashed var(--color-border)' }}>
-                    <h3>Today's Movement Challenge ⚡</h3>
-                    <p style={{ fontSize: '1.2rem', margin: '1rem 0' }}>80 Squats + 20 Pushups + 5 Minute Plank</p>
-                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>"Movement is medicine for a stagnant mind."</p>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button onClick={() => setStage(2)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                    <button onClick={() => setStage(4)} className="btn btn-primary" style={{ flex: 2, backgroundColor: '#006B3C', color: 'white' }}>Unlock Mental Health 🧠</button>
-                </div>
-            </div >
-        );
-    };
-
-    const MentalHealthStage = () => (
-        <div style={{ animation: 'fadeIn 0.5s' }}>
-            <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h2 style={{ color: '#00BFFF' }}>Phase 4: Mental Resilience 🧠</h2>
-                <p style={{ color: 'var(--color-text-muted)' }}>A strong mind drives a strong life.</p>
-            </header>
-
-            <div className="grid-cols" style={{ marginBottom: '3rem' }}>
-                <div className="card">
-                    <h4>Emotional Awareness</h4>
-                    <p>Learn to identify what you feel. Is it stress, anxiety, or growth discomfort? Naming it is the first step to mastering it.</p>
-                </div>
-                <div className="card">
-                    <h4>The Stoic Calm</h4>
-                    <p>Focus only on what you can control. Your breath, your reactions, and your effort. Let go of the rest.</p>
-                </div>
-                <div className="card">
-                    <h4>Journaling Power</h4>
-                    <p>Write to clear the mental clutter. 5 minutes of brain-dumping every morning changes your perspective.</p>
-                </div>
-            </div>
-
-            <div className="card" style={{
-                marginBottom: '3rem',
-                border: '1px solid rgba(0, 191, 255, 0.3)',
-                background: 'linear-gradient(to right, rgba(0, 191, 255, 0.05), transparent)'
-            }}>
-                <h3>Interactive Exercise: The 4-7-8 Breath</h3>
-                <p>Inhale for 4s, Hold for 7s, Exhale for 8s. Repeat 4 times.</p>
-                <button
-                    onClick={() => showToast("Calmness Activated! 🌊", 'success')}
-                    className="btn btn-outline"
-                    style={{ marginTop: '1rem', borderColor: '#00BFFF', color: '#00BFFF' }}
-                >
-                    Start Timer ⏱️
-                </button>
-            </div>
-
-            <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => setStage(3)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                <button
-                    onClick={() => setStage(5)}
-                    className="btn btn-primary"
-                    style={{ flex: 2, backgroundColor: '#00BFFF', color: 'white' }}
-                >
-                    Unlock Body Changes 🧬
-                </button>
-            </div>
-        </div>
-    );
-
-    const ReproductiveHealthStage = () => (
-        <div style={{ animation: 'fadeIn 0.5s' }}>
-            <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h2 style={{ color: '#DB7093' }}>Phase 5: Life & Body Awareness 🧬</h2>
-                <p style={{ color: 'var(--color-text-muted)' }}>Understanding your vessel leads to better decisions.</p>
-            </header>
-
-            <div className="grid-cols" style={{ marginBottom: '3rem' }}>
-                <div className="card">
-                    <h4>Body Changes</h4>
-                    <p>{isKid ? "Your body grows as you get older. It's perfectly normal and healthy!" : "Understanding puberty and hormonal cycles helps you manage your physical and emotional well-being."}</p>
-                </div>
-                <div className="card">
-                    <h4>Safe Practices</h4>
-                    <p>{isKid ? "Always ask for permission before touching others, and say 'No' if you feel uncomfortable." : "Consent is active, enthusiastic, and revocable. Protect your health with STI awareness and prevention."}</p>
-                </div>
-                <div className="card">
-                    <h4>Healthy Relationships</h4>
-                    <p>Respect, communication, and boundaries are the foundations of any strong connection.</p>
-                </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => setStage(4)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                <button onClick={() => setStage(6)} className="btn btn-primary" style={{ flex: 2, backgroundColor: '#DB7093', color: 'white' }}>Unlock Sleep 🌙</button>
-            </div>
-        </div>
-    );
-
-    const SleepStage = () => (
-        <div style={{ animation: 'fadeIn 0.5s' }}>
-            <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h2 style={{ color: '#6A5ACD' }}>Phase 6: Sleep & Recovery 🌙</h2>
-                <p style={{ color: 'var(--color-text-muted)' }}>Sleep is not a luxury; it's a high-performance necessity.</p>
-            </header>
-
-            <div className="grid-cols" style={{ marginBottom: '3rem' }}>
-                <div className="card">
-                    <h4>The 7-9 Hour Rule</h4>
-                    <p>During deep sleep, your brain flushes toxins and consolidates memories. Missing this is like not charging your battery.</p>
-                </div>
-                <div className="card">
-                    <h4>Sleep Cycles</h4>
-                    <p>We sleep in 90-minute chunks. Waking up at the end of a cycle makes you feel refreshed, not groggy.</p>
-                </div>
-                <div className="card">
-                    <h4>Sleep Hygiene</h4>
-                    <p>No screens 1 hour before bed. Keep the room cool and dark. Consistency is king.</p>
-                </div>
-            </div>
-
-            <div className="card" style={{ marginBottom: '3rem', border: '1px solid rgba(106, 90, 205, 0.3)' }}>
-                <h3>The Cost of Deprivation</h3>
-                <p>One night of bad sleep reduces your focus by 40%. Long-term lack leads to anxiety and weakened immunity.</p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => setStage(5)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                <button onClick={() => setStage(7)} className="btn btn-primary" style={{ flex: 2, backgroundColor: '#6A5ACD', color: 'white' }}>Unlock Digital Health 📱</button>
-            </div>
-        </div>
-    );
-
-    const DigitalHygieneStage = () => (
-        <div style={{ animation: 'fadeIn 0.5s' }}>
-            <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h2 style={{ color: '#00BFFF' }}>Phase 7: Digital Hygiene 📱</h2>
-                <p style={{ color: 'var(--color-text-muted)' }}>Own your tools; don't let them own you.</p>
-            </header>
-
-            <div className="grid-cols" style={{ marginBottom: '3rem' }}>
-                <div className="card">
-                    <h4>Screen Time & The Brain</h4>
-                    <p>Endless scrolling triggers dopamine loops that kill deep focus. Set hard limits for social apps.</p>
-                </div>
-                <div className="card">
-                    <h4>Digital Detox</h4>
-                    <p>Schedule 1 hour a day and 1 day a month with zero screens. Reconnect with the physical world.</p>
-                </div>
-                <div className="card">
-                    <h4>Productivity Hacks</h4>
-                    <p>Turn off non-human notifications. Use "Do Not Disturb" during deep work sessions.</p>
-                </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => setStage(6)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                <button onClick={() => setStage(8)} className="btn btn-primary" style={{ flex: 2, backgroundColor: '#00BFFF', color: 'white' }}>Unlock Mindset 💎</button>
-            </div>
-        </div>
-    );
-
-    const MindsetStage = () => (
-        <div style={{ animation: 'fadeIn 0.5s' }}>
-            <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-                <h2 style={{ color: '#C5A019' }}>Phase 8: Micro-Discipline 💎</h2>
-                <p style={{ color: 'var(--color-text-muted)' }}>Discipline compounds faster than money.</p>
-            </header>
-
-            <div className="grid-cols" style={{ marginBottom: '3rem' }}>
-                <div className="card">
-                    <h4>Small Habits = Big Results</h4>
-                    <p>Winning the morning wins the day. Make your bed, drink water, and do 10 pushups immediately.</p>
-                </div>
-                <div className="card">
-                    <h4>The Power of 'No'</h4>
-                    <p>Discipline is saying 'No' to a small pleasure now for a massive victory later.</p>
-                </div>
-                <div className="card">
-                    <h4>Body Fuels Mind</h4>
-                    <p>Never forget: Your physical state dictates your mental drive. If you're stuck, MOVE.</p>
-                </div>
-            </div>
-
-            <div className="card" style={{ marginBottom: '3rem', textAlign: 'center', background: 'var(--color-primary-soft)' }}>
-                <h3>"Discipline is the bridge between goals and accomplishment."</h3>
-                <p>— Jim Rohn</p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => setStage(7)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                <button onClick={() => setStage(9)} className="btn btn-primary" style={{ flex: 2 }}>The Final Challenge 🏆</button>
-            </div>
-        </div>
-    );
-
-    const CommunityStage = () => (
-        <div style={{ animation: 'fadeIn 0.5s', textAlign: 'center' }}>
-            <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>🏆</div>
-            <h2 style={{ color: 'var(--color-primary)' }}>Level 9: The Community Challenge</h2>
-            <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 3rem auto' }}>
-                Wellness is infectious. Your final task isn't about you—it's about lifting others.
-            </p>
-
-            <div className="card" style={{ marginBottom: '4rem', textAlign: 'left' }}>
-                <h3>Your Mandate:</h3>
-                <ul style={{ listStyleType: 'none', padding: 0, marginTop: '1.5rem' }}>
-                    <li style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
-                        <span style={{ fontSize: '1.5rem' }}>👥</span>
-                        <span><strong>Teach One:</strong> Share one thing you learned today with a friend or family member.</span>
-                    </li>
-                    <li style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
-                        <span style={{ fontSize: '1.5rem' }}>🌿</span>
-                        <span><strong>Impact One:</strong> Help someone make a healthier choice today.</span>
-                    </li>
-                    <li style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
-                        <span style={{ fontSize: '1.5rem' }}>🛡️</span>
-                        <span><strong>Protect One:</strong> Stand up for the wellness of your community environment.</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => setStage(8)} className="btn btn-outline" style={{ flex: 1 }}>Back</button>
-                <button
-                    onClick={() => {
-                        showToast("Wellness Mastery Claimed! 🎓", 'success');
-                        navigate('/');
-                    }}
-                    className="btn btn-primary"
-                    style={{ flex: 2 }}
-                >
-                    Finish Mastery 🎓
-                </button>
-            </div>
-        </div>
-    );
-
-    // --- MAIN RENDER ---
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '6rem' }}>
-            {toast && (
-                <div style={{
-                    position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
-                    zIndex: 1000, padding: '1rem 2rem', borderRadius: '50px',
-                    backgroundColor: toast.type === 'success' ? '#006B3C' : '#C5A019',
-                    color: 'white', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', animation: 'popIn 0.3s'
-                }}>
-                    {toast.message}
+        <div style={{ padding: '1rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 3: Fitness 🏃</h2>
+            <p>Movement is medicine.</p>
+
+            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
+                <h3>👟 Step Challenge</h3>
+                <p>Goal: {GOAL.toLocaleString()} steps/day</p>
+
+                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: steps >= GOAL ? '#00C851' : '#fff', margin: '1rem 0' }}>
+                    {steps.toLocaleString()}
                 </div>
-            )}
 
-            <button onClick={() => navigate('/')} className="btn-back" style={{ marginBottom: '2rem' }}>← Hub</button>
-
-            {stage === 1 && <IntroStage />}
-            {stage === 2 && <NutritionStage />}
-            {stage === 3 && <FitnessStage />}
-            {stage === 4 && <MentalHealthStage />}
-            {stage === 5 && <ReproductiveHealthStage />}
-            {stage === 6 && <SleepStage />}
-            {stage === 7 && <DigitalHygieneStage />}
-            {stage === 8 && <MindsetStage />}
-            {stage === 9 && <CommunityStage />}
-
-            {/* Placeholder for future stages */}
-            {stage > 9 && (
-                <div className="card" style={{ textAlign: 'center', padding: '100px 20px' }}>
-                    <h2>Phase {stage} Coming Soon! 🚀</h2>
-                    <p>The mastery continues. Check back in a few moments.</p>
-                    <button onClick={() => setStage(stage - 1)} className="btn btn-outline" style={{ marginTop: '2rem' }}>Go Back</button>
+                <div style={{ width: '100%', height: '10px', backgroundColor: '#333', borderRadius: '5px', marginBottom: '1.5rem' }}>
+                    <div style={{ width: `${Math.min(100, (steps / GOAL) * 100)}%`, height: '100%', backgroundColor: steps >= GOAL ? '#00C851' : 'var(--color-secondary)', borderRadius: '5px', transition: 'width 0.5s' }}></div>
                 </div>
-            )}
 
-            {/* Progress indicator */}
-            <div style={{
-                position: 'fixed',
-                bottom: '20px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'rgba(0,0,0,0.8)',
-                padding: '0.5rem 1rem',
-                borderRadius: '100px',
-                border: '1px solid var(--color-border)',
-                backdropFilter: 'blur(10px)',
-                display: 'flex',
-                gap: '8px',
-                zIndex: 99
-            }}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-                    <div
-                        key={num}
-                        style={{
-                            width: '10px',
-                            height: '10px',
-                            borderRadius: '50%',
-                            backgroundColor: stage >= num ? 'var(--color-primary)' : '#333',
-                            transition: 'var(--transition)'
-                        }}
-                    />
-                ))}
+                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <button onClick={() => addSteps(100)} className="btn btn-outline">+100 Steps</button>
+                    <button onClick={() => addSteps(500)} className="btn btn-outline">+500 Steps</button>
+                    <button onClick={() => addSteps(1000)} className="btn btn-outline">+1,000 Steps</button>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '1rem' }}>(Log your real-world steps here!)</p>
             </div>
+
+            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>Complete & Continue →</button>
+        </div>
+    );
+};
+
+const MentalHealthModule = ({ onNext, showToast }) => {
+    const [mood, setMood] = useState(localStorage.getItem('healthMood') || '');
+    const [journal, setJournal] = useState('');
+
+    const saveEntry = () => {
+        if (!mood) {
+            showToast("Please select a mood first.", 'error');
+            return;
+        }
+        localStorage.setItem('healthMood', mood);
+        // In a real app, save journal to DB or local array
+        showToast("Journal saved! 🧠 Feelings acknowledged.", 'success');
+        onNext();
+    };
+
+    const moods = ['😠', '😢', '😐', '🙂', '🤩'];
+
+    return (
+        <div style={{ padding: '1rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 4: Mental Health 🧠</h2>
+            <p>Your mind matters. How are you feeling today?</p>
+
+            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
+                <h3>Mood Tracker</h3>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', fontSize: '2.5rem', margin: '1.5rem 0' }}>
+                    {moods.map(m => (
+                        <div
+                            key={m}
+                            onClick={() => setMood(m)}
+                            style={{
+                                cursor: 'pointer',
+                                transform: mood === m ? 'scale(1.3)' : 'scale(1)',
+                                transition: 'transform 0.2s',
+                                opacity: mood && mood !== m ? 0.3 : 1
+                            }}
+                        >
+                            {m}
+                        </div>
+                    ))}
+                </div>
+
+                <textarea
+                    placeholder="Why do you feel this way? (Optional)"
+                    value={journal}
+                    onChange={(e) => setJournal(e.target.value)}
+                    style={{
+                        width: '100%', minHeight: '100px', backgroundColor: '#333', color: '#fff',
+                        padding: '1rem', borderRadius: '10px', border: 'none', resize: 'vertical'
+                    }}
+                />
+            </div>
+
+            <button onClick={saveEntry} className="btn btn-primary" style={{ width: '100%' }}>Save & Continue →</button>
+        </div>
+    );
+};
+
+const ReproductiveHealthModule = ({ onNext, showToast }) => {
+    const [qIndex, setQIndex] = useState(0);
+    const [score, setScore] = useState(0);
+
+    const questions = [
+        { q: "What is consent?", options: ["Saying yes freely", "Being forced", "Silence"], a: 0 },
+        { q: "Puberty is...", options: ["Scary", "Normal body changes", "A sickness"], a: 1 },
+        { q: "If you feel unsafe, you should...", options: ["Tell a trusted adult", "Hide it", "Ignore it"], a: 0 }
+    ];
+
+    const handleAnswer = (idx) => {
+        if (idx === questions[qIndex].a) {
+            setScore(score + 1);
+            showToast("Correct!", 'success');
+        } else {
+            showToast("Not quite. Safety first!", 'error');
+        }
+
+        if (qIndex < questions.length - 1) {
+            setQIndex(qIndex + 1);
+        } else {
+            onNext();
+        }
+    };
+
+    return (
+        <div style={{ padding: '1rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 5: Reproductive Health 🏥</h2>
+            <p>Respect your body and others.</p>
+
+            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
+                <h3>Scenario Quiz {qIndex + 1}/{questions.length}</h3>
+                <p style={{ fontSize: '1.2rem', margin: '1.5rem 0' }}>{questions[qIndex].q}</p>
+
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                    {questions[qIndex].options.map((opt, i) => (
+                        <button
+                            key={i}
+                            onClick={() => handleAnswer(i)}
+                            className="btn btn-outline"
+                        >
+                            {opt}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const SleepModule = ({ onNext, showToast }) => {
+    const [hours, setHours] = useState(7);
+
+    const checkSleep = () => {
+        if (hours < 7) {
+            showToast("Try to get at least 7-9 hours!", 'warning');
+        } else if (hours > 10) {
+            showToast("Oversleeping can make you groggy.", 'warning');
+        } else {
+            showToast("Perfect! Rest is recovery.", 'success');
+        }
+        onNext();
+    };
+
+    return (
+        <div style={{ padding: '1rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 6: Sleep & Recovery 😴</h2>
+            <p>Sleep is when your brain learns.</p>
+
+            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
+                <h3>Sleep Tracker</h3>
+                <p>How many hours did you sleep last night?</p>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', margin: '2rem 0' }}>
+                    <button onClick={() => setHours(Math.max(0, hours - 0.5))} className="btn btn-sm">-</button>
+                    <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{hours} hrs</div>
+                    <button onClick={() => setHours(Math.min(24, hours + 0.5))} className="btn btn-sm">+</button>
+                </div>
+            </div>
+
+            <button onClick={checkSleep} className="btn btn-primary" style={{ width: '100%' }}>Log Sleep & Continue →</button>
+        </div>
+    );
+};
+
+const DigitalHygieneModule = ({ onNext, showToast }) => {
+    const [screenTime, setScreenTime] = useState(0);
+
+    const handleLog = () => {
+        if (screenTime > 4) {
+            showToast("Whoa! Try to reduce that. 📱❌", 'warning');
+        } else {
+            showToast("Great balance! 📵✅", 'success');
+        }
+        onNext();
+    };
+
+    return (
+        <div style={{ padding: '1rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 7: Digital Hygiene 📵</h2>
+            <p>Control your device, don't let it control you.</p>
+
+            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
+                <h3>Screen Time Check</h3>
+                <p>How many hours of "fun" screen time today?</p>
+                <input
+                    type="range" min="0" max="12" step="0.5"
+                    value={screenTime} onChange={(e) => setScreenTime(Number(e.target.value))}
+                    style={{ width: '80%', margin: '2rem 0', accentColor: 'var(--color-primary)' }}
+                />
+                <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>{screenTime} hrs</div>
+            </div>
+
+            <button onClick={handleLog} className="btn btn-primary" style={{ width: '100%' }}>Log & Continue →</button>
+        </div>
+    );
+};
+
+const MindsetModule = ({ onNext, showToast }) => {
+    const [habits, setHabits] = useState({ bed: false, water: false, read: false });
+
+    const toggle = (h) => setHabits(prev => ({ ...prev, [h]: !prev[h] }));
+
+    return (
+        <div style={{ padding: '1rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 8: Micro-Discipline 🧱</h2>
+            <p>Small habits build big futures.</p>
+
+            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
+                <h3>Daily Win Tracker</h3>
+                <div style={{ display: 'grid', gap: '1rem', margin: '1.5rem 0' }}>
+                    <button onClick={() => toggle('bed')} className={habits.bed ? "btn btn-primary" : "btn btn-outline"}>
+                        {habits.bed ? "Made Bed ✅" : "Make Bed 🛏️"}
+                    </button>
+                    <button onClick={() => toggle('water')} className={habits.water ? "btn btn-primary" : "btn btn-outline"}>
+                        {habits.water ? "Drank Water ✅" : "Drink Water 💧"}
+                    </button>
+                    <button onClick={() => toggle('read')} className={habits.read ? "btn btn-primary" : "btn btn-outline"}>
+                        {habits.read ? "Read valid page ✅" : "Read 1 Page 📖"}
+                    </button>
+                </div>
+            </div>
+
+            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>Complete & Continue →</button>
+        </div>
+    );
+};
+
+const CommunityModule = ({ onNext, showToast }) => {
+    return (
+        <div style={{ padding: '1rem', textAlign: 'center' }}>
+            <h2 style={{ color: 'var(--color-secondary)', marginBottom: '1rem' }}>Module 9: Community 🤝</h2>
+            <p>We rise by lifting others.</p>
+
+            <div className="card" style={{ margin: '2rem 0', padding: '2rem' }}>
+                <h3>Today's Challenge</h3>
+                <div style={{ fontSize: '3rem', margin: '1rem' }}>🍲</div>
+                <p style={{ fontSize: '1.2rem', fontStyle: 'italic', color: '#FFD700' }}>
+                    "Cook one healthy meal for your family or friends."
+                </p>
+                <p style={{ marginTop: '1rem', color: '#aaa' }}>Take a picture and share it with your circle!</p>
+            </div>
+
+            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>I Accept the Challenge! →</button>
+        </div>
+    );
+};
+
+const CertificateModule = ({ onNext }) => {
+    return (
+        <div style={{ padding: '1rem', textAlign: 'center', animation: 'fadeIn 1s' }}>
+            <h2 style={{ color: '#FFD700', marginBottom: '1rem' }}>🎉 Congratulations! 🎉</h2>
+            <p>You have completed the Health, Wellness & Mindset Course.</p>
+
+            <div style={{
+                margin: '2rem auto', padding: '2rem', border: '10px solid #FFD700',
+                borderRadius: '10px', backgroundColor: '#fff', color: '#000', maxWidth: '500px'
+            }}>
+                <h1 style={{ fontFamily: 'serif', color: '#000' }}>Certificate of Completion</h1>
+                <p>This certifies that</p>
+                <div style={{ borderBottom: '2px solid #000', margin: '1rem 2rem', fontSize: '1.5rem', fontFamily: 'cursive' }}>
+                    Future Leader
+                </div>
+                <p>Has successfully mastered the pillars of</p>
+                <h3>Health, Wellness & Mindset</h3>
+                <div style={{ fontSize: '3rem', margin: '1rem' }}>🏅</div>
+                <p style={{ fontSize: '0.8rem', color: '#555' }}>African Future Academy</p>
+            </div>
+
+            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>Return to Hub →</button>
         </div>
     );
 };
