@@ -468,50 +468,52 @@ const History = ({ ageGroup }) => {
             </div>
 
             {/* GREAT CIVILIZATIONS SECTION */}
-            <section style={{ marginBottom: '4rem' }}>
-                <h2 style={{ color: 'var(--color-secondary)', borderBottom: '2px solid var(--color-secondary)', paddingBottom: '0.5rem', marginBottom: '2rem' }}>
-                    🏛️ Great African Civilizations
-                </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                    {civilizationsData.map((civ) => (
-                        <div key={civ.id} className="card" style={{
-                            padding: '1.5rem',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '1rem',
-                            border: '1px solid #333',
-                            transition: 'transform 0.3s ease, border-color 0.3s ease',
-                            cursor: 'default',
-                            backgroundColor: 'rgba(255,255,255,0.02)'
-                        }}>
-                            <div>
-                                <span style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '0.8rem', textTransform: 'uppercase' }}>{civ.period}</span>
-                                <h3 style={{ margin: '0.2rem 0', color: '#fff' }}>{civ.title}</h3>
-                            </div>
-                            <p style={{ fontSize: '0.95rem', color: '#ccc', lineHeight: '1.5' }}>{civ.description}</p>
-
-                            <div>
-                                <h4 style={{ fontSize: '0.9rem', color: 'var(--color-secondary)', marginBottom: '0.5rem' }}>Key Achievements:</h4>
-                                <ul style={{ paddingLeft: '1.2rem', margin: 0, fontSize: '0.85rem', color: '#aaa', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                    {civ.achievements.map((a, i) => <li key={i}>{a}</li>)}
-                                </ul>
-                            </div>
-
-                            <div style={{
-                                marginTop: 'auto',
-                                padding: '0.8rem',
-                                backgroundColor: 'rgba(255, 136, 0, 0.1)',
-                                borderRadius: '8px',
-                                border: '1px dashed var(--color-primary)'
+            {!isKid && (
+                <section style={{ marginBottom: '4rem' }}>
+                    <h2 style={{ color: 'var(--color-secondary)', borderBottom: '2px solid var(--color-secondary)', paddingBottom: '0.5rem', marginBottom: '2rem' }}>
+                        🏛️ Great African Civilizations
+                    </h2>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                        {civilizationsData.map((civ) => (
+                            <div key={civ.id} className="card" style={{
+                                padding: '1.5rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '1rem',
+                                border: '1px solid #333',
+                                transition: 'transform 0.3s ease, border-color 0.3s ease',
+                                cursor: 'default',
+                                backgroundColor: 'rgba(255,255,255,0.02)'
                             }}>
-                                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-primary)', fontStyle: 'italic' }}>
-                                    <strong>Fun Fact:</strong> {civ.funFact}
-                                </p>
+                                <div>
+                                    <span style={{ color: 'var(--color-accent)', fontWeight: 'bold', fontSize: '0.8rem', textTransform: 'uppercase' }}>{civ.period}</span>
+                                    <h3 style={{ margin: '0.2rem 0', color: '#fff' }}>{civ.title}</h3>
+                                </div>
+                                <p style={{ fontSize: '0.95rem', color: '#ccc', lineHeight: '1.5' }}>{civ.description}</p>
+
+                                <div>
+                                    <h4 style={{ fontSize: '0.9rem', color: 'var(--color-secondary)', marginBottom: '0.5rem' }}>Key Achievements:</h4>
+                                    <ul style={{ paddingLeft: '1.2rem', margin: 0, fontSize: '0.85rem', color: '#aaa', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                        {civ.achievements.map((a, i) => <li key={i}>{a}</li>)}
+                                    </ul>
+                                </div>
+
+                                <div style={{
+                                    marginTop: 'auto',
+                                    padding: '0.8rem',
+                                    backgroundColor: 'rgba(255, 136, 0, 0.1)',
+                                    borderRadius: '8px',
+                                    border: '1px dashed var(--color-primary)'
+                                }}>
+                                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-primary)', fontStyle: 'italic' }}>
+                                        <strong>Fun Fact:</strong> {civ.funFact}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* TIMELINE SECTION */}
             <section>
