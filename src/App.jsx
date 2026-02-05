@@ -16,6 +16,8 @@ const Civics = lazy(() => import('./pages/Civics'));
 const Health = lazy(() => import('./pages/Health'));
 const Transparency = lazy(() => import('./pages/Transparency'));
 
+import WordOriginManager from './components/WordOriginManager';
+
 // Loading fallback component
 const LoadingScreen = () => (
   <div style={{
@@ -60,6 +62,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="app-container">
+          <WordOriginManager />
           <Suspense fallback={<LoadingScreen />}>
             <Routes>
               <Route path="/" element={<Home ageGroup={ageGroup} setAgeGroup={setAgeGroup} />} />
