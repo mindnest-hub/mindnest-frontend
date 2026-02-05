@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 
-const WordOriginPopup = ({ wordData, onClose }) => {
+const WordOriginPopup = ({ wordData, onClose, isKid }) => {
     const [layer, setLayer] = useState(1);
+
+    // Kids only see Layer 1, Teens/Adults see all 3
+    const maxLayers = isKid ? 1 : 3;
 
     if (!wordData) return null;
 
     const handleNext = () => {
-        if (layer < 3) setLayer(prev => prev + 1);
+        if (layer < maxLayers) setLayer(prev => prev + 1);
         else onClose();
     };
 
@@ -42,11 +45,11 @@ const WordOriginPopup = ({ wordData, onClose }) => {
 
                 <div style={{ padding: '2.5rem 2rem', textAlign: 'center' }}>
 
-                    {/* LAYER 1: SURFACE */}
+                    {/* LAYER 1: SURFACE (Everyone sees this) */}
                     {layer === 1 && (
                         <div style={{ animation: 'slideUp 0.4s' }}>
                             <div style={{ fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '2px', color: '#888', marginBottom: '1rem' }}>
-                                Word Origin
+                                {isKid ? '✨ Fun Fact!' : 'Word Origin'}
                             </div>
                             <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>{wordData.icon}</div>
                             <h2 style={{ fontSize: '2.5rem', color: '#fff', marginBottom: '0.5rem' }}>{wordData.word}</h2>
@@ -57,13 +60,13 @@ const WordOriginPopup = ({ wordData, onClose }) => {
                                 {wordData.layer1.text}
                             </p>
                             <button onClick={handleNext} className="btn btn-primary" style={{ width: '100%' }}>
-                                Analyze Meaning 🔍
+                                {isKid ? 'Cool! Got it! 🌟' : 'Analyze Meaning 🔍'}
                             </button>
                         </div>
                     )}
 
-                    {/* LAYER 2: COGNITIVE */}
-                    {layer === 2 && (
+                    {/* LAYER 2: COGNITIVE (Teens/Adults only) */}
+                    {layer === 2 && !isKid && (
                         <div style={{ animation: 'slideUp 0.4s' }}>
                             <div style={{ fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '2px', color: '#FFD700', marginBottom: '1rem' }}>
                                 Critical Insight
@@ -85,8 +88,8 @@ const WordOriginPopup = ({ wordData, onClose }) => {
                         </div>
                     )}
 
-                    {/* LAYER 3: DEPTH */}
-                    {layer === 3 && (
+                    {/* LAYER 3: DEPTH (Teens/Adults only) */}
+                    {layer === 3 && !isKid && (
                         <div style={{ animation: 'slideUp 0.4s' }}>
                             <div style={{ fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '2px', color: '#00C851', marginBottom: '1rem' }}>
                                 Historical Context
@@ -103,16 +106,18 @@ const WordOriginPopup = ({ wordData, onClose }) => {
                         </div>
                     )}
 
-                    {/* Step Indicators */}
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
-                        {[1, 2, 3].map(step => (
-                            <div key={step} style={{
-                                width: '8px', height: '8px', borderRadius: '50%',
-                                backgroundColor: step === layer ? '#FFD700' : '#444',
-                                transition: 'background 0.3s'
-                            }}></div>
-                        ))}
-                    </div>
+                    {/* Step Indicators - Only show multiple dots for Teens/Adults */}
+                    {!isKid && (
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '2rem' }}>
+                            {[1, 2, 3].map(step => (
+                                <div key={step} style={{
+                                    width: '8px', height: '8px', borderRadius: '50%',
+                                    backgroundColor: step === layer ? '#FFD700' : '#444',
+                                    transition: 'background 0.3s'
+                                }}></div>
+                            ))}
+                        </div>
+                    )}
 
                 </div>
             </div>

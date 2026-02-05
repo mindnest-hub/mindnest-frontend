@@ -62,7 +62,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="app-container">
-          <WordOriginManager />
+          <WordOriginManager ageGroup={ageGroup} />
           <Suspense fallback={<LoadingScreen />}>
             <Routes>
               <Route path="/" element={<Home ageGroup={ageGroup} setAgeGroup={setAgeGroup} />} />

@@ -3,13 +3,16 @@ import { useLocation } from 'react-router-dom';
 import { wordOrigins } from '../data/wordOrigins';
 import WordOriginPopup from './WordOriginPopup';
 
-const WordOriginManager = () => {
+const WordOriginManager = ({ ageGroup }) => {
     const location = useLocation();
     const [activeWord, setActiveWord] = useState(null);
     const [showToast, setShowToast] = useState(null);
     const [seenWords, setSeenWords] = useState(() => {
         return JSON.parse(localStorage.getItem('seenWordOrigins')) || [];
     });
+
+    // Determine if user is a kid
+    const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
 
     // Map routes to categories or specific words
     const routeMap = {
@@ -18,7 +21,7 @@ const WordOriginManager = () => {
         '/civics': ['civics'],
         '/critical-thinking': ['critical-thinking'],
         '/transparency': ['civics', 'history'],
-        '/agri': ['finance', 'history'] // Agri has mortgage/villain overlaps
+        '/agri': ['finance', 'history']
     };
 
     useEffect(() => {
@@ -26,16 +29,12 @@ const WordOriginManager = () => {
         const categories = routeMap[path];
 
         if (categories) {
-            // Find words that match these categories and haven't been seen yet
             const candidates = wordOrigins.filter(w =>
                 categories.includes(w.category) && !seenWords.includes(w.id)
             );
 
             if (candidates.length > 0) {
-                // Pick one randomly
                 const word = candidates[Math.floor(Math.random() * candidates.length)];
-
-                // Delay slightly so it doesn't clash with page load
                 const timer = setTimeout(() => {
                     setShowToast(word);
                 }, 2000);
@@ -48,8 +47,6 @@ const WordOriginManager = () => {
         if (showToast) {
             setActiveWord(showToast);
             setShowToast(null);
-
-            // Mark as seen
             const newSeen = [...seenWords, showToast.id];
             setSeenWords(newSeen);
             localStorage.setItem('seenWordOrigins', JSON.stringify(newSeen));
@@ -68,7 +65,7 @@ const WordOriginManager = () => {
                     onClick={handleOpen}
                     style={{
                         position: 'fixed',
-                        bottom: '100px', // Above bottom nav/chatbot
+                        bottom: '100px',
                         right: '20px',
                         backgroundColor: '#FFD700',
                         color: '#000',
@@ -97,6 +94,7 @@ const WordOriginManager = () => {
                 <WordOriginPopup
                     wordData={activeWord}
                     onClose={handleClose}
+                    isKid={isKid}
                 />
             )}
 
@@ -112,3 +110,4 @@ const WordOriginManager = () => {
 };
 
 export default WordOriginManager;
+
