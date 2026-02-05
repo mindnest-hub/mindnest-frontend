@@ -87,11 +87,15 @@ export const useWallet = () => {
 
         // Global Anti-Exploitation Cap for Kids/Teens
         if (isYoung) {
-            // Special exception for History module as requested
+            // Special exception for History module
             if (module === 'history') return 2000;
             // Special exception for Finance module (15 levels * 100 coins)
             if (module === 'finance') return 1500;
-            // Default cap for all other modules for kids
+            // Special exception for Tech module (user requested 2000 cap)
+            if (module === 'tech') return 2000;
+            // Health stays at 1000 (10 games * 100 coins)
+            if (module === 'health') return 1000;
+            // Default cap for other modules for kids
             return 1000;
         }
 

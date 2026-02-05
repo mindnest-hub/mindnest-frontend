@@ -6,6 +6,10 @@ const WordOriginPopup = ({ wordData, onClose, isKid }) => {
     // Kids only see Layer 1, Teens/Adults see all 3
     const maxLayers = isKid ? 1 : 3;
 
+    // Color theme - RED for Africa-centric branding
+    const accentColor = '#E53935'; // Vibrant Red
+    const accentLight = 'rgba(229, 57, 53, 0.3)';
+
     if (!wordData) return null;
 
     const handleNext = () => {
@@ -23,14 +27,14 @@ const WordOriginPopup = ({ wordData, onClose, isKid }) => {
             <div className="card" style={{
                 width: '90%', maxWidth: '500px',
                 background: 'linear-gradient(145deg, #1a1a1a, #222)',
-                border: '1px solid rgba(255, 215, 0, 0.3)',
+                border: `1px solid ${accentLight}`,
                 boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
                 position: 'relative', overflow: 'hidden'
             }}>
-                {/* Header Decor */}
+                {/* Header Decor - RED */}
                 <div style={{
                     position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
-                    background: 'linear-gradient(90deg, transparent, #FFD700, transparent)'
+                    background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`
                 }}></div>
 
                 <button
@@ -53,13 +57,13 @@ const WordOriginPopup = ({ wordData, onClose, isKid }) => {
                             </div>
                             <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>{wordData.icon}</div>
                             <h2 style={{ fontSize: '2.5rem', color: '#fff', marginBottom: '0.5rem' }}>{wordData.word}</h2>
-                            <h3 style={{ fontSize: '1.2rem', color: '#FFD700', marginBottom: '1.5rem', fontWeight: 'normal' }}>
+                            <h3 style={{ fontSize: '1.2rem', color: accentColor, marginBottom: '1.5rem', fontWeight: 'normal' }}>
                                 {wordData.layer1.title}
                             </h3>
                             <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: '#ccc', marginBottom: '2rem' }}>
                                 {wordData.layer1.text}
                             </p>
-                            <button onClick={handleNext} className="btn btn-primary" style={{ width: '100%' }}>
+                            <button onClick={handleNext} className="btn" style={{ width: '100%', backgroundColor: accentColor, color: '#fff', border: 'none' }}>
                                 {isKid ? 'Cool! Got it! 🌟' : 'Analyze Meaning 🔍'}
                             </button>
                         </div>
@@ -68,20 +72,20 @@ const WordOriginPopup = ({ wordData, onClose, isKid }) => {
                     {/* LAYER 2: COGNITIVE (Teens/Adults only) */}
                     {layer === 2 && !isKid && (
                         <div style={{ animation: 'slideUp 0.4s' }}>
-                            <div style={{ fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '2px', color: '#FFD700', marginBottom: '1rem' }}>
+                            <div style={{ fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '2px', color: accentColor, marginBottom: '1rem' }}>
                                 Critical Insight
                             </div>
                             <h3 style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '1.5rem' }}>
                                 {wordData.layer2.title}
                             </h3>
-                            <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: '#ccc', marginBottom: '2rem', borderLeft: '3px solid #FFD700', paddingLeft: '1rem', textAlign: 'left' }}>
+                            <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: '#ccc', marginBottom: '2rem', borderLeft: `3px solid ${accentColor}`, paddingLeft: '1rem', textAlign: 'left' }}>
                                 {wordData.layer2.text}
                             </p>
                             <div style={{ display: 'flex', gap: '1rem' }}>
-                                <button onClick={onClose} className="btn btn-outline" style={{ flex: 1 }}>
+                                <button onClick={onClose} className="btn btn-outline" style={{ flex: 1, borderColor: accentColor, color: accentColor }}>
                                     Close
                                 </button>
-                                <button onClick={handleNext} className="btn btn-primary" style={{ flex: 1 }}>
+                                <button onClick={handleNext} className="btn" style={{ flex: 1, backgroundColor: accentColor, color: '#fff', border: 'none' }}>
                                     Dive Deeper 🌊
                                 </button>
                             </div>
@@ -100,7 +104,7 @@ const WordOriginPopup = ({ wordData, onClose, isKid }) => {
                             <p style={{ fontSize: '1.1rem', lineHeight: '1.6', color: '#ccc', marginBottom: '2rem' }}>
                                 {wordData.layer3.text}
                             </p>
-                            <button onClick={onClose} className="btn btn-primary" style={{ width: '100%' }}>
+                            <button onClick={onClose} className="btn" style={{ width: '100%', backgroundColor: accentColor, color: '#fff', border: 'none' }}>
                                 Complete Lesson 🎓
                             </button>
                         </div>
@@ -112,7 +116,7 @@ const WordOriginPopup = ({ wordData, onClose, isKid }) => {
                             {[1, 2, 3].map(step => (
                                 <div key={step} style={{
                                     width: '8px', height: '8px', borderRadius: '50%',
-                                    backgroundColor: step === layer ? '#FFD700' : '#444',
+                                    backgroundColor: step === layer ? accentColor : '#444',
                                     transition: 'background 0.3s'
                                 }}></div>
                             ))}

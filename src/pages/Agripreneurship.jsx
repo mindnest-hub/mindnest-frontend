@@ -25,7 +25,9 @@ const Agripreneurship = () => {
     const { addEarnings, deductGlobal, balance, getAgeGroup } = useWallet();
     const safeGetAgeGroup = getAgeGroup || (() => 'kids');
     const ageGroup = safeGetAgeGroup() || 'kids';
-    const isAdult = ageGroup !== 'kids' && ageGroup !== 'teens';
+    const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
+    const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
+    const isAdult = !isKid && !isTeen;
 
     // State with Safe Init
     const [isPremium, setIsPremium] = useState(false);
@@ -364,7 +366,7 @@ const Agripreneurship = () => {
                             <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>{getCropEmoji()}</div>
                             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                                 {cropStage === 0 && <button className="btn btn-primary" onClick={handlePlant}>Plant (-₦100)</button>}
-                                {cropStage > 0 && cropStage < 3 && <button className="btn" style={{ backgroundColor: '#00BFFF', color: '#fff' }} onClick={handleWater}>Irrigate 💧</button>}
+                                {cropStage > 0 && cropStage < 3 && <button className="btn" style={{ backgroundColor: '#00BFFF', color: '#fff' }} onClick={handleWater}>{isKid ? 'Water 💧' : 'Irrigate 💧'}</button>}
                                 {cropStage === 2 && <button className="btn" style={{ backgroundColor: 'var(--color-secondary)', color: '#fff' }} onClick={handleHarvest}>Harvest (+₦{upgrades.vertical ? '450' : '300'})</button>}
                             </div>
                         </div>
