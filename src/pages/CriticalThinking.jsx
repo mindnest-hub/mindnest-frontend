@@ -191,7 +191,7 @@ const CriticalThinking = ({ ageGroup }) => {
     const [obsInput, setObsInput] = useState("");
     const [obsFeedback, setObsFeedback] = useState("");
     const [showMemory, setShowMemory] = useState(true); // For teens memory game
-    const [memoryTimer, setMemoryTimer] = useState(5);
+    const [memoryTimer, setMemoryTimer] = useState(15);
 
     const kidObsItems = [
         { id: 1, emoji: "🦁", name: "Lion", hint: "King of the jungle. Starts with L." },
@@ -201,7 +201,10 @@ const CriticalThinking = ({ ageGroup }) => {
 
     const teenObsItems = [
         { id: 1, items: ["🎭", "🥁", "🪘", "🏺"], answer: ["mask", "drum", "djembe", "pot"] },
-        { id: 2, items: ["🐘", "🦒", "🦓", "🐊"], answer: ["elephant", "giraffe", "zebra", "crocodile"] }
+        { id: 2, items: ["🐘", "🦒", "🦓", "🐊"], answer: ["elephant", "giraffe", "zebra", "crocodile"] },
+        { id: 3, items: ["🌽", "🥭", "🍍", "🥥"], answer: ["maize", "mango", "pineapple", "coconut"] },
+        { id: 4, items: ["💻", "📱", "🛰️", "📡"], answer: ["laptop", "phone", "satellite", "dish"] },
+        { id: 5, items: ["⚒️", "🛖", "⛏️", "🛶"], answer: ["tools", "hut", "pickaxe", "canoe"] }
     ];
 
     // Module 2: Asking Good Questions (Chat Bot)
@@ -251,6 +254,11 @@ const CriticalThinking = ({ ageGroup }) => {
     const [dilemmaIndex, setDilemmaIndex] = useState(() => Number(localStorage.getItem('dilemmaIndex')) || 0);
     const [dilemmaFeedback, setDilemmaFeedback] = useState("");
 
+    // --- TIME MASTERY STATE ---
+    const [timeStep, setTimeStep] = useState(0);
+    const [timeScore, setTimeScore] = useState(0);
+    const [timeFeedback, setTimeFeedback] = useState("");
+
     useEffect(() => {
         localStorage.setItem('dilemmaIndex', dilemmaIndex);
     }, [dilemmaIndex]);
@@ -262,6 +270,57 @@ const CriticalThinking = ({ ageGroup }) => {
         // Teens
         { q: "Your best friend cheated on a test and got the highest score. What do you do?", options: ["Report them", "Talk to them privately", "Ignore it"], good: "Talk to them privately" },
         { q: "You realize you were given too much change at a shop. Do you return it?", options: ["Keep it as a blessing", "Go back and return it", "Give it to a beggar"], good: "Go back and return it" }
+    ];
+
+    const teenTimeScenarios = [
+        {
+            q: "You have a big exam in 3 days. What's your strategy? 📚",
+            options: [
+                { text: "Plan: Study 2 hours daily + review notes 🧠", type: 'high', feedback: "Excellent! Planning avoids burnout." },
+                { text: "Cram: Study 12 hours straight the night before 😵‍💫", type: 'low', feedback: "Risky! Fatigue reduces retention." },
+                { text: "Chill: Watch series and hope for the best 📺", type: 'distraction', feedback: "Bad move! Hope is not a strategy." }
+            ]
+        },
+        {
+            q: "A friend invites you to a party, but you promised to help your community garden. 🌻",
+            options: [
+                { text: "Go to the garden as promised 🤝", type: 'high', feedback: "Integrity! Your word is your bond." },
+                { text: "Go to the party and apologize later 🥳", type: 'low', feedback: "Mistake. Social credit is hard to earn back." },
+                { text: "Do neither and stay home sleeping 😴", type: 'distraction', feedback: "Double loss. No fun, no impact." }
+            ]
+        },
+        {
+            q: "You want to start a side business. How do you find the time? 💼",
+            options: [
+                { text: "Set aside 1 hour before school daily 🌅", type: 'high', feedback: "Mastery! Small steps lead to big wins." },
+                { text: "Wait for a 'perfect time' to start ⏳", type: 'low', feedback: "Stalling. The perfect time is now." },
+                { text: "Keep scrolling for 'inspiration' 📱", type: 'distraction', feedback: "Trap! Inspiration without action is zero." }
+            ]
+        },
+        {
+            q: "You have ₦50,000 in personal savings. How do you use it? 💰",
+            options: [
+                { text: "Invest in 1 month of professional skill training 🎓", type: 'high', feedback: "Visionary! Investing in yourself yields the highest ROI." },
+                { text: "Buy the latest design sneakers 👟", type: 'low', feedback: "Liability. Values drop, skills rise." },
+                { text: "Lend it all to a friend with no plan 💸", type: 'distraction', feedback: "Risky! Charity is good, but protect your capital." }
+            ]
+        },
+        {
+            q: "You're building a project and hit a difficult wall. What now? 🧱",
+            options: [
+                { text: "Research and break the task into tiny pieces 🔧", type: 'high', feedback: "Logic! Any wall is just a pile of small bricks." },
+                { text: "Switch to a 'different, easier' project 🔄", type: 'low', feedback: "Quitting. You'll hit a wall there too." },
+                { text: "Wait for someone to help you fix it 🧘", type: 'distraction', feedback: "Passive. Waiting is the enemy of progress." }
+            ]
+        },
+        {
+            q: "You have been asked to lead a youth parliament petition. It will take 10 hours a week. 🏛️",
+            options: [
+                { text: "Schedule 2 hours every evening for drafting 📝", type: 'high', feedback: "Leadership! Consistent effort builds movements." },
+                { text: "Say yes but hope others do the work 🤷", type: 'low', feedback: "Unreliable. Leadership requires accountability." },
+                { text: "Say no because you need more 'me time' 🛋️", type: 'distraction', feedback: "Comfort Trap. Growth happens outside your comfort zone." }
+            ]
+        }
     ];
 
     // --- TEACH A FRIEND STATE ---
@@ -1291,20 +1350,47 @@ const CriticalThinking = ({ ageGroup }) => {
 
     const handleDilemmaChoice = (option) => {
         verifyAction(() => {
-            const current = dilemmas[dilemmaIndex];
-            if (option === current.good) {
-                setDilemmaFeedback(`You chose honor! 🦁 ${getRandomFact()}`);
+            const d = dilemmas[dilemmaIndex];
+            if (option === d.good) {
+                setDilemmaFeedback(`Wonderful Choice! 🌟 ${getRandomFact()}`);
                 triggerConfetti();
+                addEarnings('criticalThinking', 100);
                 setTimeout(() => {
                     setDilemmaFeedback("");
-                    if (dilemmaIndex < dilemmas.length - 1) setDilemmaIndex(i => i + 1);
-                    else markComplete(10); // Ethical Thinking ID
-                }, 4000);
+                    if (dilemmaIndex < dilemmas.length - 1) {
+                        setDilemmaIndex(prev => prev + 1);
+                    } else {
+                        markComplete(10);
+                    }
+                }, 3000);
             } else {
-                setDilemmaFeedback("Is that the right thing to do? Listen to your heart. ❤️");
-                setTimeout(() => setDilemmaFeedback(""), 1000);
+                setDilemmaFeedback("Think again! Is there a more positive choice? 🤔");
+                setTimeout(() => setDilemmaFeedback(""), 2000);
             }
         }, "Weighing Options...");
+    };
+
+    const handleTimeChoice = (choice) => {
+        verifyAction(() => {
+            const scenario = teenTimeScenarios[timeStep];
+            const selected = scenario.options.find(o => o.text === choice);
+
+            if (selected.type === 'high') {
+                setTimeScore(prev => prev + 1);
+                showToast(`Correct! ${selected.feedback}`, 'success');
+                triggerConfetti();
+            } else {
+                showToast(selected.feedback, 'warning');
+            }
+
+            if (timeStep < teenTimeScenarios.length - 1) {
+                setTimeout(() => setTimeStep(prev => prev + 1), 2000);
+            } else {
+                markComplete(20);
+                addEarnings('criticalThinking', timeScore * 50 + 100);
+                setTimeFeedback("Module Complete! You're a Time Master! ⏱️");
+            }
+        }, "Managing Time...");
     };
 
     const saveWisdom = () => {
@@ -1360,7 +1446,7 @@ const CriticalThinking = ({ ageGroup }) => {
                         setObsFeedback("");
                         setObsInput("");
                         setShowMemory(true);
-                        setMemoryTimer(5);
+                        setMemoryTimer(15);
                         if (obsLevel < teenObsItems.length - 1) setObsLevel(l => l + 1);
                         else markComplete(1);
                     }, 4000);
@@ -1898,7 +1984,7 @@ const CriticalThinking = ({ ageGroup }) => {
                                 </>
                             )}
                             <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
-                                Question {logicLevel + 1}/4
+                                Question {logicLevel + 1}/{isKid ? 4 : 5}
                             </div>
                         </div>
                     )}
@@ -1942,7 +2028,7 @@ const CriticalThinking = ({ ageGroup }) => {
                                 </>
                             )}
                             <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
-                                Sequence {logicLevel + 1}/4
+                                Sequence {logicLevel + 1}/{isKid ? 4 : 5}
                             </div>
                         </div>
                     )}
@@ -1984,13 +2070,13 @@ const CriticalThinking = ({ ageGroup }) => {
                                 </>
                             )}
                             <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
-                                Question {logicLevel + 1}/4
+                                Question {logicLevel + 1}/{isKid ? 4 : 5}
                             </div>
                         </div>
                     )}
 
                     <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
-                        Total Score: {logicScore}/16 • Game {logicGame + 1}/4
+                        Total Score: {logicScore} • Game {logicGame + 1}/4
                     </div>
                 </div>
             )
@@ -2437,7 +2523,7 @@ const CriticalThinking = ({ ageGroup }) => {
                     )}
 
                     <div style={{ marginTop: '1rem', textAlign: 'center', color: '#888', fontSize: '0.85rem' }}>
-                        Game {reasoningGame + 1}/3 • Level {reasoningLevel + 1}/3 • Score: {reasoningScore}/9
+                        Game {reasoningGame + 1}/3 • Level {reasoningLevel + 1}/{isKid ? 3 : 5} • Score: {reasoningScore}
                     </div>
                 </div>
             )
@@ -3062,6 +3148,54 @@ const CriticalThinking = ({ ageGroup }) => {
                     )}
                 </div>
             )
+        },
+        {
+            id: 20,
+            title: "Time Mastery ⏱️",
+            desc: "The Wealth of Time.",
+            content: (
+                <div style={{ padding: '1rem', backgroundColor: '#2c2c2c', borderRadius: '10px' }}>
+                    {isKid ? (
+                        <div style={{ textAlign: 'center', padding: '1rem' }}>
+                            <p>This module is for advanced thinking! Come back when you're a Teen. 🦁</p>
+                        </div>
+                    ) : timeFeedback ? (
+                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                            <h3 style={{ color: '#00C851' }}>{timeFeedback}</h3>
+                            <p>You earned ₦{timeScore * 50 + 100}!</p>
+                            <button onClick={() => { setTimeStep(0); setTimeFeedback(""); setTimeScore(0); }} className="btn btn-sm" style={{ marginTop: '1rem' }}>Replay 🔄</button>
+                        </div>
+                    ) : (
+                        <div>
+                            <p style={{ fontSize: '1.2rem', textAlign: 'center', marginBottom: '1.5rem', fontWeight: 'bold' }}>
+                                {teenTimeScenarios[timeStep].q}
+                            </p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                                {teenTimeScenarios[timeStep].options.map((opt, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => handleTimeChoice(opt.text)}
+                                        className="btn"
+                                        style={{
+                                            padding: '1rem',
+                                            textAlign: 'left',
+                                            fontSize: '1rem',
+                                            backgroundColor: '#333',
+                                            border: '1px solid #555',
+                                            lineHeight: '1.4'
+                                        }}
+                                    >
+                                        {opt.text}
+                                    </button>
+                                ))}
+                            </div>
+                            <p style={{ marginTop: '1.5rem', textAlign: 'center', color: '#888', fontSize: '0.9rem' }}>
+                                Scenario {timeStep + 1} of {teenTimeScenarios.length}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )
         }
     ];
 
@@ -3132,10 +3266,10 @@ const CriticalThinking = ({ ageGroup }) => {
                 <div style={{ marginBottom: '2rem', padding: '1rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '15px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                         <span><strong>Brain Power:</strong> {brainPower} XP</span>
-                        <span>{completedModules.length}/15 Modules</span>
+                        <span>{completedModules.length}/20 Modules</span>
                     </div>
                     <div style={{ width: '100%', height: '15px', backgroundColor: '#333', borderRadius: '10px', overflow: 'hidden' }}>
-                        <div style={{ width: `${(completedModules.length / 15) * 100}%`, height: '100%', backgroundColor: '#00C851', transition: 'width 0.5s' }}></div>
+                        <div style={{ width: `${(completedModules.length / 20) * 100}%`, height: '100%', backgroundColor: '#00C851', transition: 'width 0.5s' }}></div>
                     </div>
                     {showLevelUp && <div style={{ textAlign: 'center', color: '#FFD700', fontWeight: 'bold', marginTop: '0.5rem', animation: 'bounce 0.5s' }}>🎉 LEVEL UP! +10 XP</div>}
                 </div>

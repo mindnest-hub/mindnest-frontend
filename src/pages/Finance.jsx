@@ -8,8 +8,8 @@ const Finance = ({ ageGroup }) => {
   const { balance, moduleBalances, moduleEarnings, addEarnings, deductPenalty, getModuleCap, WITHDRAWAL_LIMIT, setModuleBalance } = useWallet();
   const MODULE_CAP = getModuleCap('finance');
 
-  const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
-  const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
+  const isKid = ageGroup?.toLowerCase() === 'kids' || ageGroup?.toLowerCase() === 'kid';
+  const isTeen = ageGroup?.toLowerCase() === 'teens' || ageGroup?.toLowerCase() === 'teen';
   const isAdult = !isKid && !isTeen;
 
   const [expandedModule, setExpandedModule] = useState(null);
@@ -131,7 +131,9 @@ const Finance = ({ ageGroup }) => {
   const teenTradeScenarios = [
     { want: "A Brand New Laptop 💻", offer: "6 Months of Quality Work ⌨️", correct: "6 Months of Quality Work ⌨️", options: ["6 Months of Quality Work ⌨️", "1 Used Phone 📱", "A Social Media Shoutout 📣"], fact: "Value Exchange: Your time and skills are your first assets. Trading specialized labor for high-value goods is the foundation of a modern career." },
     { want: "5% Stake in a Farm 🚜", offer: "₦500k Investment 💰", correct: "₦500k Investment 💰", options: ["₦500k Investment 💰", "A Promise to Help 🤝", "1 Bag of Fertilizer 🪴"], fact: "Equity Barter: Investing capital (money) for a share of ownership (equity) allows you to earn passive income as the business grows." },
-    { want: "Higher Harvest Yields 🌾", offer: "Advanced Irrigation System 💧", correct: "Advanced Irrigation System 💧", options: ["Advanced Irrigation System 💧", "More Hard Work ⛏️", "Wishing for Rain ⛈️"], fact: "Technology Leverage: Trading today's capital for technology increases future productivity. This is called Capital Expenditure (CAPEX)." }
+    { want: "Higher Harvest Yields 🌾", offer: "Advanced Irrigation System 💧", correct: "Advanced Irrigation System 💧", options: ["Advanced Irrigation System 💧", "More Hard Work ⛏️", "Wishing for Rain ⛈️"], fact: "Technology Leverage: Trading today's capital for technology increases future productivity. This is called Capital Expenditure (CAPEX)." },
+    { want: "Community Solar Hub ☀️", offer: "Grant for Clean Energy 📜", correct: "Grant for Clean Energy 📜", options: ["Grant for Clean Energy 📜", "Selling Small Batteries 🔋", "Praying for Sunshine ☀️"], fact: "Public-Private Partnership: Social enterprises trade community impact for institutional funding. This is how large-scale infrastructure is often built." },
+    { want: "International Export License 🚢", offer: "Certified Quality Audit 📋", correct: "Certified Quality Audit 📋", options: ["Certified Quality Audit 📋", "A Fancy Suit 👔", "Knowing the Captain ⚓"], fact: "Compliance Trade: In global markets, you trade 'Proof of Quality' for 'Access to Markets'. Standards are just as valuable as the product itself." }
   ];
 
   const tradeScenarios = isKid ? kidTradeScenarios : teenTradeScenarios;
@@ -141,7 +143,7 @@ const Finance = ({ ageGroup }) => {
   const [isCoinGameActive, setIsCoinGameActive] = useState(false);
   const [fallingItems, setFallingItems] = useState([]); // {id, type, left, top}
   const kidCoinTargets = [5, 10, 15];
-  const teenCoinTargets = [12, 18, 25];
+  const teenCoinTargets = [12, 18, 25, 30, 35];
   const coinTargets = isKid ? kidCoinTargets : teenCoinTargets;
 
   // Level 3: Slice the Pie (Budgeting)
@@ -210,6 +212,26 @@ const Finance = ({ ageGroup }) => {
       wants: ["Latest Gadget", "Lagos Staycation", "Hobbies"],
       savingsGoal: "Real Estate Downpayment",
       fact: "Sinking Funds: Save for big annual expenses (like Rent or Insurance) by dividing the total cost by 12 and saving that amount every month."
+    },
+    {
+      role: "Lola (Small Business Owner) 🌽",
+      name: "Lola",
+      income: 80000,
+      desc: "Profit from a local catering service.",
+      needs: ["Ingredients", "Gas/Fuel", "Staff Pay"],
+      wants: ["Gifts", "New TV", "Weekends Off"],
+      savingsGoal: "Commercial Kitchen Equipment",
+      fact: "Operating Margin: Your 'Needs' in business include everything required to keep the doors open. If your margin is too thin, any emergency can sink you."
+    },
+    {
+      role: "Koffi (Visual Artist) 🎨",
+      name: "Koffi",
+      income: 150000,
+      desc: "Selling paintings and digital assets.",
+      needs: ["Studio Rent", "Art Supplies", "Internet"],
+      wants: ["Gallery Travel", "Collectibles", "High-end Gear"],
+      savingsGoal: "International Exhibition Fund",
+      fact: "Creative Capital: As an artist, your 'Wants' often look like 'Needs' (travel, gear). Be strict! Only spend on things that directly generate more value."
     }
   ];
 
@@ -229,6 +251,14 @@ const Finance = ({ ageGroup }) => {
     [ // Stage 3 (Soap)
       { name: "Soap (1 pack)", price: 500, bulk: false },
       { name: "Soap (6 pack)", price: 2500, bulk: true } // 416/pack
+    ],
+    [ // Stage 4 (Beans)
+      { name: "Beans (1 cup)", price: 400, bulk: false },
+      { name: "Beans (Painter/Bucket)", price: 5000, bulk: true }
+    ],
+    [ // Stage 5 (Cement/Salt - Bulk context)
+      { name: "Salt (Small sachet)", price: 100, bulk: false },
+      { name: "Salt (Big bag)", price: 1500, bulk: true }
     ]
   ];
 
@@ -254,17 +284,16 @@ const Finance = ({ ageGroup }) => {
       // Advance Sub-Stage
       setSubStage(prev => {
         const nextStage = prev + 1;
-        if (nextStage >= 3) {
-          // Level Complete (3 stages done)
+        const maxStages = isKid ? 3 : 5;
+        if (nextStage >= maxStages) {
+          // Level Complete
           setTimeout(() => {
             completeLevel(levelId); // Mark level as done and reset
             setSubStage(0);
           }, 1500);
 
-          // CRITICAL FIX: Do not return 3 for array-based levels, as it crashes rendering (index out of bounds)
-          // Exception: Module 14 (City Builder) explicitly handles stage 3
           if (levelId === 14) return 3;
-          return 2; // Stay at last stage visuals while completion triggers
+          return maxStages - 1; // Stay at last stage visuals
         }
         return nextStage;
       });
@@ -282,7 +311,9 @@ const Finance = ({ ageGroup }) => {
   const careerLevels = [
     { title: "Intern ☕", desc: "Start your journey.", task: "Learn Skills", reward: 30, options: [{ txt: "Study Hard 📚", type: "good" }, { txt: "Nap 😴", type: "bad" }] },
     { title: "Manager 👔", desc: "Lead the team.", task: "Manage Team", reward: 30, options: [{ txt: "Mentor Team 🤝", type: "good" }, { txt: "Micromanage 🧐", type: "bad" }] },
-    { title: "CEO 🚀", desc: "Lead the company.", task: "Innovate", reward: 40, options: [{ txt: "Launch Product 💡", type: "good" }, { txt: "Cut Costs 📉", type: "bad" }] }
+    { title: "Director 🏢", desc: "Scale the branch.", task: "Optimize", reward: 40, options: [{ txt: "Efficient Systems ⚙️", type: "good" }, { txt: "Lobbying 🗣️", type: "bad" }] },
+    { title: "CEO 🚀", desc: "Lead the company.", task: "Innovate", reward: 50, options: [{ txt: "Launch Product 💡", type: "good" }, { txt: "Cut Costs 📉", type: "bad" }] },
+    { title: "Founder 🦄", desc: "Build a legend.", task: "Legacy", reward: 100, options: [{ txt: "Public Listing 📈", type: "good" }, { txt: "Sell Out 💰", type: "bad" }] }
   ];
 
   // Level 7: Investing (The Garden)
@@ -291,7 +322,9 @@ const Finance = ({ ageGroup }) => {
   const investStages = [
     { year: 1, title: "Sowing Seeds 🌱", desc: "Plant your money safely.", options: [{ name: "Govt Bond 🏛️", risk: "low" }, { name: "Daily Ajo 💰", risk: "low" }], correct: "low", reward: 30 },
     { year: 2, title: "Watering 🚿", desc: "Nurture with steady growth.", options: [{ name: "Real Estate (Lagos Land) 🏘️", risk: "med" }, { name: "Cash under mattress 🛏️", risk: "none" }], correct: "med", reward: 30 },
-    { year: 3, title: "Harvesting 🍎", desc: "Reap the rewards!", options: [{ name: "Tech Stock 💻", risk: "high" }, { name: "Ponzi Scheme ⚠️", risk: "scam" }], correct: "high", reward: 40 }
+    { year: 3, title: "Growth 🌿", desc: "Diversify for more fruit.", options: [{ name: "Index Fund 📊", risk: "med" }, { name: "New Phone 📱", risk: "none" }], correct: "med", reward: 30 },
+    { year: 4, title: "Pruning ✂️", desc: "Cut bad assets.", options: [{ name: "Diversified Stocks 📈", risk: "high" }, { name: "Gambling 🎰", risk: "scam" }], correct: "high", reward: 30 },
+    { year: 5, title: "Harvesting 🍎", desc: "Reap the rewards!", options: [{ name: "Tech Stock 💻", risk: "high" }, { name: "Ponzi Scheme ⚠️", risk: "scam" }], correct: "high", reward: 40 }
   ];
 
   // Level 8: Risk & Reward (Nigerian Choices)
@@ -310,6 +343,8 @@ const Finance = ({ ageGroup }) => {
   const debtStages = [
     { title: "Bad Debt: High Interest", target: "bad", items: [{ name: "Quick Credit (Lapo) 💸", type: "bad" }, { name: "Education Fund 🎓", type: "good" }], reward: 30 },
     { title: "Bad Debt: Consumer Debt", target: "bad", items: [{ name: "Expensive Phone Loan 💳", type: "bad" }, { name: "Mortgage 🏠", type: "good" }], reward: 30 },
+    { title: "Business vs Personal", target: "bad", items: [{ name: "Leased Laptop for Work 💻", type: "good" }, { name: "Vacation Loan ✈️", type: "bad" }], reward: 30 },
+    { title: "Emergency Debt", target: "bad", items: [{ name: "Credit Card for Party 🎈", type: "bad" }, { name: "Hospital Loan 🏥", type: "good" }], reward: 30 },
     { title: "Predatory Lenders", target: "bad", items: [{ name: "Loan Shark 🦈", type: "bad" }, { name: "Small Business Loan 💼", type: "good" }], reward: 40 }
   ];
 
@@ -320,6 +355,8 @@ const Finance = ({ ageGroup }) => {
   const rainStages = [
     { name: "Drizzle 🌦️", need: "Raincoat", reward: 30, options: ["Raincoat 🧥", "New Shoes 👟"] },
     { name: "Thunderstorm ⛈️", need: "Umbrella", reward: 30, options: ["Umbrella ☂️", "Sunglasses 🕶️"] },
+    { name: "Food Shortage 🍲", need: "Food Bank", reward: 30, options: ["Emergency Fund 💰", "Gold Chain ⛓️"] },
+    { name: "Medical Emergency 🏥", need: "Health Insurance", reward: 30, options: ["Health Insurance 📋", "New Car 🚗"] },
     { name: "Hurricane 🌀", need: "Shelter", reward: 40, options: ["House Insurance 🏠", "Beach Towel 🏖️"] }
   ];
 
@@ -329,6 +366,8 @@ const Finance = ({ ageGroup }) => {
   const scamLevels = [
     { title: "Email Inspector 📧", type: "email", text: "From: Prince Aliko. Subject: URGENT! I have $5M for you. Click Link.", correct: "scam", reward: 30 },
     { title: "Website Warrior 🌐", type: "web", text: "Secure Bank Login (http://bank-secure-login.net)", correct: "scam", reward: 30 },
+    { title: "Social Media 📸", type: "post", text: "DM: 'Help! I'm stuck abroad. Send ₦50k instantly!'", correct: "scam", reward: 30 },
+    { title: "Investment Bait 📈", type: "post", text: "Earn 200% profit in 24 hours. Guaranteed!", correct: "scam", reward: 30 },
     { title: "The Call 📞", type: "call", text: "Caller: 'Hello, this is your bank. What is your PIN?'", correct: "scam", reward: 40 }
   ];
 
@@ -337,6 +376,8 @@ const Finance = ({ ageGroup }) => {
   const assetStages = [
     { title: "Money Magnet 🗑️", task: "Drag things that GROW your money here", items: [{ name: "Lagos Land/Plot 🏠", type: "asset" }, { name: "New iPhone 📱", type: "liability" }], reward: 30 },
     { title: "Cash Flow 💸", task: "Which one yields profit every month?", items: [{ name: "Rental Shop 🏢", type: "asset" }, { name: "Luxury Watch ⌚", type: "liability" }], reward: 30 },
+    { title: "Stock Options 📈", task: "Pick the growth engine", items: [{ name: "Index Fund 📊", type: "asset" }, { name: "Designer Bag 👜", type: "liability" }], reward: 30 },
+    { title: "Royalties 🎶", task: "Passive income source?", items: [{ name: "Writing a Book 📚", type: "asset" }, { name: "Buying Snacks 🍟", type: "liability" }], reward: 30 },
     { title: "Income Team 💼", task: "Pick the team that makes you rich", items: ["Gold Bar 🥇", "Small Shop 🏪", "Lagos Land 🏘️", "Lottery Ticket 🎫"], correct: ["Gold Bar 🥇", "Small Shop 🏪", "Lagos Land 🏘️"], reward: 40 }
   ];
 
@@ -345,7 +386,9 @@ const Finance = ({ ageGroup }) => {
   const [passiveIncome, setPassiveIncome] = useState(0);
   const freedomStages = [
     { title: "The Grind 🔨", goal: "Active Income", task: "Click to earn salary.", reward: 30 },
-    { title: "Smart Moves 🧠", goal: "Buy Assets", task: "Turn salary into assets.", reward: 30 },
+    { title: "Upskilling 🎓", goal: "Professional Certs", task: "Learn new tools.", reward: 30 },
+    { title: "Investing 🧠", goal: "Buy Assets", task: "Turn salary into assets.", reward: 30 },
+    { title: "Scaling 📈", goal: "Multiple Income", task: "Build diverse streams.", reward: 30 },
     { title: "Freedom 🕊️", goal: "Passive > Expense", task: "Relax while money grows.", reward: 40 }
   ];
 
@@ -450,7 +493,7 @@ const Finance = ({ ageGroup }) => {
     }
 
     const reward = subStage === 2 ? 60 : 40;
-    const currentScenario = budgetScenarios[subStage];
+    const currentScenario = budgetScenarios[Math.min(subStage, isKid ? 2 : 4)];
     showToast(`Budget Balanced! +₦${reward} 🏆\n\nExpert Tip: ${currentScenario.fact}`, "success");
     handleStageComplete(3, reward);
   };
@@ -806,7 +849,7 @@ const Finance = ({ ageGroup }) => {
         if (currentLevel === 16) {
           setTimeout(() => completeLevel(16), 1500);
           setCryptoStage(0);
-          setPortfolio({ bitcoin: 0, ethereum: 0, stocks: 0, cash: 1000 });
+          setPortfolio({ bitcoin: 0, ethereum: 0, stocks: 0, realEstate: 0, bankFixed: 0, cash: 1000 });
         }
       }
     } else {
@@ -977,8 +1020,8 @@ const Finance = ({ ageGroup }) => {
       desc: "Before money, we traded items.",
       content: (
         <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> The villager wants <strong>{tradeScenarios[Math.min(subStage, 2)].want}</strong>.</p>
-          <p>You have: <strong>{tradeScenarios[Math.min(subStage, 2)].offer}</strong>.</p>
+          <p><strong>Stage {Math.min(subStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> The villager wants <strong>{tradeScenarios[Math.min(subStage, isKid ? 2 : 4)].want}</strong>.</p>
+          <p>You have: <strong>{tradeScenarios[Math.min(subStage, isKid ? 2 : 4)].offer}</strong>.</p>
 
           {tradeStep === 0 && (
             <button onClick={() => setTradeStep(1)} className="btn" style={{ backgroundColor: '#FFBB33', color: 'black' }}>Start Trading</button>
@@ -1394,7 +1437,7 @@ const Finance = ({ ageGroup }) => {
                   <span style={{ color: '#4285F4', fontWeight: 'bold' }}>{pieSlices.needs}%</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>
-                  {budgetScenarios[Math.min(subStage, 2)].needs.join(', ')}
+                  {budgetScenarios[Math.min(subStage, isKid ? 2 : 4)].needs.join(', ')}
                 </div>
                 <input
                   type="range"
@@ -1418,7 +1461,7 @@ const Finance = ({ ageGroup }) => {
                   <span style={{ color: '#EA4335', fontWeight: 'bold' }}>{pieSlices.wants}%</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>
-                  {budgetScenarios[Math.min(subStage, 2)].wants.join(', ')}
+                  {budgetScenarios[Math.min(subStage, isKid ? 2 : 4)].wants.join(', ')}
                 </div>
                 <input
                   type="range"
@@ -1442,7 +1485,7 @@ const Finance = ({ ageGroup }) => {
                   <span style={{ color: '#34A853', fontWeight: 'bold' }}>{pieSlices.savings}%</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem' }}>
-                  Goal: {budgetScenarios[Math.min(subStage, 2)].savingsGoal}
+                  Goal: {budgetScenarios[Math.min(subStage, isKid ? 2 : 4)].savingsGoal}
                 </div>
                 <input
                   type="range"
@@ -1508,7 +1551,7 @@ const Finance = ({ ageGroup }) => {
                 </p>
                 {pieFeedback.includes('✅') && pieSlices.savings >= 25 && (
                   <p style={{ margin: '0.75rem 0 0 0', textAlign: 'center', fontSize: '0.85rem', opacity: 0.9 }}>
-                    🏆 Excellent! {budgetScenarios[Math.min(subStage, 2)].name}'s future is secure!
+                    🏆 Excellent! {budgetScenarios[Math.min(subStage, isKid ? 2 : 4)].name}'s future is secure!
                   </p>
                 )}
               </div>
@@ -1529,6 +1572,8 @@ const Finance = ({ ageGroup }) => {
               {subStage === 0 && 'Students: Save at least 20% for unexpected school expenses!'}
               {subStage === 1 && 'Young workers: Build an emergency fund of 3-6 months expenses before splurging!'}
               {subStage === 2 && 'Families: Prioritize children\'s education savings - it\'s the best investment!'}
+              {subStage === 3 && 'Business Owners: Reinvest at least 40% of profit back into the business!'}
+              {subStage === 4 && 'High Earners: Don\'t let lifestyle creep eat your wealth. Keep a high savings rate!'}
             </div>
           </div>
 
@@ -1548,9 +1593,9 @@ const Finance = ({ ageGroup }) => {
       desc: "Find the best value.",
       content: (
         <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Which option is the better value?</p>
+          <p><strong>Stage {Math.min(subStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> Which option is the better value?</p>
           <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-            {shopScenarios[Math.min(subStage, 2)].map((item, idx) => (
+            {shopScenarios[Math.min(subStage, isKid ? 2 : 4)].map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => handleShopChoice(item)}
@@ -1576,7 +1621,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Sort items to the right place.",
       content: (
         <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Sort 5 items correctly.</p>
+          <p><strong>Stage {Math.min(subStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> Sort 5 items correctly.</p>
 
           {!safeGameActive && safeScore < 5 ? (
             <button onClick={startSafeGame} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#9C27B0' }}>Start Sorting</button>
@@ -1607,7 +1652,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Skills = Money.",
       content: (
         <div>
-          <p><strong>Stage {careerStep + 1}/3:</strong> {careerLevels[careerStep].title}</p>
+          <p><strong>Stage {Math.min(careerStep, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {careerLevels[Math.min(careerStep, 4)].title}</p>
           <p>{careerLevels[careerStep].desc}</p>
           <p><strong>Goal:</strong> {careerLevels[careerStep].task}</p>
 
@@ -1646,7 +1691,7 @@ const Finance = ({ ageGroup }) => {
             .pulse-animation { animation: pulse 0.5s ease-in-out; }
             @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); box-shadow: 0 0 20px #00C851; } 100% { transform: scale(1); } }
           `}</style >
-          <p><strong>Stage {investYear + 1}/3:</strong> {investStages[investYear].title}</p>
+          <p><strong>Stage {Math.min(investYear, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {investStages[Math.min(investYear, 4)].title}</p>
           <p><em>{investStages[investYear].desc}</em></p>
 
           <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid var(--color-primary)' }}>
@@ -1683,7 +1728,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Balance risk and safety.",
       content: (
         <div>
-          <p><strong>Scenario {riskChoiceLevel + 1}/3:</strong> Which risk is right for you?</p>
+          <p><strong>Scenario {Math.min(riskChoiceLevel, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> Which risk is right for you?</p>
 
           <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid #FF9800' }}>
             <h4 style={{ color: '#FF9800', marginTop: 0 }}>The Big Decision</h4>
@@ -1728,7 +1773,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Slash the bad debt!",
       content: (
         <div>
-          <p><strong>Stage {debtStage + 1}/3:</strong> {debtStages[debtStage].title}</p>
+          <p><strong>Stage {Math.min(debtStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {debtStages[Math.min(debtStage, 4)].title}</p>
           <p>Sharpen your sword! Slash <strong>{debtStages[debtStage].target === 'bad' ? 'BAD DEBT' : 'BAD DEBT'}</strong>.</p>
 
           <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
@@ -1765,7 +1810,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Prepare for the storm.",
       content: (
         <div>
-          <p><strong>Stage {rainStage + 1}/3:</strong> {rainStages[rainStage].name}</p>
+          <p><strong>Stage {Math.min(rainStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {rainStages[Math.min(rainStage, 4)].name}</p>
           <p>The weather is changing. <strong>{rainStages[rainStage].need}</strong> needed!</p>
 
           <div style={{
@@ -1808,7 +1853,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Spot the fakes.",
       content: (
         <div>
-          <p><strong>Stage {scamStep + 1}/3:</strong> {scamLevels[scamStep].title}</p>
+          <p><strong>Stage {Math.min(scamStep, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {scamLevels[Math.min(scamStep, 4)].title}</p>
           <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
             <p style={{ fontSize: '1.2rem', margin: '1rem 0', fontFamily: 'monospace' }}>"{scamLevels[scamStep].text}"</p>
             <div style={{ display: 'flex', gap: '1rem' }}>
@@ -1825,7 +1870,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Assets vs Liabilities.",
       content: (
         <div>
-          <p><strong>Stage {assetStage + 1}/3:</strong> {assetStages[assetStage].title}</p>
+          <p><strong>Stage {Math.min(assetStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {assetStages[Math.min(assetStage, 4)].title}</p>
           <p style={{ color: '#FFD700', fontWeight: 'bold' }}>Your Task: {assetStages[assetStage].task}</p>
 
           <div style={{
@@ -1862,7 +1907,7 @@ const Finance = ({ ageGroup }) => {
       desc: "The ultimate goal.",
       content: (
         <div>
-          <p><strong>Stage {freedomStep + 1}/3:</strong> {freedomStages[freedomStep].title}</p>
+          <p><strong>Stage {Math.min(freedomStep, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {freedomStages[Math.min(freedomStep, 4)].title}</p>
           <p>{freedomStages[freedomStep].task}</p>
 
           <div style={{ textAlign: 'center', margin: '1rem 0' }}>
@@ -1885,7 +1930,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Why we pay taxes.",
       content: (
         <div>
-          <p><strong>Stage {Math.min(subStage, 2) + 1}/3:</strong> Taxes build our community. Watch it grow!</p>
+          <p><strong>Stage {Math.min(subStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> Taxes build our community. Watch it grow!</p>
           <div style={{
             height: '150px', backgroundColor: '#222', borderRadius: '20px', border: '1px solid #555',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '1rem', marginBottom: '1rem'
@@ -1906,12 +1951,12 @@ const Finance = ({ ageGroup }) => {
               fontSize: '1.1rem',
               height: '50px'
             }}
-            disabled={subStage >= 3}
+            disabled={subStage >= (isKid ? 3 : 5)}
           >
-            {subStage >= 3 ? "Village Fully Built! 🌆✅" : `Pay Tax & Build ${['School', 'Road', 'Hospital'][subStage] || ''} 🏗️`}
+            {subStage >= (isKid ? 3 : 5) ? "Village Fully Built! 🌆✅" : `Pay Tax & Build ${['School', 'Road', 'Hospital', 'Library', 'Solar Farm'][subStage] || ''} 🏗️`}
           </button>
 
-          {subStage >= 3 && (
+          {subStage >= (isKid ? 3 : 5) && (
             <div style={{ textAlign: 'center', marginTop: '1rem', color: '#00C851' }}>
               <h3>Community Thriving! 🌟</h3>
               <p>Your taxes provided essential services.</p>
@@ -1926,7 +1971,7 @@ const Finance = ({ ageGroup }) => {
       desc: "Diversify to survive.",
       content: (
         <div>
-          <p><strong>Scenario {riskStage + 1}/3:</strong> {riskStages[riskStage].title}</p>
+          <p><strong>Scenario {Math.min(riskStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {riskStages[Math.min(riskStage, 4)].title}</p>
           <p><em>{riskStages[riskStage].desc}</em></p>
 
           <div style={{ margin: '1.5rem 0' }}>
