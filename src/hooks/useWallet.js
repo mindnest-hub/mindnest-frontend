@@ -4,15 +4,15 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 
 const MODULE_CAPS = {
-    history: 4000,
+    history: 2000,
     finance: 2000,
     tech: 2000,
-    agri: 2000,
+    agri: 1500,
     civics: 2000,
-    health: 2000,
-    criticalThinking: 1500
+    health: 1500,
+    criticalThinking: 2000
 };
-const DEFAULT_CAP = 2000;
+const DEFAULT_CAP = 1500;
 const WITHDRAWAL_LIMIT = 5000;
 
 export const useWallet = () => {
@@ -20,20 +20,20 @@ export const useWallet = () => {
     // Track spendable balance per module
     const [moduleBalances, setModuleBalances] = useState(() => {
         try {
-            return JSON.parse(localStorage.getItem('moduleBalances')) || { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0 };
+            return JSON.parse(localStorage.getItem('moduleBalances')) || { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0, criticalThinking: 0 };
         } catch (e) {
             console.error("Error parsing moduleBalances:", e);
-            return { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0 };
+            return { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0, criticalThinking: 0 };
         }
     });
 
     // Track lifetime earnings per module (for Caps)
     const [moduleEarnings, setModuleEarnings] = useState(() => {
         try {
-            return JSON.parse(localStorage.getItem('moduleEarnings')) || { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0 };
+            return JSON.parse(localStorage.getItem('moduleEarnings')) || { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0, criticalThinking: 0 };
         } catch (e) {
             console.error("Error parsing moduleEarnings:", e);
-            return { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0 };
+            return { finance: 0, history: 0, tech: 0, agri: 0, civics: 0, health: 0, criticalThinking: 0 };
         }
     });
 
@@ -82,23 +82,6 @@ export const useWallet = () => {
     }, [moduleBalances, moduleEarnings, balance, token]);
 
     const getModuleCap = (module) => {
-        const savedAgeGroup = localStorage.getItem('ageGroup');
-        const isYoung = savedAgeGroup && (savedAgeGroup.toLowerCase() === 'kids' || savedAgeGroup.toLowerCase() === 'teens');
-
-        // Global Anti-Exploitation Cap for Kids/Teens
-        if (isYoung) {
-            // Special exception for History module
-            if (module === 'history') return 2000;
-            // Special exception for Finance module (15 levels * 100 coins)
-            if (module === 'finance') return 1500;
-            // Special exception for Tech module (user requested 2000 cap)
-            if (module === 'tech') return 2000;
-            // Health stays at 1000 (10 games * 100 coins)
-            if (module === 'health') return 1000;
-            // Default cap for other modules for kids
-            return 1000;
-        }
-
         return MODULE_CAPS[module] || DEFAULT_CAP;
     };
 

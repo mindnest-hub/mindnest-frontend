@@ -18,12 +18,12 @@ const KidsWellnessHub = ({ onComplete }) => {
         { id: 'super_plate', name: 'Super Plate', icon: '🍽️', color: '#FFBB33' },
         { id: 'sparkle_teeth', name: 'Sparkle Teeth', icon: '🦷', color: '#33b5e5' },
         { id: 'hand_wash', name: 'Hand Wash', icon: '🧼', color: '#00C851' },
-        { id: 'move_groove', name: 'Move & Groove', icon: '🏃‍♂️', color: '#FF8800' },
+        { id: 'move_groove', name: 'African Dance', icon: '💃', color: '#FF8800' },
         { id: 'sleep_catch', name: 'Sleep Catcher', icon: '😴', color: '#AA66CC' },
         { id: 'mood_detect', name: 'Mood Detective', icon: '😊', color: '#FFD700' },
         { id: 'safe_shield', name: 'Safety Shield', icon: '🛡️', color: '#CC0000' },
-        { id: 'kind_connect', name: 'Kindness Connect', icon: '🤝', color: '#2BBBAD' },
-        { id: 'mind_cloud', name: 'Mindful Cloud', icon: '☁️', color: '#9933CC' },
+        { id: 'kind_connect', name: 'Ubuntu Spirit', icon: '🤝', color: '#2BBBAD' },
+        { id: 'mind_cloud', name: 'Baobab Reflection', icon: '🌳', color: '#9933CC' },
     ];
 
     useEffect(() => {
@@ -87,9 +87,9 @@ const KidsWellnessHub = ({ onComplete }) => {
 const GameFoodSorter = ({ level, onWin }) => {
     const [score, setScore] = useState(0);
     const target = level * 3;
-    const items = level === 1 ? [{ n: '🍎', t: 'good' }, { n: '🍔', t: 'bad' }] :
-        level === 2 ? [{ n: '🥦', t: 'good' }, { n: '🍬', t: 'bad' }] :
-            [{ n: '🍗', t: 'protein' }, { n: '🍞', t: 'carb' }];
+    const items = level === 1 ? [{ n: '🍠', t: 'good' }, { n: '🍔', t: 'bad' }] : // Yam vs Burger
+        level === 2 ? [{ n: '🥭', t: 'good' }, { n: '🍬', t: 'bad' }] : // Mango vs Candy
+            [{ n: '🐟', t: 'protein' }, { n: '🍞', t: 'carb' }]; // Fish vs Bread
 
     const handleTap = (type) => {
         if (type === 'good' || type === 'protein') {
@@ -126,9 +126,9 @@ const GameSuperPlate = ({ level, onWin }) => {
                 {plate.map((p, i) => <span key={i} style={{ fontSize: '1.5rem' }}>{p}</span>)}
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => add('🥗')} className="btn" style={{ fontSize: '2rem' }}>🥗</button>
-                <button onClick={() => add('🍚')} className="btn" style={{ fontSize: '2rem' }}>🍚</button>
-                <button onClick={() => add('🍗')} className="btn" style={{ fontSize: '2rem' }}>🍗</button>
+                <button onClick={() => add('🍲')} className="btn" style={{ fontSize: '2rem' }}>🍲</button> {/* Soup */}
+                <button onClick={() => add('🥣')} className="btn" style={{ fontSize: '2rem' }}>🥣</button> {/* Fufu */}
+                <button onClick={() => add('🐟')} className="btn" style={{ fontSize: '2rem' }}>🐟</button> {/* Tilapia */}
             </div>
         </div>
     );
@@ -178,12 +178,12 @@ const GameHandWash = ({ level, onWin }) => {
 };
 
 const GameMoveGroove = ({ level, onWin }) => {
-    const target = ['🙆‍♂️', '🏃‍♂️', '🧘‍♂️'][level - 1];
+    const target = ['💃', '🙌', '👏'][level - 1]; // Dance, Celebrate, Clap
     return (
         <div>
-            <h4>Copy the move: {target}</h4>
+            <h4>Show your moves: {target}</h4>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                {['🙆‍♂️', '🏃‍♂️', '🧘‍♂️'].map(p => (
+                {['💃', '🙌', '👏'].map(p => (
                     <button key={p} onClick={() => { if (p === target) onWin(); }} className="btn" style={{ fontSize: '3rem' }}>{p}</button>
                 ))}
             </div>
@@ -262,8 +262,8 @@ const GameSafeShield = ({ level, onWin }) => {
 const GameKindConnect = ({ level, onWin }) => {
     return (
         <div>
-            <h4>Share your toy with a friend!</h4>
-            <button onClick={onWin} className="btn btn-primary" style={{ marginTop: '2rem', fontSize: '1.5rem' }}>🎁 Give Gift</button>
+            <h4>Share a piece of fruit with a neighbor!</h4>
+            <button onClick={onWin} className="btn btn-primary" style={{ marginTop: '2rem', fontSize: '1.5rem' }}>🥭 Ubuntu Spirit</button>
         </div>
     );
 };
@@ -370,8 +370,8 @@ const Health = ({ ageGroup }) => {
         if (!newCompleted[index]) {
             newCompleted[index] = true;
             setCompletedModules(newCompleted);
-            addEarnings('health', 500);
-            showToast("Pillar Mastered! +₦500 🏆", 'success');
+            addEarnings('health', 250);
+            showToast("Pillar Mastered! +₦250 🏆", 'success');
         }
     };
 
@@ -444,11 +444,11 @@ const NutritionPillar = ({ onNext, showToast, isKid }) => {
     const [teensPlate, setTeensPlate] = useState({ protein: 0, carbs: 0, veg: 0, fats: 0 });
 
     const foodClasses = [
-        { name: "Yam/Rice", class: "Carbohydrate", icon: "🍚", fact: "Energy for your brain and body!" },
-        { name: "Beans/Fish", class: "Protein", icon: "🐟", fact: "Builds and repairs your muscles." },
-        { name: "Spinach/Okra", class: "Vitamin", icon: "🥬", fact: "Protects you from getting sick." },
-        { name: "Groundnut/Oil", class: "Fat", icon: "🥜", fact: "Helps your brain work better!" },
-        { name: "Water/Salt", class: "Mineral", icon: "💧", fact: "Essential for healthy blood and bones." }
+        { name: "Yam/Fufu", class: "Carbohydrate", icon: "🥣", fact: "Energy for your brain and body!" },
+        { name: "Beans/Dried Fish", class: "Protein", icon: "🐟", fact: "Builds and repairs your muscles." },
+        { name: "Okra/Garden Egg", class: "Vitamin", icon: "🍆", fact: "Protects you from getting sick." },
+        { name: "Red Palm Oil", class: "Fat", icon: "🏺", fact: "Helps your brain work better!" },
+        { name: "Hibiscus (Zobo)", class: "Mineral", icon: "🏮", fact: "Essential for healthy blood and bones." }
     ];
 
     const kidsQuest = [
@@ -576,7 +576,7 @@ const NutritionPillar = ({ onNext, showToast, isKid }) => {
                     <div style={{ backgroundColor: 'rgba(0, 200, 81, 0.1)', padding: '1.5rem', borderRadius: '15px', margin: '1.5rem 0', textAlign: 'left', borderLeft: '4px solid #00C851' }}>
                         <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>🌱 African Superfood Fact</h4>
                         <p style={{ margin: 0, fontSize: '0.95rem' }}>
-                            Did you know? <strong>Baobab</strong> fruit has 6 times more Vitamin C than oranges! It keeps your immune system ready for anything.
+                            Did you know? <strong>Baobab</strong> fruit has 6 times more Vitamin C than oranges! And <strong>Moringa</strong> has 17 times more calcium than milk. They are the secrets of the African elders!
                         </p>
                     </div>
                     <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>

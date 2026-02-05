@@ -42,6 +42,8 @@ const History = ({ ageGroup }) => {
     const [showTimelineQuest, setShowTimelineQuest] = useState(false);
     const [timelineScore, setTimelineScore] = useState(0);
     const [shuffledTimeline, setShuffledTimeline] = useState([]);
+    const [showTimelineFact, setShowTimelineFact] = useState(false);
+    const [lastTimelineCorrect, setLastTimelineCorrect] = useState(null);
 
     // --- TTS STATE ---
     const [isReading, setIsReading] = useState(false);
@@ -610,6 +612,7 @@ const History = ({ ageGroup }) => {
                                     setShuffledTimeline(shuffled);
                                     setShowTimelineQuest(true);
                                     setTimelineScore(0);
+                                    setShowTimelineFact(false);
                                 }}
                                 className="btn"
                                 style={{ backgroundColor: 'var(--color-secondary)' }}
@@ -623,25 +626,53 @@ const History = ({ ageGroup }) => {
                             {timelineScore < shuffledTimeline.length ? (
                                 <div>
                                     <p style={{ fontSize: '1.2rem', margin: '1rem 0' }}>"{shuffledTimeline[timelineScore].desc}" - **What year did this happen?**</p>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-                                        {[shuffledTimeline[timelineScore].year, "1500 BC", "1994", "1884"].sort(() => Math.random() - 0.5).map(yr => (
+
+                                    {showTimelineFact ? (
+                                        <div style={{
+                                            marginTop: '1.5rem',
+                                            padding: '1.5rem',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                            borderRadius: '10px',
+                                            borderLeft: `5px solid ${lastTimelineCorrect ? 'var(--color-secondary)' : '#ff4444'}`,
+                                            animation: 'slideIn 0.3s ease-out'
+                                        }}>
+                                            <h4 style={{ color: lastTimelineCorrect ? 'var(--color-secondary)' : '#ff4444', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                {lastTimelineCorrect ? '✅ Excellent!' : '❌ Not quite!'}
+                                            </h4>
+                                            <p style={{ fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '1.5rem', color: '#eee' }}>
+                                                <strong style={{ color: 'var(--color-secondary)' }}>Did you know?</strong> {shuffledTimeline[timelineScore].details}
+                                            </p>
                                             <button
-                                                key={yr}
                                                 onClick={() => {
-                                                    if (yr === shuffledTimeline[timelineScore].year) {
-                                                        showToast("Historian! 📜", 'success');
-                                                        setTimelineScore(prev => prev + 1);
-                                                        addEarnings('history', 150);
-                                                    } else {
-                                                        showToast("Check the timeline above!", 'error');
-                                                    }
+                                                    setShowTimelineFact(false);
+                                                    setTimelineScore(prev => prev + 1);
                                                 }}
-                                                className="btn btn-outline"
+                                                className="btn"
+                                                style={{ backgroundColor: 'var(--color-secondary)', width: '100%', color: '#000', fontWeight: 'bold' }}
                                             >
-                                                {yr}
+                                                Continue Quest ➔
                                             </button>
-                                        ))}
-                                    </div>
+                                        </div>
+                                    ) : (
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                                            {[shuffledTimeline[timelineScore].year, "1500 BC", "1994", "1884"].sort(() => Math.random() - 0.5).map(yr => (
+                                                <button
+                                                    key={yr}
+                                                    onClick={() => {
+                                                        const isCorrect = yr === shuffledTimeline[timelineScore].year;
+                                                        setLastTimelineCorrect(isCorrect);
+                                                        setShowTimelineFact(true);
+                                                        if (isCorrect) {
+                                                            addEarnings('history', 150);
+                                                        }
+                                                    }}
+                                                    className="btn btn-outline"
+                                                >
+                                                    {yr}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <div style={{ textAlign: 'center' }}>
