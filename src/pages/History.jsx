@@ -286,9 +286,17 @@ const History = ({ ageGroup }) => {
         },
         {
             year: "2002",
-            title: "The African Union (AU)",
+            title: "The African Union (AU) 🌍",
             desc: "African leaders united to promote peace, unity, and economic growth.",
-            details: "Replacing the OAU, the AU focuses on 'African Solutions to African Problems'. It represents the reversing of the division caused by the Berlin Conference."
+            details: "Replacing the OAU, the AU focuses on 'African Solutions to African Problems'. It represents the reversing of the division caused by the Berlin Conference.",
+            modernContext: "Today, the AU works on the Agenda 2063, a blueprint for transforming Africa into the global powerhouse of the future."
+        },
+        {
+            year: "2020s",
+            title: "The African Digital Renaissance 🚀",
+            desc: "Africa becomes a global leader in mobile money and fintech innovation.",
+            details: "From M-Pesa in Kenya to the thriving tech hubs in Yaba (Lagos) and Cape Town, African youth are using technology to solve local problems. This is the 'Leapfrog' era where Africa bypasses old tech for the new.",
+            modernContext: "Africa has the youngest population in the world, with over 60% under age 25. You are part of this history!"
         }
     ];
 
@@ -303,6 +311,14 @@ const History = ({ ageGroup }) => {
         { date: "Jun 25, 1975", country: "Mozambique 🇲🇿", leader: "Samora Machel" },
         { date: "Apr 18, 1980", country: "Zimbabwe 🇿🇼", leader: "Robert Mugabe" },
         { date: "Mar 21, 1990", country: "Namibia 🇳🇦", leader: "Sam Nujoma" },
+    ];
+
+    const teenQuizQuestions = [
+        { q: "Which empire was ruled by the richest man in history, Mansa Musa?", a: "Mali Empire", options: ["Mali Empire", "Songhai Empire", "Ghana Empire"], fact: "Mali was so wealthy that Mansa Musa's pilgrimage to Mecca caused gold prices to drop in Egypt for a decade." },
+        { q: "What was the main purpose of the Berlin Conference of 1884?", a: "To divide Africa among European powers", options: ["To divide Africa among European powers", "To grant independence to African nations", "To end the slave trade"], fact: "Not a single African leader was invited to the Berlin Conference." },
+        { q: "Who was the first Sub-Saharan nation to gain independence from colonial rule?", a: "Ghana", options: ["Ghana", "Nigeria", "Kenya"], fact: "Ghana gained independence in 1957 under the leadership of Kwame Nkrumah." },
+        { q: "The Battle of Adwa in 1896 is significant because:", a: "Ethiopia defeated Italy to remain independent", options: ["Ethiopia defeated Italy to remain independent", "It started the Scramble for Africa", "It was the end of the Mali Empire"], fact: "Ethiopia was the only African nation to successfully defeat a European power during the colonial era." },
+        { q: "What does 'Agenda 2063' refer to in the modern African context?", a: "The AU's blueprint for transforming Africa", options: ["The AU's blueprint for transforming Africa", "A plan for the 2063 Olympics in Cairo", "The date for a unified African currency"], fact: "Agenda 2063 is the African Union's strategic framework for the socio-economic transformation of the continent." }
     ];
 
     return (
@@ -608,7 +624,9 @@ const History = ({ ageGroup }) => {
                         <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                             <button
                                 onClick={() => {
-                                    const shuffled = [...events].sort(() => Math.random() - 0.5).slice(0, 3);
+                                    const source = isKid ? events : teenQuizQuestions;
+                                    const count = isKid ? 3 : 5;
+                                    const shuffled = [...source].sort(() => Math.random() - 0.5).slice(0, count);
                                     setShuffledTimeline(shuffled);
                                     setShowTimelineQuest(true);
                                     setTimelineScore(0);
@@ -617,15 +635,23 @@ const History = ({ ageGroup }) => {
                                 className="btn"
                                 style={{ backgroundColor: 'var(--color-secondary)' }}
                             >
-                                Challenge the Timeline Quest ⏳
+                                Challenge the {isKid ? 'Timeline' : 'History'} Quest ⏳
                             </button>
                         </div>
                     ) : (
                         <div className="card" style={{ marginTop: '2rem', animation: 'fadeIn 0.5s', border: '2px solid var(--color-secondary)' }}>
-                            <h3 style={{ color: 'var(--color-secondary)' }}>Timeline Mastery Quiz {timelineScore + 1}/3</h3>
+                            <h3 style={{ color: 'var(--color-secondary)' }}>
+                                {isKid ? 'Timeline' : 'Historical'} Mastery Quiz {timelineScore + 1}/{isKid ? 3 : 5}
+                            </h3>
                             {timelineScore < shuffledTimeline.length ? (
                                 <div>
-                                    <p style={{ fontSize: '1.2rem', margin: '1rem 0' }}>"{shuffledTimeline[timelineScore].desc}" - **What year did this happen?**</p>
+                                    <p style={{ fontSize: '1.2rem', margin: '1rem 0' }}>
+                                        {isKid ? (
+                                            <>"{shuffledTimeline[timelineScore].desc}" - **What year did this happen?**</>
+                                        ) : (
+                                            <>{shuffledTimeline[timelineScore].q}</>
+                                        )}
+                                    </p>
 
                                     {showTimelineFact ? (
                                         <div style={{
@@ -640,7 +666,7 @@ const History = ({ ageGroup }) => {
                                                 {lastTimelineCorrect ? '✅ Excellent!' : '❌ Not quite!'}
                                             </h4>
                                             <p style={{ fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '1.5rem', color: '#eee' }}>
-                                                <strong style={{ color: 'var(--color-secondary)' }}>Did you know?</strong> {shuffledTimeline[timelineScore].details}
+                                                <strong style={{ color: 'var(--color-secondary)' }}>Deep Fact:</strong> {shuffledTimeline[timelineScore].fact || shuffledTimeline[timelineScore].details}
                                             </p>
                                             <button
                                                 onClick={() => {
@@ -655,22 +681,27 @@ const History = ({ ageGroup }) => {
                                         </div>
                                     ) : (
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-                                            {[shuffledTimeline[timelineScore].year, "1500 BC", "1994", "1884"].sort(() => Math.random() - 0.5).map(yr => (
-                                                <button
-                                                    key={yr}
-                                                    onClick={() => {
-                                                        const isCorrect = yr === shuffledTimeline[timelineScore].year;
-                                                        setLastTimelineCorrect(isCorrect);
-                                                        setShowTimelineFact(true);
-                                                        if (isCorrect) {
-                                                            addEarnings('history', 150);
-                                                        }
-                                                    }}
-                                                    className="btn btn-outline"
-                                                >
-                                                    {yr}
-                                                </button>
-                                            ))}
+                                            {(isKid
+                                                ? [shuffledTimeline[timelineScore].year, "1500 BC", "1994", "1884"]
+                                                : shuffledTimeline[timelineScore].options).sort(() => Math.random() - 0.5).map(opt => (
+                                                    <button
+                                                        key={opt}
+                                                        onClick={() => {
+                                                            const isCorrect = isKid
+                                                                ? opt === shuffledTimeline[timelineScore].year
+                                                                : opt === shuffledTimeline[timelineScore].a;
+                                                            setLastTimelineCorrect(isCorrect);
+                                                            setShowTimelineFact(true);
+                                                            if (isCorrect) {
+                                                                addEarnings('history', isKid ? 150 : 250);
+                                                            }
+                                                        }}
+                                                        className="btn btn-outline"
+                                                        style={{ minHeight: '60px', padding: '0.5rem' }}
+                                                    >
+                                                        {opt}
+                                                    </button>
+                                                ))}
                                         </div>
                                     )}
                                 </div>

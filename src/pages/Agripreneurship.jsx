@@ -114,22 +114,28 @@ const Agripreneurship = () => {
     useEffect(() => {
         const timer = setInterval(() => {
             // Solar irrigation reduces moisture loss
-            const loss = upgrades.solar ? 2 : 5;
+            // Harder for Teens and Adults: faster moisture loss
+            const baseLoss = (isTeen || isAdult) ? 8 : 5;
+            const reduction = upgrades.solar ? (isKid ? 3 : 4) : 0;
+            const loss = baseLoss - reduction;
+
             setSoilMoisture(prev => Math.max(0, prev - loss));
 
             // Random Events based on Resilience
-            if (Math.random() > 0.95) {
+            if (Math.random() > 0.92) { // Slightly more frequent events
                 const eventSeverity = Math.max(0, 100 - climateResilience);
-                if (eventSeverity > 50) {
+                if (eventSeverity > 40) { // Lower threshold for trouble
                     setWeather('Heatwave 🔥');
-                    setSoilMoisture(prev => Math.max(0, prev - 20));
+                    const heatLoss = (isTeen || isAdult) ? 30 : 20;
+                    setSoilMoisture(prev => Math.max(0, prev - heatLoss));
+                    showToast("Alert: Heatwave detected! Moisture dropping fast.", "warning");
                 } else {
                     setWeather('Sunny ☀️');
                 }
             }
         }, 2000);
         return () => clearInterval(timer);
-    }, [climateResilience, upgrades.solar]);
+    }, [climateResilience, upgrades.solar, isTeen, isAdult, isKid]);
 
     const handleWater = () => {
         setSoilMoisture(100);
@@ -307,12 +313,12 @@ const Agripreneurship = () => {
                     🧪 Soil Lab
                 </button>
 
-                {isAdult && (
+                {!isKid && (
                     <button
                         onClick={() => setActiveTab('business')}
                         style={{ padding: '1rem 2rem', background: 'none', border: 'none', color: activeTab === 'business' ? 'var(--color-accent)' : '#aaa', borderBottom: activeTab === 'business' ? '3px solid var(--color-accent)' : 'none', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 'bold' }}
                     >
-                        💼 Business Hub
+                        💼 {isAdult ? 'Business Hub' : 'Project Planner'}
                     </button>
                 )}
 

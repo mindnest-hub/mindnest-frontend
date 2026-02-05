@@ -122,50 +122,98 @@ const Finance = ({ ageGroup }) => {
   // Level 1: Trade Master
   const [tradeStep, setTradeStep] = useState(0); // 0: intro, 1: game, 2: success
   const [subStage, setSubStage] = useState(0); // 0, 1, 2 (for 3-stage levels)
-  const tradeScenarios = [
-    { want: "Goat 🐐", offer: "3 Chickens 🐔", correct: "3 Chickens 🐔", options: ["1 Stone 🪨", "3 Chickens 🐔", "1 Leaf 🍃"] },
-    { want: "Bread 🍞", offer: "2 Fish 🐟", correct: "2 Fish 🐟", options: ["2 Fish 🐟", "1 Shoe 👞", "Mud 🧱"] },
-    { want: "Cow 🐄", offer: "5 Sacks of Rice 🍚", correct: "5 Sacks of Rice 🍚", options: ["1 Feather 🪶", "5 Sacks of Rice 🍚", "1 Stick 🪵"] }
+  const kidTradeScenarios = [
+    { want: "Goat 🐐", offer: "3 Chickens 🐔", correct: "3 Chickens 🐔", options: ["1 Stone 🪨", "3 Chickens 🐔", "1 Leaf 🍃"], fact: "Barter is the exchange of goods without money. It requires a 'double coincidence of wants'." },
+    { want: "Bread 🍞", offer: "2 Fish 🐟", correct: "2 Fish 🐟", options: ["2 Fish 🐟", "1 Shoe 👞", "Mud 🧱"], fact: "In ancient times, salt was used as money because everyone needed it." },
+    { want: "Cow 🐄", offer: "5 Sacks of Rice 🍚", correct: "5 Sacks of Rice 🍚", options: ["1 Feather 🪶", "5 Sacks of Rice 🍚", "1 Stick 🪵"], fact: "Before coins, Africans used Cowries and Manillas as medium of exchange." }
   ];
+
+  const teenTradeScenarios = [
+    { want: "A Brand New Laptop 💻", offer: "6 Months of Quality Work ⌨️", correct: "6 Months of Quality Work ⌨️", options: ["6 Months of Quality Work ⌨️", "1 Used Phone 📱", "A Social Media Shoutout 📣"], fact: "Value Exchange: Your time and skills are your first assets. Trading specialized labor for high-value goods is the foundation of a modern career." },
+    { want: "5% Stake in a Farm 🚜", offer: "₦500k Investment 💰", correct: "₦500k Investment 💰", options: ["₦500k Investment 💰", "A Promise to Help 🤝", "1 Bag of Fertilizer 🪴"], fact: "Equity Barter: Investing capital (money) for a share of ownership (equity) allows you to earn passive income as the business grows." },
+    { want: "Higher Harvest Yields 🌾", offer: "Advanced Irrigation System 💧", correct: "Advanced Irrigation System 💧", options: ["Advanced Irrigation System 💧", "More Hard Work ⛏️", "Wishing for Rain ⛈️"], fact: "Technology Leverage: Trading today's capital for technology increases future productivity. This is called Capital Expenditure (CAPEX)." }
+  ];
+
+  const tradeScenarios = isKid ? kidTradeScenarios : teenTradeScenarios;
 
   // Level 2: Coin Catcher
   const [coinScore, setCoinScore] = useState(0);
   const [isCoinGameActive, setIsCoinGameActive] = useState(false);
   const [fallingItems, setFallingItems] = useState([]); // {id, type, left, top}
-  const coinTargets = [5, 10, 15]; // Increasing difficulty
+  const kidCoinTargets = [5, 10, 15];
+  const teenCoinTargets = [12, 18, 25];
+  const coinTargets = isKid ? kidCoinTargets : teenCoinTargets;
 
   // Level 3: Slice the Pie (Budgeting)
   const [pieSlices, setPieSlices] = useState({ needs: 50, wants: 30, savings: 20 });
   const [pieFeedback, setPieFeedback] = useState("");
-  const budgetScenarios = [
+  const kidBudgetScenarios = [
     {
       role: "Chioma (Student) 🎓",
       name: "Chioma",
       income: 5000,
-      desc: "Weekly allowance for a secondary student",
+      desc: "Weekly allowance for a secondary student.",
       needs: ["Transport (okada)", "Lunch", "Textbooks"],
       wants: ["Snacks", "Phone credit", "Cinema"],
-      savingsGoal: "Class contribution fund"
+      savingsGoal: "Class contribution fund",
+      fact: "Needs are things you MUST have to survive or go to school. Wants are things that are just 'nice to have'."
     },
     {
-      role: "Emeka (Young Worker) 👷",
+      role: "Emeka (Shop Help) 🛒",
       name: "Emeka",
-      income: 50000,
-      desc: "First salary as a junior developer in Lagos",
-      needs: ["Rent (₦15k)", "Food (₦10k)", "Transport (₦5k)"],
-      wants: ["Weekend hangouts", "New clothes", "DSTV"],
-      savingsGoal: "Emergency fund"
+      income: 15000,
+      desc: "Monthly savings for a new bicycle.",
+      needs: ["Work shoes", "Data for home", "Savings"],
+      wants: ["New jeans", "Gala & Coke", "Game center"],
+      savingsGoal: "Bicycle fund (₦30,000)",
+      fact: "A savings goal helps you stay focused. If you save ₦10,000 a month, you'll have your bike in 3 months!"
     },
     {
-      role: "Mensah Family 👨‍👩‍👧",
-      name: "the Mensahs",
-      income: 200000,
-      desc: "Monthly household budget with 2 kids",
-      needs: ["Rent (₦60k)", "School fees", "Food", "Bills"],
-      wants: ["Weekend jollof", "DSTV", "New furniture"],
-      savingsGoal: "Children's university fund"
+      role: "Amina (Young Farmer) 🚜",
+      name: "Amina",
+      income: 30000,
+      desc: "Starting her own poultry farm.",
+      needs: ["Chicken feed", "Vaccines", "Water"],
+      wants: ["Fancy boots", "Sola radio", "New scarf"],
+      savingsGoal: "Expansion fund",
+      fact: "Business expenses (seeds, feed) are 'Needs'. If you don't buy them, you won't make more money later."
     }
   ];
+
+  const teenBudgetScenarios = [
+    {
+      role: "Tayo (Tech Graduate) 💼",
+      name: "Tayo",
+      income: 120000,
+      desc: "Monthly salary after PAYE tax and Pension deductions.",
+      needs: ["Rent (₦40k)", "Internet (₦15k)", "Commute", "Emergency Fund"],
+      wants: ["Socializing", "Premium Apps", "Fashion"],
+      savingsGoal: "Laptop Upgrade (₦450,000)",
+      fact: "Black Tax: In many African households, supporting siblings or parents is a cultural 'Need'. Budgeting for it early prevents financial stress later."
+    },
+    {
+      role: "Ada (Enterprising Student) 👗",
+      name: "Ada",
+      income: 45000,
+      desc: "Earnings from a side-thrifting business.",
+      needs: ["Inventory", "Shipping", "Marketing"],
+      wants: ["Dining Out", "New Heels", "Celebration"],
+      savingsGoal: "Business Warehouse Space",
+      fact: "Reinvesting Profit: For a business, at least 40% of profit should go back into growth. This is the difference between a 'hustle' and a 'company'."
+    },
+    {
+      role: "Musa (Digital Nomad) 💻",
+      name: "Musa",
+      income: 250000,
+      desc: "Freelance income with fluctuating monthly totals.",
+      needs: ["Solar Power Setup", "Health Insurance", "Tax Reserve"],
+      wants: ["Latest Gadget", "Lagos Staycation", "Hobbies"],
+      savingsGoal: "Real Estate Downpayment",
+      fact: "Sinking Funds: Save for big annual expenses (like Rent or Insurance) by dividing the total cost by 12 and saving that amount every month."
+    }
+  ];
+
+  const budgetScenarios = isKid ? kidBudgetScenarios : teenBudgetScenarios;
 
   // Level 4: Supermarket Sweep
   const [shopScenario, setShopScenario] = useState(0);
@@ -348,10 +396,10 @@ const Finance = ({ ageGroup }) => {
     const currentScenario = tradeScenarios[subStage];
     if (option === currentScenario.correct) {
       const reward = subStage === 2 ? 40 : 30; // 30, 30, 40 distribution
-      showToast(`Good Trade! +₦${reward} 🤝`, 'success');
+      showToast(`Good Trade! +₦${reward} 🤝\n${currentScenario.fact}`, 'success');
       handleStageComplete(1, reward);
     } else {
-      showToast("Not a fair trade! Try again.", 'error');
+      showToast("Not a fair trade! Think about the value exchange.", 'error');
     }
   };
 
@@ -369,31 +417,41 @@ const Finance = ({ ageGroup }) => {
         if (newScore >= target) {
           setIsCoinGameActive(false);
           const reward = subStage === 2 ? 40 : 30;
-          showToast(`Kolo Full! +₦${reward} 💰`, 'success');
+          const fact = isKid
+            ? "Saving a little every day builds a big mountain of treasure! 🏔️"
+            : "Compound Interest Warning: If you don't save, inflation (price rises) will eat your buying power. Saving is your defense! 🛡️";
+          showToast(`Kolo Full! +₦${reward} 💰\n\n${fact}`, 'success');
           handleStageComplete(2, reward);
         }
         return newScore;
       });
     } else {
       // Penalty for clicking temptations (candy/temptation/etc.)
-      setCoinScore(prev => Math.max(0, prev - 1));
-      showToast('Ah! Avoid temptations! Save your money! 💸', 'warning');
+      const penalty = isKid ? 1 : 2;
+      setCoinScore(prev => Math.max(0, prev - penalty));
+      showToast(isKid ? 'Ah! Avoid temptations! Save your money! 💸' : 'Impulse Buy! 📉 Teens/Adults: Avoid liabilities that lose value over time.', 'warning');
     }
   };
 
-  const handleBudgetCheck = () => {
+  const checkBudget = () => {
     const total = pieSlices.needs + pieSlices.wants + pieSlices.savings;
-    if (Math.abs(total - 100) > 1) {
-      setPieFeedback("Total must be 100%!");
-      return;
-    }
-    if (pieSlices.savings < 20) {
-      setPieFeedback("Try to save at least 20%!");
+    if (total !== 100) {
+      showToast("Budget must add up to exactly 100%!", "error");
       return;
     }
 
-    const reward = subStage === 2 ? 40 : 30;
-    setPieFeedback(`Great Budget! +₦${reward} ✅`);
+    if (pieSlices.needs < 40) {
+      showToast(isKid ? "You didn't buy enough food or books! 😟" : "Your basic survival (Rent/Food) is underfunded. Risk of debt! 📉", "error");
+      return;
+    }
+
+    if (pieSlices.savings < (isKid ? 10 : 20)) {
+      showToast(isKid ? "Try to save a bit more for your goal! 💰" : "Teens/Adults: Savings should be at least 20% to fight inflation and build wealth.", "warning");
+    }
+
+    const reward = subStage === 2 ? 60 : 40;
+    const currentScenario = budgetScenarios[subStage];
+    showToast(`Budget Balanced! +₦${reward} 🏆\n\nExpert Tip: ${currentScenario.fact}`, "success");
     handleStageComplete(3, reward);
   };
 

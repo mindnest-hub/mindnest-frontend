@@ -145,6 +145,40 @@ We are seeking ${data.ask} to scale operations and meet confirmed demand.
 ------------------------------------------------
 Contact: ${data.startup_name} Management
 `
+    },
+    "teen_social_enterprise": {
+        name: "Youth Social Enterprise Draft",
+        description: "A business plan for teen-led clubs or school farms focusing on community impact.",
+        category: "business",
+        tier: "free",
+        countries: ["General"],
+        fields: [
+            { id: "club_name", label: "Club/Project Name", type: "text", required: true, placeholder: "e.g. Future Feeders Club" },
+            { id: "purpose", label: "Social Mission", type: "textarea", required: true, placeholder: "e.g. To teach students about nutrition and provide free vegetables to the local orphanage." },
+            { id: "activity", label: "What will you grow/do?", type: "text", required: true, placeholder: "e.g. A school garden for Okra and Pumpkins" },
+            { id: "member_count", label: "Number of Members", type: "number", required: true },
+            { id: "date", label: "Date", type: "date", required: true }
+        ],
+        generateTemplate: (data) => `
+YOUTH SOCIAL ENTERPRISE PLAN
+------------------------------------------------
+Project Name: ${data.club_name}
+Date: ${data.date}
+Number of Members: ${data.member_count}
+
+1. OUR MISSION (UBUNTU)
+Our project, ${data.club_name}, exists to fulfill the following mission:
+${data.purpose}
+
+2. THE ACTIVITY
+We will focus on ${data.activity}. This will involve student leadership, hands-on learning, and community service.
+
+3. COMMUNITY IMPACT
+By working together (Ubuntu), we will demonstrate that youth can lead the way in food security. Proceeds or harvest will be used to support our mission and ensure the sustainability of the club.
+
+------------------------------------------------
+Lead Coordinator: __________________________
+`
     }
 };
 

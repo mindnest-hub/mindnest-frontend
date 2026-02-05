@@ -341,14 +341,23 @@ const Tech = () => {
       {/* Teens & Adults: Advanced Javascript Editor */}
       {(isTeen || isAdult) && (
         <div className="card" style={{ marginBottom: '2rem' }}>
-          <h3>{isTeen ? 'Level 1: VS Code Simulation' : 'Level 1: Business Automation'}</h3>
+          <h3>{isTeen ? 'Level 1: VS Code Simulation 🖥️' : 'Level 1: Business Automation'}</h3>
           <p style={{ color: '#aaa', marginBottom: '1rem' }}>
-            {isTeen ? 'Write real Javascript using logic! Try to console.log a string.' : 'Automate a greeting for your business using JS.'}
+            {isTeen ? 'Write real Javascript using logic! Try one of the Africa-centric projects below.' : 'Automate a greeting for your business using JS.'}
           </p>
+
+          {isTeen && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              <button className="btn btn-sm" onClick={() => setDebugCode(`const user = "Abba";\nconst balance = 5000;\nconsole.log(user + "'s M-Pesa Balance: ₦" + balance);`)} style={{ backgroundColor: '#1e1e1e', border: '1px solid #00C851', color: '#00C851' }}>📱 M-Pesa Logic</button>
+              <button className="btn btn-sm" onClick={() => setDebugCode(`const temp = 35;\nif (temp > 30) {\n  console.log("Activating Solar Pump... ☀️");\n} else {\n  console.log("Pump Idle.");\n}`)} style={{ backgroundColor: '#1e1e1e', border: '1px solid #FF8800', color: '#FF8800' }}>☀️ Smart Farm API</button>
+              <button className="btn btn-sm" onClick={() => setDebugCode(`const code = "*123#";\nif (code === "*123#") {\n  console.log("1. Check Balance\\n2. Buy Data\\n3. Transfer");\n}`)} style={{ backgroundColor: '#1e1e1e', border: '1px solid #2196F3', color: '#2196F3' }}>📟 USSD Menu</button>
+            </div>
+          )}
+
           <div style={{ backgroundColor: '#1e1e1e', padding: '1.5rem', borderRadius: '12px', border: '1px solid #333' }}>
             <div style={{ display: 'flex', gap: '10px', color: '#666', marginBottom: '10px', fontSize: '0.8rem' }}>
-              <span>index.js</span>
-              <span>package.json</span>
+              <span>main.js</span>
+              <span>index.html</span>
             </div>
             <textarea
               style={{
@@ -362,13 +371,18 @@ const Tech = () => {
                 outline: 'none',
                 resize: 'none'
               }}
+              value={isTeen ? debugCode : undefined}
+              onChange={isTeen ? (e) => setDebugCode(e.target.value) : undefined}
               placeholder={`// Write your code here...\nconsole.log("MindNest Pro");`}
-              defaultValue={`const appName = "MindNest";\nconsole.log(appName + " is ready!");`}
+              defaultValue={!isTeen ? `const appName = "MindNest";\nconsole.log(appName + " is ready!");` : undefined}
             />
           </div>
           <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button className="btn" style={{ backgroundColor: '#2196F3' }} onClick={() => completeLesson('coding-advanced', 50)}>Deploy Code 🚀</button>
-            <span style={{ color: '#aaa', fontSize: '0.9rem' }}>Hint: Practice using variables and console functions.</span>
+            <button className="btn" style={{ backgroundColor: '#2196F3' }} onClick={() => {
+              showToast("Deploying to African Regional Server... 🚀", "success");
+              completeLesson('coding-advanced', 50);
+            }}>Deploy Code 🚀</button>
+            <span style={{ color: '#aaa', fontSize: '0.9rem' }}>Hint: Practice using variables and logic.</span>
           </div>
         </div>
       )}

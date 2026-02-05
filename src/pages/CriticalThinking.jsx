@@ -200,8 +200,8 @@ const CriticalThinking = ({ ageGroup }) => {
     ];
 
     const teenObsItems = [
-        { id: 1, items: ["📕", "👓", "🔑", "🍎"], answer: ["book", "glasses", "key", "apple"] },
-        { id: 2, items: ["⚽", "👟", "🏆", "👕"], answer: ["ball", "shoe", "trophy", "shirt"] }
+        { id: 1, items: ["🎭", "🥁", "🪘", "🏺"], answer: ["mask", "drum", "djembe", "pot"] },
+        { id: 2, items: ["🐘", "🦒", "🦓", "🐊"], answer: ["elephant", "giraffe", "zebra", "crocodile"] }
     ];
 
     // Module 2: Asking Good Questions (Chat Bot)
@@ -241,7 +241,10 @@ const CriticalThinking = ({ ageGroup }) => {
     const marketScenarios = [
         { q: "You have ₦100. Apples cost ₦20. How many can you buy?", options: ["3", "5", "10"], choice: "5", reason: "100 / 20 = 5" },
         { q: "A toy is ₦50. It's on sale for half price. How much is it?", options: ["₦25", "₦50", "₦10"], choice: "₦25", reason: "Half of 50 is 25." },
-        { q: "You want to save ₦10 every day. How much in a week?", options: ["₦50", "₦70", "₦100"], choice: "₦70", reason: "10 x 7 = 70." }
+        { q: "You want to save ₦10 every day. How much in a week?", options: ["₦50", "₦70", "₦100"], choice: "₦70", reason: "10 x 7 = 70." },
+        // Additional for Teens
+        { q: "Wholesale eggs cost ₦1200 for 30. Single eggs cost ₦60. Saving?", options: ["₦600", "₦800", "₦500"], choice: "₦600", reason: "30x60=1800. 1800-1200=600 savings." },
+        { q: "Profit is ₦5000. Rent is ₦1200, Materials ₦800. Net Profit?", options: ["₦3000", "₦4200", "₦3800"], choice: "₦3000", reason: "5000 - 1200 - 800 = 3000." }
     ];
 
     // --- DILEMMA TALES STATE ---
@@ -254,7 +257,11 @@ const CriticalThinking = ({ ageGroup }) => {
 
     const dilemmas = [
         { q: "A hungry lion asks where the gazelle went. You know. What do you say?", options: ["Tell the truth (Lion eats Gazelle)", "Lie (Save Gazelle)", "Run away"], good: "Lie (Save Gazelle)" },
-        { q: "You promised to keep a secret, but it might hurt someone. Do you tell?", options: ["Keep Secret", "Tell to protect", "Ignore it"], good: "Tell to protect" }
+        { q: "You promised to keep a secret, but it might hurt someone. Do you tell?", options: ["Keep Secret", "Tell to protect", "Ignore it"], good: "Tell to protect" },
+        { q: "You found a wallet with money but no ID. What do you do?", options: ["Keep it for yourself", "Ask around the market", "Donate to charity"], good: "Ask around the market" },
+        // Teens
+        { q: "Your best friend cheated on a test and got the highest score. What do you do?", options: ["Report them", "Talk to them privately", "Ignore it"], good: "Talk to them privately" },
+        { q: "You realize you were given too much change at a shop. Do you return it?", options: ["Keep it as a blessing", "Go back and return it", "Give it to a beggar"], good: "Go back and return it" }
     ];
 
     // --- TEACH A FRIEND STATE ---
@@ -307,6 +314,12 @@ const CriticalThinking = ({ ageGroup }) => {
             keywords: ["trust", "believe", "honest", "friends", "right", "good"],
             goodResponse: "Perfect! 🦁 You understand honesty! When we tell the truth, people can trust us and we feel good inside!",
             encouragement: "Good effort! 💭 Think about: What happens when someone lies to you? Truth helps people trust each other. Try again!"
+        },
+        {
+            topic: "Why should we save money for the future?",
+            keywords: ["future", "emergency", "buy", "save", "invest", "wealth"],
+            goodResponse: "Brilliant! 💰 You explain fiscal responsibility well! Saving helps you handle emergencies and build a better future.",
+            encouragement: "Think deeper! 🏦 Why not spend it all now? What if something breaks tomorrow? Saving is about freedom later!"
         }
     ];
 
@@ -359,21 +372,27 @@ const CriticalThinking = ({ ageGroup }) => {
     const shapeGames = [
         { shapes: ["🔴", "🔴", "🟦"], question: "Which shapes are the same?", answer: "🔴", options: ["🔴", "🟦", "🟢"] },
         { shapes: ["⭐", "⭐", "⭐", "🌙"], question: "Which one is different?", answer: "🌙", options: ["⭐", "🌙", "🔴"] },
-        { shapes: ["🔺", "🔺", "🔻"], question: "Which shapes match?", answer: "🔺", options: ["🔺", "🔻", "🟦"] }
+        { shapes: ["🔺", "🔺", "🔻"], question: "Which shapes match?", answer: "🔺", options: ["🔺", "🔻", "🟦"] },
+        { shapes: ["🏺", "🏺", "🥁"], question: "Find the pair!", answer: "🏺", options: ["🏺", "🥁", "🪘"] },
+        { shapes: ["🐘", "🐘", "🦁"], question: "Match the twins!", answer: "🐘", options: ["🐘", "🦁", "🦒"] }
     ];
 
     // Game 2: What Comes Next (Patterns)
     const sequenceGames = [
         { sequence: ["🍎", "🍌", "🍎", "🍌", "🍎", "?"], answer: "🍌", options: ["🍌", "🍎", "🍊"] },
         { sequence: ["🐶", "🐱", "🐶", "🐱", "?"], answer: "🐶", options: ["🐶", "🐱", "🐭"] },
-        { sequence: ["🌞", "🌙", "🌞", "🌙", "?"], answer: "🌞", options: ["🌞", "🌙", "⭐"] }
+        { sequence: ["🌞", "🌙", "🌞", "🌙", "?"], answer: "🌞", options: ["🌞", "🌙", "⭐"] },
+        { sequence: ["1", "0", "1", "0", "?"], answer: "1", options: ["1", "0", "2"] },
+        { sequence: ["⬅️", "➡️", "⬅️", "➡️", "?"], answer: "⬅️", options: ["⬅️", "➡️", "⬆️"] }
     ];
 
     // Game 3: Odd One Out
     const oddOneGames = [
         { items: ["🍎", "🍌", "🍊", "🚗"], question: "Which doesn't belong?", answer: "🚗", options: ["🍎", "🍌", "🚗"] },
         { items: ["🐶", "🐱", "🐭", "🌳"], question: "Which is not an animal?", answer: "🌳", options: ["🐶", "🌳", "🐭"] },
-        { items: ["⚽", "🏀", "🎾", "🍕"], question: "Which is not a ball?", answer: "🍕", options: ["⚽", "🍕", "🏀"] }
+        { items: ["⚽", "🏀", "🎾", "🍕"], question: "Which is not a ball?", answer: "🍕", options: ["⚽", "🍕", "🏀"] },
+        { items: ["✏️", "📖", "🖍️", "🍦"], question: "Which is not a school tool?", answer: "🍦", options: ["✏️", "🍦", "📖"] },
+        { items: ["📱", "💻", "📟", "🍌"], question: "Which is not technology?", answer: "🍌", options: ["💻", "🍌", "📟"] }
     ];
 
     const handleReasoningAnswer = (answer) => {
@@ -397,7 +416,8 @@ const CriticalThinking = ({ ageGroup }) => {
 
                 setTimeout(() => {
                     setReasoningFeedback("");
-                    if (reasoningLevel < 2) {
+                    const maxLevel = isKid ? 2 : 4;
+                    if (reasoningLevel < maxLevel) {
                         setReasoningLevel(prev => prev + 1);
                     } else if (reasoningGame < 2) {
                         setReasoningGame(prev => prev + 1);
@@ -424,7 +444,8 @@ const CriticalThinking = ({ ageGroup }) => {
         { statement: "All birds can fly", answer: false, explanation: "Penguins and ostriches are birds but can't fly! 🐧" },
         { statement: "The sun rises in the east", answer: true, explanation: "Correct! The sun always rises in the east! ☀️" },
         { statement: "Fish can live without water", answer: false, explanation: "Fish need water to breathe! 🐠" },
-        { statement: "Lions are the king of the jungle", answer: true, explanation: "Yes! Lions are called the king of the jungle! 🦁" }
+        { statement: "Lions are the king of the jungle", answer: true, explanation: "Yes! Lions are called the king of the jungle! 🦁" },
+        { statement: "Nigeria is the only country in Africa", answer: false, explanation: "Africa has 54 beautiful countries! 🌍" }
     ];
 
     // Game 2: Number Sequences (What's Missing?)
@@ -432,7 +453,8 @@ const CriticalThinking = ({ ageGroup }) => {
         { sequence: [2, 4, "?", 8, 10], answer: "6", options: ["5", "6", "7"], explanation: "Count by 2s: 2, 4, 6, 8, 10!" },
         { sequence: [1, 3, 5, "?", 9], answer: "7", options: ["6", "7", "8"], explanation: "Odd numbers: 1, 3, 5, 7, 9!" },
         { sequence: [10, 20, 30, "?"], answer: "40", options: ["35", "40", "50"], explanation: "Count by 10s: 10, 20, 30, 40!" },
-        { sequence: [5, 10, 15, "?", 25], answer: "20", options: ["18", "20", "22"], explanation: "Count by 5s: 5, 10, 15, 20, 25!" }
+        { sequence: [5, 10, 15, "?", 25], answer: "20", options: ["18", "20", "22"], explanation: "Count by 5s: 5, 10, 15, 20, 25!" },
+        { sequence: [3, 6, 9, "?", 15], answer: "12", options: ["10", "12", "14"], explanation: "Count by 3s: 3, 6, 9, 12, 15!" }
     ];
 
     // Game 3: If-Then Logic
@@ -460,6 +482,12 @@ const CriticalThinking = ({ ageGroup }) => {
             options: ["Be happy 😊", "Be sad 😢", "Be angry 😠"],
             answer: "Be happy 😊",
             explanation: "Kindness makes people happy!"
+        },
+        {
+            question: "If the sun goes down, it becomes ___",
+            options: ["Dark 🌑", "Bright ☀️", "Cold ❄️"],
+            answer: "Dark 🌑",
+            explanation: "Without the sun, the world becomes dark at night."
         }
     ];
 
@@ -492,7 +520,8 @@ const CriticalThinking = ({ ageGroup }) => {
 
                 setTimeout(() => {
                     setLogicFeedback("");
-                    if (logicLevel < 3) {
+                    const maxLevel = isKid ? 3 : 4;
+                    if (logicLevel < maxLevel) {
                         setLogicLevel(prev => prev + 1);
                     } else if (logicGame < 3) {
                         setLogicGame(prev => prev + 1);
@@ -523,7 +552,8 @@ const CriticalThinking = ({ ageGroup }) => {
         { q: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?", options: ["A Map 🗺️", "A Dream 💭", "A Painting 🎨"], ans: "A Map 🗺️" },
         { q: "The more of this there is, the less you see. What is it?", options: ["Darkness 🌑", "Fog 🌫️", "Light 💡"], ans: "Darkness 🌑" },
         { q: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?", options: ["An Echo 🗣️", "A Ghost 👻", "A Cloud ☁️"], ans: "An Echo 🗣️" },
-        { q: "I have a neck but no head. I have two arms but no hands. What am I?", options: ["A Shirt 👕", "A Tree 🌳", "A River 🌊"], ans: "A Shirt 👕" }
+        { q: "I have a neck but no head. I have two arms but no hands. What am I?", options: ["A Shirt 👕", "A Tree 🌳", "A River 🌊"], ans: "A Shirt 👕" },
+        { q: "What has keys but no locks, and space but no rooms? You can enter, but never leave.", options: ["A Keyboard ⌨️", "A Prison ⛓️", "A Book 📖"], ans: "A Keyboard ⌨️" }
     ];
 
     // Game 2: Animal Sounds (What Animal Makes This Sound?)
@@ -531,7 +561,8 @@ const CriticalThinking = ({ ageGroup }) => {
         { sound: "ROAR!", emoji: "🦁", question: "What animal makes this sound?", options: ["Lion 🦁", "Elephant 🐘", "Monkey 🐒"], ans: "Lion 🦁" },
         { sound: "MOO!", emoji: "🐄", question: "What animal makes this sound?", options: ["Goat 🐐", "Cow 🐄", "Sheep 🐑"], ans: "Cow 🐄" },
         { sound: "TWEET TWEET!", emoji: "🐦", question: "What animal makes this sound?", options: ["Bird 🐦", "Frog 🐸", "Cat 🐱"], ans: "Bird 🐦" },
-        { sound: "HISS!", emoji: "🐍", question: "What animal makes this sound?", options: ["Snake 🐍", "Lion 🦁", "Dog 🐕"], ans: "Snake 🐍" }
+        { sound: "HISS!", emoji: "🐍", question: "What animal makes this sound?", options: ["Snake 🐍", "Lion 🦁", "Dog 🐕"], ans: "Snake 🐍" },
+        { sound: "QUACK!", emoji: "🦆", question: "What animal makes this sound?", options: ["Duck 🦆", "Horse 🐎", "Wolf 🐺"], ans: "Duck 🦆" }
     ];
 
     // Game 3: Rhyme Time (Complete the Rhyme)
@@ -539,7 +570,8 @@ const CriticalThinking = ({ ageGroup }) => {
         { line1: "Twinkle, twinkle, little ___", options: ["Star ⭐", "Car 🚗", "Jar 🏺"], ans: "Star ⭐", hint: "It shines in the sky!" },
         { line1: "The cat sat on the ___", options: ["Mat 🧘", "Bat 🦇", "Hat 🎩"], ans: "Mat 🧘", hint: "You sit or stand on it!" },
         { line1: "I see a big red ___", options: ["Ball ⚽", "Wall 🧱", "Doll 🪆"], ans: "Ball ⚽", hint: "You can throw and catch it!" },
-        { line1: "The sun is very ___", options: ["Hot ☀️", "Pot 🍲", "Dot •"], ans: "Hot ☀️", hint: "It gives us warmth!" }
+        { line1: "The sun is very ___", options: ["Hot ☀️", "Pot 🍲", "Dot •"], ans: "Hot ☀️", hint: "It gives us warmth!" },
+        { line1: "Rain, rain, go ___", options: ["Away 🏃", "Today 📅", "Stay 🏠"], ans: "Away 🏃", hint: "You want it to leave!" }
     ];
 
     const riddles = classicRiddles; // Keep for backward compatibility
@@ -555,7 +587,9 @@ const CriticalThinking = ({ ageGroup }) => {
     const patterns = [
         { seq: ["🔴", "🔵", "🔴", "?"], options: ["🔴", "🔵", "🟢"], ans: "🔵" },
         { seq: ["⭐", "🌙", "⭐", "🌙", "?"], options: ["⭐", "☀️", "🌙"], ans: "⭐" },
-        { seq: ["1", "2", "4", "8", "?"], options: ["10", "12", "16"], ans: "16" }
+        { seq: ["1", "2", "4", "8", "?"], options: ["10", "12", "16"], ans: "16" },
+        { seq: ["🏺", "🥁", "🪘", "🏺", "?"], options: ["🥁", "🪘", "🦁"], ans: "🥁" },
+        { seq: ["A", "B", "D", "G", "?"], options: ["H", "K", "L"], ans: "K" } // A(+1)B(+2)D(+3)G(+4)K
     ];
 
     // --- RIVER CROSSING STATE (Logic) ---
@@ -632,6 +666,22 @@ const CriticalThinking = ({ ageGroup }) => {
             goal: { x: 4, y: 0 },
             obstacles: [{ x: 1, y: 1, type: 'rock' }, { x: 2, y: 2, type: 'rock' }, { x: 3, y: 1, type: 'rock' }],
             lions: [{ x: 2, y: 0 }, { x: 4, y: 2 }]
+        },
+        {
+            id: 4,
+            gridSize: 6,
+            start: { x: 0, y: 0 },
+            goal: { x: 5, y: 5 },
+            obstacles: [{ x: 1, y: 1, type: 'rock' }, { x: 2, y: 2, type: 'rock' }, { x: 3, y: 3, type: 'rock' }, { x: 4, y: 4, type: 'rock' }],
+            lions: [{ x: 5, y: 4 }, { x: 4, y: 5 }, { x: 0, y: 5 }]
+        },
+        {
+            id: 5,
+            gridSize: 6,
+            start: { x: 0, y: 0 },
+            goal: { x: 1, y: 5 },
+            obstacles: [{ x: 1, y: 1, type: 'rock' }, { x: 2, y: 2, type: 'rock' }, { x: 3, y: 3, type: 'rock' }],
+            lions: [{ x: 1, y: 4 }, { x: 2, y: 5 }, { x: 0, y: 4 }]
         }
     ];
 
@@ -679,7 +729,9 @@ const CriticalThinking = ({ ageGroup }) => {
     const fixItChallenges = [
         { problem: "The village well is dry. 💧", solution: "Dig deeper or build a rainwater tank. 🌧️", options: ["Wait for rain 🌧️", "Build a rainwater tank 🏗️", "Move the village 🏃"], correct: 1 },
         { problem: "Goats are eating the crops. 🐐", solution: "Build a fence. 🚧", options: ["Yell at goats 🗣️", "Build a fence 🚧", "Stop planting 🌱"], correct: 1 },
-        { problem: "It's too dark to study at night. 🌑", solution: "Solar lamps. ☀️", options: ["Sleep earlier 😴", "Use solar lamps 💡", "Catch fireflies 🪰"], correct: 1 }
+        { problem: "It's too dark to study at night. 🌑", solution: "Solar lamps. ☀️", options: ["Sleep earlier 😴", "Use solar lamps 💡", "Catch fireflies 🪰"], correct: 1 },
+        { problem: "The market path is muddy. 🌧️", solution: "Lay stones. 🪨", options: ["Stay home 🏠", "Lay stones 🪨", "Swim through 🏊"], correct: 1 },
+        { problem: "Grain is spoiling in the heat. ☀️", solution: "Build a cool silo. 🏺", options: ["Eat it all fast 🍽️", "Build a cool silo 🏺", "Throw it away 🗑️"], correct: 1 }
     ];
 
     // --- PALAVER TREE STATE (EQ) ---
@@ -694,13 +746,17 @@ const CriticalThinking = ({ ageGroup }) => {
     const kidPalaver = [
         { q: "Two friends want the same toy. 🧸", good: "Take turns ⏳", bad: "Grab it 😠", goodRes: "✅ Taking turns is fair! Both friends are happy.", badRes: "❌ Grabbing hurts feelings. Now no one wants to play." },
         { q: "You accidentally broke your sister's drawing. 🖼️", good: "Say sorry & help fix 🩹", bad: "Hide it 🤫", goodRes: "✅ Apologizing shows you care. You can make a new one together!", badRes: "❌ Hiding it breaks trust. It's better to be honest." },
-        { q: "A new student is sitting alone. 🧍", good: "Invite them to play 👋", bad: "Ignore them 😒", goodRes: "✅ Kindness makes new friends! They feel welcome now.", badRes: "❌ Being ignored feels lonely. Be the friend you would want." }
+        { q: "A new student is sitting alone. 🧍", good: "Invite them to play 👋", bad: "Ignore them 😒", goodRes: "✅ Kindness makes new friends! They feel welcome now.", badRes: "❌ Being ignored feels lonely. Be the friend you would want." },
+        { q: "Your friend has a loud tummy because they forgot lunch. 🍱", good: "Share your food 🥖", bad: "Eat in front of them 😋", goodRes: "✅ Ubuntu! Sharing is caring. You made your friend's day better.", badRes: "❌ That's not very kind. Imagine how you would feel if you were hungry." },
+        { q: "You found a shiny coin on the playground. 🪙", good: "Ask who lost it 🙋‍♂️", bad: "Keep it 🏃‍♂️", goodRes: "✅ Honesty is the best policy! The owner will be so happy.", badRes: "❌ Finding isn't always keeping. It's better to be honest." }
     ];
 
     const teenPalaver = [
-        { q: "Your group wants to skip class. You don't. 🏫", good: "Stay & study 📚", bad: "Follow them 🚶", goodRes: "✅ Leadership is standing alone for what's right. Respect earned!", badRes: "❌ Following the crowd into trouble isn't freedom. It's peer pressure." },
-        { q: "You hear a rumor about a friend. 🗣️", good: "Stop the rumor 🛑", bad: "Spread it 📢", goodRes: "✅ Real friends protect each other's names. You showed integrity.", badRes: "❌ Gossip destroys trust. Imagine if it was about you." },
-        { q: "You are angry at your parents. 😡", good: "Talk calmly 🗣️", bad: "Yell & slam door 🚪", goodRes: "✅ Communication solves problems. Yelling creates them.", badRes: "❌ Anger controls you. Calmness controls the situation." }
+        { q: "A friend asks you to help them cheat on a math test. What do you do? 📝", good: "Refuse & Offer to Tutor", bad: "Help them cheat", goodRes: "✅ Integrity is success! You offered a real solution by tutoring. Ubuntu means helping the right way.", badRes: "❌ Cheating hurts both of you in the long run. Real friends don't lead friends into trouble." },
+        { q: "You see a classmate being mocked for their traditional hairstyle or attire. 🎭", good: "Stand by them", bad: "Join the mockery", goodRes: "✅ Pride in heritage is our strength! You showed leadership by defending African culture.", badRes: "❌ Mocking our own roots weakens us all. We should celebrate our diverse identities." },
+        { q: "Your community group is disagreeing on how to spend a small grant. 💰", good: "Listen & Compromise", bad: "Shout to get your way", goodRes: "✅ The Palaver spirit is about consensus. You helped the group move forward in unity!", badRes: "❌ Force is not leadership. In the village square, every voice is heard to find the best path." },
+        { q: "A younger child is being bullied near your house. 🏘️", good: "Intervene & Protect", bad: "Walk away", goodRes: "✅ You are a guardian of the community! Protecting the vulnerable is the mark of a true leader.", badRes: "❌ Silence gives consent to the bully. In a strong community, we look out for one another." },
+        { q: "You made a mistake that cost your team the football match. ⚽", good: "Own it & Apologize", bad: "Blame the referee", goodRes: "✅ Accountability builds respect. Admit your errors, learn, and the team will grow stronger.", badRes: "❌ Blaming others stops growth. True champions take responsibility for their part." }
     ];
 
     // --- DECISION MAKING STATE (Module 5) ---
@@ -713,7 +769,9 @@ const CriticalThinking = ({ ageGroup }) => {
     const habitScenarios = [
         { q: "You're thirsty! What do you drink?", options: [{ txt: "Water 💧", type: "good" }, { txt: "Soda 🥤", type: "bad" }], good: "Hydration Hero! 💧", bad: "Sugar crash coming! 📉" },
         { q: "You found ₦500. What now?", options: [{ txt: "Save it 🐖", type: "good" }, { txt: "Buy sweets 🍬", type: "bad" }], good: "Future Millionaire! 💰", bad: "Money gone! 💸" },
-        { q: "It's late. Bedtime?", options: [{ txt: "Sleep 😴", type: "good" }, { txt: "Play games 🎮", type: "bad" }], good: "Restored Energy! ⚡", bad: "Tired tomorrow... 😴" }
+        { q: "It's late. Bedtime?", options: [{ txt: "Sleep 😴", type: "good" }, { txt: "Play games 🎮", type: "bad" }], good: "Restored Energy! ⚡", bad: "Tired tomorrow... 😴" },
+        { q: "Your homework is due tomorrow.", options: [{ txt: "Do it now 📝", type: "good" }, { txt: "Watch TV 📺", type: "bad" }], good: "Stress-free tomorrow! ✅", bad: "Late night ahead... 😫" },
+        { q: "Brush your teeth?", options: [{ txt: "Every night 🦷", type: "good" }, { txt: "Sometimes 🤷", type: "bad" }], good: "Shiny smile! ✨", bad: "Dentist visit soon! 🦷" }
     ];
 
     // Game 2: Empathy Challenge
@@ -723,7 +781,9 @@ const CriticalThinking = ({ ageGroup }) => {
     const empathyScenarios = [
         { q: "Friend fell down.", options: [{ txt: "Laugh 😂", type: "bad" }, { txt: "Help up 🤝", type: "good" }], good: "Kindness is power! ❤️", bad: "Ouch. That hurts feelings. 💔" },
         { q: "New kid alone.", options: [{ txt: "Say Hello 👋", type: "good" }, { txt: "Ignore 😒", type: "bad" }], good: "New friend made! 🌟", bad: "Loneliness is sad. 😢" },
-        { q: "Sister broke toy.", options: [{ txt: "Forgive 🕊️", type: "good" }, { txt: "Yell 😡", type: "bad" }], good: "Peace maker! 🏳️", bad: "Anger doesn't fix toys. 🧩" }
+        { q: "Sister broke toy.", options: [{ txt: "Forgive 🕊️", type: "good" }, { txt: "Yell 😡", type: "bad" }], good: "Peace maker! 🏳️", bad: "Anger doesn't fix toys. 🧩" },
+        { q: "Friend is sad.", options: [{ txt: "Listen 👂", type: "good" }, { txt: "Leave 🚶", type: "bad" }], good: "A true friend! ❤️", bad: "They missed you. 😢" },
+        { q: "Small child crying.", options: [{ txt: "Find parents 🕵️", type: "good" }, { txt: "Ignore 🚶", type: "bad" }], good: "Hero of the day! 🦸", bad: "Poor little one. 💔" }
     ];
 
     // Handlers
@@ -818,6 +878,24 @@ const CriticalThinking = ({ ageGroup }) => {
             experiment: "Stand outside at 12 PM.",
             observation: "Shadow is tiny! 👣",
             conclusion: "Sun is high, shadow is short."
+        },
+        {
+            q: "Why do we wear light clothes in the heat? ☀️",
+            options: ["To stay cool 🧊", "To look fly 😎"],
+            correct: "To stay cool 🧊",
+            explanation: "Light colors reflect sunlight, keeping you cooler than dark colors.",
+            experiment: "Wear black vs white in the sun.",
+            observation: "Black feels hotter! 🔥",
+            conclusion: "Colors affect heat absorption."
+        },
+        {
+            q: "Can you see air? 🌬️",
+            options: ["Yes 👀", "No 💨"],
+            correct: "No 💨",
+            explanation: "Air is an invisible gas, but we can see it move things like leaves!",
+            experiment: "Blow on a piece of paper.",
+            observation: "Paper moves! 📄",
+            conclusion: "Air exists even if invisible."
         }
     ];
 
@@ -848,6 +926,24 @@ const CriticalThinking = ({ ageGroup }) => {
             experiment: "Drop a ball.",
             observation: "It accelerates down. ⬇️",
             conclusion: "Gravity is a force of attraction."
+        },
+        {
+            q: "Why does iron rust? ⚙️",
+            options: ["Oxidation (Reaction with oxygen) 💨", "It gets old 👴"],
+            correct: "Oxidation (Reaction with oxygen) 💨",
+            explanation: "Rusting is a chemical reaction (oxidation) between iron, oxygen, and moisture.",
+            experiment: "Put a nail in water.",
+            observation: "It turns brown/orange. 🟤",
+            conclusion: "Chemical reactions change matter."
+        },
+        {
+            q: "Why do we have seasons? 🌎",
+            options: ["Earth's tilt 📐", "Clouds blocking sun ☁️"],
+            correct: "Earth's tilt 📐",
+            explanation: "Earth's 23.5-degree tilt means different parts get more sun at different times of the year.",
+            experiment: "Flashlight on a tilted globe.",
+            observation: "Light spreads differently. 🔦",
+            conclusion: "Tilt causes varying solar intensity."
         }
     ];
 
@@ -1343,36 +1439,36 @@ const CriticalThinking = ({ ageGroup }) => {
         teens: [
             {
                 id: 0,
-                title: "The Missing Trophy 🏆",
-                scenario: "The school trophy disappeared overnight. Security footage shows someone in a blue uniform.",
+                title: "The Solar Hub Mystery ☀️",
+                scenario: "The village solar hub stopped working overnight. The fuse was removed. Who could it be?",
                 clues: [
-                    "The thief wore a BLUE uniform.",
-                    "The janitor was cleaning the gym until 10 PM.",
-                    "The coach left at 6 PM (has alibi).",
-                    "The rival team captain was seen near the trophy case at 9 PM."
+                    "The person was seen carrying a yellow tool kit.",
+                    "The Apprentice was fixing a pump at 6 AM (yellow kit).",
+                    "The Guard was on duty but fell asleep at midnight.",
+                    "The Rival Contractor was seen in the area at 10 PM with a blue kit."
                 ],
                 suspects: [
-                    { id: 1, name: "Coach", emoji: "👨‍🏫", detail: "Left early" },
-                    { id: 2, name: "Janitor", emoji: "🧹", detail: "Blue uniform" },
-                    { id: 3, name: "Rival Captain", emoji: "⚽", detail: "Red jersey" }
+                    { id: 1, name: "Guard", emoji: "👮", detail: "Asleep at post" },
+                    { id: 2, name: "Apprentice", emoji: "🛠️", detail: "Yellow tool kit" },
+                    { id: 3, name: "Contractor", emoji: "🏗️", detail: "Blue tool kit" }
                 ],
                 culprit: 2,
                 reward: 150
             },
             {
                 id: 1,
-                title: "Science Fair Sabotage 🧪",
-                scenario: "A chemistry project was destroyed. Chemical residue found: H2O2 (hydrogen peroxide).",
+                title: "The Market Scale Sabotage ⚖️",
+                scenario: "A merchant's scale was tampered with to show extra weight. Tiny magnets were found.",
                 clues: [
-                    "The saboteur used hydrogen peroxide (found in biology lab).",
-                    "Lab partner was home sick (verified by parents).",
-                    "Rival student has access to biology lab (member of science club).",
-                    "Janitor doesn't have keys to chemical storage."
+                    "Magnets were found under the scale pan.",
+                    "The Blacksmith sells magnets (but was at the forge).",
+                    "The Rival Merchant was seen 'checking' the scale at dawn.",
+                    "The Customer claimed the scale was wrong but has no magnets."
                 ],
                 suspects: [
-                    { id: 1, name: "Lab Partner", emoji: "👥", detail: "Sick at home" },
-                    { id: 2, name: "Rival Student", emoji: "🎓", detail: "Science club" },
-                    { id: 3, name: "Janitor", emoji: "🧹", detail: "No chem access" }
+                    { id: 1, name: "Blacksmith", emoji: "⚒️", detail: "At the forge" },
+                    { id: 2, name: "Rival Merchant", emoji: "🧔", detail: "Seen at dawn" },
+                    { id: 3, name: "Customer", emoji: "👩‍🦱", detail: "No magnets" }
                 ],
                 culprit: 2,
                 reward: 200
@@ -1415,7 +1511,43 @@ const CriticalThinking = ({ ageGroup }) => {
                     { id: 3, name: "IT Admin", emoji: "💻", detail: "Green hoodie, logged out" }
                 ],
                 culprit: 2,
+                reward: 200
+            },
+            {
+                id: 1,
+                title: "The Market Scale Sabotage ⚖️",
+                scenario: "A trader is complaining that the community scale is giving wrong weights. Who tampered with it?",
+                clues: [
+                    "A magnet was found stuck under the scale.",
+                    "The Competitor was seen polishing her own scale nearby.",
+                    "The Blacksmith was seen fixing a stall next to the scale.",
+                    "The Customer who bought 50kg of grain had a heavy magnet in his pocket."
+                ],
+                suspects: [
+                    { id: 1, name: "Competitor", emoji: "👩‍🌾" },
+                    { id: 2, name: "Blacksmith", emoji: "🔨" },
+                    { id: 3, name: "Customer", emoji: "🤵" }
+                ],
+                culprit: 3,
                 reward: 250
+            },
+            {
+                id: 2,
+                title: "The Missing Seed Supply 🌱",
+                scenario: "A bag of high-quality seeds went missing from the store. Who took it?",
+                clues: [
+                    "There was a trail of soil leading to the garden.",
+                    "The Gardener was seen late at night 'checking the locks'.",
+                    "The Security Guard has brand new boots but no soil on them.",
+                    "The Neighbor's chicken was found eating seeds near the garden."
+                ],
+                suspects: [
+                    { id: 1, name: "Gardener", emoji: "👨‍🌾" },
+                    { id: 2, name: "Security Guard", emoji: "👮" },
+                    { id: 3, name: "Neighbor", emoji: "👩‍🦳" }
+                ],
+                culprit: 1,
+                reward: 300
             }
         ]
     };

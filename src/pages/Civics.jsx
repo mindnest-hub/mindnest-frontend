@@ -142,9 +142,10 @@ const Civics = ({ ageGroup }) => {
     ];
 
     const teenGovtScenarios = [
-        { q: "Headline: 'President vetos new environmental bill.' Which branch exercised power?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: "The President (Executive) can veto bills passed by the Legislature." },
-        { q: "Headline: 'Court rules new digital tax is unconstitutional.' Which branch decided?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary reviews the constitutionality of laws." },
-        { q: "Headline: 'National Assembly approves 2026 Budget.' Who made the decision?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "The Legislative branch has the 'Power of the Purse' to approve budgets." }
+        { q: "Headline: 'The African Union (AU) proposes a new regional trade agreement.' Who represents your country to sign it?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: "The President or Ministers (Executive) handle international diplomacy and treaties." },
+        { q: "Headline: 'Eco-Activists sue the state over oil spill management in the Delta.' Which branch hears the case?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary (Courts) settle disputes between citizens and the state." },
+        { q: "Headline: 'Parliament debates the new African Continental Free Trade Area (AfCFTA) regulations.' Who is debating?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "The Legislative branch (Parliament/National Assembly) creates and debates national laws." },
+        { q: "You want to petition for a new Youth Center in your district. Which branch of government should you target first?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: "The Executive (Local Government/Ministers) implements projects and manages budgets." }
     ];
 
     const adultGovtScenarios = [
@@ -164,9 +165,9 @@ const Civics = ({ ageGroup }) => {
     ];
 
     const teenRightsLevels = [
-        { title: "Level 1: Digital Rights 📱", desc: "Protecting your presence online.", rights: [{ t: "Data Privacy", d: "Companies must protect your info.", icon: "🔐" }, { t: "Digital Speech", d: "Right to express online without illegal censorship.", icon: "📡" }] },
-        { title: "Level 2: Equality & Justice 🤝", desc: "The pillar of a fair society.", rights: [{ t: "Non-Discrimination", d: "Equal treatment regardless of tribe or gender.", icon: "🌈" }, { t: "Fair Hearing", d: "The right to explain yourself in court.", icon: "⚖️" }] },
-        { title: "Level 3: Right to Education 📚", desc: "The engine of progress.", rights: [{ t: "Quality Learning", d: "Access to standard schools and materials.", icon: "🏢" }, { t: "Scientific Freedom", d: "Right to research and innovate.", icon: "🧪" }] }
+        { title: "Level 1: Digital & Privacy Rights 📱", desc: "Protecting your future in the digital age.", rights: [{ t: "Data Sovereignty", d: "Your right to control how your personal data is stored in Africa.", icon: "🔐" }, { t: "Access to Info", d: "The RIGHT to access government records (FOI Act).", icon: "📡" }] },
+        { title: "Level 2: Equality & Cultural Rights 🌍", desc: "Proudly African, equally protected.", rights: [{ t: "Cultural Identity", d: "Right to practice your culture and speak your native language.", icon: "🎭" }, { t: "Gender Equity", d: "Equal opportunities for all genders in education and work.", icon: "⚖️" }] },
+        { title: "Level 3: Environmental Rights 🍃", desc: "Protecting the land for your children.", rights: [{ t: "Clean Environment", d: "Right to live in a place free from illegal pollution and toxic waste.", icon: "🌳" }, { t: "Sustainable Tech", d: "Right to access green energy and clean water.", icon: "☀️" }] }
     ];
 
     const adultRightsLevels = [
@@ -326,9 +327,9 @@ const Civics = ({ ageGroup }) => {
     ];
 
     const teenRespScenarios = [
-        { q: "You see a classmate being bullied online. What is your civic duty?", a: "Report & Support", options: ["Report & Support", "Laugh along", "Ignore it"], hint: "Digital citizenship means standing up for others in online spaces." },
-        { q: "A protest is happening for a cause you believe in. How do you lead?", a: "Peaceful Action", options: ["Peaceful Action", "Violent Protest", "Doing nothing"], hint: "The right to protest is protected, but keeping it peaceful is a responsibility." },
-        { q: "You discover a way to save water in your school. What do you do?", a: "Propose a plan", options: ["Propose a plan", "Keep it secret", "Waste more"], hint: "Innovation for the common good is a mark of a responsible citizen." }
+        { q: "You discover a local stream is being polluted by a factory. What is your civic duty?", a: "Mobilize & Report", options: ["Mobilize & Report", "Wait for others", "Ignore it"], hint: "The 'Ubuntu' spirit means protecting the community's resources together." },
+        { q: "The National Anthem is playing at a public event. How do you respond?", a: "Stand Respectfully", options: ["Stand Respectfully", "Keep walking", "Talk loudly"], hint: "Respecting national symbols shows unity and patriotism." },
+        { q: "A younger student is being excluded from a game because of their tribe. Action?", a: "Include & Educate", options: ["Include & Educate", "Walk away", "Join the exclusion"], hint: "Promoting Pan-African unity starts with ending discrimination in our own circles." }
     ];
 
     const adultRespScenarios = [

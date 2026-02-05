@@ -7,12 +7,12 @@ const MODULE_CAPS = {
     history: 2000,
     finance: 2000,
     tech: 2000,
-    agri: 1500,
+    agri: 2000,
     civics: 2000,
     health: 1500,
     criticalThinking: 2000
 };
-const DEFAULT_CAP = 1500;
+const DEFAULT_CAP = 2000;
 const WITHDRAWAL_LIMIT = 5000;
 
 export const useWallet = () => {
