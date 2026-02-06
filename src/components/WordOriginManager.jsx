@@ -65,7 +65,7 @@ const WordOriginManager = ({ ageGroup }) => {
                     onClick={handleOpen}
                     style={{
                         position: 'fixed',
-                        bottom: '100px',
+                        bottom: '160px',
                         right: '20px',
                         backgroundColor: '#FFD700',
                         color: '#000',

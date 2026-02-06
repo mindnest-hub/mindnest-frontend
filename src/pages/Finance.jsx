@@ -456,7 +456,7 @@ const Finance = ({ ageGroup }) => {
     if (type === 'coin') {
       setCoinScore(prev => {
         const newScore = prev + 1;
-        const target = coinTargets[subStage];
+        const target = coinTargets[Math.min(subStage, isKid ? 2 : 4)];
         if (newScore >= target) {
           setIsCoinGameActive(false);
           const reward = subStage === 2 ? 40 : 30;
@@ -998,10 +998,10 @@ const Finance = ({ ageGroup }) => {
   const [taxPaid, setTaxPaid] = useState(0);
 
   const handlePayTax = () => {
-    const buildings = ['School 🏫', 'Road 🛣️', 'Hospital 🏥'];
-    // Stage 0: School, Stage 1: Road, Stage 2: Hospital
+    const buildings = ['School 🏫', 'Road 🛣️', 'Hospital 🏥', 'Library 📚', 'Solar Farm ☀️'];
+    // Stage 0: School, Stage 1: Road, Stage 2: Hospital, Stage 3: Library, Stage 4: Solar Farm
 
-    if (subStage < 3) {
+    if (subStage < (isKid ? 3 : 5)) {
       setCityBuildings([...cityBuildings, buildings[subStage]]);
       setTaxPaid(prev => prev + 1);
 
@@ -1029,7 +1029,7 @@ const Finance = ({ ageGroup }) => {
 
           {tradeStep === 1 && (
             <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.75rem', marginTop: '1rem' }}>
-              {tradeScenarios[Math.min(subStage, 2)].options.map((opt, idx) => (
+              {tradeScenarios[Math.min(subStage, isKid ? 2 : 4)].options.map((opt, idx) => (
                 <button key={idx} onClick={() => handleTrade(opt)} className="btn btn-outline" style={{ padding: '0.75rem' }}>
                   {opt}
                 </button>
@@ -1506,7 +1506,7 @@ const Finance = ({ ageGroup }) => {
             {/* Check Budget Button */}
             <button
               className="btn"
-              onClick={handleBudgetCheck}
+              onClick={checkBudget}
               style={{
                 width: '100%',
                 background: 'linear-gradient(135deg, #00C851 0%, #00E676 100%)',
@@ -1971,8 +1971,8 @@ const Finance = ({ ageGroup }) => {
       desc: "Diversify to survive.",
       content: (
         <div>
-          <p><strong>Scenario {Math.min(riskStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {riskStages[Math.min(riskStage, 4)].title}</p>
-          <p><em>{riskStages[riskStage].desc}</em></p>
+          <p><strong>Scenario {Math.min(riskStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {riskStages[Math.min(riskStage, 2)].title}</p>
+          <p><em>{riskStages[Math.min(riskStage, 2)].desc}</em></p>
 
           <div style={{ margin: '1.5rem 0' }}>
             <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>

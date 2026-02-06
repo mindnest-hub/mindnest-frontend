@@ -307,7 +307,7 @@ const Chatbot = () => {
                     display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}
             >
-                {isOpen ? '✕' : '🤖'}
+                {isOpen ? '✕' : '💬'}
             </button>
 
             {isOpen && (
@@ -328,7 +328,7 @@ const Chatbot = () => {
                     {/* Header */}
                     <div style={{ padding: '1rem', borderBottom: '1px solid #333', backgroundColor: 'var(--color-primary)', borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem', color: '#fff' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>MindNest Consultant 🤖</h3>
+                            <h3 style={{ margin: 0 }}>MindNest Consultant ✨</h3>
                             <button
                                 onClick={() => setShowHistory(!showHistory)}
                                 style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '1.2rem' }}
