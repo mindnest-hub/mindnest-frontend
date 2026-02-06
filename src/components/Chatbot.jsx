@@ -136,7 +136,7 @@ const Chatbot = () => {
     const topics = [
         { id: 'rights', label: '⚖️ Legal Rights', prompt: 'legal rights and police procedures' },
         { id: 'land', label: '🏠 Land & Property', prompt: 'land titles, verification, and property scams' },
-        { id: 'traffic', label: '🚦 Traffic Safety', prompt: 'traffic laws, road safety, and police stops' },
+        { id: 'chat', label: '💬 Let\'s Chat', prompt: 'general conversation, educational guidance, and MindNest features' },
         { id: 'invest', label: '📈 Investment', prompt: 'real estate investment and financial growth' }
     ];
 
@@ -225,7 +225,7 @@ const Chatbot = () => {
 
             if (isInappropriate) {
                 setMessages(prev => [...prev, {
-                    text: "I'm here to help with educational topics like legal rights, property verification, traffic safety, and investment advice. Please keep questions appropriate and on-topic.",
+                    text: "I'm here to help with educational topics like legal rights, property verification, and investment advice, or we can just have a general chat. Please keep questions appropriate and on-topic.",
                     sender: 'bot'
                 }]);
                 setIsLoading(false);
@@ -239,8 +239,8 @@ const Chatbot = () => {
 
                     if (topic === 'land') {
                         mockResponse += "Key points about land verification:\n\n1. **Certificate of Occupancy (C of O)**: Always verify it's genuine at the Land Registry\n2. **Survey Plan**: Must match current coordinates\n3. **Payment**: Never pay cash - use bank transfers for accountability\n4. **Due Diligence**: Check for family disputes or government acquisition\n\nNeed help verifying a specific property? Let me know!";
-                    } else if (topic === 'traffic') {
-                        mockResponse += "Your rights at traffic stops:\n\n1. **Stop safely**: Pull over when signaled\n2. **Show documents**: License, registration, insurance\n3. **No bribes**: Politely decline and ask for a ticket\n4. **Record details**: Officer's name, badge number, time\n\nBeen stopped unfairly? I can guide you through the complaint process.";
+                    } else if (topic === 'chat') {
+                        mockResponse += "I'm happy to chat! MindNest is all about helping you reclaim your past and build your future.\n\nHow can I help you today? We can discuss:\n- **History**: Discover untold African stories\n- **Wealth**: Learn about money and assets\n- **Growth**: Sharpen your critical thinking skills\n\nWhat's on your mind?";
                     } else if (topic === 'invest') {
                         mockResponse += "Smart investment principles:\n\n1. **Diversify**: Don't put all funds in one asset\n2. **Verify**: Especially for real estate - check documents\n3. **Long-term**: Best returns come from patience\n4. **Professional advice**: Consult verified experts\n\nInterested in real estate investment? I can explain the verification process.";
                     } else {
