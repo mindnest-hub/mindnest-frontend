@@ -1028,9 +1028,21 @@ const Finance = ({ ageGroup }) => {
           )}
 
           {tradeStep === 1 && (
-            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.75rem', marginTop: '1rem' }}>
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
               {tradeScenarios[Math.min(subStage, isKid ? 2 : 4)].options.map((opt, idx) => (
-                <button key={idx} onClick={() => handleTrade(opt)} className="btn btn-outline" style={{ padding: '0.75rem' }}>
+                <button
+                  key={idx}
+                  onClick={() => handleTrade(opt)}
+                  className="btn btn-outline"
+                  style={{
+                    padding: '1rem',
+                    minHeight: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.95rem'
+                  }}
+                >
                   {opt}
                 </button>
               ))}
@@ -1079,22 +1091,25 @@ const Finance = ({ ageGroup }) => {
           {/* Score Display */}
           <div style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             alignItems: 'center',
-            marginBottom: '1.25rem',
-            flexWrap: 'wrap',
-            gap: '0.75rem'
+            marginBottom: '1.5rem',
+            gap: '1rem',
+            minHeight: '80px'
           }}>
             <div style={{
               backgroundColor: '#1a1a1a',
-              padding: '0.85rem 1.35rem',
-              borderRadius: '10px',
+              padding: '0.85rem 1.5rem',
+              borderRadius: '12px',
               border: '2px solid #00C851',
-              flex: '1 1 150px',
-              boxShadow: '0 2px 10px rgba(0,200,81,0.2)'
+              boxShadow: '0 2px 10px rgba(0,200,81,0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              minWidth: '140px'
             }}>
-              <div style={{ fontSize: '0.7rem', color: '#aaa', marginBottom: '0.2rem', fontWeight: '600' }}>💰 SAVINGS</div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 'bold', color: '#00C851' }}>
+              <div style={{ fontSize: '0.75rem', color: '#aaa', marginBottom: '0.2rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💰 SAVINGS</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#00C851' }}>
                 {coinScore}/{coinTargets[Math.min(subStage, 2)] || 10}
               </div>
             </div>
@@ -1103,14 +1118,15 @@ const Finance = ({ ageGroup }) => {
               <div style={{
                 backgroundColor: '#FFD700',
                 color: '#000',
-                padding: '0.65rem 1.15rem',
-                borderRadius: '10px',
-                fontWeight: 'bold',
+                padding: '0.8rem 1.2rem',
+                borderRadius: '12px',
+                fontWeight: '900',
                 animation: 'pulse 0.6s ease-in-out infinite',
-                flex: '0 1 auto',
-                boxShadow: '0 4px 15px rgba(255,215,0,0.4)'
+                fontSize: '0.9rem',
+                boxShadow: '0 4px 15px rgba(255,215,0,0.4)',
+                whiteSpace: 'nowrap'
               }}>
-                🔥 SAVING STREAK!
+                🔥 STREAK!
               </div>
             )}
           </div>
@@ -1601,14 +1617,17 @@ const Finance = ({ ageGroup }) => {
                 onClick={() => handleShopChoice(item)}
                 className="card"
                 style={{
-                  padding: '1rem', border: '2px solid var(--color-border)',
+                  padding: '1.5rem', border: '2px solid var(--color-border)',
                   backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem',
+                  minHeight: '180px',
+                  justifyContent: 'center',
+                  transition: 'all 0.3s'
                 }}
               >
-                <span style={{ fontSize: '2rem' }}>{idx === 0 ? '📦' : '📦📦'}</span>
-                <strong>{item.name}</strong>
-                <span style={{ color: 'var(--color-primary)' }}>₦{item.price}</span>
+                <span style={{ fontSize: '2.5rem' }}>{idx === 0 ? '📦' : '📦📦'}</span>
+                <strong style={{ fontSize: '1.1rem' }}>{item.name}</strong>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '1.2rem' }}>₦{item.price}</span>
               </button>
             ))}
           </div>
@@ -1636,9 +1655,9 @@ const Finance = ({ ageGroup }) => {
           ) : (
             <div style={{ textAlign: 'center', marginTop: '1rem' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem', animation: 'popIn 0.5s' }}>{currentSafeItem?.name}</div>
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <button onClick={() => handleSafeSort('bank')} className="btn btn-primary" style={{ flex: '1 1 120px' }}>Bank 🏦</button>
-                <button onClick={() => handleSafeSort('mattress')} className="btn btn-outline" style={{ flex: '1 1 120px' }}>Home 🏠</button>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button onClick={() => handleSafeSort('bank')} className="btn btn-primary" style={{ flex: '1 1 140px', height: '54px', fontSize: '1.1rem' }}>Bank 🏦</button>
+                <button onClick={() => handleSafeSort('mattress')} className="btn btn-outline" style={{ flex: '1 1 140px', height: '54px', fontSize: '1.1rem' }}>Home 🏠</button>
               </div>
               <p style={{ marginTop: '1rem' }}>Score: {safeScore}/5</p>
             </div>
@@ -1656,19 +1675,37 @@ const Finance = ({ ageGroup }) => {
           <p>{careerLevels[careerStep].desc}</p>
           <p><strong>Goal:</strong> {careerLevels[careerStep].task}</p>
 
-          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-            <div style={{ flex: '1 1 150px', borderRight: '1px solid var(--color-border)', textAlign: 'center', padding: '1rem' }}>
-              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>{careerStep === 0 ? '☕' : careerStep === 1 ? '👔' : '🚀'}</div>
-              <p>Current: {careerLevels[careerStep].title.split(' ')[0]}</p>
+          <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1.5rem', flexWrap: 'wrap', alignItems: 'stretch' }}>
+            <div style={{
+              flex: '1 1 180px',
+              border: '2px solid var(--color-border)',
+              textAlign: 'center',
+              padding: '1.5rem',
+              borderRadius: '15px',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
+            }}>
+              <div style={{ fontSize: '4.5rem', marginBottom: '1rem' }}>{careerStep === 0 ? '☕' : careerStep === 1 ? '👔' : careerStep === 2 ? '🏢' : careerStep === 3 ? '🚀' : '🦄'}</div>
+              <p style={{ margin: 0, fontWeight: 'bold', color: 'var(--color-primary)' }}>Current: {careerLevels[careerStep].title.split(' ')[0]}</p>
             </div>
-            <div style={{ flex: '2 1 200px' }}>
-              <p style={{ marginBottom: '1rem' }}>Choose your action:</p>
+            <div style={{ flex: '2 1 250px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <p style={{ marginBottom: '0.25rem', fontWeight: 'bold', opacity: 0.8 }}>Choose your action:</p>
               {careerLevels[careerStep].options.map((opt, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleCareerChoice(opt.type)}
                   className="btn btn-outline"
-                  style={{ width: '100%', marginBottom: '0.75rem' }}
+                  style={{
+                    width: '100%',
+                    padding: '1rem',
+                    minHeight: '60px',
+                    fontSize: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
                 >
                   {opt.txt}
                 </button>
@@ -1697,7 +1734,7 @@ const Finance = ({ ageGroup }) => {
           <div style={{ backgroundColor: '#2c2c2c', padding: '1.5rem', borderRadius: '15px', marginTop: '1rem', border: '1px solid var(--color-primary)' }}>
             <h4 style={{ color: 'var(--color-primary)', marginTop: 0 }}>Year {investStages[investYear].year} Strategy 🌳</h4>
 
-            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
               {investStages[investYear].options
                 .filter(opt => !(isKid && opt.name === "Tech Stock 💻")) // Filter out for kids
                 .map((opt, idx) => (
@@ -1706,13 +1743,16 @@ const Finance = ({ ageGroup }) => {
                     onClick={() => handleInvestChoice(opt.risk)}
                     className="card"
                     style={{
-                      padding: '1rem', border: '1px solid var(--color-border)',
+                      padding: '1.25rem', border: '2px solid var(--color-border)',
                       backgroundColor: 'var(--color-surface)', color: 'white', cursor: 'pointer',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem'
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem',
+                      minHeight: '140px',
+                      justifyContent: 'center',
+                      transition: 'all 0.3s'
                     }}
                   >
-                    <span style={{ fontSize: '1.5rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
-                    <strong>{opt.name}</strong>
+                    <span style={{ fontSize: '2rem' }}>{opt.name.split(' ')[opt.name.split(' ').length - 1]}</span>
+                    <strong style={{ textAlign: 'center' }}>{opt.name}</strong>
                   </button>
                 ))}
             </div>
@@ -1776,25 +1816,27 @@ const Finance = ({ ageGroup }) => {
           <p><strong>Stage {Math.min(debtStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {debtStages[Math.min(debtStage, 4)].title}</p>
           <p>Sharpen your sword! Slash <strong>{debtStages[debtStage].target === 'bad' ? 'BAD DEBT' : 'BAD DEBT'}</strong>.</p>
 
-          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+          <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
             {debtStages[debtStage].items.map((item, idx) => (
               <button
                 key={idx}
                 onClick={() => handleDebtAction(item.type)}
                 className="btn"
                 style={{
-                  minHeight: '140px',
-                  padding: '1rem',
+                  minHeight: '160px',
+                  padding: '1.5rem',
                   fontSize: '1rem',
-                  lineHeight: '1.2',
-                  backgroundColor: '#333',
+                  lineHeight: '1.3',
+                  backgroundColor: '#1a1a1a',
                   border: '2px solid #555',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  borderRadius: '15px',
+                  transition: 'all 0.3s'
                 }}
               >
-                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{item.name.split(' ').pop()}</div>
-                <div style={{ fontWeight: 'bold' }}>{item.name.replace(item.name.split(' ').pop(), '')}</div>
+                <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>{item.name.split(' ').pop()}</div>
+                <div style={{ fontWeight: 'bold', width: '100%' }}>{item.name.replace(item.name.split(' ').pop(), '')}</div>
               </button>
             ))}
           </div>
@@ -1832,13 +1874,19 @@ const Finance = ({ ageGroup }) => {
             </div>
           </div>
 
-          <div style={{ marginTop: '1rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+          <div style={{ marginTop: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
             {rainStages[rainStage].options.map((opt, idx) => (
               <button
                 key={idx}
                 onClick={() => handleRainChoice(opt)}
-                className="btn"
-                style={{ backgroundColor: '#444' }}
+                className="btn btn-outline"
+                style={{
+                  minHeight: '60px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '1rem'
+                }}
               >
                 {opt}
               </button>
@@ -1856,9 +1904,9 @@ const Finance = ({ ageGroup }) => {
           <p><strong>Stage {Math.min(scamStep, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> {scamLevels[Math.min(scamStep, 4)].title}</p>
           <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
             <p style={{ fontSize: '1.2rem', margin: '1rem 0', fontFamily: 'monospace' }}>"{scamLevels[scamStep].text}"</p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <button className="btn" style={{ flex: 1, backgroundColor: '#ff4444' }} onClick={() => handleScamGuess(true)}>Scam! ❌</button>
-              <button className="btn" style={{ flex: 1, backgroundColor: '#00C851' }} onClick={() => handleScamGuess(false)}>Safe ✅</button>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
+              <button className="btn" style={{ flex: 1, backgroundColor: '#ff4444', height: '54px', fontSize: '1.1rem', fontWeight: 'bold' }} onClick={() => handleScamGuess(true)}>Scam! ❌</button>
+              <button className="btn" style={{ flex: 1, backgroundColor: '#00C851', height: '54px', fontSize: '1.1rem', fontWeight: 'bold' }} onClick={() => handleScamGuess(false)}>Safe ✅</button>
             </div>
           </div>
         </div>
@@ -1877,20 +1925,20 @@ const Finance = ({ ageGroup }) => {
             border: '2px solid #00C851', borderRadius: '20px', overflow: 'hidden', padding: '1.5rem',
             backgroundColor: 'rgba(0,200,81,0.05)', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem'
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
               {assetStages[assetStage].items.map((item, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleAssetAction(item)}
                   className="card"
                   style={{
-                    backgroundColor: '#333', border: '1px solid #555', padding: '1rem',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
-                    transition: 'transform 0.2s', minHeight: '120px'
+                    backgroundColor: '#1a1a1a', border: '2px solid #444', padding: '1.5rem',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem',
+                    transition: 'all 0.3s', minHeight: '140px', justifyContent: 'center'
                   }}
                 >
-                  <div style={{ fontSize: '2.5rem' }}>{typeof item === 'string' ? item.split(' ').pop() : item.name.split(' ').pop()}</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{typeof item === 'string' ? item.replace(item.split(' ').pop(), '') : item.name.replace(item.name.split(' ').pop(), '')}</div>
+                  <div style={{ fontSize: '2.8rem' }}>{typeof item === 'string' ? item.split(' ').pop() : item.name.split(' ').pop()}</div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 'bold', textAlign: 'center' }}>{typeof item === 'string' ? item.replace(item.split(' ').pop(), '') : item.name.replace(item.name.split(' ').pop(), '')}</div>
                 </button>
               ))}
             </div>
@@ -1916,10 +1964,10 @@ const Finance = ({ ageGroup }) => {
             {freedomStep > 1 && <p style={{ color: '#00C851' }}>Passive Income: ₦{passiveIncome}</p>}
           </div>
 
-          <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem' }}>
-            <button onClick={() => handleFreedomAction('work')} className="btn" style={{ backgroundColor: '#4285F4', opacity: freedomStep === 0 ? 1 : 0.5, border: '1px solid #fff' }}>Work 🔨</button>
-            <button onClick={() => handleFreedomAction('invest')} className="btn" style={{ backgroundColor: '#FF8800', opacity: freedomStep === 1 ? 1 : 0.5, border: '1px solid #fff' }}>Invest 🧠</button>
-            <button onClick={() => handleFreedomAction('relax')} className="btn" style={{ backgroundColor: '#00C851', opacity: freedomStep === 2 ? 1 : 0.5, border: '1px solid #fff' }}>Relax 🕊️</button>
+          <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
+            <button onClick={() => handleFreedomAction('work')} className="btn" style={{ backgroundColor: '#4285F4', opacity: freedomStep === 0 ? 1 : 0.5, border: '1px solid #fff', height: '60px', fontWeight: 'bold' }}>Work 🔨</button>
+            <button onClick={() => handleFreedomAction('invest')} className="btn" style={{ backgroundColor: '#FF8800', opacity: freedomStep === 1 ? 1 : 0.5, border: '1px solid #fff', height: '60px', fontWeight: 'bold' }}>Invest 🧠</button>
+            <button onClick={() => handleFreedomAction('relax')} className="btn" style={{ backgroundColor: '#00C851', opacity: freedomStep === 2 ? 1 : 0.5, border: '1px solid #fff', height: '60px', fontWeight: 'bold' }}>Relax 🕊️</button>
           </div>
         </div>
       )
@@ -1932,12 +1980,13 @@ const Finance = ({ ageGroup }) => {
         <div>
           <p><strong>Stage {Math.min(subStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> Taxes build our community. Watch it grow!</p>
           <div style={{
-            height: '150px', backgroundColor: '#222', borderRadius: '20px', border: '1px solid #555',
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', padding: '1rem', marginBottom: '1rem'
+            height: '180px', backgroundColor: '#1a1a1a', borderRadius: '24px', border: '2px dashed #444',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '1.5rem', marginBottom: '1.5rem',
+            gap: '1.5rem'
           }}>
-            {cityBuildings.length === 0 && <p style={{ color: '#aaa', alignSelf: 'center' }}>Empty Land waiting for development...</p>}
+            {cityBuildings.length === 0 && <p style={{ color: '#aaa', alignSelf: 'center', fontStyle: 'italic' }}>Building a legacy...</p>}
             {cityBuildings.map((b, i) => (
-              <div key={i} style={{ fontSize: '3rem', animation: 'popIn 0.5s' }}>{b.split(' ')[1]}</div>
+              <div key={i} style={{ fontSize: '3.5rem', animation: 'popIn 0.5s', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.3))' }}>{b.split(' ')[1]}</div>
             ))}
           </div>
 
@@ -1975,32 +2024,34 @@ const Finance = ({ ageGroup }) => {
           <p><em>{riskStages[Math.min(riskStage, 2)].desc}</em></p>
 
           <div style={{ margin: '1.5rem 0' }}>
-            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1.5rem' }}>
               <button
                 onClick={() => handleRiskAction('single')}
                 className="card"
                 disabled={riskFeedback !== ""}
                 style={{
-                  padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
-                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
-                  opacity: riskFeedback.includes('Poor harvest') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
+                  padding: '2rem', border: '2px solid #555', backgroundColor: '#1a1a1a',
+                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '1rem',
+                  opacity: riskFeedback.includes('Poor harvest') ? 1 : (riskFeedback !== "" ? 0.3 : 1),
+                  transition: 'all 0.3s', minHeight: '200px', justifyContent: 'center', borderRadius: '20px'
                 }}
               >
-                <div style={{ fontSize: '3rem' }}>🌽</div>
-                <strong>Sell Only Corn</strong>
+                <div style={{ fontSize: '3.5rem' }}>🌽</div>
+                <strong style={{ fontSize: '1.1rem' }}>Sell Only Corn</strong>
               </button>
               <button
                 onClick={() => handleRiskAction('diverse')}
                 className="card"
                 disabled={riskFeedback !== ""}
                 style={{
-                  padding: '1.5rem', border: '2px solid #555', backgroundColor: '#333',
-                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '0.5rem',
-                  opacity: riskFeedback.includes('Safe') || riskFeedback.includes('Survival') ? 1 : (riskFeedback !== "" ? 0.3 : 1)
+                  padding: '2rem', border: '2px solid #555', backgroundColor: '#1a1a1a',
+                  flexDirection: 'column', alignItems: 'center', display: 'flex', gap: '1rem',
+                  opacity: riskFeedback.includes('Safe') || riskFeedback.includes('Survival') ? 1 : (riskFeedback !== "" ? 0.3 : 1),
+                  transition: 'all 0.3s', minHeight: '200px', justifyContent: 'center', borderRadius: '20px'
                 }}
               >
-                <div style={{ fontSize: '3rem' }}>🛍️</div>
-                <strong>Mixed Goods</strong>
+                <div style={{ fontSize: '3.5rem' }}>🛍️</div>
+                <strong style={{ fontSize: '1.1rem' }}>Mixed Goods</strong>
               </button>
             </div>
           </div>
@@ -2153,15 +2204,15 @@ const Finance = ({ ageGroup }) => {
         ← Back to Hub
       </button>
 
-      <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '800px', margin: '0 auto 3rem auto' }}>
-        <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>
+      <header style={{ marginBottom: '2rem', textAlign: 'center', width: '100%', maxWidth: '800px', margin: '0 auto 3rem auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <h1 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem', width: '100%' }}>
           {isKid || isTeen ? "Path to Wealth 🚀" : "Financial Literacy 💰"}
         </h1>
-        <p style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', color: 'var(--color-text-muted)' }}>
+        <p style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)', color: 'var(--color-text-muted)', width: '100%' }}>
           {isKid || isTeen ? "Level Up & Earn Real Cash!" : "Master the Rules of Money"}
         </p>
-        <div style={{ display: 'inline-block', padding: '0.4rem 1rem', border: '1px solid var(--color-primary)', borderRadius: '20px', marginTop: '1rem', color: 'var(--color-primary)', fontSize: '0.9rem' }}>
-          Mode: {ageGroup || 'Adults'}
+        <div style={{ display: 'inline-flex', padding: '0.4rem 1.2rem', border: '1px solid var(--color-primary)', borderRadius: '20px', marginTop: '1rem', color: 'var(--color-primary)', fontSize: '0.9rem', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ opacity: 0.7 }}>Mode:</span> <strong>{ageGroup || 'Adults'}</strong>
         </div>
       </header>
       {(isKid || isTeen) ? (
@@ -2231,20 +2282,28 @@ const Finance = ({ ageGroup }) => {
             background: 'linear-gradient(135deg, #00C851 0%, #007E33 100%)',
             padding: '2rem', borderRadius: '24px', color: 'white', marginBottom: '2rem',
             boxShadow: '0 10px 30px rgba(0,200,81,0.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            flexWrap: 'wrap', gap: '1.5rem'
+            flexWrap: 'wrap', gap: '1.5rem', border: '1px solid rgba(255,255,255,0.1)'
           }}>
-            <div>
-              <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>Finance Wallet Balance</p>
-              <h2 style={{ fontSize: '2.5rem', margin: 0 }}>₦{moduleBalances.finance || 0}</h2>
-              <p style={{ fontSize: '0.8rem', opacity: 0.8 }}>Goal: ₦{WITHDRAWAL_LIMIT}</p>
+            <div style={{ flex: '1 1 200px' }}>
+              <p style={{ fontSize: '0.9rem', opacity: 0.9, marginBottom: '0.25rem' }}>Finance Wallet Balance</p>
+              <h2 style={{ fontSize: '2.8rem', margin: 0, fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                ₦{moduleBalances.finance || 0}
+              </h2>
+              <p style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <span>🎯 Goal:</span> <strong>₦{WITHDRAWAL_LIMIT}</strong>
+              </p>
             </div>
             <button
               onClick={() => setShowWithdrawModal(true)}
               disabled={(moduleBalances.finance || 0) < WITHDRAWAL_LIMIT}
               style={{
-                backgroundColor: 'white', color: '#007E33', border: 'none', padding: '0.8rem 1.5rem',
+                backgroundColor: 'white', color: '#007E33', border: 'none', padding: '1rem 2rem',
                 borderRadius: '30px', fontWeight: 'bold', cursor: (moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? 'pointer' : 'not-allowed',
-                opacity: (moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? 1 : 0.5
+                opacity: (moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? 1 : 0.7,
+                transition: 'all 0.3s',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                fontSize: '1.1rem',
+                minWidth: '160px'
               }}
             >
               {(moduleBalances.finance || 0) >= WITHDRAWAL_LIMIT ? "Withdraw 🏦" : "Locked 🔒"}
@@ -2264,12 +2323,18 @@ const Finance = ({ ageGroup }) => {
                   {!verificationStatus || verificationStatus === 'idle' ? (
                     <>
                       <p>To ensure secure transactions, we must verify your identity and wealth records.</p>
-                      <div style={{ backgroundColor: '#333', padding: '1rem', borderRadius: '10px', margin: '1rem 0', textAlign: 'left' }}>
-                        <p style={{ margin: '0.4rem 0' }}>📋 <strong>Requirement 1:</strong> Balance ≥ ₦{WITHDRAWAL_LIMIT} ✅</p>
-                        <p style={{ margin: '0.4rem 0' }}>📜 <strong>Requirement 2:</strong> History Wallet ≥ ₦2,000 {moduleBalances.history >= 2000 ? '✅' : '❌'}</p>
-                        <p style={{ margin: '0.4rem 0' }}>🏗️ <strong>Requirement 3:</strong> Active Investments {(portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0) ? '✅' : '❌'}</p>
+                      <div style={{ backgroundColor: '#1a1a1a', padding: '1.5rem', borderRadius: '15px', margin: '1.5rem 0', textAlign: 'left', border: '1px solid #333' }}>
+                        <p style={{ margin: '0.6rem 0', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                          <span style={{ fontSize: '1.2rem' }}>📋</span> <strong>Requirement 1:</strong> Balance ≥ ₦{WITHDRAWAL_LIMIT} <span style={{ color: '#00C851', marginLeft: 'auto', fontWeight: 'bold' }}>✅</span>
+                        </p>
+                        <p style={{ margin: '0.6rem 0', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                          <span style={{ fontSize: '1.2rem' }}>📜</span> <strong>Requirement 2:</strong> History Wallet ≥ ₦2,000 <span style={{ color: moduleBalances.history >= 2000 ? '#00C851' : '#ff4444', marginLeft: 'auto', fontWeight: 'bold' }}>{moduleBalances.history >= 2000 ? '✅' : '❌'}</span>
+                        </p>
+                        <p style={{ margin: '0.6rem 0', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                          <span style={{ fontSize: '1.2rem' }}>🏗️</span> <strong>Requirement 3:</strong> Active Investments <span style={{ color: (portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0) ? '#00C851' : '#ff4444', marginLeft: 'auto', fontWeight: 'bold' }}>{(portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0) ? '✅' : '❌'}</span>
+                        </p>
                       </div>
-                      <div style={{ display: 'flex', gap: '1rem' }}>
+                      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                         <button
                           onClick={() => {
                             const hasInvestments = portfolio.bitcoin > 0 || portfolio.stocks > 0 || portfolio.realEstate > 0 || portfolio.bankFixed > 0;
@@ -2281,11 +2346,11 @@ const Finance = ({ ageGroup }) => {
                             }
                           }}
                           className="btn"
-                          style={{ backgroundColor: '#00C851', flex: 1 }}
+                          style={{ backgroundColor: '#00C851', flex: 1, padding: '1rem', fontWeight: 'bold' }}
                         >
-                          Start Verification 🕵️‍♂️
+                          Verify Records 🕵️‍♂️
                         </button>
-                        <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Cancel</button>
+                        <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#333', flex: 1, padding: '1rem', border: '1px solid #555' }}>Cancel</button>
                       </div>
                     </>
 
