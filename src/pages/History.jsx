@@ -759,13 +759,25 @@ const History = ({ ageGroup }) => {
                             {currentQuestion && (
                                 <>
                                     <p style={{ fontSize: '1.25rem', margin: '1rem 0' }}>Where is <strong>{currentQuestion.resource}</strong> found?</p>
-                                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem' }}>
+                                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
                                         {currentQuestion.options.map((opt, i) => (
                                             <button
                                                 key={i}
                                                 onClick={() => handleGameAnswer(opt)}
                                                 className="btn btn-outline"
-                                                style={{ padding: '0.75rem' }}
+                                                style={{
+                                                    padding: '0.5rem',
+                                                    minHeight: '70px',
+                                                    fontSize: '0.95rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    textAlign: 'center',
+                                                    lineHeight: '1.2',
+                                                    whiteSpace: 'normal',
+                                                    wordWrap: 'break-word',
+                                                    width: '100%'
+                                                }}
                                             >
                                                 {opt}
                                             </button>
