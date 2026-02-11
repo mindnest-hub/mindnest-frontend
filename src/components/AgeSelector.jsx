@@ -29,16 +29,19 @@ const AgeSelector = ({ onSelect }) => {
                 margin: '0 auto',
                 minHeight: 'fit-content'
             }}>
-                <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', marginBottom: '1rem', color: 'var(--color-primary)' }}>Welcome to MindNest</h2>
+                <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', marginBottom: '0.5rem', color: 'var(--color-primary)', lineHeight: '1.2' }}>
+                    MindNest<br />
+                    <span style={{ fontSize: '0.6em', color: 'var(--color-text)', display: 'block', marginTop: '0.5rem', fontWeight: '400' }}>Building Africa’s Youth Readiness Infrastructure</span>
+                </h2>
                 <p style={{
                     fontSize: 'clamp(1rem, 3.5vw, 1.25rem)',
                     color: 'var(--color-text-muted)',
                     marginBottom: '2rem',
                     lineHeight: '1.6',
                     maxWidth: '90%',
-                    margin: '0 auto 2.5rem auto'
+                    margin: '1.5rem auto 2.5rem auto'
                 }}>
-                    MindNest rewards young people for learning real-world skills and verified knowledge and connects them to opportunities.
+                    A digital platform that verifies real-world skills, rewards learning, and connects young people to measurable economic opportunities.
                 </p>
                 <p style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)', color: 'var(--color-text-muted)', marginBottom: '3rem' }}>
                     Start earning verified skills and unlock real opportunities
