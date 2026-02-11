@@ -64,6 +64,7 @@ const KidsWellnessHub = ({ onComplete }) => {
 
             {activeGame ? (
                 <WellnessGameModal
+                    key={`${activeGame}-${(progress[activeGame] || 0) + 1}`} // FORCE RESET ON LEVEL CHANGE
                     game={games.find(g => g.id === activeGame)}
                     currentLevel={(progress[activeGame] || 0) + 1}
                     onClose={() => setActiveGame(null)}
@@ -273,26 +274,91 @@ const GameFoodSorter = ({ level, updateScore }) => {
 };
 
 const GameSuperPlate = ({ level, updateScore }) => {
-    const [plate, setPlate] = useState([]);
-    const needed = level === 1 ? 3 : level === 2 ? 4 : 5;
+    const [plate, setPlate] = useState({ protein: 0, carbs: 0, veg: 0 });
+    // Logic: Level 1 = Just items. Level 2 = Min 1 protein. Level 3 = Min 1 protein + 1 veg.
+    const targetCount = level === 1 ? 3 : level === 2 ? 5 : 7;
 
-    const add = (i) => {
-        const newP = [...plate, i];
-        setPlate(newP);
-        if (newP.length >= needed) {
-            updateScore(1); // Task complete status
+    // Food Library
+    const foods = {
+        carbs: ['🍠', '🍚', '🥖', '🍝', '🌽'],
+        protein: ['🐟', '🍗', '🥚', '🥩', '🥜'],
+        veg: ['🥬', '🥕', '🥦', '🍅', '🧅']
+    };
+
+    const addToPlate = (type) => {
+        const total = plate.protein + plate.carbs + plate.veg;
+        if (total < targetCount) {
+            const newPlate = { ...plate, [type]: plate[type] + 1 };
+            setPlate(newPlate);
+            checkWin(newPlate);
         }
     };
+
+    const checkWin = (currentPlate) => {
+        const total = currentPlate.protein + currentPlate.carbs + currentPlate.veg;
+
+        if (total >= targetCount) {
+            let win = false;
+            if (level === 1) win = true;
+            else if (level === 2) win = currentPlate.protein >= 1;
+            else if (level === 3) win = currentPlate.protein >= 1 && currentPlate.veg >= 1;
+
+            if (win) updateScore(1);
+        }
+    };
+
+    const resetPlate = () => {
+        setPlate({ protein: 0, carbs: 0, veg: 0 });
+        updateScore(0);
+    };
+
+    const Instructions = () => {
+        if (level === 1) return "Add any 3 tasty items!";
+        if (level === 2) return "Add 5 items (Include Protein 🐟)!";
+        return "Add 7 items (Protein 🐟 + Veggies 🥬)!";
+    };
+
     return (
-        <div>
-            <h4>Build a plate with {needed} items!</h4>
-            <div style={{ width: '150px', height: '150px', borderRadius: '50%', border: '4px solid #fff', margin: '1rem auto' }}>
-                {plate.map((p, i) => <span key={i} style={{ fontSize: '1.5rem' }}>{p}</span>)}
+        <div style={{ padding: '0 1rem' }}>
+            <h4 style={{ color: '#FFD700' }}>{Instructions()}</h4>
+
+            {/* The Plate */}
+            <div style={{
+                width: '200px', height: '200px', borderRadius: '50%', backgroundColor: '#fff',
+                margin: '1rem auto', position: 'relative', border: '8px solid #ddd',
+                display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap',
+                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)'
+            }}>
+                <div style={{ fontSize: '1.5rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '5px', maxWidth: '80%' }}>
+                    {[...Array(plate.carbs)].map((_, i) => <span key={`c${i}`}>🍚</span>)}
+                    {[...Array(plate.protein)].map((_, i) => <span key={`p${i}`}>🐟</span>)}
+                    {[...Array(plate.veg)].map((_, i) => <span key={`v${i}`}>🥬</span>)}
+                </div>
             </div>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                <button onClick={() => add('🍲')} className="btn" style={{ fontSize: '2rem' }}>🍲</button>
-                <button onClick={() => add('🐟')} className="btn" style={{ fontSize: '2rem' }}>🐟</button>
+
+            {/* Controls */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.8rem', marginBottom: '0.3rem' }}>Carbs</div>
+                    {foods.carbs.slice(0, 3).map(f => (
+                        <button key={f} onClick={() => addToPlate('carbs')} className="btn btn-sm btn-outline" style={{ margin: '2px', fontSize: '1.2rem' }}>{f}</button>
+                    ))}
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.8rem', marginBottom: '0.3rem' }}>Protein</div>
+                    {foods.protein.slice(0, 3).map(f => (
+                        <button key={f} onClick={() => addToPlate('protein')} className="btn btn-sm btn-outline" style={{ margin: '2px', fontSize: '1.2rem' }}>{f}</button>
+                    ))}
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '0.8rem', marginBottom: '0.3rem' }}>Veggies</div>
+                    {foods.veg.slice(0, 3).map(f => (
+                        <button key={f} onClick={() => addToPlate('veg')} className="btn btn-sm btn-outline" style={{ margin: '2px', fontSize: '1.2rem' }}>{f}</button>
+                    ))}
+                </div>
             </div>
+
+            <button onClick={resetPlate} className="btn btn-sm" style={{ opacity: 0.7 }}>Reset Plate 🔄</button>
         </div>
     );
 };
