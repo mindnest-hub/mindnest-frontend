@@ -4,14 +4,13 @@ import Toast from '../components/Toast';
 import { useWallet } from '../hooks/useWallet';
 
 
-// --- KIDS WELLNESS COMPONENTS (10 GAMES) ---
+// --- KIDS WELLNESS COMPONENTS (10 SEQUENTIAL GAMES) ---
 
 const KidsWellnessHub = ({ onComplete }) => {
-    // 10 Games, 3 Levels each.
     // Progress Key: { 'gameId': currentLevel (0=Locked, 1=Lvl1, 2=Lvl2, 3=Lvl3, 4=Done) }
     const [progress, setProgress] = useState(() => JSON.parse(localStorage.getItem('kidsHealthProgress')) || {});
     const [activeGame, setActiveGame] = useState(null);
-    const { addEarnings } = useWallet();
+    const { addEarnings, balance } = useWallet();
 
     const games = [
         { id: 'food_sort', name: 'Food Sorter', icon: '🍎', color: '#FF4444' },
@@ -49,6 +48,20 @@ const KidsWellnessHub = ({ onComplete }) => {
 
     return (
         <div style={{ padding: '1rem' }}>
+            {/* Header with Balance for Kids */}
+            <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                backgroundColor: 'var(--color-surface)', padding: '1rem', borderRadius: '15px', marginBottom: '2rem',
+                border: '2px solid #FFD700', boxShadow: '0 4px 15px rgba(255, 215, 0, 0.2)'
+            }}>
+                <div style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#FFD700' }}>
+                    My Wallet: ₦{balance?.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '1.2rem' }}>
+                    Total Stars: {Object.values(progress).reduce((a, b) => a + b, 0)}/30 🌟
+                </div>
+            </div>
+
             {activeGame ? (
                 <WellnessGameModal
                     game={games.find(g => g.id === activeGame)}
@@ -58,20 +71,33 @@ const KidsWellnessHub = ({ onComplete }) => {
                 />
             ) : (
                 <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-                    {games.map(g => {
+                    {games.map((g, index) => {
                         const level = progress[g.id] || 0;
+                        // Unlocking Logic: Game 0 is always unlocked. Game N unlocks if Game N-1 has level >= 1.
+                        const isLocked = index > 0 && (progress[games[index - 1].id] || 0) < 1;
                         const stars = level >= 3 ? "⭐⭐⭐" : level >= 2 ? "⭐⭐" : level >= 1 ? "⭐" : "";
+
                         return (
                             <div key={g.id}
-                                onClick={() => setActiveGame(g.id)}
+                                onClick={() => !isLocked && setActiveGame(g.id)}
                                 className="card"
                                 style={{
-                                    cursor: 'pointer', textAlign: 'center',
+                                    cursor: isLocked ? 'not-allowed' : 'pointer',
+                                    textAlign: 'center',
                                     backgroundColor: level >= 3 ? 'rgba(0,200,81,0.2)' : 'var(--color-surface)',
-                                    border: level >= 3 ? '2px solid #00C851' : '1px solid #333'
+                                    border: level >= 3 ? '2px solid #00C851' : '1px solid #333',
+                                    opacity: isLocked ? 0.5 : 1,
+                                    position: 'relative',
+                                    transform: isLocked ? 'none' : 'scale(1)',
+                                    transition: 'transform 0.2s'
                                 }}
+                                onMouseEnter={(e) => !isLocked && (e.currentTarget.style.transform = 'scale(1.05)')}
+                                onMouseLeave={(e) => !isLocked && (e.currentTarget.style.transform = 'scale(1)')}
                             >
-                                <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>{g.icon}</div>
+                                {isLocked && (
+                                    <div style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '1.2rem' }}>🔒</div>
+                                )}
+                                <div style={{ fontSize: '3rem', marginBottom: '0.5rem', filter: isLocked ? 'grayscale(100%)' : 'none' }}>{g.icon}</div>
                                 <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{g.name}</div>
                                 <div style={{ color: '#FFD700', fontSize: '0.8rem', height: '1.2rem' }}>{stars}</div>
                             </div>
@@ -83,26 +109,161 @@ const KidsWellnessHub = ({ onComplete }) => {
     );
 };
 
-// MINI GAMES LOGIC
-const GameFoodSorter = ({ level, onWin }) => {
+// MINI GAMES WRAPPER & LOGIC
+const WellnessGameModal = ({ game, currentLevel, onClose, onComplete }) => {
+    const [showIntro, setShowIntro] = useState(game.id === 'food_sort' && currentLevel === 1);
+    const [timeLeft, setTimeLeft] = useState(15);
+    const [gameScore, setGameScore] = useState(0);
+    const [gameState, setGameState] = useState('playing'); // playing, won, lost
+
+    useEffect(() => {
+        if (showIntro || gameState !== 'playing') return;
+        const timer = setInterval(() => {
+            setTimeLeft(prev => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    handleTimeUp();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [gameState]);
+
+    const handleTimeUp = () => {
+        // Win Condition: Use score thresholds based on game type
+        // Basic threshold: score >= target * 0.8? Or just pass/fail
+        // Simplification: Games report score. Wrapper decides.
+        // Actually, let games define their target via a prop or internal?
+        // Let's passed `target` logic here purely or let game trigger 'complete'?
+        // The implementation plan says: "When Timer hits 0: If score >= target, Level Complete."
+        // We need to know the target. Let's ask the game component for target? No.
+        // Let's set targets here based on level for generic scoring games.
+        const target = currentLevel * 5; // Default generic target
+        // Some games have different scoring scales.
+        // We will pass `onScoreUpdate` to games.
+        // And we will evaluate result here.
+
+        let success = false;
+        // Logic variation per game
+        if (['food_sort', 'sleep_catch', 'sparkle_teeth', 'hand_wash', 'move_groove'].includes(game.id)) {
+            success = gameScore >= (currentLevel * 3); // Action games
+        } else if (['super_plate'].includes(game.id)) {
+            success = gameScore >= 1; // Built at least 1 plate
+        } else if (['mood_detect'].includes(game.id)) {
+            success = gameScore >= 2;
+        } else if (['safe_shield'].includes(game.id)) {
+            success = gameScore >= 1;
+        } else if (['kind_connect', 'mind_cloud'].includes(game.id)) {
+            success = gameScore >= (currentLevel * 2);
+        } else {
+            success = true; // Fallback
+        }
+
+        if (success) {
+            setGameState('won');
+        } else {
+            setGameState('lost');
+        }
+    };
+
+    const handleScoreUpdate = (newScore) => {
+        if (gameState === 'playing' && !showIntro) setGameScore(newScore);
+    };
+
+    if (showIntro) {
+        return (
+            <div style={{ textAlign: 'center', animation: 'fadeIn 0.3s', padding: '2rem' }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🍎🥦</div>
+                <h2 style={{ color: '#FFD700', marginBottom: '1rem' }}>Eat Healthy to be Strong!</h2>
+                <p style={{ fontSize: '1.2rem', marginBottom: '2rem', lineHeight: '1.6', color: '#fff' }}>
+                    Eating good food like yams, fruits, and veggies gives you energy to play, run, and learn!
+                    <br /><br />
+                    Avoid too much sugar so your teeth stay shiny and your brain stays sharp!
+                </p>
+                <button onClick={() => setShowIntro(false)} className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '0.8rem 2rem' }}>
+                    I'm Ready! 🚀
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ textAlign: 'center', animation: 'fadeIn 0.3s' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <button onClick={onClose} className="btn btn-sm">❌ Exit</button>
+                <div style={{ fontWeight: 'bold' }}>Level {currentLevel}</div>
+                <div style={{ padding: '0.5rem 1rem', borderRadius: '10px', backgroundColor: timeLeft < 5 ? '#ff4444' : '#333', color: '#fff' }}>
+                    ⏱️ {timeLeft}s
+                </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem', width: '100%', height: '8px', backgroundColor: '#333', borderRadius: '4px' }}>
+                <div style={{ width: `${(timeLeft / 15) * 100}%`, height: '100%', backgroundColor: game.color, transition: 'width 1s linear' }}></div>
+            </div>
+
+            {gameState === 'playing' ? (
+                <div className="card" style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                    <h3 style={{ marginBottom: '1rem' }}>{game.name}</h3>
+                    <RenderGame gameId={game.id} level={currentLevel} onScore={handleScoreUpdate} />
+                </div>
+            ) : gameState === 'won' ? (
+                <div style={{ padding: '2rem' }}>
+                    <div style={{ fontSize: '4rem' }}>🌟</div>
+                    <h3>Level Complete!</h3>
+                    <p>Score: {gameScore}</p>
+                    <button onClick={() => onComplete(currentLevel)} className="btn btn-primary">Collect Reward 💰</button>
+                </div>
+            ) : (
+                <div style={{ padding: '2rem' }}>
+                    <div style={{ fontSize: '4rem' }}>⏰</div>
+                    <h3>Time's Up!</h3>
+                    <p>You didn't reach the target. Try again!</p>
+                    <button onClick={() => { setTimeLeft(15); setGameScore(0); setGameState('playing'); }} className="btn btn-outline">Try Again 🔄</button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// MINI GAME COMPONENT RENDERER
+const RenderGame = ({ gameId, level, onScore }) => {
+    switch (gameId) {
+        case 'food_sort': return <GameFoodSorter level={level} updateScore={onScore} />;
+        case 'super_plate': return <GameSuperPlate level={level} updateScore={onScore} />;
+        case 'sparkle_teeth': return <GameSparkleTeeth level={level} updateScore={onScore} />;
+        case 'hand_wash': return <GameHandWash level={level} updateScore={onScore} />;
+        case 'move_groove': return <GameMoveGroove level={level} updateScore={onScore} />;
+        case 'sleep_catch': return <GameSleepCatch level={level} updateScore={onScore} />;
+        case 'mood_detect': return <GameMoodDetect level={level} updateScore={onScore} />;
+        case 'safe_shield': return <GameSafeShield level={level} updateScore={onScore} />;
+        case 'kind_connect': return <GameKindConnect level={level} updateScore={onScore} />;
+        case 'mind_cloud': return <GameMindCloud level={level} updateScore={onScore} />;
+        default: return <div>Game Loading...</div>;
+    }
+};
+
+// REFACTORED MINI GAMES (Score-based)
+
+const GameFoodSorter = ({ level, updateScore }) => {
     const [score, setScore] = useState(0);
-    const target = level * 3;
-    const items = level === 1 ? [{ n: '🍠', t: 'good' }, { n: '🍔', t: 'bad' }] : // Yam vs Burger
-        level === 2 ? [{ n: '🥭', t: 'good' }, { n: '🍬', t: 'bad' }] : // Mango vs Candy
-            [{ n: '🐟', t: 'protein' }, { n: '🍞', t: 'carb' }]; // Fish vs Bread
+    const items = level === 1 ? [{ n: '🍠', t: 'good' }, { n: '🍔', t: 'bad' }] :
+        level === 2 ? [{ n: '🥭', t: 'good' }, { n: '🍬', t: 'bad' }] :
+            [{ n: '🐟', t: 'protein' }, { n: '🍞', t: 'carb' }];
 
     const handleTap = (type) => {
         if (type === 'good' || type === 'protein') {
             const newScore = score + 1;
             setScore(newScore);
-            if (newScore >= target) onWin();
+            updateScore(newScore);
         }
     };
 
     return (
         <div>
-            <h4>Tap the Healthy/Protein Food!</h4>
-            <div style={{ fontSize: '2rem', margin: '1rem' }}>Score: {score}/{target}</div>
+            <h4>Tap the Healthy Food!</h4>
+            <div style={{ fontSize: '2rem', margin: '1rem' }}>Score: {score}</div>
             <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
                 <button onClick={() => handleTap(items[0].t)} className="btn" style={{ fontSize: '3rem' }}>{items[0].n}</button>
                 <button onClick={() => handleTap(items[1].t)} className="btn" style={{ fontSize: '3rem' }}>{items[1].n}</button>
@@ -111,98 +272,94 @@ const GameFoodSorter = ({ level, onWin }) => {
     );
 };
 
-const GameSuperPlate = ({ level, onWin }) => {
+const GameSuperPlate = ({ level, updateScore }) => {
     const [plate, setPlate] = useState([]);
-    const needed = level === 1 ? 2 : level === 2 ? 3 : 4;
+    const needed = level === 1 ? 3 : level === 2 ? 4 : 5;
+
     const add = (i) => {
         const newP = [...plate, i];
         setPlate(newP);
-        if (newP.length >= needed) onWin();
+        if (newP.length >= needed) {
+            updateScore(1); // Task complete status
+        }
     };
     return (
         <div>
-            <h4>Put {needed} items on the plate!</h4>
+            <h4>Build a plate with {needed} items!</h4>
             <div style={{ width: '150px', height: '150px', borderRadius: '50%', border: '4px solid #fff', margin: '1rem auto' }}>
                 {plate.map((p, i) => <span key={i} style={{ fontSize: '1.5rem' }}>{p}</span>)}
             </div>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-                <button onClick={() => add('🍲')} className="btn" style={{ fontSize: '2rem' }}>🍲</button> {/* Soup */}
-                <button onClick={() => add('🥣')} className="btn" style={{ fontSize: '2rem' }}>🥣</button> {/* Fufu */}
-                <button onClick={() => add('🐟')} className="btn" style={{ fontSize: '2rem' }}>🐟</button> {/* Tilapia */}
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                <button onClick={() => add('🍲')} className="btn" style={{ fontSize: '2rem' }}>🍲</button>
+                <button onClick={() => add('🐟')} className="btn" style={{ fontSize: '2rem' }}>🐟</button>
             </div>
         </div>
     );
 };
 
-const GameSparkleTeeth = ({ level, onWin }) => {
+const GameSparkleTeeth = ({ level, updateScore }) => {
     const [clicks, setClicks] = useState(0);
-    const target = level * 5;
     const brush = () => {
-        setClicks(c => {
-            if (c + 1 >= target) onWin();
-            return c + 1;
-        });
+        const newC = clicks + 1;
+        setClicks(newC);
+        updateScore(newC);
     };
     return (
         <div>
-            <h4>Brush away the germs!</h4>
+            <h4>Brush Fast!</h4>
             <div style={{ fontSize: '4rem', margin: '1rem', cursor: 'pointer' }} onClick={brush}>
                 {clicks % 2 === 0 ? '🦷' : '✨'}
             </div>
-            <p>Tap {target} times!</p>
-            <div style={{ width: '100%', backgroundColor: '#333', height: '10px' }}>
-                <div style={{ width: `${(clicks / target) * 100}%`, backgroundColor: '#33b5e5', height: '100%' }}></div>
-            </div>
+            <p>Score: {clicks}</p>
         </div>
     );
 };
 
-const GameHandWash = ({ level, onWin }) => {
+const GameHandWash = ({ level, updateScore }) => {
     const [progress, setProgress] = useState(0);
-    const target = level === 1 ? 5 : level === 2 ? 20 : 50;
     const scrub = () => {
-        setProgress(p => {
-            if (p + 1 >= target) onWin();
-            return p + 1;
-        });
+        const p = progress + 1;
+        setProgress(p);
+        updateScore(p);
     };
     return (
         <div>
-            <h4>Scrub to clean the hands! 🧼</h4>
+            <h4>Scrub those hands! 🧼</h4>
             <div style={{ fontSize: '4rem', margin: '1rem', cursor: 'pointer' }} onClick={scrub}>
                 {progress % 2 === 0 ? '👐' : '🫧'}
             </div>
-            <p>{progress}/{target} scrubs</p>
+            <p>Scrubs: {progress}</p>
         </div>
     );
 };
 
-const GameMoveGroove = ({ level, onWin }) => {
-    const target = ['💃', '🙌', '👏'][level - 1]; // Dance, Celebrate, Clap
+const GameMoveGroove = ({ level, updateScore }) => {
+    const target = ['💃', '🙌', '👏'][level - 1] || '💃';
+    const [score, setScore] = useState(0);
     return (
         <div>
-            <h4>Show your moves: {target}</h4>
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+            <h4>Do the move: {target}</h4>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', justifyContent: 'center' }}>
                 {['💃', '🙌', '👏'].map(p => (
-                    <button key={p} onClick={() => { if (p === target) onWin(); }} className="btn" style={{ fontSize: '3rem' }}>{p}</button>
+                    <button key={p} onClick={() => { if (p === target) { const s = score + 1; setScore(s); updateScore(s); } }} className="btn" style={{ fontSize: '3rem' }}>{p}</button>
                 ))}
             </div>
+            <p>Moves: {score}</p>
         </div>
     );
 };
 
-const GameSleepCatch = ({ level, onWin }) => {
+const GameSleepCatch = ({ level, updateScore }) => {
     const [caught, setCaught] = useState(0);
-    const target = level * 3;
     return (
         <div>
-            <h4>Catch {target} Zzz's! (Tap them)</h4>
-            <div style={{ height: '200px', width: '100%', position: 'relative', overflow: 'hidden', border: '1px solid #555' }}>
+            <h4>Tap the Zzz's!</h4>
+            <div style={{ height: '200px', width: '300px', position: 'relative', overflow: 'hidden', border: '1px solid #555', margin: '0 auto' }}>
                 <button
                     onClick={() => {
                         const next = caught + 1;
                         setCaught(next);
-                        if (next >= target) onWin();
+                        updateScore(next);
                     }}
                     style={{
                         position: 'absolute',
@@ -214,112 +371,76 @@ const GameSleepCatch = ({ level, onWin }) => {
                     💤
                 </button>
             </div>
-            <p>Score: {caught}/{target}</p>
+            <p>caught: {caught}</p>
         </div>
     );
 };
 
-const GameMoodDetect = ({ level, onWin }) => {
-    const moods = level === 1 ? [{ e: '😢', n: 'Sad' }, { e: '😊', n: 'Happy' }] :
-        level === 2 ? [{ e: '😠', n: 'Angry' }, { e: '😨', n: 'Scared' }] :
-            [{ e: '😴', n: 'Tired' }, { e: '🤔', n: 'Confused' }];
+const GameMoodDetect = ({ level, updateScore }) => {
+    const moods = level === 1 ? [{ e: '😢', n: 'Sad' }, { e: '😊', n: 'Happy' }] : [{ e: '😠', n: 'Angry' }, { e: '😨', n: 'Scared' }];
     const [q, setQ] = useState(0);
-    const target = moods[q];
+    const [score, setScore] = useState(0);
+    const target = moods[q % moods.length];
+
     const guess = (name) => {
         if (name === target.n) {
-            if (q + 1 >= moods.length) onWin();
-            else setQ(q + 1);
+            const s = score + 1;
+            setScore(s);
+            updateScore(s);
+            setQ(q + 1);
         }
     };
     return (
         <div>
-            <h4>Which face is "{target.n}"?</h4>
+            <h4>Find: "{target.n}"</h4>
             <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginTop: '2rem' }}>
                 {moods.map(m => (
                     <button key={m.n} onClick={() => guess(m.n)} className="btn" style={{ fontSize: '4rem' }}>{m.e}</button>
                 ))}
             </div>
+            <p>Score: {score}</p>
         </div>
     );
 };
 
-const GameSafeShield = ({ level, onWin }) => {
-    const q = level === 1 ? "A stranger offers candy." : level === 2 ? "Riding a bike." : "You see smoke.";
-    const a = level === 1 ? "Run Away" : level === 2 ? "Wear Helmet" : "Tell Adult";
-    const opts = level === 1 ? ["Go with them", "Run Away"] : level === 2 ? ["No Helmet", "Wear Helmet"] : ["Hide", "Tell Adult"];
+const GameSafeShield = ({ level, updateScore }) => {
+    const opts = ["Run Away", "Tell Adult", "Say No"];
+    const [score, setScore] = useState(0);
     return (
         <div>
-            <h4>Safety Check: {q}</h4>
+            <h4>Safety: Tap correct choice!</h4>
             <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
                 {opts.map(o => (
-                    <button key={o} onClick={() => { if (o === a) onWin(); }} className="btn btn-outline">{o}</button>
+                    <button key={o} onClick={() => { const s = score + 1; setScore(s); updateScore(s); }} className="btn btn-outline">{o}</button>
                 ))}
             </div>
+            <p>Choices made: {score}</p>
         </div>
     );
 };
 
-const GameKindConnect = ({ level, onWin }) => {
+const GameKindConnect = ({ level, updateScore }) => {
+    const [score, setScore] = useState(0);
     return (
         <div>
-            <h4>Share a piece of fruit with a neighbor!</h4>
-            <button onClick={onWin} className="btn btn-primary" style={{ marginTop: '2rem', fontSize: '1.5rem' }}>🥭 Ubuntu Spirit</button>
+            <h4>Share fruit with neighbors!</h4>
+            <button onClick={() => { const s = score + 1; setScore(s); updateScore(s); }} className="btn btn-primary" style={{ marginTop: '2rem', fontSize: '1.5rem' }}>🥭 Give Fruit</button>
+            <p>Shared: {score}</p>
         </div>
     );
 };
 
-const GameMindCloud = ({ level, onWin }) => {
+const GameMindCloud = ({ level, updateScore }) => {
     const [breaths, setBreaths] = useState(0);
-    const target = level * 3;
     return (
         <div>
-            <h4>Take {target} deep breaths.</h4>
+            <h4>Deep Breaths...</h4>
             <div style={{ fontSize: '4rem', margin: '2rem', animation: 'pulse 2s infinite' }}>🌬️</div>
             <button onClick={() => {
                 const b = breaths + 1;
                 setBreaths(b);
-                if (b >= target) onWin();
-            }} className="btn btn-outline">Breathe In... Out ({breaths}/{target})</button>
-        </div>
-    );
-};
-
-const WellnessGameModal = ({ game, currentLevel, onClose, onComplete }) => {
-    const renderGame = () => {
-        switch (game.id) {
-            case 'food_sort': return <GameFoodSorter level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'super_plate': return <GameSuperPlate level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'sparkle_teeth': return <GameSparkleTeeth level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'hand_wash': return <GameHandWash level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'move_groove': return <GameMoveGroove level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'sleep_catch': return <GameSleepCatch level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'mood_detect': return <GameMoodDetect level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'safe_shield': return <GameSafeShield level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'kind_connect': return <GameKindConnect level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            case 'mind_cloud': return <GameMindCloud level={currentLevel} onWin={() => onComplete(currentLevel)} />;
-            default: return <div>Game Coming Soon!</div>;
-        }
-    };
-
-    return (
-        <div style={{ textAlign: 'center', animation: 'fadeIn 0.3s' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <button onClick={onClose} className="btn btn-sm">❌ Exit</button>
-                <h3 style={{ margin: 0 }}>{game.icon} {game.name} - Level {currentLevel}</h3>
-                <div style={{ width: '60px' }}></div>
-            </div>
-            {currentLevel > 3 ? (
-                <div style={{ padding: '2rem' }}>
-                    <div style={{ fontSize: '4rem' }}>👑</div>
-                    <h3>Mastered!</h3>
-                    <p>You have completed all levels for this game.</p>
-                    <button onClick={onClose} className="btn btn-primary">Back to Hub</button>
-                </div>
-            ) : (
-                <div className="card" style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {renderGame()}
-                </div>
-            )}
+                updateScore(b);
+            }} className="btn btn-outline">Breathe In... Out ({breaths})</button>
         </div>
     );
 };
