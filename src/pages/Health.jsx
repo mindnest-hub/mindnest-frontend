@@ -532,7 +532,10 @@ const Health = ({ ageGroup }) => {
                         ← Hub
                     </button>
                     <h1 style={{ color: '#FFD700' }}>Wellness World 🌍</h1>
-                    <p>Play 10 Games • Earn Stars 🌟</p>
+                    <p style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '0.5rem', fontStyle: 'italic' }}>
+                        Your mind and body are your first investments.
+                    </p>
+                    <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Play 10 Games • Earn Stars 🌟</p>
                 </header>
                 <KidsWellnessHub />
             </div>
@@ -564,12 +567,12 @@ const Health = ({ ageGroup }) => {
 
     const renderCurrentModule = () => {
         switch (activeModule) {
-            case 0: return <IntroModule onNext={() => { markComplete(0); setActiveModule(1); }} />;
+            case 0: return <IntroModule ageGroup={ageGroup} onNext={() => { markComplete(0); setActiveModule(1); }} />;
             case 1: return <NutritionPillar onNext={() => { markComplete(1); setActiveModule(2); }} showToast={showToast} isKid={isKid} />;
             case 2: return <VitalityPillar onNext={() => { markComplete(2); setActiveModule(3); }} showToast={showToast} isKid={isKid} />;
             case 3: return <HarmonyPillar onNext={() => { markComplete(3); setActiveModule(4); }} showToast={showToast} isKid={isKid} />;
             case 4: return <CertificateModule onNext={() => navigate('/')} />;
-            default: return <IntroModule onNext={() => setActiveModule(1)} />;
+            default: return <IntroModule ageGroup={ageGroup} onNext={() => setActiveModule(1)} />;
         }
     };
 
@@ -613,17 +616,29 @@ const Health = ({ ageGroup }) => {
     );
 };
 
-const IntroModule = ({ onNext }) => (
-    <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-        <h1 style={{ color: 'var(--color-secondary)', fontSize: '2.5rem', marginBottom: '1.5rem' }}>Health, Wellness & Mindset 🌿</h1>
-        <p style={{ fontSize: '1.2rem', lineHeight: '1.8', color: '#ccc', maxWidth: '600px', margin: '0 auto 2rem' }}>
-            Your body, mind, and habits shape your future. Learn to eat well, stay fit, manage your mind, and develop habits that make you strong, disciplined, and productive.
-        </p>
-        <button onClick={onNext} className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}>
-            Start Journey 🚀
-        </button>
-    </div>
-);
+const IntroModule = ({ onNext, ageGroup }) => {
+    const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
+
+    // Customized Text Logic
+    const introText = isTeen
+        ? "Strong health builds strong decisions. Strong decisions build strong futures."
+        : "Your body is your engine. Your mind is your steering wheel.";
+
+    return (
+        <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+            <h1 style={{ color: 'var(--color-secondary)', fontSize: '2.5rem', marginBottom: '1.5rem' }}>Health, Wellness & Mindset 🌿</h1>
+            <p style={{ fontSize: '1.3rem', lineHeight: '1.6', color: '#fff', maxWidth: '700px', margin: '0 auto 2rem', fontStyle: 'italic', borderLeft: '4px solid var(--color-secondary)', paddingLeft: '1rem' }}>
+                "{introText}"
+            </p>
+            <p style={{ fontSize: '1rem', color: '#aaa', maxWidth: '600px', margin: '0 auto 2rem' }}>
+                Learn to eat well, stay fit, manage your mind, and develop habits that make you strong, disciplined, and productive.
+            </p>
+            <button onClick={onNext} className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}>
+                Start Journey 🚀
+            </button>
+        </div>
+    );
+};
 
 const NutritionPillar = ({ onNext, showToast, isKid }) => {
     const [step, setStep] = useState(0);
