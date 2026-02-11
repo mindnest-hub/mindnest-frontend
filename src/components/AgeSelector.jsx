@@ -41,7 +41,7 @@ const AgeSelector = ({ onSelect }) => {
                     MindNest rewards young people for learning real-world skills and verified knowledge and connects them to opportunities.
                 </p>
                 <p style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)', color: 'var(--color-text-muted)', marginBottom: '3rem' }}>
-                    Select your age group to begin your journey.
+                    Start earning verified skills and unlock real opportunities
                 </p>
 
                 <div style={{
