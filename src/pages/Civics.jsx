@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import Toast from '../components/Toast';
+import CivicGuide from '../components/CivicGuide';
 
 const Civics = ({ ageGroup }) => {
     const navigate = useNavigate();
@@ -37,6 +38,7 @@ const Civics = ({ ageGroup }) => {
     }, [userName, selectedCountry]);
 
     const [activePillar, setActivePillar] = useState(1);
+    const [viewMode, setViewMode] = useState('games'); // 'games' or 'guide'
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -983,81 +985,125 @@ const Civics = ({ ageGroup }) => {
                 </div>
             </header>
 
-
-            <div className="civics-layout-wrapper">
-                {/* PILLAR NAVIGATION */}
-                <div className="pillar-nav-grid">
-                    {pillars.map((p, idx) => {
-                        const isUnlocked = idx === 0 || completedPillars.includes(pillars[idx - 1].id);
-                        const isDone = completedPillars.includes(p.id);
-
-                        return (
-                            <button
-                                key={p.id}
-                                disabled={!isUnlocked}
-                                onClick={() => setActivePillar(p.id)}
-                                className={`btn ${activePillar === p.id ? 'active' : ''}`}
-                                style={{
-                                    backgroundColor: activePillar === p.id ? p.color : '#222',
-                                    color: activePillar === p.id ? 'black' : (isDone ? '#00C851' : (isUnlocked ? 'white' : '#555')),
-                                    border: `1px solid ${isDone ? '#00C851' : (isUnlocked ? '#444' : '#222')}`,
-                                    padding: '1rem', borderRadius: '15px', fontSize: '0.8rem', position: 'relative',
-                                    cursor: isUnlocked ? 'pointer' : 'not-allowed',
-                                    opacity: isUnlocked ? 1 : 0.6
-                                }}
-                            >
-                                {!isUnlocked && <span style={{ marginRight: '0.5rem' }}>🔒</span>}
-                                {p.title}
-                                {isDone && <span style={{ position: 'absolute', top: '5px', right: '5px' }}>✅</span>}
-                            </button>
-                        );
-                    })}
+            {/* VIEW TOGGLE FOR TEENS/ADULTS ONLY */}
+            {!isKid && (
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '1rem',
+                    marginBottom: '2rem',
+                    flexWrap: 'wrap'
+                }}>
+                    <button
+                        onClick={() => setViewMode('games')}
+                        className="btn"
+                        style={{
+                            backgroundColor: viewMode === 'games' ? '#9C27B0' : '#222',
+                            color: viewMode === 'games' ? 'white' : '#aaa',
+                            border: `2px solid ${viewMode === 'games' ? '#9C27B0' : '#444'}`,
+                            padding: '1rem 2rem',
+                            fontSize: '1rem',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        🎮 Interactive Games
+                    </button>
+                    <button
+                        onClick={() => setViewMode('guide')}
+                        className="btn"
+                        style={{
+                            backgroundColor: viewMode === 'guide' ? '#9C27B0' : '#222',
+                            color: viewMode === 'guide' ? 'white' : '#aaa',
+                            border: `2px solid ${viewMode === 'guide' ? '#9C27B0' : '#444'}`,
+                            padding: '1rem 2rem',
+                            fontSize: '1rem',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        📚 Civic Guide
+                    </button>
                 </div>
+            )}
 
-                {/* PILLAR CONTENT */}
-                <div className="pillar-content-area">
-                    {pillarTimer > 0 && !completedPillars.includes(activePillar) && (
-                        <div style={{ position: 'absolute', top: '-30px', right: 0, backgroundColor: '#9C27B0', padding: '0.2rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', animation: 'pulse 1s infinite' }}>
-                            📖 Reading: {pillarTimer}s
-                        </div>
-                    )}
-                    <div style={{ animation: 'fadeIn 0.5s' }}>
-                        <h2 style={{ color: activePillarData.color, marginBottom: '1.5rem' }}>{activePillarData.title}</h2>
+            {/* RENDER CIVIC GUIDE OR INTERACTIVE GAMES */}
+            {viewMode === 'guide' && !isKid ? (
+                <CivicGuide ageGroup={ageGroup} />
+            ) : (
+                <div className="civics-layout-wrapper">
+                    {/* PILLAR NAVIGATION */}
+                    <div className="pillar-nav-grid">
+                        {pillars.map((p, idx) => {
+                            const isUnlocked = idx === 0 || completedPillars.includes(pillars[idx - 1].id);
+                            const isDone = completedPillars.includes(p.id);
 
-                        {activePillar === 1 && renderGovtGame()}
-                        {activePillar === 2 && renderRights()}
-                        {activePillar === 3 && renderResponsibilities()}
-                        {activePillar === 4 && renderLaw()}
-                        {activePillar === 5 && renderProjects()}
-                        {activePillar === 6 && renderTools()}
-                        {activePillar === 7 && renderBudget()}
-                        {activePillar === 8 && renderEthics()}
-                        {activePillar === 9 && renderLeadership()}
-                        {activePillar === 10 && renderLocal()}
-                        {activePillar === 11 && renderSimulator()}
-
-                        {/* MASTERY AWARD BUTTON */}
-                        {isMaster && (
-                            <div style={{
-                                marginTop: '3rem', padding: '2rem', backgroundColor: 'rgba(156, 39, 176, 0.1)',
-                                borderRadius: '20px', border: '2px dashed #9C27B0', textAlign: 'center',
-                                animation: 'fadeIn 1s'
-                            }}>
-                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
-                                <h3 style={{ color: '#9C27B0' }}>Mastery Achieved!</h3>
-                                <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>You have successfully completed all 11 pillars of Civic Mastery.</p>
+                            return (
                                 <button
-                                    onClick={() => setShowCertificate(true)}
-                                    className="btn btn-primary"
-                                    style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', backgroundColor: '#9C27B0' }}
+                                    key={p.id}
+                                    disabled={!isUnlocked}
+                                    onClick={() => setActivePillar(p.id)}
+                                    className={`btn ${activePillar === p.id ? 'active' : ''}`}
+                                    style={{
+                                        backgroundColor: activePillar === p.id ? p.color : '#222',
+                                        color: activePillar === p.id ? 'black' : (isDone ? '#00C851' : (isUnlocked ? 'white' : '#555')),
+                                        border: `1px solid ${isDone ? '#00C851' : (isUnlocked ? '#444' : '#222')}`,
+                                        padding: '1rem', borderRadius: '15px', fontSize: '0.8rem', position: 'relative',
+                                        cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                                        opacity: isUnlocked ? 1 : 0.6
+                                    }}
                                 >
-                                    Claim Your Certificate 📜
+                                    {!isUnlocked && <span style={{ marginRight: '0.5rem' }}>🔒</span>}
+                                    {p.title}
+                                    {isDone && <span style={{ position: 'absolute', top: '5px', right: '5px' }}>✅</span>}
                                 </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* PILLAR CONTENT */}
+                    <div className="pillar-content-area">
+                        {pillarTimer > 0 && !completedPillars.includes(activePillar) && (
+                            <div style={{ position: 'absolute', top: '-30px', right: 0, backgroundColor: '#9C27B0', padding: '0.2rem 0.8rem', borderRadius: '20px', fontSize: '0.8rem', animation: 'pulse 1s infinite' }}>
+                                📖 Reading: {pillarTimer}s
                             </div>
                         )}
+                        <div style={{ animation: 'fadeIn 0.5s' }}>
+                            <h2 style={{ color: activePillarData.color, marginBottom: '1.5rem' }}>{activePillarData.title}</h2>
+
+                            {activePillar === 1 && renderGovtGame()}
+                            {activePillar === 2 && renderRights()}
+                            {activePillar === 3 && renderResponsibilities()}
+                            {activePillar === 4 && renderLaw()}
+                            {activePillar === 5 && renderProjects()}
+                            {activePillar === 6 && renderTools()}
+                            {activePillar === 7 && renderBudget()}
+                            {activePillar === 8 && renderEthics()}
+                            {activePillar === 9 && renderLeadership()}
+                            {activePillar === 10 && renderLocal()}
+                            {activePillar === 11 && renderSimulator()}
+
+                            {/* MASTERY AWARD BUTTON */}
+                            {isMaster && (
+                                <div style={{
+                                    marginTop: '3rem', padding: '2rem', backgroundColor: 'rgba(156, 39, 176, 0.1)',
+                                    borderRadius: '20px', border: '2px dashed #9C27B0', textAlign: 'center',
+                                    animation: 'fadeIn 1s'
+                                }}>
+                                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
+                                    <h3 style={{ color: '#9C27B0' }}>Mastery Achieved!</h3>
+                                    <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>You have successfully completed all 11 pillars of Civic Mastery.</p>
+                                    <button
+                                        onClick={() => setShowCertificate(true)}
+                                        className="btn btn-primary"
+                                        style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', backgroundColor: '#9C27B0' }}
+                                    >
+                                        Claim Your Certificate 📜
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </div >
+                </div >
+            )}
 
 
             {/* CIVIC FACT MODAL */}
