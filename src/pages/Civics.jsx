@@ -144,16 +144,21 @@ const Civics = ({ ageGroup }) => {
     ];
 
     const teenGovtScenarios = [
-        { q: "Headline: 'The African Union (AU) proposes a new regional trade agreement.' Who represents your country to sign it?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: "The President or Ministers (Executive) handle international diplomacy and treaties." },
-        { q: "Headline: 'Eco-Activists sue the state over oil spill management in the Delta.' Which branch hears the case?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary (Courts) settle disputes between citizens and the state." },
-        { q: "Headline: 'Parliament debates the new African Continental Free Trade Area (AfCFTA) regulations.' Who is debating?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "The Legislative branch (Parliament/National Assembly) creates and debates national laws." },
-        { q: "You want to petition for a new Youth Center in your district. Which branch of government should you target first?", a: "Executive", options: ["Executive", "Legislative", "Judiciary"], hint: "The Executive (Local Government/Ministers) implements projects and manages budgets." }
+        { q: "A reporter wants to interview a Minister. Which branch is the Minister in?", a: "Executive", options: ["Executive", "Legislature", "Judiciary", "Press"], hint: "The Executive implements policy and manages ministries." },
+        { q: "A new law on digital privacy is being debated in the House. Which branch?", a: "Legislature", options: ["Executive", "Legislature", "Judiciary", "Police"], hint: "The Legislature makes, debates, and passes laws." },
+        { q: "A citizen sues the government over a land dispute. Who decides?", a: "Judiciary", options: ["Executive", "Legislature", "Judiciary", "Traditional Leaders"], hint: "The Judiciary interprets the law and settles disputes." },
+        { q: "The National Budget needs approval before money is spent. Who approves it?", a: "Legislature", options: ["Executive", "Legislature", "Judiciary", "Central Bank"], hint: "The Legislature holds the 'power of the purse'." },
+        { q: "A governor is inaugurated and starts appointing commissioners. Which branch?", a: "Executive", options: ["Executive", "Legislature", "Judiciary", "Civil Service"], hint: "The Executive head appoints the team to carry out governance." }
     ];
 
     const adultGovtScenarios = [
-        { q: "Process: You want to propose a 'Small Business Grant' law. Where does it start?", a: "Legislative", options: ["Executive", "Legislative", "Judiciary"], hint: "Laws begin as Bills in the Legislative branch." },
-        { q: "Process: The Bill is passed but the Governor refuses to sign. What is this called?", a: "Veto", options: ["Veto", "Impeachment", "Recess"], hint: "A Veto is when the head of the Executive branch rejects a bill." },
-        { q: "Process: The law is enacted but citizens claim it violates their privacy. Who settles this?", a: "Judiciary", options: ["Executive", "Legislative", "Judiciary"], hint: "The Judiciary protects citizen rights against government overreach." }
+        { q: "National security policy is failing. Who is ultimately responsible for the strategy?", a: "Executive", options: ["Executive", "Legislature", "Judiciary", "Civil Society"], hint: "The Executive branch manages national security and the armed forces." },
+        { q: "A bill is vetoed by the President. How can it still become law?", a: "Legislature override", options: ["Legislature override", "Judiciary ruling", "Public protest", "It can't"], hint: "The Legislature can override a veto with a two-thirds majority." },
+        { q: "A law is found to violate the Constitution. Who can nullify it?", a: "Judiciary", options: ["Executive", "Legislature", "Judiciary", "Electoral Commission"], hint: "The Judiciary has the power of judicial review." },
+        { q: "Who audits the government's spending to ensure transparency?", a: "Auditor-General/Legislature", options: ["Auditor-General/Legislature", "Executive", "The Bank", "The Press"], hint: "The Auditor-General reports to the Legislature to check the Executive." },
+        { q: "Which body regulates the conduct of elections to ensure fairness?", a: "INEC/Electoral Body", options: ["INEC/Electoral Body", "The President", "The Army", "Ruling Party"], hint: "An independent electoral body is vital for democratic legitimacy." },
+        { q: "A state wants to create its own police force. Who decides if this is constitutional?", a: "Supreme Court", options: ["Supreme Court", "The Governor", "The Senate", "Police IG"], hint: "Institutional disputes regarding the constitution are settled by the highest court." },
+        { q: "The Central Bank changes interest rates. Which part of governance is this?", a: "Executive/Monetary Policy", options: ["Executive/Monetary Policy", "Legislature", "Judiciary", "Private Sector"], hint: "Financial regulation and monetary policy are executive functions carried out by the Central Bank." }
     ];
 
     const govtScenarios = isKid ? kidGovtScenarios : (isTeen ? teenGovtScenarios : adultGovtScenarios);
@@ -167,13 +172,14 @@ const Civics = ({ ageGroup }) => {
     ];
 
     const teenRightsLevels = [
-        { title: "Level 1: Digital & Privacy Rights 📱", desc: "Protecting your future in the digital age.", rights: [{ t: "Data Sovereignty", d: "Your right to control how your personal data is stored in Africa.", icon: "🔐" }, { t: "Access to Info", d: "The RIGHT to access government records (FOI Act).", icon: "📡" }] },
-        { title: "Level 2: Equality & Cultural Rights 🌍", desc: "Proudly African, equally protected.", rights: [{ t: "Cultural Identity", d: "Right to practice your culture and speak your native language.", icon: "🎭" }, { t: "Gender Equity", d: "Equal opportunities for all genders in education and work.", icon: "⚖️" }] },
-        { title: "Level 3: Environmental Rights 🍃", desc: "Protecting the land for your children.", rights: [{ t: "Clean Environment", d: "Right to live in a place free from illegal pollution and toxic waste.", icon: "🌳" }, { t: "Sustainable Tech", d: "Right to access green energy and clean water.", icon: "☀️" }] }
+        { title: 'Level 1: Personal Freedoms', desc: 'Identify your rights to speech, assembly, and belief.' },
+        { title: 'Level 2: Educational Access', desc: 'Understanding your right to quality schooling and knowledge.' },
+        { title: 'Level 3: Digital Privacy', desc: 'Protecting your data and identity in the online world.' },
+        { title: 'Level 4: Consumer Rights', desc: 'Ensuring you get what you pay for in the marketplace.' },
+        { title: 'Level 5: Environmental Safety', desc: 'Your right to a clean and sustainable neighborhood.' }
     ];
 
     const adultRightsLevels = [
-        { title: "Level 1: Professional Rights 💼", desc: "Rights in the workplace and business.", rights: [{ t: "Fair Wages", d: "Equal pay for equal work.", icon: "💰" }, { t: "Safe Conditions", d: "Protection from work hazards.", icon: "👷" }] },
         { title: "Level 2: Legal Precedence 📜", desc: "Advanced constitutional rights.", rights: [{ t: "Habeas Corpus", d: "Protection from illegal detention.", icon: "⛓️" }, { t: "Presumption of Innocence", d: "Innocent until proven guilty.", icon: "🕊️" }] },
         { title: "Level 3: Consumer Protection 🛡️", desc: "Defending economic rights.", rights: [{ t: "Product Liability", d: "Companies are liable for harmful goods.", icon: "⚠️" }, { t: "Truth in Advertising", d: "Right to honest marketing.", icon: "📢" }] }
     ];
@@ -228,7 +234,7 @@ const Civics = ({ ageGroup }) => {
                     {isKid ? 'Match the problem to the branch of government.' : (isTeen ? 'Analyze the news and identify the branch involved.' : 'Navigate the complex process of governance.')}
                 </p>
 
-                {govtStep < 3 ? (
+                {govtStep < scenarios.length ? (
                     <div>
                         <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem' }}>"{scenarios[govtStep].q}"</p>
                         <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '1rem' }}>
@@ -240,7 +246,7 @@ const Civics = ({ ageGroup }) => {
                                         if (opt === scenarios[govtStep].a) {
                                             showToast("Correct!", 'success');
                                             setActiveFact({ term: "Governance Fact 🎓", fact: scenarios[govtStep].hint });
-                                            if (govtStep === 2) handlePillarComplete(1);
+                                            if (govtStep === scenarios.length - 1) handlePillarComplete(1);
                                             setGovtStep(prev => prev + 1);
                                         } else {
                                             showToast(scenarios[govtStep].hint, 'warning');
@@ -285,7 +291,7 @@ const Civics = ({ ageGroup }) => {
                     ))}
                 </div>
                 <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                    {rightsStage < 2 ? (
+                    {rightsStage < levels.length - 1 ? (
                         <button
                             disabled={pillarTimer > 0 && !completedPillars.includes(2)}
                             onClick={() => {
@@ -293,9 +299,13 @@ const Civics = ({ ageGroup }) => {
                                 const rightsFacts = [
                                     "Your fundamental rights are the core shield that protects your dignity as a human being.",
                                     "Civic rights, like voting, are the tools you use to shape the leadership of your country.",
-                                    "Special protections exist for children and consumers to ensure the most vulnerable are safe."
+                                    "Special protections exist for children and consumers to ensure the most vulnerable are safe.",
+                                    "Environmental rights protect our land and water for future generations of Africans.",
+                                    "Digital rights ensure your privacy and data are protected in a connected world.",
+                                    "Cultural rights preserve our heritage and diverse languages across the continent.",
+                                    "Economic rights guarantee fair opportunities and protection in the marketplace."
                                 ];
-                                setActiveFact({ term: "Rights Insight ⚖️", fact: rightsFacts[rightsStage] });
+                                setActiveFact({ term: "Rights Insight ⚖️", fact: rightsFacts[rightsStage] || "Keep learning about your rights!" });
                                 setRightsStage(prev => prev + 1);
                             }}
                             className="btn btn-primary"
@@ -331,13 +341,19 @@ const Civics = ({ ageGroup }) => {
     const teenRespScenarios = [
         { q: "You discover a local stream is being polluted by a factory. What is your civic duty?", a: "Mobilize & Report", options: ["Mobilize & Report", "Wait for others", "Ignore it"], hint: "The 'Ubuntu' spirit means protecting the community's resources together." },
         { q: "The National Anthem is playing at a public event. How do you respond?", a: "Stand Respectfully", options: ["Stand Respectfully", "Keep walking", "Talk loudly"], hint: "Respecting national symbols shows unity and patriotism." },
-        { q: "A younger student is being excluded from a game because of their tribe. Action?", a: "Include & Educate", options: ["Include & Educate", "Walk away", "Join the exclusion"], hint: "Promoting Pan-African unity starts with ending discrimination in our own circles." }
+        { q: "A younger student is being excluded from a game because of their tribe. Action?", a: "Include & Educate", options: ["Include & Educate", "Walk away", "Join the exclusion"], hint: "Promoting Pan-African unity starts with ending discrimination in our own circles." },
+        { q: "You see a viral news story that seems suspicious. What is your digital responsibility?", a: "Fact-check before sharing", options: ["Fact-check before sharing", "Share it immediately", "Comment something angry"], hint: "Responsible citizens prevent the spread of misinformation." },
+        { q: "Your school is holding a 'Community Clean-up' day on a Saturday. Response?", a: "Volunteer to lead", options: ["Volunteer to lead", "Stay home and sleep", "Watch from a distance"], hint: "Leadership starts with small acts of service to your immediate environment." }
     ];
 
     const adultRespScenarios = [
         { q: "You notice a government project in your ward is stalled. Action?", a: "Audit & Petition", options: ["Audit & Petition", "Complain on FB", "Do nothing"], hint: "Citizens should track local projects and use formal channels for accountability." },
         { q: "You are called for community oversight or townhall. Response?", a: "Attend & Speak", options: ["Attend & Speak", "Stay home", "Send a representative"], hint: "Active participation in local governance is the core of a thriving democracy." },
-        { q: "You witness a professional colleague accepting a bribe. Action?", a: "Report to authorities", options: ["Report to authorities", "Ask for a share", "Keep quiet"], hint: "Integrity in the workplace is essential for national development." }
+        { q: "You witness a professional colleague accepting a bribe. Action?", a: "Report to authorities", options: ["Report to authorities", "Ask for a share", "Keep quiet"], hint: "Integrity in the workplace is essential for national development." },
+        { q: "It is tax season for your small business. What is your primary duty?", a: "File and pay accurately", options: ["File and pay accurately", "Hide your income", "Wait for a tax amnesty"], hint: "Taxes fund the public services that sustain our economy." },
+        { q: "A local election is approaching, but you don't like any candidate.", a: "Research & Vote anyway", options: ["Research & Vote anyway", "Stay home in protest", "Tear your voter card"], hint: "Voting is a responsibility to choose the 'least bad' or best option for progress." },
+        { q: "You are offered a position on a community board. Response?", a: "Accept if qualified", options: ["Accept if qualified", "Decline to stay 'neutral'", "Ask for a salary first"], hint: "Civic service often requires non-compensated contribution of your expertise." },
+        { q: "You notice a neighbor is struggling with mental health issues. Role?", a: "Connect with support", options: ["Connect with support", "Gossip about it", "Ignore it"], hint: "A healthy society is a caring society where we look out for each other." }
     ];
 
     const respScenarios = isKid ? kidRespScenarios : (isTeen ? teenRespScenarios : adultRespScenarios);
@@ -352,13 +368,19 @@ const Civics = ({ ageGroup }) => {
     const teenLawScenarios = [
         { q: "You want to sign an 'End User License' for an app. What should you do?", a: "Read the Privacy section", options: ["Read the Privacy section", "Click accept immediately", "Delete app"], hint: "Digital literacy includes understanding what data you are giving away." },
         { q: "You are starting a small side-hustle. What is a 'Contract'?", a: "A binding agreement", options: ["A binding agreement", "A friendly promise", "A type of tax"], hint: "Contracts protect both parties in a business transaction." },
-        { q: "Is taking a photo of someone without permission in public legal?", a: "Generally Yes", options: ["Generally Yes", "Always No", "Only if they are rich"], hint: "Laws vary, but public spaces usually have lower privacy expectations than private ones." }
+        { q: "Is taking a photo of someone without permission in public legal?", a: "Generally Yes", options: ["Generally Yes", "Always No", "Only if they are rich"], hint: "Laws vary, but public spaces usually have lower privacy expectations than private ones." },
+        { q: "A friend is being bullied on a group chat. What is a legal digital responsibility?", a: "Report & Support", options: ["Report & Support", "Join the jokes", "Delete the chat"], hint: "Cyberbullying can have legal consequences; standing against it is a civic duty." },
+        { q: "You created a cool logo for your brand. How do you protect it?", a: "Trademark/Copyright", options: ["Trademark/Copyright", "Tell everyone it's yours", "Keep it a secret"], hint: "Intellectual Property laws help you own and profit from your creative work." }
     ];
 
     const adultLawScenarios = [
         { q: "You are dealing with a property dispute. What is the first step?", a: "Mediation/Legal Review", options: ["Mediation/Legal Review", "Self-help/Force", "Social media rant"], hint: "Legal disputes should be settled through formal mediation or the court system." },
         { q: "What is the consequence of tax evasion for a business?", a: "Heavy Fines/Jail", options: ["Heavy Fines/Jail", "Nothing", "A small pat on back"], hint: "Paying taxes is a legal requirement that funds the nation's infrastructure." },
-        { q: "What is 'Intellectual Property' (IP) protection used for?", a: "Protecting inventions", options: ["Protecting inventions", "Owning people", "Buying land"], hint: "IP laws allow creators to own and profit from their original ideas." }
+        { q: "What is 'Intellectual Property' (IP) protection used for?", a: "Protecting inventions", options: ["Protecting inventions", "Owning people", "Buying land"], hint: "IP laws allow creators to own and profit from their original ideas." },
+        { q: "Your employer asks you to work 12 hours a day without extra pay. Right?", a: "Right to Fair Labor", options: ["Right to Fair Labor", "Just do it for the experience", "Quit immediately"], hint: "Labor laws set limits on working hours and guarantee overtime or fair treatment." },
+        { q: "A landlord wants to increase rent mid-contract by 100%. Legal?", a: "Check Tenancy Law", options: ["Check Tenancy Law", "Pay it to avoid trouble", "Refusal to pay any rent"], hint: "Tenancy laws protect both parties from arbitrary changes in agreed terms." },
+        { q: "You discover a public official is mismanaging funds. Potential action?", a: "Public Interest Litigation", options: ["Public Interest Litigation", "Ignore it", "Bribe them for a share"], hint: "Citizens can use the courts to seek justice for matters affecting the whole community." },
+        { q: "How do you request records from a government agency in Africa?", a: "Freedom of Information Act", options: ["Freedom of Information Act", "Ask on Twitter", "Wait for the news"], hint: "The FOI Act is a powerful tool for transparency and government accountability." }
     ];
 
     const lawScenarios = isKid ? kidLawScenarios : (isTeen ? teenLawScenarios : adultLawScenarios);
@@ -368,7 +390,7 @@ const Civics = ({ ageGroup }) => {
         return (
             <div className="card" style={{ borderTop: '4px solid #4CAF50' }}>
                 <h3>{isKid ? 'The Good Citizen Test' : (isTeen ? 'Digital & Civic Duty' : 'The Sentinel Test')} 🤝</h3>
-                {respStep < 3 ? (
+                {respStep < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{scenarios[respStep].q}"</p>
                         <div style={{ display: 'grid', gap: '0.8rem' }}>
@@ -380,7 +402,7 @@ const Civics = ({ ageGroup }) => {
                                         if (opt === scenarios[respStep].a) {
                                             showToast("Responsible Choice! ✅", 'success');
                                             setActiveFact({ term: "Responsibility Fact 🤝", fact: scenarios[respStep].hint });
-                                            if (respStep === 2) handlePillarComplete(3);
+                                            if (respStep === scenarios.length - 1) handlePillarComplete(3);
                                             setRespStep(prev => prev + 1);
                                         } else {
                                             showToast(scenarios[respStep].hint, 'warning');
@@ -410,7 +432,7 @@ const Civics = ({ ageGroup }) => {
         return (
             <div className="card" style={{ borderTop: '4px solid #FF9800' }}>
                 <h3>{isKid ? 'Legal Eagle Challenge' : (isTeen ? 'Contract & Digital Literacy' : 'The Law & The Professional')} 🦅</h3>
-                {lawStep < 3 ? (
+                {lawStep < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>"{scenarios[lawStep].q}"</p>
                         <div style={{ display: 'grid', gap: '1rem' }}>
@@ -422,7 +444,7 @@ const Civics = ({ ageGroup }) => {
                                         if (opt === scenarios[lawStep].a) {
                                             showToast("Legal Mastery! ✅", 'success');
                                             setActiveFact({ term: "Legal Wisdom ⚖️", fact: scenarios[lawStep].hint });
-                                            if (lawStep === 2) handlePillarComplete(4);
+                                            if (lawStep === scenarios.length - 1) handlePillarComplete(4);
                                             setLawStep(prev => prev + 1);
                                         } else {
                                             showToast(scenarios[lawStep].hint, 'warning');
@@ -457,13 +479,19 @@ const Civics = ({ ageGroup }) => {
     const teenProjScenarios = [
         { q: "Level 1: Youth Mobilization - How do you attract volunteers for a park cleanup?", options: ["Social Media & Peer impact", "Pay them a small fee", "Wait for teachers"], icon: "📢" },
         { q: "Level 2: Resource Mapping - Where can you find tools and support?", options: ["Local businesses & PTA", "Steal from the store", "Buy everything brand new"], icon: "🗺️" },
-        { q: "Level 3: Impact Pitch - How do you convince the Principal to support your club?", options: ["Presentation of Benefits", "Demand it as a right", "Quit school"], icon: "💡" }
+        { q: "Level 3: Impact Pitch - How do you convince the Principal to support your club?", options: ["Presentation of Benefits", "Demand it as a right", "Quit school"], icon: "💡" },
+        { q: "Level 4: Sustainability - How do you keep the project going after 6 months?", options: ["System of rotation & Mentorship", "Ask for money every day", "Quit when it gets hard"], icon: "🔄" },
+        { q: "Level 5: Digital Advocacy - How do you scale your impact online?", options: ["Impact stories & Hashtags", "Shouting at people", "Buying fake followers"], icon: "📱" }
     ];
 
     const adultProjScenarios = [
         { q: "Level 1: Needs Assessment - How do you validate a community project idea?", options: ["Surveys & Townhall data", "Personal opinion", "Asking the Oracle"], icon: "📊" },
         { q: "Level 2: Grant Writing - What is the most critical part of a funding proposal?", options: ["Measurable Outcomes & Budget", "Poetic descriptions", "Threatening to stop working"], icon: "🖋️" },
-        { q: "Level 3: Public-Private Partnership - How do you engage corporate CSR?", options: ["Align with their ESG goals", "Beg for charity", "Force them via laws"], icon: "🤝" }
+        { q: "Level 3: Public-Private Partnership - How do you engage corporate CSR?", options: ["Align with their ESG goals", "Beg for charity", "Force them via laws"], icon: "🤝" },
+        { q: "Level 4: Stakeholder Engagement - How do you handle opposition to your project?", options: ["Dialogue & Conciliation", "Ignore them", "Shame them publicly"], icon: "👥" },
+        { q: "Level 5: Policy Advocacy - How do you turn a project into a local law?", options: ["Policy Brief & Lobbying", "Hiring a lawyer", "Complaining on radio"], icon: "📜" },
+        { q: "Level 6: Scaling Impact - How do you move from one ward to the whole LGA?", options: ["Replicable Model & Networking", "Working 24/7 alone", "Waiting for government"], icon: "📈" },
+        { q: "Level 7: Governance Monitoring - How do you ensure the project remains ethical?", options: ["Social Audits & Transparency", "Trusting everyone blindly", "Keeping secrets"], icon: "⚖️" }
     ];
 
     const renderProjects = () => {
@@ -471,7 +499,7 @@ const Civics = ({ ageGroup }) => {
         return (
             <div className="card" style={{ borderTop: '4px solid #E91E63' }}>
                 <h3>{isKid ? 'Village Hero Quest' : (isTeen ? 'Youth Impact Catalyst' : 'Community Solutions Architect')} 🦸‍♂️</h3>
-                {projStep < 3 ? (
+                {projStep < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{scenarios[projStep].icon}</div>
                         <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{scenarios[projStep].q}</p>
@@ -484,7 +512,7 @@ const Civics = ({ ageGroup }) => {
                                         if (i === 0) {
                                             showToast("Great Leadership! 🚀", 'success');
                                             setActiveFact({ term: "Civic Action Fact 🏗️", fact: "Collaboration is the key to sustainable community development." });
-                                            if (projStep === 2) handlePillarComplete(5);
+                                            if (projStep === scenarios.length - 1) handlePillarComplete(5);
                                             setProjStep(prev => prev + 1);
                                         } else {
                                             showToast("Try a more collaborative approach!", 'warning');
@@ -519,13 +547,19 @@ const Civics = ({ ageGroup }) => {
     const teenToolScenarios = [
         { q: "Level 1: Freedom of Information (FOI) - How do you ask a school board for their budget?", options: ["Formal FOI Request", "Shouting in the hall", "Wait until graduation"], icon: "📂" },
         { q: "Level 2: Digital Fact-Checking - Which tool helps verify a suspicious viral video?", options: ["Reverse Image Search", "Just believing it", "Sharing it to check"], icon: "🔍" },
-        { q: "Level 3: Online Petitions - What makes a petition more effective for change?", options: ["Specific ask & Evidence", "A lot of emojis", "Angry language"], icon: "🖋️" }
+        { q: "Level 3: Online Petitions - What makes a petition more effective for change?", options: ["Specific ask & Evidence", "A lot of emojis", "Angry language"], icon: "🖋️" },
+        { q: "Level 4: Mobile Civic Tech - Which app helps report local infrastructure issues?", options: ["Civic reporting apps", "Instagram only", "Gaming apps"], icon: "📱" },
+        { q: "Level 5: Social Media Advocacy - How do you tag a leader effectively?", options: ["Evidence & Polite mention", "Constant spamming", "Using insults"], icon: "📢" }
     ];
 
     const adultToolScenarios = [
         { q: "Level 1: Administrative Law - How do you appeal a wrong tax assessment?", options: ["Tax Appeal Tribunal", "Not paying it", "Hiding your assets"], icon: "⚖️" },
         { q: "Level 2: Lobbying - How do you influence high-level legislative change?", options: ["Professional Advocacy/Lobbying", "Bribery", "Twitter hashtags only"], icon: "🏛️" },
-        { q: "Level 3: Investigative Journalism - How do you support accountability?", options: ["Supporting credible media", "Ignoring news", "Spreading rumors"], icon: "🗞️" }
+        { q: "Level 3: Investigative Journalism - How do you support accountability?", options: ["Supporting credible media", "Ignoring news", "Spreading rumors"], icon: "🗞️" },
+        { q: "Level 4: Judicial Review - How do you challenge a government's executive order?", options: ["Filing for Judicial Review", "Ignoring the order", "Buying a protest banner"], icon: "⚖️" },
+        { q: "Level 5: Public Budget Tracking - Which platform shows state spending?", options: ["Open Budget Portals", "The leader's blog", "Private bank statements"], icon: "📉" },
+        { q: "Level 6: Whistleblowing - How do you report corruption safely?", options: ["Secure Whistleblower channels", "Telling a neighbor", "Posting on Facebook"], icon: "🤫" },
+        { q: "Level 7: Int. Mechanisms - Where do you go if national courts fail human rights?", options: ["Regional/Int. Courts", "Nowhere, the end", "A private vigilante"], icon: "🌐" }
     ];
 
 
@@ -546,7 +580,7 @@ const Civics = ({ ageGroup }) => {
         return (
             <div className="card" style={{ borderTop: '4px solid #607D8B' }}>
                 <h3>{isKid ? 'Civic Helper Workshop' : (isTeen ? 'Digital Advocacy Hub' : 'The Professional Activist')} 🛠️</h3>
-                {toolStep < 3 ? (
+                {toolStep < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: '1rem' }}>{scenarios[toolStep].icon}</div>
                         <h4>{scenarios[toolStep].q}</h4>
@@ -559,7 +593,7 @@ const Civics = ({ ageGroup }) => {
                                         // Simple logic: first option is best for flow
                                         showToast("Tool Mastered! ✅", 'success');
                                         setActiveFact({ term: "Civic Tool Insight 🛠️", fact: "Knowledge is the greatest tool for civic empowerment." });
-                                        if (toolStep === 2) handlePillarComplete(6);
+                                        if (toolStep === scenarios.length - 1) handlePillarComplete(6);
                                         setToolStep(prev => prev + 1);
                                     }}
                                     className="btn btn-outline"
@@ -592,13 +626,19 @@ const Civics = ({ ageGroup }) => {
     const teenBudgetScenarios = [
         { q: "Level 1: Transparency - What is the 'Power of the Purse'?", options: ["Legislature's power to approve spending", "Having a lot of money", "Secret spending"], a: 0, fact: "The Legislature must approve every cent the Executive spends." },
         { q: "Level 2: National Debt - When is borrowing money by a country okay?", options: ["To build lasting infrastructure", "To pay salaries", "To buy luxury cars"], a: 0, fact: "Debt should only be used for investments that create future wealth." },
-        { q: "Level 3: Fiscal Responsibility - Why should a country save in a 'Rainy Day' fund?", options: ["For economic emergencies", "To hide money from citizens", "Because it's a trend"], a: 0, fact: "Sovereign Wealth Funds protect countries during global financial crises." }
+        { q: "Level 3: Fiscal Responsibility - Why should a country save in a 'Rainy Day' fund?", options: ["For economic emergencies", "To hide money from citizens", "Because it's a trend"], a: 0, fact: "Sovereign Wealth Funds protect countries during global financial crises." },
+        { q: "Level 4: Inflation - Why do prices of goods rise when too much money is printed?", options: ["Value of money drops", "Shopkeepers get greedy", "Goods become magic"], a: 0, fact: "Maintaining the value of currency is a key job of the Central Bank." },
+        { q: "Level 5: Personal vs Civic - Why should you save money for your future?", options: ["To be independent & contribute", "To buy video games only", "To show off to friends"], a: 0, fact: "Financial independence allows you to be a more effective civic participant." }
     ];
 
     const adultBudgetScenarios = [
         { q: "Level 1: Macroeconomics - What is the difference between a Deficit and a Surplus?", options: ["Deficit: Spending > Revenue", "Surplus: Spending > Revenue", "They are the same"], a: 0, fact: "Managing a deficit is a key part of fiscal policy." },
         { q: "Level 2: Resource Management - What is the 'Natural Resource Curse'?", options: ["Dependence on one export (like oil)", "Resources disappearing", "Ghost stories"], a: 0, fact: "Diversifying the economy is essential to avoid the resource curse." },
-        { q: "Level 3: Social Auditing - How can citizens track local budget performance?", options: ["Reviewing Open Budget portals", "Waiting for news", "Asking the neighbor"], a: 0, fact: "Many governments now publish open data for citizen oversight." }
+        { q: "Level 3: Social Auditing - How can citizens track local budget performance?", options: ["Reviewing Open Budget portals", "Waiting for news", "Asking the neighbor"], a: 0, fact: "Many governments now publish open data for citizen oversight." },
+        { q: "Level 4: Sovereign Wealth - What is the purpose of an 'Intergenerational Fund'?", options: ["To save for future citizens", "To pay current salaries", "To fund current elections"], a: 0, fact: "Wealth from natural resources belongs to both present and future generations." },
+        { q: "Level 5: Illicit Flows - What is the impact of money laundering on a nation?", options: ["Weakens the economy & security", "Makes the country rich", "Nothing, it's just paper"], a: 0, fact: "Stopping illicit financial flows is crucial for national stability." },
+        { q: "Level 6: Debt Management - What is 'Debt Sustainability'?", options: ["Ability to pay back without crisis", "Borrowing until you stop", "Never paying back"], a: 0, fact: "Managing debt ratios ensures the country remains credit-worthy." },
+        { q: "Level 7: Economic Diversification - Why move from oil to 'Knowledge Economy'?", options: ["Resources run out; knowledge grows", "Knowledge is cheaper", "Oil is too heavy"], a: 0, fact: "A diversified economy is more resilient to global market shocks." }
     ];
 
     const renderBudget = () => {
@@ -606,7 +646,7 @@ const Civics = ({ ageGroup }) => {
         return (
             <div className="card" style={{ borderTop: '4px solid #FFEB3B' }}>
                 <h3 style={{ color: '#FFEB3B' }}>{isKid ? 'National Budget Master' : (isTeen ? 'Fiscal Navigator' : 'The Wealth of Nations')} 💰</h3>
-                {budgetStep < 3 ? (
+                {budgetStep < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>{scenarios[budgetStep].q}</p>
                         <div style={{ display: 'grid', gap: '0.8rem' }}>
@@ -618,7 +658,7 @@ const Civics = ({ ageGroup }) => {
                                         if (i === scenarios[budgetStep].a) {
                                             showToast(scenarios[budgetStep].fact, 'success');
                                             setActiveFact({ term: "Budgeting Fact 🎓", fact: scenarios[budgetStep].fact });
-                                            if (budgetStep === 2) handlePillarComplete(7);
+                                            if (budgetStep === scenarios.length - 1) handlePillarComplete(7);
                                             setBudgetStep(prev => prev + 1);
                                         } else {
                                             showToast("Try a more sustainable choice!", 'warning');
@@ -656,17 +696,23 @@ const Civics = ({ ageGroup }) => {
         ] : isTeen ? [
             { q: "Academic Integrity: A friend offers you the answers to the math test.", options: ["Refuse and study harder", "Accept them to pass", "Report the friend immediately"], a: 0, hint: "Cheating devalues your education and your character." },
             { q: "Peer Pressure: Everyone is sharing a private photo of a classmate.", options: ["Delete it and don't share", "Share it to feel included", "Show it to your parents"], a: 0, hint: "Respecting others' privacy is a digital responsibility." },
-            { q: "Social Ethics: You see someone being treated unfairly because of their tribe.", options: ["Stand up for them", "Join in the teasing", "Stay silent"], a: 0, hint: "A leader stands up for justice, even when they are alone." }
+            { q: "Social Ethics: You see someone being treated unfairly because of their tribe.", options: ["Stand up for them", "Join in the teasing", "Stay silent"], a: 0, hint: "A leader stands up for justice, even when they are alone." },
+            { q: "Digital Integrity: You found a way to use a paid app for free illegally.", options: ["Pay for it or use a free alt", "Use the illegal version", "Tell everyone how to do it"], a: 0, hint: "Respecting intellectual property is an ethical digital choice." },
+            { q: "Sportsmanship: You see a teammate cheating during a sports match.", options: ["Tell them to play fair", "Help them hide it", "Ignore it if you're winning"], a: 0, hint: "Integrity in small games prepares you for integrity in large ones." }
         ] : [
             { q: "Corporate Integrity: You discover your company is dumping waste illegally.", options: ["Report to environmental agency", "Keep quiet for your bonus", "Quit without saying anything"], a: 0, hint: "Professional ethics protect the health of the entire nation." },
             { q: "Anti-Corruption: A contractor offers you a kickback to win a bid.", options: ["Report the bribe attempt", "Take it once 'for charity'", "Ignore it and award them anyway"], a: 0, hint: "Corruption is the biggest obstacle to our national progress." },
-            { q: "Public Office: You have the power to hire a relative who is unqualified.", options: ["Hiring based on merit only", "Give them the job", "Create a fake position"], a: 0, hint: "Meritocracy ensures the best people serve the people." }
+            { q: "Public Office: You have the power to hire a relative who is unqualified.", options: ["Hiring based on merit only", "Give them the job", "Create a fake position"], a: 0, hint: "Meritocracy ensures the best people serve the people." },
+            { q: "Business Ethics: A competitor's secret documents are left on your desk.", options: ["Return them unopened", "Read them to get ahead", "Share them with the press"], a: 0, hint: "Ethical competition drives long-term success more than cheating." },
+            { q: "Whistleblowing: You uncover systematic fraud in your department.", options: ["Report through secure channels", "Anonymously blackmail the boss", "Keep a record but say nothing"], a: 0, hint: "Whistleblower protections exist to help you stand for truth safely." },
+            { q: "Professionalism: You are asked to ignore a safety flaw in a public bridge.", options: ["Report it immediately", "Sign off to save time", "Let someone else handle it"], a: 0, hint: "Professional accountability can save lives." },
+            { q: "Leadership Ethics: Your team made a mistake that will look bad on you.", options: ["Take responsibility as leader", "Blame the newest member", "Try to hide the mistake"], a: 0, hint: "Accountability is the foundation of trust in leadership." }
         ];
 
         return (
             <div className="card" style={{ borderTop: '4px solid #00BCD4' }}>
                 <h3>{isKid ? 'The Integrity Shield' : (isTeen ? 'Ethics & Peer Power' : 'The Pillar of Integrity')} 💎</h3>
-                {ethicsStage < 3 ? (
+                {ethicsStage < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>"{scenarios[ethicsStage].q}"</p>
                         <div style={{ display: 'grid', gap: '1rem' }}>
@@ -678,7 +724,7 @@ const Civics = ({ ageGroup }) => {
                                         if (i === 0) {
                                             showToast("Integrity Upheld! 💎", 'success');
                                             setActiveFact({ term: "Ethics Fact 💎", fact: scenarios[ethicsStage].hint });
-                                            if (ethicsStage === 2) handlePillarComplete(8);
+                                            if (ethicsStage === scenarios.length - 1) handlePillarComplete(8);
                                             setEthicsStage(prev => prev + 1);
                                         } else {
                                             showToast("Think about the long-term character!", 'warning');
@@ -713,17 +759,23 @@ const Civics = ({ ageGroup }) => {
         ] : isTeen ? [
             { q: "Level 1: Vision - Your school needs a green club. How do you start?", options: ["Present a 1-year plan", "Demand it from Principal", "Hope someone else does it"], a: 0, fact: "Vision is seeing the future clearly." },
             { q: "Level 2: Crisis - A flash flood hits the neighborhood. Your role?", options: ["Organize emergency help", "Panic and run", "Wait for news"], a: 0, fact: "Leadership is calm during the storm." },
-            { q: "Level 3: Ethics - A friend asks you to leak exam questions. Response?", options: ["Refuse and explain why", "Do it to 'help' them", "Keep quiet but do it"], a: 0, fact: "Ethics is the compass of power." }
+            { q: "Level 3: Ethics - A friend asks you to leak exam questions. Response?", options: ["Refuse and explain why", "Do it to 'help' them", "Keep quiet but do it"], a: 0, fact: "Ethics is the compass of power." },
+            { q: "Level 4: Collaboration - Your team is arguing over the project topic.", options: ["Identify common goals", "Pick your own topic only", "Quit the team"], a: 0, fact: "Great leaders build bridges, not walls." },
+            { q: "Level 5: Influence - You need to convince your class to save water.", options: ["Impact stories & Data", "Shouting orders", "Setting a bad example"], a: 0, fact: "Influence is earned through credibility, not force." }
         ] : [
             { q: "Level 1: Strategy - The national power grid is failing. First step?", options: ["Diversify energy sources", "Blame the previous team", "Ignore the data"], a: 0, fact: "Strategic thinking solves root causes." },
             { q: "Level 2: Diplomacy - Two neighboring states are in a border dispute.", options: ["Negotiate a trade deal", "Send the military", "Ignore the conflict"], a: 0, fact: "Diplomacy is the highest form of leadership." },
-            { q: "Level 3: Legacy - How do you want to be remembered after 4 years?", options: ["By the institutions built", "By the wealth acquired", "By the enemies defeated"], a: 0, fact: "Legacy is what lives after the leader leaves." }
+            { q: "Level 3: Legacy - How do you want to be remembered after 4 years?", options: ["By the institutions built", "By the wealth acquired", "By the enemies defeated"], a: 0, fact: "Legacy is what lives after the leader leaves." },
+            { q: "Level 4: Institutional Reform - Civil service is slow and corrupt.", options: ["Digitize & Merit-based hiring", "Hire more relatives", "Blame the citizens"], a: 0, fact: "Technology and meritocracy are the cures for bureaucratic stagnation." },
+            { q: "Level 5: Internal Conflict - Your cabinet is divided on a major policy.", options: ["Consensus & Alignment", "Fire everyone who disagrees", "Flip a coin"], a: 0, fact: "Diverse opinions should strengthen, not stall, leadership." },
+            { q: "Level 6: Communication - A national crisis is causing public panic.", options: ["Honest & Frequent updates", "Hide until it blows over", "Blame the media"], a: 0, fact: "Trust is built through transparency during crises." },
+            { q: "Level 7: Global Partnership - How to attract foreign direct investment?", options: ["Rule of Law & Infrastructure", "Begging for grants", "Promising the world"], a: 0, fact: "Stability and justice are the best magnets for growth." }
         ];
 
         return (
             <div className="card" style={{ borderTop: '4px solid #795548' }}>
                 <h3>{isKid ? 'Kind Leader Academy' : (isTeen ? 'Visionary Leadership' : 'The Statesman\'s Path')} 🧠</h3>
-                {leadStep < 3 ? (
+                {leadStep < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>"{scenarios[leadStep].q}"</p>
                         <div style={{ display: 'grid', gap: '0.8rem' }}>
@@ -735,7 +787,7 @@ const Civics = ({ ageGroup }) => {
                                         if (i === 0) {
                                             showToast("Visionary Leadership! 🚀", 'success');
                                             setActiveFact({ term: "Leadership Fact 🧠", fact: scenarios[leadStep].fact });
-                                            if (leadStep === 2) handlePillarComplete(9);
+                                            if (leadStep === scenarios.length - 1) handlePillarComplete(9);
                                             setLeadStep(prev => prev + 1);
                                         } else {
                                             showToast("Think about the common good!", 'warning');
@@ -769,17 +821,23 @@ const Civics = ({ ageGroup }) => {
         ] : isTeen ? [
             { q: "How can a student influence local government?", options: ["Organizing a Youth Townhall", "Voting (but I'm under 18)", "Doing nothing"], a: 0, fact: "Youth organizations have a powerful voice at the local level." },
             { q: "Why is the Ward Councillor's phone number important?", options: ["To report community issues", "To ask for money", "For prank calls"], a: 0, fact: "Direct communication is vital for local accountability." },
-            { q: "What is a community 'Bylaw'?", options: ["A local rule made by the LGA", "A national law", "A secret code"], a: 0, fact: "LGAs have the power to make specific rules for their area." }
+            { q: "What is a community 'Bylaw'?", options: ["A local rule made by the LGA", "A national law", "A secret code"], a: 0, fact: "LGAs have the power to make specific rules for their area." },
+            { q: "You notice waste is piling up at the local market. Action?", options: ["Report to LGA Waste Dept", "Wait for it to disappear", "Burn it yourself"], a: 0, fact: "Reporting to the correct department ensures systematic cleanup." },
+            { q: "What is the purpose of a 'Youth Council' in an LGA?", options: ["To advise on youth-specific needs", "To plan parties", "To replace the Chairman"], a: 0, fact: "Youth councils provide a formal link between young people and local leaders." }
         ] : [
             { q: "Public Hearing: A new market development is proposed. Action?", options: ["Review plans and submit feedback", "Wait for it to be built", "Complain after it's done"], a: 0, fact: "Public hearings are legal requirements for community input." },
             { q: "Budget Defense: Your LGA chairman presents a project list.", options: ["Verify project survival & cost", "Clap for chairman", "Ignore it"], a: 0, fact: "Citizen oversight ensures local funds are used properly." },
-            { q: "Local Taxation: Why pay land rates to the LGA?", options: ["To fund local waste & roads", "To make chairman rich", "Because it's a gift"], a: 0, fact: "Local taxes fund the services in your immediate area." }
+            { q: "Local Taxation: Why pay land rates to the LGA?", options: ["To fund local waste & roads", "To make chairman rich", "Because it's a gift"], a: 0, fact: "Local taxes fund the services in your immediate area." },
+            { q: "You want to build a small shop extension. Who gives the permit?", options: ["LGA Planning Authority", "The Police", "Your neighbors"], a: 0, fact: "Local government regulates land use and building safety." },
+            { q: "Community Policing: How do citizens help local security?", options: ["Oversight & Information sharing", "Taking the law into own hands", "Paying bribes to officers"], a: 0, fact: "Citizen cooperation and oversight improve local security outcomes." },
+            { q: "Infrastructure: A local road has a massive pothole. Procedure?", options: ["File a maintenance request", "Plant a tree in it", "Wait for national govt"], a: 0, fact: "Identifying correctly which level of government owns a road helps fix it faster." },
+            { q: "Transparency: How can you see what your LGA spent last year?", options: ["Check the Annual Report/Portal", "Guess based on the roads", "Asking the Chairman's friend"], a: 0, fact: "LGAs are required to publish financial statements for public audit." }
         ];
 
         return (
             <div className="card" style={{ borderTop: '4px solid #3F51B5' }}>
                 <h3>{isKid ? 'LGA Hero Quest' : (isTeen ? 'Local Impact Lab' : 'Municipal Oversight')} 🏘️</h3>
-                {localStep < 3 ? (
+                {localStep < scenarios.length ? (
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                         <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '2rem', textAlign: 'center' }}>Step {localStep + 1}</p>
                         <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>"{scenarios[localStep].q}"</p>
@@ -792,7 +850,7 @@ const Civics = ({ ageGroup }) => {
                                         if (i === scenarios[localStep].a) {
                                             showToast("Local Insight Gained! 🏘️", 'success');
                                             setActiveFact({ term: "Local Gov Fact 🏗️", fact: scenarios[localStep].fact });
-                                            if (localStep === 2) handlePillarComplete(10);
+                                            if (localStep === scenarios.length - 1) handlePillarComplete(10);
                                             setLocalStep(prev => prev + 1);
                                         } else {
                                             showToast("Think about local accountability!", 'warning');
@@ -838,11 +896,17 @@ const Civics = ({ ageGroup }) => {
         const scenarios = isAdult ? [
             { q: "Fiscal Policy Crisis: Inflation is rising. Your move?", options: ["Restrict spending & hike interest", "Print more money", "Fix prices manually"], a: 0, fact: "Macroeconomic stability requires painful but necessary fiscal discipline." },
             { q: "Diplomatic Strain: A neighbor is violating trade treaties.", options: ["Negotiate via Regional Bloc", "Declare immediate war", "Do nothing"], a: 0, fact: "Multilateral diplomacy is the engine of regional prosperity." },
-            { q: "Institutional Reform: Civil service is slow and corrupt.", options: ["Digitize & Merit-based hiring", "Hire more relatives", "Blame the citizens"], a: 0, fact: "Technology and meritocracy are the cures for bureaucratic stagnation." }
+            { q: "Institutional Reform: Civil service is slow and corrupt.", options: ["Digitize & Merit-based hiring", "Hire more relatives", "Blame the citizens"], a: 0, fact: "Technology and meritocracy are the cures for bureaucratic stagnation." },
+            { q: "Reform Pivot: The nation's debt is too high. Action?", options: ["Restructure & Cut waste", "Print money to pay it", "Stop paying entirely"], a: 0, fact: "Responsible debt management preserves national credit and future." },
+            { q: "Energy Transition: Global oil prices are dropping forever.", options: ["Invest in Renewables & Gas", "Hope prices rise again", "Drill more oil quickly"], a: 0, fact: "Economic resilience comes from diversifying energy and income." },
+            { q: "Integration: AU wants a common currency. Response?", options: ["Analyze convergence & Align", "Refuse to talk", "Join immediately without prep"], a: 0, fact: "Regional integration requires strong domestic economic foundations." },
+            { q: "Global Crisis: A pandemic is affecting world trade.", options: ["Strategic Reserve & Local Prod", "Wait for vaccine grants only", "Close all borders permanently"], a: 0, fact: "A leader must build domestic capacity while maintaining global links." }
         ] : (isTeen ? [
             { q: "Budget Choice: You have extra revenue. Where does it go?", options: ["Youth Entrepreneurship Fund", "Buying new SUVs for staff", "Building another statue"], a: 0, fact: "Investing in youth is the highest ROI for any nation." },
             { q: "Media Crisis: Fake news is causing a panic.", options: ["Fact-check & Public address", "Ban social media", "Ignore it"], a: 0, fact: "A leader must communicate truth in the face of chaos." },
-            { q: "Pollution Incident: A factory is polluting the river.", options: ["Heavy fines & Remediation", "Take a bribe to hide it", "Close the factory forever"], a: 0, fact: "Balance economic growth with environmental sustainability." }
+            { q: "Pollution Incident: A factory is polluting the river.", options: ["Heavy fines & Remediation", "Take a bribe to hide it", "Close the factory forever"], a: 0, fact: "Balance economic growth with environmental sustainability." },
+            { q: "Education Reform: Students are graduating without jobs.", options: ["Skill-based curriculum update", "Build more classrooms only", "Make exams harder"], a: 0, fact: "Quality of education is as important as access." },
+            { q: "Employment: High youth unemployment. Strategy?", options: ["Support startups & Voc training", "Give everyone a small cash gift", "Tell them to wait for govt jobs"], a: 0, fact: "Job creation happens when the environment for business is friendly." }
         ] : [
             { q: "Crisis: The playground is broken.", options: ["Organize a repair day", "Cry", "Blame the principal"], a: 0, fact: "Leaders take action to solve problems." },
             { q: "Teamwork: Everyone is arguing over the ball.", options: ["Set up a fair rotation", "Take the ball away", "Join the fight"], a: 0, fact: "Peace is better for everyone." },
@@ -907,7 +971,7 @@ const Civics = ({ ageGroup }) => {
                             ))}
                         </div>
                     </div>
-                ) : simStep < 5 ? (
+                ) : simStep < scenarios.length + 2 ? (
                     <div style={{ animation: 'fadeIn 0.5s', width: '100%' }}>
                         <p style={{ wordBreak: 'break-word' }}><strong>🚨 Challenge {simStep - 1}:</strong> {scenarios[simStep - 2].q}</p>
                         <div style={{ display: 'grid', gap: '1rem', marginTop: '1.5rem', width: '100%' }}>
@@ -917,7 +981,7 @@ const Civics = ({ ageGroup }) => {
                                     onClick={() => {
                                         if (i === 0) {
                                             showToast("Statecraft Insight Gained!", 'success');
-                                            if (simStep === 4) handlePillarComplete(11);
+                                            if (simStep === scenarios.length + 1) handlePillarComplete(11);
                                             setSimStep(prev => prev + 1);
                                         } else {
                                             showToast(scenarios[simStep - 2].fact, 'warning');
