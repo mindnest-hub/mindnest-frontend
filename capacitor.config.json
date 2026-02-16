@@ -1,0 +1,6 @@
+{
+    "appId": "bond.mindnest.app",
+    "appName": "MindNest Africa",
+    "webDir": "dist",
+    "bundledWebRuntime": false
+}
