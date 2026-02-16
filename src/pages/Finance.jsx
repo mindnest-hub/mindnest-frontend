@@ -494,7 +494,7 @@ const Finance = ({ ageGroup }) => {
 
     const reward = subStage === 2 ? 60 : 40;
     const currentScenario = budgetScenarios[Math.min(subStage, isKid ? 2 : 4)];
-    showToast(`Budget Balanced! +₦${reward} 🏆\n\nExpert Tip: ${currentScenario.fact}`, "success");
+    showToast(`${currentScenario.fact}`, "success");
     handleStageComplete(3, reward);
   };
 
@@ -881,7 +881,7 @@ const Finance = ({ ageGroup }) => {
     // Staged levels (1-15) already award 100 via handleStageComplete.
     // Level 16 is graduation (no money).
 
-    if (levelId === 16) {
+    if (levelId === (isKid ? 15 : 16)) {
       setShowBadge(true);
       triggerConfetti();
     }
@@ -2157,7 +2157,7 @@ const Finance = ({ ageGroup }) => {
             <div style={{ fontSize: '5rem', marginBottom: '1.5rem' }}>🏅</div>
             <h2 style={{ color: '#FFD700', marginBottom: '0.5rem' }}>FINANCE MASTER!</h2>
             <p style={{ color: '#fff', marginBottom: '1.5rem' }}>
-              Congratulations! You've unlocked all 16 levels of Financial Literacy.
+              Congratulations! You've unlocked all {isKid ? '15' : '16'} levels of Financial Literacy.
               You are now a certified Wealth Builder! 👑
             </p>
             <div style={{
@@ -2524,44 +2524,46 @@ const Finance = ({ ageGroup }) => {
 
           {/* LEVELS LIST */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {modules.map((module) => {
-              const isLocked = module.id > (currentLevel || 1);
-              const isCompleted = module.id < currentLevel;
-              return (
-                <div
-                  key={module.id}
-                  className="card"
-                  style={{
-                    padding: '0', overflow: 'hidden',
-                    borderLeft: isCompleted ? '4px solid #00C851' : (isLocked ? '4px solid #555' : '4px solid var(--color-primary)'),
-                    opacity: isLocked ? 0.5 : 1,
-                    filter: isLocked ? 'grayscale(1)' : 'none'
-                  }}
-                >
+            {modules
+              .filter(m => !(isKid && m.id === 16))
+              .map((module) => {
+                const isLocked = module.id > (currentLevel || 1);
+                const isCompleted = module.id < currentLevel;
+                return (
                   <div
-                    onClick={() => !isLocked && toggleModule(module.id)}
+                    key={module.id}
+                    className="card"
                     style={{
-                      padding: '1.5rem', cursor: isLocked ? 'not-allowed' : 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      backgroundColor: expandedModule === module.id ? 'rgba(255,255,255,0.05)' : 'transparent'
+                      padding: '0', overflow: 'hidden',
+                      borderLeft: isCompleted ? '4px solid #00C851' : (isLocked ? '4px solid #555' : '4px solid var(--color-primary)'),
+                      opacity: isLocked ? 0.5 : 1,
+                      filter: isLocked ? 'grayscale(1)' : 'none'
                     }}
                   >
-                    <div>
-                      <h3 style={{ margin: 0, color: isCompleted ? '#00C851' : (isLocked ? '#888' : 'var(--color-primary)') }}>
-                        {module.id}. {module.title} {isCompleted && '✅'} {isLocked && '🔒'}
-                      </h3>
-                      <p style={{ margin: '0.5rem 0 0 0', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>{module.desc}</p>
+                    <div
+                      onClick={() => !isLocked && toggleModule(module.id)}
+                      style={{
+                        padding: '1.5rem', cursor: isLocked ? 'not-allowed' : 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        backgroundColor: expandedModule === module.id ? 'rgba(255,255,255,0.05)' : 'transparent'
+                      }}
+                    >
+                      <div>
+                        <h3 style={{ margin: 0, color: isCompleted ? '#00C851' : (isLocked ? '#888' : 'var(--color-primary)') }}>
+                          {module.id}. {module.title} {isCompleted && '✅'} {isLocked && '🔒'}
+                        </h3>
+                        <p style={{ margin: '0.5rem 0 0 0', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>{module.desc}</p>
+                      </div>
+                      {!isLocked && <span style={{ fontSize: '1.5rem', transform: expandedModule === module.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>▼</span>}
                     </div>
-                    {!isLocked && <span style={{ fontSize: '1.5rem', transform: expandedModule === module.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>▼</span>}
-                  </div>
 
-                  {expandedModule === module.id && (
-                    <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', animation: 'fadeIn 0.5s' }}>
-                      {module.content}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                    {expandedModule === module.id && (
+                      <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', animation: 'fadeIn 0.5s' }}>
+                        {module.content}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
           </div>
           {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </>

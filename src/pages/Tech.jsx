@@ -47,13 +47,25 @@ const Tech = () => {
   };
 
   // --- CODING STATE ---
-  const correctOrder = ['console', '.', 'log', '(', '"Hello Africa"', ')', ';'];
-  const [availableBlocks, setAvailableBlocks] = useState([
-    { id: 1, text: 'log' }, { id: 2, text: '"Hello Africa"' }, { id: 3, text: ';' },
-    { id: 4, text: 'console' }, { id: 5, text: '(' }, { id: 6, text: '.' }, { id: 7, text: ')' },
-  ]);
+  const kidCorrectOrder = ['Start 🚀', 'Walk 👣', 'Jump 🦘', 'Finish 🏁'];
+  const adultCorrectOrder = ['console', '.', 'log', '(', '"Hello Africa"', ')', ';'];
+  const correctOrder = isKid ? kidCorrectOrder : adultCorrectOrder;
+
+  const [availableBlocks, setAvailableBlocks] = useState(() => {
+    if (ageGroup === 'Kids') {
+      return [
+        { id: 4, text: 'Walk 👣' }, { id: 1, text: 'Start 🚀' },
+        { id: 2, text: 'Finish 🏁' }, { id: 3, text: 'Jump 🦘' }
+      ];
+    }
+    return [
+      { id: 1, text: 'log' }, { id: 2, text: '"Hello Africa"' }, { id: 3, text: ';' },
+      { id: 4, text: 'console' }, { id: 5, text: '(' }, { id: 6, text: '.' }, { id: 7, text: ')' },
+    ];
+  });
+
   const [userCode, setUserCode] = useState([]);
-  const [codeMessage, setCodeMessage] = useState("Arrange the blocks!");
+  const [codeMessage, setCodeMessage] = useState(isKid ? "Drag the steps in order!" : "Arrange the blocks!");
   const [loopCount, setLoopCount] = useState(3);
   const [isLoopPlaying, setIsLoopPlaying] = useState(false);
   const [loopStep, setLoopStep] = useState(0);
@@ -63,7 +75,13 @@ const Tech = () => {
   // --- CYBERSECURITY STATE ---
   const [password, setPassword] = useState('');
   const [passwordStrength, setPasswordStrength] = useState('');
-  const chatScenarios = [
+  const chatScenarios = isKid ? [
+    { id: 1, message: "Hi! I am a friend from school. Want to see my puppy?", safe: true },
+    { id: 2, message: "I am a stranger. Tell me your home address so I can send a toy!", safe: false },
+    { id: 3, message: "Let's play an online game together tomorrow!", safe: true },
+    { id: 4, message: "Tell me your school name and what time you leave", safe: false },
+    { id: 5, message: "What is your favorite cartoon?", safe: true },
+  ] : [
     { id: 1, message: "Hi! What's your favorite color?", safe: true },
     { id: 2, message: "Can you send me your home address?", safe: false },
     { id: 3, message: "Want to play a game together?", safe: true },
@@ -112,7 +130,11 @@ const Tech = () => {
   const [robotX, setRobotX] = useState(50);
 
   // --- PROBLEM SOLVING STATE ---
-  const logicPuzzles = [
+  const logicPuzzles = isKid ? [
+    { q: "If you have 2 apples and get 1 more, do you have 3?", a: "yes" },
+    { q: "Is the sun cold at night?", a: "no" },
+    { q: "Can a dog fly to the moon?", a: "no" },
+  ] : [
     { q: "All lions are cats. Simba is a lion. Is Simba a cat?", a: "yes" },
     { q: "If it rains, the ground is wet. The ground is wet. Did it rain?", a: "maybe" },
     { q: "All birds can fly. Penguins are birds. Can penguins fly?", a: "no" },
@@ -309,7 +331,14 @@ const Tech = () => {
   // --- RENDER FUNCTIONS ---
   const renderCoding = () => (
     <div>
-      <h2 style={{ marginBottom: '2rem', color: '#FFD700' }}>💻 Coding: talk to computers</h2>
+      <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>💻 Coding: talk to computers</h2>
+      {isKid && (
+        <div style={{ backgroundColor: 'rgba(33, 150, 243, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid #2196F3', marginBottom: '2rem' }}>
+          <p style={{ margin: 0, fontSize: '0.95rem', color: '#fff' }}>
+            <strong>What is Coding?</strong> 🎓 Coding is like giving a <strong>recipe</strong> to a robot. You tell it exactly what steps to take!
+          </p>
+        </div>
+      )}
 
       {/* Kids Track: Basic Sequences */}
       {isKid && (
@@ -446,7 +475,17 @@ const Tech = () => {
 
   const renderCybersecurity = () => (
     <div>
-      <h2 style={{ marginBottom: '2rem', color: '#FFD700' }}>🔒 Cybersecurity: {isKid ? 'Shield Your Self' : 'Defense and Encryption'}</h2>
+      <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>🔒 Cybersecurity: {isKid ? 'Shield Your Self' : 'Defense and Encryption'}</h2>
+      {isKid && (
+        <div style={{ backgroundColor: 'rgba(244, 67, 54, 0.1)', padding: '1.5rem', borderRadius: '12px', border: '1px solid #f44336', marginBottom: '2rem' }}>
+          <h4 style={{ margin: '0 0 0.5rem 0', color: '#f44336' }}>📖 Kid's Tech Dictionary</h4>
+          <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.9rem', color: '#fff', lineHeight: '1.6' }}>
+            <li><strong>Password</strong>: A secret key for your digital house.</li>
+            <li><strong>Scam</strong>: A trick someone uses to steal something from you.</li>
+            <li><strong>Private Info</strong>: Your name, school, or address. Keep them secret!</li>
+          </ul>
+        </div>
+      )}
 
       {/* Password Strength Section */}
       <div className="card" style={{ marginBottom: '2rem' }}>
@@ -598,6 +637,13 @@ const Tech = () => {
   const renderAI = () => (
     <div className="card" style={{ textAlign: 'center' }}>
       <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>🧠 {isKid ? 'AI Academy' : 'Artificial Intelligence & Ethics'}</h2>
+      {isKid && (
+        <div style={{ backgroundColor: 'rgba(156, 39, 176, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid #9C27B0', marginBottom: '2rem', textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: '0.95rem', color: '#fff' }}>
+            <strong>What is AI?</strong> 🧠 AI is a computer that learns from <strong>examples</strong>, just like you learn from books. It helps us solve problems!
+          </p>
+        </div>
+      )}
       <p style={{ marginBottom: '2rem', color: '#aaa' }}>
         {isKid ? 'Train your AI model through 5 zones of intelligence!' : isTeen ? 'Explore how AI learns, and the ethics of bias and deepfakes.' : 'Leverage AI for professional productivity and data analysis.'}
       </p>
@@ -711,7 +757,14 @@ const Tech = () => {
 
   const renderCreativity = () => (
     <div>
-      <h2 style={{ marginBottom: '2rem', color: '#FFD700' }}>🎨 Digital Creativity</h2>
+      <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>🎨 Digital Creativity</h2>
+      {isKid && (
+        <div style={{ backgroundColor: 'rgba(255, 152, 0, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid #FF9800', marginBottom: '2rem' }}>
+          <p style={{ margin: 0, fontSize: '0.95rem', color: '#fff' }}>
+            <strong>What is Digital Creativity?</strong> 🎨 It means using computers to <strong>paint with light</strong> and make <strong>music with math</strong>!
+          </p>
+        </div>
+      )}
 
       {/* Pixel Art Section */}
       <div className="card" style={{ marginBottom: '2rem' }}>
@@ -773,7 +826,14 @@ const Tech = () => {
 
   const renderRobotics = () => (
     <div>
-      <h2 style={{ marginBottom: '2rem', color: '#FFD700' }}>🤖 {isKid ? 'Robotics: Build a Friend' : 'Robotics & Automation Engineering'}</h2>
+      <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>🤖 {isKid ? 'Robotics: Build a Friend' : 'Robotics & Automation Engineering'}</h2>
+      {isKid && (
+        <div style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid #4CAF50', marginBottom: '2rem' }}>
+          <p style={{ margin: 0, fontSize: '0.95rem', color: '#fff' }}>
+            <strong>What are Robots?</strong> 🤖 Robots are machines that can <strong>move</strong> and help us with hard work. You can build one!
+          </p>
+        </div>
+      )}
 
       <div className="card" style={{ marginBottom: '2rem' }}>
         <h3>{isKid ? 'Build a Robot' : 'System Integration: Mechanical & Logic'}</h3>
@@ -825,7 +885,14 @@ const Tech = () => {
 
   const renderProblemSolving = () => (
     <div>
-      <h2 style={{ marginBottom: '2rem', color: '#FFD700' }}>🧩 {isKid ? 'Problem Solving' : 'Critical Analysis & Troubleshooting'}</h2>
+      <h2 style={{ marginBottom: '1rem', color: '#FFD700' }}>🧩 {isKid ? 'Problem Solving' : 'Critical Analysis & Troubleshooting'}</h2>
+      {isKid && (
+        <div style={{ backgroundColor: 'rgba(255, 215, 0, 0.1)', padding: '1rem', borderRadius: '12px', border: '1px solid #FFD700', marginBottom: '2rem' }}>
+          <p style={{ margin: 0, fontSize: '0.95rem', color: '#fff' }}>
+            <strong>What is Logic?</strong> 🧩 Logic is like being a <strong>detective</strong>. You use what you know to solve puzzles!
+          </p>
+        </div>
+      )}
 
       <div className="card" style={{ marginBottom: '2rem' }}>
         <h3>{isKid ? 'Logic Puzzles' : isTeen ? 'Deductive Logic Gates' : 'Systems Architecture Logic'}</h3>
@@ -845,7 +912,7 @@ const Tech = () => {
       </div>
 
       <div className="card">
-        <h3>{isKid ? 'Debug Challenge' : 'Technical Troubleshooting'}</h3>
+        <h3>{isKid ? 'Fix the Mistake 🛠️' : 'Technical Troubleshooting'}</h3>
         <p style={{ marginBottom: '1rem', color: '#aaa' }}>
           {isKid ? 'Fix the broken code!' : 'Identify the syntax/logic error in the following snippet to restore functionality.'}
         </p>

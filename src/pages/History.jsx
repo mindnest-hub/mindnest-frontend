@@ -184,7 +184,7 @@ const History = ({ ageGroup }) => {
             setWrongAttempts(0); // Reset attempts on correct answer
             // Reward: ₦100 per correct answer
             addEarnings('history', 100);
-            showToast(`Correct! 🎉\n\nDid you know? ${currentQuestion.fact}\n\n(+₦100)`, 'success', knowledgeDuration);
+            showToast(`${currentQuestion.fact}\n\n(+₦100)`, 'success', knowledgeDuration);
         } else {
             const newAttempts = wrongAttempts + 1;
             setWrongAttempts(newAttempts);
