@@ -42,7 +42,7 @@ const Home = ({ ageGroup, setAgeGroup }) => {
         <div className="container" style={{ paddingBottom: '4rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
             <LiveNotifications />
             <DailyBonus />
-            {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+            {showAuthModal && <AuthModal ageGroup={ageGroup} onClose={() => setShowAuthModal(false)} />}
             {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
             {showAgeModal && <AgeSelector onSelect={handleAgeSelect} />}
 

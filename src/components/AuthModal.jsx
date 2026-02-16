@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './KidsMascot.css';
 
-const AuthModal = ({ onClose }) => {
+const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
     const { login, signup } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
-    const [ageGroup, setAgeGroup] = useState('kids');
+    const [ageGroup, setAgeGroup] = useState(initialAgeGroup || 'kids');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
