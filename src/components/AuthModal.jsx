@@ -78,7 +78,15 @@ const AuthModal = ({ onClose }) => {
                 {(ageGroup === 'kids' || ageGroup === 'teens') && <Mascot />}
 
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h2 style={{ fontSize: '2rem', color: '#fff' }}>
+                    <h2 style={ageGroup === 'adults' ? {
+                        position: 'relative',
+                        width: '100%',
+                        textAlign: 'center',
+                        fontSize: '2.5rem',
+                        fontWeight: '600',
+                        color: '#82c240', // Assuming #82c240 as #82c24 was likely a typo
+                        marginBottom: '10px'
+                    } : { fontSize: '2rem', color: '#fff' }}>
                         {isLogin ? 'Welcome Back' : 'Get Started'}
                     </h2>
                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
