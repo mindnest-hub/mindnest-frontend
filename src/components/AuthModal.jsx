@@ -75,16 +75,16 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
             }}>
                 <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: 'var(--color-text-muted)', fontSize: '1.5rem', transition: 'var(--transition)', zIndex: 100 }}>&times;</button>
 
-                {(ageGroup === 'kids' || ageGroup === 'teens') && <Mascot />}
+                {ageGroup === 'kids' && <Mascot />}
 
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h2 style={ageGroup === 'adults' ? {
+                    <h2 style={(ageGroup === 'adults' || ageGroup === 'teens') ? {
                         position: 'relative',
                         width: '100%',
                         textAlign: 'center',
                         fontSize: '2.5rem',
                         fontWeight: '600',
-                        color: '#82c240', // Assuming #82c240 as #82c24 was likely a typo
+                        color: ageGroup === 'teens' ? '#00BFFF' : '#82c240',
                         marginBottom: '10px'
                     } : { fontSize: '2rem', color: '#fff' }}>
                         {isLogin ? 'Welcome Back' : 'Get Started'}
