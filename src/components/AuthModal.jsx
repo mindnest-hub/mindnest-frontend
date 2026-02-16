@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import './KidsMascot.css';
 
 const AuthModal = ({ onClose }) => {
     const { login, signup } = useAuth();
@@ -10,6 +11,7 @@ const AuthModal = ({ onClose }) => {
     const [ageGroup, setAgeGroup] = useState('kids');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,6 +32,22 @@ const AuthModal = ({ onClose }) => {
         }
     };
 
+    const Mascot = () => (
+        <div className={`mascot-container ${isPasswordFocused ? 'covering' : ''}`}>
+            <div className="lion-mascot">
+                <div className="lion-mane"></div>
+                <div className="lion-face">
+                    <div className="eye eye-l"></div>
+                    <div className="eye eye-r"></div>
+                    <div className="lion-nose"></div>
+                    <div className="lion-mouth"></div>
+                </div>
+                <div className="paw-l"></div>
+                <div className="paw-r"></div>
+            </div>
+        </div>
+    );
+
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -42,7 +60,9 @@ const AuthModal = ({ onClose }) => {
                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
                 border: '1px solid var(--color-border)'
             }}>
-                <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: 'var(--color-text-muted)', fontSize: '1.5rem', transition: 'var(--transition)' }}>&times;</button>
+                <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: 'var(--color-text-muted)', fontSize: '1.5rem', transition: 'var(--transition)', zIndex: 100 }}>&times;</button>
+
+                {ageGroup === 'kids' && <Mascot />}
 
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <h2 style={{ fontSize: '2rem', color: '#fff' }}>
@@ -71,7 +91,11 @@ const AuthModal = ({ onClose }) => {
                         }}
                     />
                     <input
-                        type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required
+                        type="password" placeholder="Password" value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        onFocus={() => ageGroup === 'kids' && setIsPasswordFocused(true)}
+                        onBlur={() => setIsPasswordFocused(false)}
+                        required
                         style={{
                             padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
                             fontFamily: 'inherit', fontSize: '1rem'

@@ -1,0 +1,162 @@
+.mascot-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: -20px;
+    perspective: 1000px;
+    height: 120px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.lion-mascot {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lion-mane {
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    background: linear-gradient(135deg, #8B4513, #CD853F);
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    top: -5px;
+    left: -5px;
+    animation: mane-sway 4s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes mane-sway {
+
+    0%,
+    100% {
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    }
+
+    50% {
+        border-radius: 60% 40% 30% 70% / 50% 60% 40% 50%;
+    }
+}
+
+.lion-face {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: #deb887;
+    border-radius: 50%;
+    top: 10px;
+    left: 10px;
+    border: 2px solid #8B4513;
+    overflow: hidden;
+}
+
+.eye {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #000;
+    border-radius: 50%;
+    top: 30px;
+    transition: all 0.3s ease;
+}
+
+.eye-l {
+    left: 20px;
+}
+
+.eye-r {
+    right: 20px;
+}
+
+.eye::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+}
+
+.lion-nose {
+    position: absolute;
+    width: 14px;
+    height: 10px;
+    background: #3d1c02;
+    border-radius: 50%;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.lion-mouth {
+    position: absolute;
+    width: 20px;
+    height: 10px;
+    border: 2px solid #3d1c02;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* User's Paw Styles */
+.paw-l,
+.paw-r {
+    position: absolute;
+    width: 2.5em;
+    height: 2em;
+    background-color: #deb887;
+    /* Match face color */
+    border: 2px solid #8B4513;
+    border-radius: 1.56em 1.56em 0.6em 0.6em;
+    bottom: -15px;
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 20;
+}
+
+/* Implementation of user's specific padding/before design */
+.paw-l::before,
+.paw-r::before {
+    position: absolute;
+    content: "";
+    background-color: #ffffff;
+    height: 1.37em;
+    width: 1.75em;
+    top: 0.12em;
+    /* Adjusted bits for the smaller base */
+    left: 0.35em;
+    border-radius: 1.56em 1.56em 0.6em 0.6em;
+    opacity: 0.3;
+}
+
+.paw-l {
+    left: 5px;
+    transform: rotate(-10deg);
+}
+
+.paw-r {
+    right: 5px;
+    transform: rotate(10deg);
+}
+
+/* Animation: Covering eyes */
+.covering .paw-l {
+    transform: translate(15px, -55px) rotate(10deg);
+}
+
+.covering .paw-r {
+    transform: translate(-15px, -55px) rotate(-10deg);
+}
+
+.covering .eye {
+    height: 2px;
+    margin-top: 5px;
+}
+
+.covering .lion-mascot {
+    transform: scale(1.05);
+}
