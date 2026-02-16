@@ -172,16 +172,57 @@ const Civics = ({ ageGroup }) => {
     ];
 
     const teenRightsLevels = [
-        { title: 'Level 1: Personal Freedoms', desc: 'Identify your rights to speech, assembly, and belief.' },
-        { title: 'Level 2: Educational Access', desc: 'Understanding your right to quality schooling and knowledge.' },
-        { title: 'Level 3: Digital Privacy', desc: 'Protecting your data and identity in the online world.' },
-        { title: 'Level 4: Consumer Rights', desc: 'Ensuring you get what you pay for in the marketplace.' },
-        { title: 'Level 5: Environmental Safety', desc: 'Your right to a clean and sustainable neighborhood.' }
+        {
+            title: 'Level 1: Personal Freedoms',
+            desc: 'Identify your rights to speech and assembly (Chapter IV).',
+            rights: [
+                { t: "Freedom of Expression", d: "Right to speak and share info (Section 39).", icon: "🗣️" },
+                { t: "Peaceful Assembly", d: "Right to join groups and clubs (Section 40).", icon: "👥" }
+            ]
+        },
+        {
+            title: 'Level 2: Liberty & Privacy',
+            desc: 'Understanding your basic protections from the state.',
+            rights: [
+                { t: "Personal Liberty", d: "Protection from illegal arrest (Section 35).", icon: "🔓" },
+                { t: "Private & Family Life", d: "Protection of your data and home (Section 37).", icon: "🏠" }
+            ]
+        },
+        {
+            title: 'Level 3: Belief & Movement',
+            desc: 'Your right to follow your path and travel freely.',
+            rights: [
+                { t: "Conscience & Religion", d: "Freedom to believe and worship (Section 38).", icon: "⚖️" },
+                { t: "Freedom of Movement", d: "Right to travel throughout the nation (Section 41).", icon: "🚶" }
+            ]
+        }
     ];
 
     const adultRightsLevels = [
-        { title: "Level 2: Legal Precedence 📜", desc: "Advanced constitutional rights.", rights: [{ t: "Habeas Corpus", d: "Protection from illegal detention.", icon: "⛓️" }, { t: "Presumption of Innocence", d: "Innocent until proven guilty.", icon: "🕊️" }] },
-        { title: "Level 3: Consumer Protection 🛡️", desc: "Defending economic rights.", rights: [{ t: "Product Liability", d: "Companies are liable for harmful goods.", icon: "⚠️" }, { t: "Truth in Advertising", d: "Right to honest marketing.", icon: "📢" }] }
+        {
+            title: "Level 1: Fair Trial & Justice 📜",
+            desc: "Critical legal rights in the court system.",
+            rights: [
+                { t: "Fair Hearing", d: "Right to be heard within reasonable time (Section 36).", icon: "🔨" },
+                { t: "Innocence", d: "Presumed innocent until proven guilty (Section 36(5)).", icon: "🕊️" }
+            ]
+        },
+        {
+            title: "Level 2: Property & Equality 🏘️",
+            desc: "Economic and social protections for adults.",
+            rights: [
+                { t: "Own Property", d: "Right to own land anywhere in the nation (Section 43).", icon: "🏡" },
+                { t: "Freedom from Discrimination", d: "No bias based on tribe, sex, or religion (Section 42).", icon: "✊" }
+            ]
+        },
+        {
+            title: "Level 3: Redress & Enforcement ⚔️",
+            desc: "How to fight for your rights when they are breached.",
+            rights: [
+                { t: "Access to High Court", d: "Right to sue for rights enforcement (Section 46).", icon: "⚖️" },
+                { t: "Dignity of Person", d: "Protection from torture or slavery (Section 34).", icon: "🔗" }
+            ]
+        }
     ];
 
     const rightsLevels = isKid ? kidRightsLevels : (isTeen ? teenRightsLevels : adultRightsLevels);
