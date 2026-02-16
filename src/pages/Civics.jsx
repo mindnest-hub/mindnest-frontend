@@ -59,12 +59,6 @@ const Civics = ({ ageGroup }) => {
         localStorage.setItem('civicsProgress', JSON.stringify(completedPillars));
     }, [completedPillars]);
 
-    const [muteInsights, setMuteInsights] = useState(() => localStorage.getItem('civicsMuteInsights') === 'true');
-
-    useEffect(() => {
-        localStorage.setItem('civicsMuteInsights', muteInsights);
-    }, [muteInsights]);
-
     const isComplete = completedPillars.length >= 10;
     const isMaster = completedPillars.length === 11;
 
@@ -292,9 +286,7 @@ const Civics = ({ ageGroup }) => {
                                     onClick={() => {
                                         if (opt === scenarios[govtStep].a) {
                                             showToast("Correct!", 'success');
-                                            if (!muteInsights) {
-                                                setActiveFact({ term: "Governance 🎓", fact: scenarios[govtStep].hint });
-                                            }
+                                            setActiveFact({ term: "Governance 🎓", fact: scenarios[govtStep].hint });
                                             if (govtStep === scenarios.length - 1) handlePillarComplete(1);
                                             setGovtStep(prev => prev + 1);
                                         } else {
@@ -354,10 +346,8 @@ const Civics = ({ ageGroup }) => {
                                     "Cultural rights preserve our heritage and diverse languages across the continent.",
                                     "Economic rights guarantee fair opportunities and protection in the marketplace."
                                 ];
-                                if (!muteInsights) {
-                                    setActiveFact({ term: "Fundamental Rights ⚖️", fact: rightsFacts[rightsStage] || "Keep learning about your rights!" });
-                                }
-                                setRightsStage(prev => prev + 1);
+                                setActiveFact({ term: "Fundamental Rights ⚖️", fact: rightsFacts[rightsStage] || "Keep learning about your rights!" });
+                                setRightsStage(prev => prev + 2);
                             }}
                             className="btn btn-primary"
                             style={{ width: '100%', height: 'auto', whiteSpace: 'normal', backgroundColor: '#2196F3', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
@@ -375,14 +365,6 @@ const Civics = ({ ageGroup }) => {
                             style={{ width: '100%', height: 'auto', whiteSpace: 'normal', backgroundColor: '#00C851', opacity: (pillarTimer > 0 && !completedPillars.includes(2)) ? 0.5 : 1 }}
                         >
                             I Mastered my Rights! ✅ {(pillarTimer > 0 && !completedPillars.includes(2)) && `(${pillarTimer}s)`}
-                        </button>
-                    )}
-                    {muteInsights && (
-                        <button
-                            onClick={() => setActiveFact({ term: "Fundamental Rights ⚖️", fact: "Your rights are protected by the Constitution." })}
-                            style={{ background: 'none', border: 'none', color: '#2196F3', marginTop: '1rem', textDecoration: 'underline', cursor: 'pointer' }}
-                        >
-                            💡 View Lesson
                         </button>
                     )}
                 </div>
@@ -460,9 +442,7 @@ const Civics = ({ ageGroup }) => {
                                     onClick={() => {
                                         if (opt === scenarios[respStep].a) {
                                             showToast("Responsible Choice! ✅", 'success');
-                                            if (!muteInsights) {
-                                                setActiveFact({ term: "Civic Duty 🤝", fact: scenarios[respStep].hint });
-                                            }
+                                            setActiveFact({ term: "Civic Duty 🤝", fact: scenarios[respStep].hint });
                                             if (respStep === scenarios.length - 1) handlePillarComplete(3);
                                             setRespStep(prev => prev + 1);
                                         } else {
@@ -504,9 +484,7 @@ const Civics = ({ ageGroup }) => {
                                     onClick={() => {
                                         if (opt === scenarios[lawStep].a) {
                                             showToast("Legal Mastery! ✅", 'success');
-                                            if (!muteInsights) {
-                                                setActiveFact({ term: "Law & Society ⚖️", fact: scenarios[lawStep].hint });
-                                            }
+                                            setActiveFact({ term: "Law & Society ⚖️", fact: scenarios[lawStep].hint });
                                             if (lawStep === scenarios.length - 1) handlePillarComplete(4);
                                             setLawStep(prev => prev + 1);
                                         } else {
@@ -574,9 +552,7 @@ const Civics = ({ ageGroup }) => {
                                     onClick={() => {
                                         if (i === 0) {
                                             showToast("Great Leadership! 🚀", 'success');
-                                            if (!muteInsights) {
-                                                setActiveFact({ term: "Civic Action 🏗️", fact: "Collaboration is the key to sustainable community development." });
-                                            }
+                                            setActiveFact({ term: "Civic Action 🏗️", fact: "Collaboration is the key to sustainable community development." });
                                             if (projStep === scenarios.length - 1) handlePillarComplete(5);
                                             setProjStep(prev => prev + 1);
                                         } else {
@@ -657,9 +633,7 @@ const Civics = ({ ageGroup }) => {
                                     onClick={() => {
                                         // Simple logic: first option is best for flow
                                         showToast("Tool Mastered! ✅", 'success');
-                                        if (!muteInsights) {
-                                            setActiveFact({ term: "Civic Tools 🛠️", fact: "Knowledge is the greatest tool for civic empowerment." });
-                                        }
+                                        setActiveFact({ term: "Civic Tools 🛠️", fact: "Knowledge is the greatest tool for civic empowerment." });
                                         if (toolStep === scenarios.length - 1) handlePillarComplete(6);
                                         setToolStep(prev => prev + 1);
                                     }}
@@ -831,7 +805,7 @@ const Civics = ({ ageGroup }) => {
             { q: "Level 5: Influence - You need to convince your class to save water.", options: ["Impact stories & Data", "Shouting orders", "Setting a bad example"], a: 0, fact: "Influence is earned through credibility, not force." }
         ] : [
             { q: "Level 1: Strategy - The national power grid is failing. First step?", options: ["Diversify energy sources", "Blame the previous team", "Ignore the data"], a: 0, fact: "Strategic thinking solves root causes." },
-            { q: "Level 2: Diplomacy - Two neighboring states are in a border dispute.", options: ["Negotiate a trade deal", "Send the military", "Ignore the conflict"], a: 0, fact: "Diplomacy is the highest form of leadership." },
+            { q: "Level 2: Diplomacy - Two neighboring states are in a border dispute.", options: ["Negotiate a trade deal", "Send the military", "Ignore the conflict"], a: 0, fact: "Multilateral diplomacy is the engine of regional prosperity." },
             { q: "Level 3: Legacy - How do you want to be remembered after 4 years?", options: ["By the institutions built", "By the wealth acquired", "By the enemies defeated"], a: 0, fact: "Legacy is what lives after the leader leaves." },
             { q: "Level 4: Institutional Reform - Civil service is slow and corrupt.", options: ["Digitize & Merit-based hiring", "Hire more relatives", "Blame the citizens"], a: 0, fact: "Technology and meritocracy are the cures for bureaucratic stagnation." },
             { q: "Level 5: Internal Conflict - Your cabinet is divided on a major policy.", options: ["Consensus & Alignment", "Fire everyone who disagrees", "Flip a coin"], a: 0, fact: "Diverse opinions should strengthen, not stall, leadership." },
@@ -1261,16 +1235,6 @@ const Civics = ({ ageGroup }) => {
                             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
                             <h2 style={{ color: '#FFD700', marginTop: 0 }}>{activeFact.term}</h2>
                             <p style={{ fontSize: '1.2rem', lineHeight: '1.6', color: '#fff' }}>{activeFact.fact}</p>
-
-                            <div style={{ marginTop: '1.5rem', padding: '0.8rem', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-                                <input
-                                    type="checkbox"
-                                    id="mute-insights"
-                                    checked={muteInsights}
-                                    onChange={(e) => setMuteInsights(e.target.checked)}
-                                />
-                                <label htmlFor="mute-insights" style={{ fontSize: '0.85rem', color: '#aaa', cursor: 'pointer' }}>Mute automatic popups</label>
-                            </div>
 
                             <button
                                 onClick={() => setActiveFact(null)}

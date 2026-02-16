@@ -693,7 +693,9 @@ const History = ({ ageGroup }) => {
                                                             setLastTimelineCorrect(isCorrect);
                                                             setShowTimelineFact(true);
                                                             if (isCorrect) {
-                                                                addEarnings('history', isKid ? 150 : 250);
+                                                                const reward = isKid ? 150 : 250;
+                                                                addEarnings('history', reward);
+                                                                showToast(`Path Mastered! +₦${reward} 📜`, 'success');
                                                             }
                                                         }}
                                                         className="btn btn-outline"

@@ -663,12 +663,12 @@ const NutritionPillar = ({ onNext, showToast, isKid }) => {
 
     const handleKidChoice = (choice) => {
         if (choice === kidsQuest[questIdx].a) {
-            showToast("Correct! 🌟", 'success');
+            showToast("+₦20! Correct! 🍎", 'success');
             if (questIdx < kidsQuest.length - 1) {
                 setQuestIdx(prev => prev + 1);
             } else {
                 setKidsScore(3);
-                showToast("Nutrition Hero! 🎖️", 'success');
+                showToast("Nutrition Hero! +₦30 🍎🥦🥛", 'success');
             }
         } else {
             showToast("Try again! Check the icons.", 'warning');
@@ -873,7 +873,7 @@ const HarmonyPillar = ({ onNext, showToast, isKid }) => {
     const [scenIdx, setScenIdx] = useState(0);
     const handleScenChoice = (choice) => {
         if (choice === scenarios[scenIdx].a) {
-            showToast("Kind Heart! ❤️", "success");
+            showToast("Kind Heart! +₦20 ❤️", "success");
             if (scenIdx < scenarios.length - 1) setScenIdx(prev => prev + 1);
             else setStep(2);
         } else {

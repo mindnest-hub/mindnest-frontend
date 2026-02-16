@@ -163,12 +163,14 @@ const Agripreneurship = () => {
                 } else {
                     setMoney(prev => prev + yieldAmount);
                     addEarnings('agri', yieldAmount);
+                    showToast(`Harvest complete! +₦${yieldAmount} 🌽`, 'success');
                     setCropStage(3);
                     setTimeout(() => setCropStage(0), 2000);
                 }
             } else {
                 setMoney(prev => prev + yieldAmount);
                 addEarnings('agri', yieldAmount);
+                showToast(`Harvest complete! +₦${yieldAmount} 🌽`, 'success');
                 setCropStage(3);
                 setTimeout(() => setCropStage(0), 2000);
             }
@@ -257,7 +259,7 @@ const Agripreneurship = () => {
         }
     };
 
-    const isMasterAgripreneur = balance >= 5000 && harvestCount >= 3;
+    const isMasterAgripreneur = balance >= 10000 && harvestCount >= 3;
 
     return (
         <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -512,8 +514,8 @@ const Agripreneurship = () => {
 
                                 <div style={{ margin: '1rem 0', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <span>Total Earnings {'>'} ₦5,000:</span>
-                                        <span style={{ color: balance >= 5000 ? '#00C851' : '#ff4444' }}>{balance >= 5000 ? "✅ Passed" : `❌ (${balance}/5000)`}</span>
+                                        <span>Total Earnings {'>'} ₦10,000:</span>
+                                        <span style={{ color: balance >= 10000 ? '#00C851' : '#ff4444' }}>{balance >= 10000 ? "✅ Passed" : `❌ (${balance}/10000)`}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <span>Harvest Cycles {'>'} 3:</span>

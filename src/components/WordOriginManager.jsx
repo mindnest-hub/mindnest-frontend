@@ -7,6 +7,10 @@ const WordOriginManager = ({ ageGroup }) => {
     const location = useLocation();
     const [activeWord, setActiveWord] = useState(null);
     const [showToast, setShowToast] = useState(null);
+    const [position, setPosition] = useState({ x: window.innerWidth - 250, y: window.innerHeight - 250 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
     const [seenWords, setSeenWords] = useState(() => {
         return JSON.parse(localStorage.getItem('seenWordOrigins')) || [];
     });
@@ -43,7 +47,43 @@ const WordOriginManager = ({ ageGroup }) => {
         }
     }, [location.pathname, seenWords]);
 
-    const handleOpen = () => {
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        setDragStart({
+            x: e.clientX - position.x,
+            y: e.clientY - position.y
+        });
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (!isDragging) return;
+
+            const newX = Math.max(0, Math.min(window.innerWidth - 220, e.clientX - dragStart.x));
+            const newY = Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragStart.y));
+
+            setPosition({ x: newX, y: newY });
+        };
+
+        const handleMouseUp = () => {
+            setIsDragging(false);
+        };
+
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, dragStart]);
+
+    const handleOpen = (e) => {
+        // Only open if we aren't dragging
+        if (isDragging) return;
+
         if (showToast) {
             setActiveWord(showToast);
             setShowToast(null);
@@ -62,23 +102,26 @@ const WordOriginManager = ({ ageGroup }) => {
             {/* TOAST NOTIFICATION */}
             {showToast && !activeWord && (
                 <div
+                    onMouseDown={handleMouseDown}
                     onClick={handleOpen}
                     style={{
                         position: 'fixed',
-                        bottom: '160px',
-                        right: '20px',
+                        left: `${position.x}px`,
+                        top: `${position.y}px`,
                         backgroundColor: '#FFD700',
                         color: '#000',
                         padding: '1rem 1.5rem',
                         borderRadius: '50px',
                         boxShadow: '0 5px 15px rgba(0,0,0,0.3)',
-                        cursor: 'pointer',
+                        cursor: isDragging ? 'grabbing' : 'grab',
                         zIndex: 9999,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.8rem',
                         animation: 'bounceIn 0.5s',
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        userSelect: 'none',
+                        transition: isDragging ? 'none' : 'all 0.1s ease-out'
                     }}
                 >
                     <span style={{ fontSize: '1.5rem' }}>💡</span>
