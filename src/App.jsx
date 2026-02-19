@@ -14,6 +14,10 @@ const Agripreneurship = lazy(() => import('./pages/Agripreneurship'));
 const Tech = lazy(() => import('./pages/Tech'));
 const Civics = lazy(() => import('./pages/Civics'));
 const Health = lazy(() => import('./pages/Health'));
+const Wellness = lazy(() => import('./pages/Wellness'));
+const Habits = lazy(() => import('./pages/Habits'));
+const Relationships = lazy(() => import('./pages/Relationships'));
+const Purpose = lazy(() => import('./pages/Purpose'));
 const Transparency = lazy(() => import('./pages/Transparency'));
 
 import WordOriginManager from './components/WordOriginManager';
@@ -73,9 +77,13 @@ function App() {
               <Route path="/tech" element={<Tech ageGroup={ageGroup} />} />
               <Route path="/civics" element={<Civics ageGroup={ageGroup} />} />
               <Route path="/health" element={<Health ageGroup={ageGroup} />} />
-              <Route path="/mental-health" element={<MentalHealth ageGroup={ageGroup} />} />
+              <Route path="/wellness" element={<Wellness ageGroup={ageGroup} />} />
+              <Route path="/habits" element={<Habits ageGroup={ageGroup} />} />
+              <Route path="/relationships" element={<Relationships ageGroup={ageGroup} />} />
+              <Route path="/purpose" element={<Purpose ageGroup={ageGroup} />} />
               <Route path="/transparency" element={<Transparency />} />
             </Routes>
+            {/* Redirect legacy routes if needed, or just let them 404 if not linked */}
           </Suspense>
           <Chatbot />
           <DailyBonus />
