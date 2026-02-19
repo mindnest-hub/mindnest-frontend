@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useAuth } from '../context/AuthContext';
 import { getLegalAdvice } from '../data/legalRights';
 import DocumentDrafter from './DocumentDrafter';
 
-// Initialize Gemini API (Replace with env var in production)
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
-
 const Chatbot = () => {
     // Session Management State
+    const { user } = useAuth();
     const [sessions, setSessions] = useState(() => {
         const saved = localStorage.getItem('chatSessions');
         return saved ? JSON.parse(saved) : [];
@@ -217,7 +215,7 @@ const Chatbot = () => {
         }
 
 
-        // --- STANDARD GEMINI AI ---
+        // --- SUPABASE EDGE FUNCTION AI ---
         try {
             // Content Safety Filter
             const inappropriateKeywords = ['sex', 'nude', 'porn', 'xxx', 'naked', 'explicit'];
@@ -232,63 +230,37 @@ const Chatbot = () => {
                 return;
             }
 
-            if (!API_KEY) {
-                // Improved Mock response
-                setTimeout(() => {
-                    let mockResponse = `**${country} - ${topics.find(t => t.id === topic)?.label}**\n\n`;
+            const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_URL?.split('.')[0].split('//')[1];
+            const functionUrl = `https://${SUPABASE_PROJECT_ID}.functions.supabase.co/chat`;
 
-                    if (topic === 'land') {
-                        mockResponse += "Key points about land verification:\n\n1. **Certificate of Occupancy (C of O)**: Always verify it's genuine at the Land Registry\n2. **Survey Plan**: Must match current coordinates\n3. **Payment**: Never pay cash - use bank transfers for accountability\n4. **Due Diligence**: Check for family disputes or government acquisition\n\nNeed help verifying a specific property? Let me know!";
-                    } else if (topic === 'chat') {
-                        mockResponse += "I'm happy to chat! MindNest is all about helping you reclaim your past and build your future.\n\nHow can I help you today? We can discuss:\n- **History**: Discover untold African stories\n- **Wealth**: Learn about money and assets\n- **Growth**: Sharpen your critical thinking skills\n\nWhat's on your mind?";
-                    } else if (topic === 'invest') {
-                        mockResponse += "Smart investment principles:\n\n1. **Diversify**: Don't put all funds in one asset\n2. **Verify**: Especially for real estate - check documents\n3. **Long-term**: Best returns come from patience\n4. **Professional advice**: Consult verified experts\n\nInterested in real estate investment? I can explain the verification process.";
-                    } else {
-                        // Use legal database for Legal Rights topic
-                        const legalInfo = getLegalAdvice(country, 'arrest');
-                        if (legalInfo) {
-                            mockResponse = legalInfo;
-                        } else {
-                            mockResponse += "Your legal rights:\n\n1. **Right to silence**: You don't have to answer all questions\n2. **Right to a lawyer**: Request one if arrested\n3. **No torture**: Report any abuse immediately\n4. **Fair trial**: You're innocent until proven guilty\n\nFacing a legal issue? Tell me more so I can provide specific guidance.";
-                        }
-                    }
+            const res = await fetch(functionUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem('token')}` // Pass JWT for identity if needed
+                },
+                body: JSON.stringify({
+                    message: userMsg,
+                    userId: user?.id,
+                    ageMode: ageMode,
+                    topic: topic,
+                    country: country
+                })
+            });
 
-                    setMessages(prev => [...prev, { text: mockResponse, sender: 'bot' }]);
-                    setIsLoading(false);
-                }, 1000);
-                return;
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to connect to AI Mentor');
             }
 
-            const genAI = new GoogleGenerativeAI(API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-            let systemPrompt = `You are a helpful assistant for ${country}. Topic: ${topics.find(t => t.id === topic).prompt}. `;
-
-            if (ageMode === 'kids') systemPrompt += "Explain like I'm 10 years old. Use emojis. Keep it simple and safe. ";
-            else if (ageMode === 'teens') systemPrompt += "Explain for a teenager. Be relatable, use cool examples. ";
-            else systemPrompt += "Be professional, detailed, and practical. ";
-
-            systemPrompt += `User Question: "${userMsg}". Disclaimer: Not legal/financial advice.`;
-
-            console.log("Sending to Gemini:", systemPrompt);
-
-            const result = await model.generateContent(systemPrompt);
-            const response = await result.response;
-            const text = response.text();
-
-            console.log("Gemini response:", text);
-            setMessages(prev => [...prev, { text: text, sender: 'bot' }]);
+            const data = await res.json();
+            setMessages(prev => [...prev, { text: data.reply, sender: 'bot' }]);
         } catch (error) {
-            console.error("Gemini API Error:", error);
-            let errorMsg = "Connection error. ";
-            if (error.message?.includes("API_KEY")) {
-                errorMsg += "API key issue. Please check your configuration.";
-            } else if (error.message?.includes("quota")) {
-                errorMsg += "API quota exceeded. Please try again later.";
-            } else {
-                errorMsg += "Please try again or check your internet connection.";
-            }
-            setMessages(prev => [...prev, { text: errorMsg, sender: 'bot' }]);
+            console.error("AI Mentor Error:", error);
+            setMessages(prev => [...prev, {
+                text: "Sorry, I'm having trouble connecting to the network. Please check your internet or try again later.",
+                sender: 'bot'
+            }]);
         } finally {
             setIsLoading(false);
         }

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MindNest Africa</string>
+    <string name="title_activity_main">MindNest Africa</string>
+    <string name="package_name">bond.mindnest.app</string>
+    <string name="custom_url_scheme">bond.mindnest.app</string>
+</resources>

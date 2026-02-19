@@ -63,63 +63,49 @@ export const api = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password, ageGroup, username }),
             });
-            if (!res.ok) throw new Error('Backend unavailable');
+            // We ignore failures here as Supabase is the primary auth now
             return res.json();
         } catch (error) {
-            // Fallback to local storage
-            console.log('Using local authentication (no backend)');
-            return localAuth.signup(email, password, ageGroup, username);
+            return { success: false, error: error.message };
         }
     },
 
+    verifyOtp: async (email, code) => {
+        // Supabase handles OTP verification on frontend usually
+        return { success: true };
+    },
+
     login: async (email, password) => {
-        try {
-            const res = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-            if (!res.ok) throw new Error('Backend unavailable');
-            return res.json();
-        } catch (error) {
-            // Fallback to local storage
-            console.log('Using local authentication (no backend)');
-            return localAuth.login(email, password);
-        }
+        // Supabase handles login on frontend
+        return { success: true };
     },
 
     // User
     getProfile: async (token) => {
-        try {
-            const res = await fetch(`${API_URL}/user/profile`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            if (!res.ok) throw new Error('Backend unavailable');
-            return res.json();
-        } catch (error) {
-            // Fallback to local storage
-            console.log('Using local profile (no backend)');
-            return localAuth.getProfile(token);
+        const res = await fetch(`${API_URL}/user/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to fetch profile');
         }
+        return res.json();
     },
 
     updateProgress: async (token, data) => {
-        try {
-            const res = await fetch(`${API_URL}/user/progress`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data),
-            });
-            if (!res.ok) throw new Error('Backend unavailable');
-            return res.json();
-        } catch (error) {
-            // For now, just return success for local mode
-            console.log('Local mode: progress not synced to backend');
-            return { success: true };
+        const res = await fetch(`${API_URL}/user/progress`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to update progress');
         }
+        return res.json();
     },
 
     getLeaderboard: async () => {
@@ -128,8 +114,6 @@ export const api = {
             if (!res.ok) throw new Error('Backend unavailable');
             return res.json();
         } catch (error) {
-            // Return mock leaderboard for local mode
-            console.log('Using mock leaderboard (no backend)');
             return [];
         }
     }

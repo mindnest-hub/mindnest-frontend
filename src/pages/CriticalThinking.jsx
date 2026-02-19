@@ -5,17 +5,14 @@ import { triggerLiveEvent } from '../components/LiveNotifications';
 import { africanResources } from '../data/africanResources';
 import Toast from '../components/Toast';
 const CriticalThinking = ({ ageGroup }) => {
-    console.log("CriticalThinking: Component Mounting...");
     const navigate = useNavigate();
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
-    console.log("CriticalThinking: AgeGroup:", ageGroup, "isKid:", isKid);
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
     const isAdult = !isKid && !isTeen;
 
     let wallet;
     try {
         wallet = useWallet();
-        console.log("CriticalThinking: Wallet loaded", wallet);
     } catch (e) {
         console.error("CriticalThinking: Wallet Error", e);
     }

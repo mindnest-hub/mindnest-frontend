@@ -73,6 +73,7 @@ function App() {
               <Route path="/tech" element={<Tech ageGroup={ageGroup} />} />
               <Route path="/civics" element={<Civics ageGroup={ageGroup} />} />
               <Route path="/health" element={<Health ageGroup={ageGroup} />} />
+              <Route path="/mental-health" element={<MentalHealth ageGroup={ageGroup} />} />
               <Route path="/transparency" element={<Transparency />} />
             </Routes>
           </Suspense>

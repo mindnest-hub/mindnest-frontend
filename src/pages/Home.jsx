@@ -32,10 +32,12 @@ const Home = ({ ageGroup, setAgeGroup }) => {
         { id: 1, title: 'True History', icon: '🌍', desc: 'Discover the untold stories of Great African Civilizations.', path: '/history', color: '#B8860B' },
         { id: 2, title: 'Finance & Wealth', icon: '💰', desc: 'Master the principles of wealth building and money management.', path: '/finance', color: '#00A86B' },
         { id: 3, title: 'Critical Thinking', icon: '🧠', desc: 'Sharpen your logic with ancient games and modern puzzles.', path: '/critical-thinking', color: '#CD5C5C' },
-        { id: 4, title: 'Agripreneurship', icon: '🌱', desc: 'Bridge agriculture with business for a sustainable future.', path: '/agri', color: '#2E8B57' },
+        { id: 4, title: 'Habits (Consistency)', icon: '📅', desc: 'Build positive routines and break negative ones.', path: '/habits', color: '#2E8B57' },
         { id: 5, title: 'Tech & Innovation', icon: '💻', desc: 'Learn the skills needed to build the digital future.', path: '/tech', color: '#4682B4' },
         { id: 6, title: 'Civics & Leadership', icon: '⚖️', desc: 'Understand your roles and lead with integrity.', path: '/civics', color: '#DAA520' },
-        { id: 7, title: 'Health & Wellness', icon: '🌿', desc: 'Holistic approaches to a strong body and clear mind.', path: '/health', color: '#DB7093' },
+        { id: 7, title: 'Total Wellness 🌿', icon: '🧬', desc: 'Holistic health for a strong body and clear mind.', path: '/wellness', color: '#DB7093' },
+        { id: 8, title: 'Relationships 🤝', icon: '🫂', desc: 'Navigate friendships, family, and networks.', path: '/relationships', color: '#6A5ACD' },
+        { id: 9, title: 'Purpose 🌟', icon: '🧭', desc: 'Find your meaning, career, and legacy.', path: '/purpose', color: '#FF8C00' },
     ];
 
     return (

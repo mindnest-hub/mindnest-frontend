@@ -1,5 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { api } from '../services/api';
+import { supabase } from '../supabaseClient';
 
 const AuthContext = createContext();
 
@@ -7,47 +6,88 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (token) {
-            api.getProfile(token)
-                .then(userData => setUser(userData))
-                .catch(() => {
-                    localStorage.removeItem('token');
-                    setToken(null);
-                })
-                .finally(() => setLoading(false));
-        } else {
+        // Check for active session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                handleSession(session);
+            } else {
+                setLoading(false);
+            }
+        });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session) {
+                handleSession(session);
+            } else {
+                setUser(null);
+                localStorage.removeItem('token');
+                setLoading(false);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const handleSession = async (session) => {
+        const token = session.access_token;
+        localStorage.setItem('token', token);
+        try {
+            const userData = await api.getProfile(token);
+            setUser({ ...session.user, ...userData });
+        } catch (error) {
+            setUser(session.user);
+        } finally {
             setLoading(false);
         }
-    }, [token]);
+    };
 
     const login = async (email, password) => {
-        const data = await api.login(email, password);
-        localStorage.setItem('token', data.access_token);
-        setToken(data.access_token);
-        setUser(data.user);
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
         return data.user;
     };
 
     const signup = async (email, password, ageGroup, username) => {
-        const data = await api.signup(email, password, ageGroup, username);
-        localStorage.setItem('token', data.access_token);
-        setToken(data.access_token);
-        setUser(data.user);
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: { username, age_group: ageGroup }
+            }
+        });
+        if (error) {
+            console.error("Supabase Signup Error:", error);
+            throw error;
+        }
+
+        // Optionally notify backend to create profile
+        try {
+            await api.signup(email, password, ageGroup, username);
+        } catch (e) {
+            console.warn('Backend profile creation failed, might already exist or handled by trigger');
+        }
+
         return data.user;
     };
 
-    const logout = () => {
+    const verifyOtp = async (email, code) => {
+        const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type: 'signup' });
+        if (error) throw error;
+        return data.user;
+    };
+
+    const logout = async () => {
+        await supabase.auth.signOut();
         localStorage.removeItem('token');
-        setToken(null);
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, signup, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, signup, verifyOtp, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

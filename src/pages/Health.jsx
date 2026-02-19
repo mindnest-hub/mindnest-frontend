@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import { useWallet } from '../hooks/useWallet';
-
+import { bodyHealthData } from '../data/bodyHealthData';
 
 // --- KIDS WELLNESS COMPONENTS (10 SEQUENTIAL GAMES) ---
 
@@ -133,25 +133,13 @@ const WellnessGameModal = ({ game, currentLevel, onClose, onComplete }) => {
     }, [gameState]);
 
     const handleTimeUp = () => {
-        // Win Condition: Use score thresholds based on game type
-        // Basic threshold: score >= target * 0.8? Or just pass/fail
-        // Simplification: Games report score. Wrapper decides.
-        // Actually, let games define their target via a prop or internal?
-        // Let's passed `target` logic here purely or let game trigger 'complete'?
-        // The implementation plan says: "When Timer hits 0: If score >= target, Level Complete."
-        // We need to know the target. Let's ask the game component for target? No.
-        // Let's set targets here based on level for generic scoring games.
-        const target = currentLevel * 5; // Default generic target
-        // Some games have different scoring scales.
-        // We will pass `onScoreUpdate` to games.
-        // And we will evaluate result here.
-
+        // Simple generic win condition for kids
+        const target = currentLevel * 5;
         let success = false;
-        // Logic variation per game
         if (['food_sort', 'sleep_catch', 'sparkle_teeth', 'hand_wash', 'move_groove'].includes(game.id)) {
-            success = gameScore >= (currentLevel * 3); // Action games
+            success = gameScore >= (currentLevel * 3);
         } else if (['super_plate'].includes(game.id)) {
-            success = gameScore >= 1; // Built at least 1 plate
+            success = gameScore >= 1;
         } else if (['mood_detect'].includes(game.id)) {
             success = gameScore >= 2;
         } else if (['safe_shield'].includes(game.id)) {
@@ -228,7 +216,7 @@ const WellnessGameModal = ({ game, currentLevel, onClose, onComplete }) => {
     );
 };
 
-// MINI GAME COMPONENT RENDERER
+// MINI GAME COMPONENT RENDERER (Keep existing kids games)
 const RenderGame = ({ gameId, level, onScore }) => {
     switch (gameId) {
         case 'food_sort': return <GameFoodSorter level={level} updateScore={onScore} />;
@@ -245,7 +233,9 @@ const RenderGame = ({ gameId, level, onScore }) => {
     }
 };
 
-// REFACTORED MINI GAMES (Score-based)
+// ... Include all existing game components (GameFoodSorter, GameSuperPlate, etc.) here ...
+// To save space and avoid redundancy error, I'll copy the kids game components exactly as they were.
+// However, since I'm overwriting, I MUST include them.
 
 const GameFoodSorter = ({ level, updateScore }) => {
     const [score, setScore] = useState(0);
@@ -275,10 +265,7 @@ const GameFoodSorter = ({ level, updateScore }) => {
 
 const GameSuperPlate = ({ level, updateScore }) => {
     const [plate, setPlate] = useState({ protein: 0, carbs: 0, veg: 0 });
-    // Logic: Level 1 = Just items. Level 2 = Min 1 protein. Level 3 = Min 1 protein + 1 veg.
     const targetCount = level === 1 ? 3 : level === 2 ? 5 : 7;
-
-    // Food Library
     const foods = {
         carbs: ['🍠', '🍚', '🥖', '🍝', '🌽'],
         protein: ['🐟', '🍗', '🥚', '🥩', '🥜'],
@@ -296,13 +283,11 @@ const GameSuperPlate = ({ level, updateScore }) => {
 
     const checkWin = (currentPlate) => {
         const total = currentPlate.protein + currentPlate.carbs + currentPlate.veg;
-
         if (total >= targetCount) {
             let win = false;
             if (level === 1) win = true;
             else if (level === 2) win = currentPlate.protein >= 1;
             else if (level === 3) win = currentPlate.protein >= 1 && currentPlate.veg >= 1;
-
             if (win) updateScore(1);
         }
     };
@@ -321,8 +306,6 @@ const GameSuperPlate = ({ level, updateScore }) => {
     return (
         <div style={{ padding: '0 1rem' }}>
             <h4 style={{ color: '#FFD700' }}>{Instructions()}</h4>
-
-            {/* The Plate */}
             <div style={{
                 width: '200px', height: '200px', borderRadius: '50%', backgroundColor: '#fff',
                 margin: '1rem auto', position: 'relative', border: '8px solid #ddd',
@@ -335,8 +318,6 @@ const GameSuperPlate = ({ level, updateScore }) => {
                     {[...Array(plate.veg)].map((_, i) => <span key={`v${i}`}>🥬</span>)}
                 </div>
             </div>
-
-            {/* Controls */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
                 <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '0.8rem', marginBottom: '0.3rem' }}>Carbs</div>
@@ -357,7 +338,6 @@ const GameSuperPlate = ({ level, updateScore }) => {
                     ))}
                 </div>
             </div>
-
             <button onClick={resetPlate} className="btn btn-sm" style={{ opacity: 0.7 }}>Reset Plate 🔄</button>
         </div>
     );
@@ -447,7 +427,6 @@ const GameMoodDetect = ({ level, updateScore }) => {
     const [q, setQ] = useState(0);
     const [score, setScore] = useState(0);
     const target = moods[q % moods.length];
-
     const guess = (name) => {
         if (name === target.n) {
             const s = score + 1;
@@ -511,30 +490,22 @@ const GameMindCloud = ({ level, updateScore }) => {
     );
 };
 
+// --- MAIN HEALTH COMPONENT ---
 
 const Health = ({ ageGroup }) => {
     const navigate = useNavigate();
     const { addEarnings } = useWallet();
-
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
+    const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
 
+    // --- KIDS RENDER ---
     if (isKid) {
         return (
             <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh' }}>
                 <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <button
-                        onClick={() => navigate('/')}
-                        style={{
-                            background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem',
-                            display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto'
-                        }}
-                    >
-                        ← Hub
-                    </button>
+                    <button onClick={() => navigate('/')} style={{ background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}>← Hub</button>
                     <h1 style={{ color: '#FFD700' }}>Wellness World 🌍</h1>
-                    <p style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '0.5rem', fontStyle: 'italic' }}>
-                        Your mind and body are your first investments.
-                    </p>
+                    <p style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '0.5rem', fontStyle: 'italic' }}>Your mind and body are your first investments.</p>
                     <p style={{ fontSize: '0.9rem', opacity: 0.8 }}>Play 10 Games • Earn Stars 🌟</p>
                 </header>
                 <KidsWellnessHub />
@@ -542,421 +513,201 @@ const Health = ({ ageGroup }) => {
         );
     }
 
-    // --- TEENS/ADULTS LOGIC ---
-    const [activeModule, setActiveModule] = useState(() => Number(localStorage.getItem('healthActiveStep')) || 0);
-    const [completedModules, setCompletedModules] = useState(() => JSON.parse(localStorage.getItem('healthCompletedSteps')) || Array(4).fill(false));
-    const [toast, setToast] = useState(null);
+    // --- TEEN & ADULT RENDER (NEW BODY PILLAR) ---
+    const modules = isTeen ? bodyHealthData.teens : bodyHealthData.adults;
+    const TOTAL_LEVELS = modules.length;
 
+    const [activeLevel, setActiveLevel] = useState(null); // Index of module being viewed
+    const [completedLevels, setCompletedLevels] = useState(() => {
+        const saved = JSON.parse(localStorage.getItem(`bodyHealth_${isTeen ? 'teen' : 'adult'}`));
+        // Ensure saved array is boolean array of correct length
+        if (Array.isArray(saved) && saved.length > 0) return saved;
+        return Array(TOTAL_LEVELS).fill(false);
+    });
+
+    const [toast, setToast] = useState(null);
     const showToast = (message, type = 'info', duration = 3000) => setToast({ message, type, duration });
 
     useEffect(() => {
-        localStorage.setItem('healthActiveStep', activeModule);
-        localStorage.setItem('healthCompletedSteps', JSON.stringify(completedModules));
-        window.scrollTo(0, 0);
-    }, [activeModule, completedModules]);
+        localStorage.setItem(`bodyHealth_${isTeen ? 'teen' : 'adult'}`, JSON.stringify(completedLevels));
+    }, [completedLevels, isTeen]);
 
-    const markComplete = (index) => {
-        const newCompleted = [...completedModules];
-        if (!newCompleted[index]) {
+    const handleComplete = (index) => {
+        if (!completedLevels[index]) {
+            const newCompleted = [...completedLevels];
             newCompleted[index] = true;
-            setCompletedModules(newCompleted);
-            addEarnings('health', 250);
-            showToast("Pillar Mastered! +₦250 🏆", 'success');
+            // Pad if length mismatch
+            while (newCompleted.length < TOTAL_LEVELS) newCompleted.push(false);
+
+            setCompletedLevels(newCompleted);
+            addEarnings('health', 150);
+            showToast(`Level ${index + 1} Complete! +₦150 🏆`, 'success');
         }
     };
 
-    const renderCurrentModule = () => {
-        switch (activeModule) {
-            case 0: return <IntroModule ageGroup={ageGroup} onNext={() => { markComplete(0); setActiveModule(1); }} />;
-            case 1: return <NutritionPillar onNext={() => { markComplete(1); setActiveModule(2); }} showToast={showToast} isKid={isKid} />;
-            case 2: return <VitalityPillar onNext={() => { markComplete(2); setActiveModule(3); }} showToast={showToast} isKid={isKid} />;
-            case 3: return <HarmonyPillar onNext={() => { markComplete(3); setActiveModule(4); }} showToast={showToast} isKid={isKid} />;
-            case 4: return <CertificateModule onNext={() => navigate('/')} />;
-            default: return <IntroModule ageGroup={ageGroup} onNext={() => setActiveModule(1)} />;
-        }
-    };
-
-    const progressPercent = Math.round((completedModules.filter(Boolean).length / 4) * 100);
+    const progressPercent = Math.round((completedLevels.filter(Boolean).length / TOTAL_LEVELS) * 100);
 
     return (
         <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh' }}>
             {toast && <Toast message={toast.message} type={toast.type} duration={toast.duration} onClose={() => setToast(null)} />}
+
             <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                <button onClick={() => navigate('/')} style={{ background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto 1.5rem auto' }}>← Hub</button>
+                <h1 style={{ color: 'var(--color-secondary)', marginBottom: '0.5rem' }}>Body & Physical Health 🏃</h1>
+                <p style={{ color: '#aaa' }}>{isTeen ? "Learning Who I Am" : "Responsibility & Long-term Health"}</p>
+            </header>
+
+            {/* Mental Health Link */}
+            <div style={{ maxWidth: '800px', margin: '0 auto 2rem auto' }}>
                 <button
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/mental-health')}
+                    className="animate-pulse"
                     style={{
-                        background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem',
-                        display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto 1.5rem auto'
+                        width: '100%', padding: '1rem', marginBottom: '1.5rem',
+                        background: 'linear-gradient(135deg, #00C851 0%, #007E33 100%)',
+                        color: '#fff', border: 'none', borderRadius: '12px',
+                        fontSize: '1.1rem', fontWeight: 'bold', cursor: 'pointer',
+                        boxShadow: '0 4px 15px rgba(0, 200, 81, 0.3)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
                     }}
                 >
-                    ← Hub
+                    <span>🧠💚</span> Enter Mental Health Center
                 </button>
-                <h1 style={{ color: 'var(--color-secondary)', marginBottom: '0.5rem' }}>Wellness & Mindset</h1>
-                <p style={{ color: '#aaa' }}>Build a Strong Body & A Focused Mind</p>
-            </header>
+            </div>
+
+            {/* Progress Bar */}
             <div style={{ maxWidth: '800px', margin: '0 auto 3rem auto' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem', color: '#fff', fontWeight: 'bold' }}>
-                    <span>Module Journey</span>
-                    <span>{progressPercent}% Complete</span>
+                    <span>Pillar Progress</span>
+                    <span>{progressPercent}%</span>
                 </div>
                 <div style={{ width: '100%', height: '12px', backgroundColor: '#222', borderRadius: '20px', overflow: 'hidden', border: '1px solid #333' }}>
-                    <div style={{
-                        width: `${progressPercent}%`,
-                        height: '100%',
-                        backgroundColor: 'var(--color-secondary)',
-                        transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                        boxShadow: '0 0 10px var(--color-secondary)'
-                    }}></div>
+                    <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: 'var(--color-secondary)', transition: 'width 0.5s' }}></div>
                 </div>
             </div>
-            <div className="card" style={{ maxWidth: '900px', margin: '0 auto', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
-                {renderCurrentModule()}
-            </div>
-        </div>
-    );
-};
 
-const IntroModule = ({ onNext, ageGroup }) => {
-    const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
+            {/* Modules Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem', maxWidth: '1200px', margin: '0 auto' }}>
+                {modules.map((mod, idx) => {
+                    const isLocked = idx > 0 && !completedLevels[idx - 1];
+                    const isDone = completedLevels[idx];
 
-    // Customized Text Logic
-    const introText = isTeen
-        ? "Strong health builds strong decisions. Strong decisions build strong futures."
-        : "Your body is your engine. Your mind is your steering wheel.";
+                    return (
+                        <div key={mod.id} className="card" style={{ opacity: isLocked ? 0.6 : 1, border: isDone ? '2px solid #00C851' : '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{isLocked ? '🔒' : mod.icon}</div>
+                            <h3 style={{ marginBottom: '0.5rem' }}>{mod.title}</h3>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>{mod.desc}</p>
 
-    return (
-        <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-            <h1 style={{ color: 'var(--color-secondary)', fontSize: '2.5rem', marginBottom: '1.5rem' }}>Health, Wellness & Mindset 🌿</h1>
-            <p style={{ fontSize: '1.3rem', lineHeight: '1.6', color: '#fff', maxWidth: '700px', margin: '0 auto 2rem', fontStyle: 'italic', borderLeft: '4px solid var(--color-secondary)', paddingLeft: '1rem' }}>
-                "{introText}"
-            </p>
-            <p style={{ fontSize: '1rem', color: '#aaa', maxWidth: '600px', margin: '0 auto 2rem' }}>
-                Learn to eat well, stay fit, manage your mind, and develop habits that make you strong, disciplined, and productive.
-            </p>
-            <button onClick={onNext} className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}>
-                Start Journey 🚀
-            </button>
-        </div>
-    );
-};
-
-const NutritionPillar = ({ onNext, showToast, isKid }) => {
-    const [step, setStep] = useState(0);
-    const [kidsScore, setKidsScore] = useState(0);
-    const [teensPlate, setTeensPlate] = useState({ protein: 0, carbs: 0, veg: 0, fats: 0 });
-
-    const foodClasses = [
-        { name: "Yam/Fufu", class: "Carbohydrate", icon: "🥣", fact: "Energy for your brain and body!" },
-        { name: "Beans/Dried Fish", class: "Protein", icon: "🐟", fact: "Builds and repairs your muscles." },
-        { name: "Okra/Garden Egg", class: "Vitamin", icon: "🍆", fact: "Protects you from getting sick." },
-        { name: "Red Palm Oil", class: "Fat", icon: "🏺", fact: "Helps your brain work better!" },
-        { name: "Hibiscus (Zobo)", class: "Mineral", icon: "🏮", fact: "Essential for healthy blood and bones." }
-    ];
-
-    const kidsQuest = [
-        { q: "Which one gives you energy for school?", a: "Carbohydrate", options: foodClasses },
-        { q: "Which one helps you grow big and strong?", a: "Protein", options: foodClasses },
-        { q: "Which one keeps you safe from the flu?", a: "Vitamin", options: foodClasses }
-    ];
-
-    const [questIdx, setQuestIdx] = useState(0);
-
-    const handleKidChoice = (choice) => {
-        if (choice === kidsQuest[questIdx].a) {
-            showToast("+₦20! Correct! 🍎", 'success');
-            if (questIdx < kidsQuest.length - 1) {
-                setQuestIdx(prev => prev + 1);
-            } else {
-                setKidsScore(3);
-                showToast("Nutrition Hero! +₦30 🍎🥦🥛", 'success');
-            }
-        } else {
-            showToast("Try again! Check the icons.", 'warning');
-        }
-    };
-
-    const handleTeenPlate = (type) => {
-        setTeensPlate(prev => ({ ...prev, [type]: Math.min(prev[type] + 1, 5) }));
-    };
-
-    const isTeenPlateBalanced = teensPlate.veg >= 2 && teensPlate.protein >= 1 && teensPlate.carbs >= 1;
-
-    return (
-        <div style={{ padding: '1.5rem', animation: 'fadeIn 0.5s' }}>
-            <h2 style={{ color: 'var(--color-secondary)', textAlign: 'center', marginBottom: '1.5rem' }}>
-                Pillar 1: Nutrition & Fuel 🥗
-            </h2>
-            {step === 0 && (
-                <div style={{ textAlign: 'center' }}>
-                    <h3>{isKid ? "Learn Your Food Classes" : "Macro & Micro Mastery"}</h3>
-                    <p style={{ marginBottom: '2rem' }}>
-                        {isKid ? "Every food has a job. Let's find out what they do!" : "Fueling your body requires more than just calories. It's about balance."}
-                    </p>
-                    <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-                        {foodClasses.map(f => (
-                            <div key={f.name} className="card" style={{ padding: '1rem', textAlign: 'center', backgroundColor: 'rgba(255,255,255,0.03)' }}>
-                                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{f.icon}</div>
-                                <strong style={{ color: 'var(--color-primary)' }}>{f.class}</strong>
-                                <p style={{ fontSize: '0.8rem', marginTop: '0.5rem' }}>{f.fact}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={() => setStep(1)} className="btn btn-primary" style={{ marginTop: '2.5rem', width: '100%' }}>
-                        Start Challenge 🚀
-                    </button>
-                </div>
-            )}
-            {step === 1 && (
-                <div style={{ textAlign: 'center' }}>
-                    {isKid ? (
-                        <>
-                            <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-secondary)', marginBottom: '1rem' }}>
-                                Quest {questIdx + 1}/3
-                            </div>
-                            <h3 style={{ marginBottom: '2rem' }}>{kidsQuest[questIdx].q}</h3>
-                            <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))' }}>
-                                {foodClasses.map(f => (
-                                    <button
-                                        key={f.class}
-                                        onClick={() => handleKidChoice(f.class)}
-                                        className="btn btn-outline"
-                                        style={{ height: 'auto', padding: '1.5rem', flexDirection: 'column', gap: '0.5rem' }}
-                                    >
-                                        <span style={{ fontSize: '2rem' }}>{f.icon}</span>
-                                        <span>{f.class}</span>
-                                    </button>
-                                ))}
-                            </div>
-                            {kidsScore === 3 && (
-                                <button onClick={() => setStep(2)} className="btn btn-primary" style={{ marginTop: '2.5rem', width: '100%' }}>
-                                    Complete Pillar →
+                            {isLocked ? (
+                                <button disabled className="btn btn-outline" style={{ width: '100%', opacity: 0.5 }}>Locked</button>
+                            ) : (
+                                <button
+                                    onClick={() => setActiveLevel(idx)}
+                                    className={`btn ${isDone ? 'btn-outline' : 'btn-primary'}`}
+                                    style={{ width: '100%' }}
+                                >
+                                    {isDone ? 'Review' : 'Start'}
                                 </button>
                             )}
-                        </>
-                    ) : (
-                        <>
-                            <h3 style={{ marginBottom: '1rem' }}>Design a High-Performance Plate</h3>
-                            <p style={{ color: '#aaa', marginBottom: '2rem' }}>A balanced meal needs Fiber, Protein, and complex Carbs.</p>
-                            <div className="grid-cols" style={{ marginBottom: '2rem' }}>
-                                <div className="card" style={{ padding: '1.5rem', border: isTeenPlateBalanced ? '2px solid #00C851' : '1px solid #333' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', fontSize: '2rem', flexWrap: 'wrap', minHeight: '60px' }}>
-                                        {[...Array(teensPlate.carbs)].map((_, i) => <span key={i}>🍚</span>)}
-                                        {[...Array(teensPlate.protein)].map((_, i) => <span key={i}>🐟</span>)}
-                                        {[...Array(teensPlate.veg)].map((_, i) => <span key={i}>🥬</span>)}
-                                        {[...Array(teensPlate.fats)].map((_, i) => <span key={i}>🥜</span>)}
-                                    </div>
-                                    {isTeenPlateBalanced ? (
-                                        <div style={{ color: '#00C851', marginTop: '1rem', fontWeight: 'bold' }}>✅ Optimized Balance!</div>
-                                    ) : (
-                                        <div style={{ color: '#aaa', marginTop: '1rem', fontSize: '0.9rem' }}>Aim for: 2x Veg, 1x Protein, 1x Carbs</div>
-                                    )}
-                                </div>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-                                <button onClick={() => handleTeenPlate('carbs')} className="btn btn-outline">Add Carbs 🍚</button>
-                                <button onClick={() => handleTeenPlate('protein')} className="btn btn-outline">Add Protein 🐟</button>
-                                <button onClick={() => handleTeenPlate('veg')} className="btn btn-outline">Add Veggies 🥬</button>
-                                <button onClick={() => handleTeenPlate('fats')} className="btn btn-outline">Add Fats 🥜</button>
-                                <button onClick={() => setTeensPlate({ protein: 0, carbs: 0, veg: 0, fats: 0 })} className="btn btn-sm" style={{ gridColumn: 'span 2', opacity: 0.6 }}>Reset Plate</button>
-                            </div>
-                            <button
-                                onClick={() => setStep(2)}
-                                className="btn btn-primary"
-                                disabled={!isTeenPlateBalanced}
-                                style={{ marginTop: '2.5rem', width: '100%', opacity: isTeenPlateBalanced ? 1 : 0.5 }}
-                            >
-                                Save & Continue →
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
-            {step === 2 && (
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🏅</div>
-                    <h3>Pillar 1 Complete!</h3>
-                    <div style={{ backgroundColor: 'rgba(0, 200, 81, 0.1)', padding: '1.5rem', borderRadius: '15px', margin: '1.5rem 0', textAlign: 'left', borderLeft: '4px solid #00C851' }}>
-                        <h4 style={{ color: '#00C851', marginBottom: '0.5rem' }}>🌱 African Superfood Fact</h4>
-                        <p style={{ margin: 0, fontSize: '0.95rem' }}>
-                            Did you know? <strong>Baobab</strong> fruit has 6 times more Vitamin C than oranges! And <strong>Moringa</strong> has 17 times more calcium than milk. They are the secrets of the African elders!
-                        </p>
-                    </div>
-                    <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>
-                        Go to Pillar 2 ⚡
-                    </button>
-                </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Module Modal/View */}
+            {activeLevel !== null && modules[activeLevel] && (
+                <ModuleViewer
+                    module={modules[activeLevel]}
+                    isDone={completedLevels[activeLevel]}
+                    onClose={() => setActiveLevel(null)}
+                    onComplete={() => {
+                        handleComplete(activeLevel);
+                        setActiveLevel(null);
+                    }}
+                />
             )}
         </div>
     );
 };
 
-const VitalityPillar = ({ onNext, showToast, isKid }) => {
-    const [step, setStep] = useState(0);
-    const [habits, setHabits] = useState({ water: false, brush: false, sleep: false });
-    const [stats, setStats] = useState({ steps: 2000, sleep: 7, screen: 2 });
-    const toggleHabit = (h) => setHabits(prev => ({ ...prev, [h]: !prev[h] }));
-    const habitsDone = habits.water && habits.brush && habits.sleep;
+const ModuleViewer = ({ module, isDone, onClose, onComplete }) => {
+    const [quizIdx, setQuizIdx] = useState(0);
+    const [score, setScore] = useState(0);
+    const [showQuiz, setShowQuiz] = useState(false);
 
-    return (
-        <div style={{ padding: '1.5rem', animation: 'fadeIn 0.5s' }}>
-            <h2 style={{ color: 'var(--color-secondary)', textAlign: 'center', marginBottom: '1.5rem' }}>
-                Pillar 2: Vitality & Energy ⚡
-            </h2>
-            {step === 0 && (
-                <div style={{ textAlign: 'center' }}>
-                    <h3>{isKid ? "Daily Power-Up Tasks" : "The Human Recovery Loop"}</h3>
-                    <p style={{ marginBottom: '2rem' }}>
-                        {isKid ? "Being a hero starts with small wins. Can you finish your daily mission?" : "Optimize your performance by balancing activity, rest, and digital load."}
-                    </p>
-                    {isKid ? (
-                        <div style={{ display: 'grid', gap: '1rem', maxWidth: '400px', margin: '0 auto' }}>
-                            <button onClick={() => toggleHabit('water')} className={habits.water ? "btn btn-primary" : "btn btn-outline"}>
-                                {habits.water ? "Drank Water ✅" : "Drink 5 Waters 💧"}
-                            </button>
-                            <button onClick={() => toggleHabit('brush')} className={habits.brush ? "btn btn-primary" : "btn btn-outline"}>
-                                {habits.brush ? "Brushed Teeth ✅" : "Brush Teeth 2x 🪥"}
-                            </button>
-                            <button onClick={() => toggleHabit('sleep')} className={habits.sleep ? "btn btn-primary" : "btn btn-outline"}>
-                                {habits.sleep ? "Slept 9 Hours ✅" : "Sleep 9 Hours 😴"}
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="grid-cols">
-                            <div className="card" style={{ padding: '1rem' }}>
-                                <strong>Steps</strong>
-                                <div style={{ fontSize: '2rem', margin: '0.5rem 0' }}>👟 {stats.steps}</div>
-                                <input type="range" min="0" max="10000" step="500" value={stats.steps} onChange={e => setStats({ ...stats, steps: e.target.value })} style={{ width: '100%' }} />
-                            </div>
-                            <div className="card" style={{ padding: '1rem' }}>
-                                <strong>Sleep</strong>
-                                <div style={{ fontSize: '2rem', margin: '0.5rem 0' }}>😴 {stats.sleep}h</div>
-                                <input type="range" min="0" max="12" step="0.5" value={stats.sleep} onChange={e => setStats({ ...stats, sleep: e.target.value })} style={{ width: '100%' }} />
-                            </div>
-                            <div className="card" style={{ padding: '1rem' }}>
-                                <strong>Screen Time</strong>
-                                <div style={{ fontSize: '2rem', margin: '0.5rem 0' }}>📵 {stats.screen}h</div>
-                                <input type="range" min="0" max="12" step="0.5" value={stats.screen} onChange={e => setStats({ ...stats, screen: e.target.value })} style={{ width: '100%' }} />
-                            </div>
-                        </div>
-                    )}
-                    <button
-                        onClick={() => setStep(1)}
-                        className="btn btn-primary"
-                        disabled={isKid && !habitsDone}
-                        style={{ marginTop: '2.5rem', width: '100%', opacity: (isKid && !habitsDone) ? 0.5 : 1 }}
-                    >
-                        {isKid && !habitsDone ? "Complete Tasks to Continue 🔒" : "Save & Continue →"}
-                    </button>
-                </div>
-            )}
-            {step === 1 && (
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>⚡</div>
-                    <h3>System Optimized!</h3>
-                    <p>Consistency is the secret to greatness.</p>
-                    <button onClick={onNext} className="btn btn-primary" style={{ width: '100%', marginTop: '2rem' }}>
-                        Go to Pillar 3 🧘
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-};
+    if (!module) return null;
 
-const HarmonyPillar = ({ onNext, showToast, isKid }) => {
-    const [step, setStep] = useState(0);
-    const [journal, setJournal] = useState("");
-    const scenarios = [
-        { q: "A friend is sad because they lost a game. What do you do?", a: "Cheer them up", options: ["Cheer them up", "Laugh at them", "Ignore them"] },
-        { q: "You found ₦20 that isn't yours. What is the hero choice?", a: "Find the owner", options: ["Keep it", "Find the owner", "Hide it"] }
-    ];
-    const [scenIdx, setScenIdx] = useState(0);
-    const handleScenChoice = (choice) => {
-        if (choice === scenarios[scenIdx].a) {
-            showToast("Kind Heart! +₦20 ❤️", "success");
-            if (scenIdx < scenarios.length - 1) setScenIdx(prev => prev + 1);
-            else setStep(2);
+    const handleAnswer = (optionIndex) => {
+        const correct = optionIndex === module.quiz[quizIdx].a;
+        if (correct) {
+            const newScore = score + 1;
+            setScore(newScore);
+            alert("Correct! 🎉"); // Simple feedback
         } else {
-            showToast("Heroes are kind and honest. Try again!", "warning");
+            alert("Incorrect. Keep trying!");
+        }
+
+        // Move to next or finish
+        if (quizIdx < module.quiz.length - 1) {
+            setQuizIdx(quizIdx + 1);
+        } else {
+            // Done
+            if (score + (correct ? 1 : 0) >= module.quiz.length - 1) {
+                setTimeout(() => {
+                    alert("Module Complete! Well done.");
+                    onComplete();
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    alert("Good effort! Module Complete.");
+                    onComplete();
+                }, 500);
+            }
         }
     };
 
     return (
-        <div style={{ padding: '1.5rem', animation: 'fadeIn 0.5s' }}>
-            <h2 style={{ color: 'var(--color-secondary)', textAlign: 'center', marginBottom: '1.5rem' }}>
-                Pillar 3: Harmony & Mindset 🧘
-            </h2>
-            {step === 0 && (
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontStyle: 'italic', color: 'var(--color-accent)', marginBottom: '1.5rem', fontSize: '1.2rem' }}>
-                        "He who climbs a good tree is always given a push." — African Proverb
-                    </div>
-                    {isKid ? (
-                        <div>
-                            <h3 style={{ marginBottom: '1.5rem' }}>The Kindness Quest</h3>
-                            <p style={{ marginBottom: '2rem' }}>{scenarios[scenIdx].q}</p>
-                            <div className="grid-cols" style={{ gridTemplateColumns: '1fr' }}>
-                                {scenarios[scenIdx].options.map(opt => (
-                                    <button key={opt} onClick={() => handleScenChoice(opt)} className="btn btn-outline" style={{ padding: '1rem' }}>{opt}</button>
-                                ))}
-                            </div>
-                        </div>
-                    ) : (
-                        <div>
-                            <h3>Reflective Wisdom</h3>
-                            <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>True health includes the state of your mind. Record one thing you are grateful for today.</p>
-                            <textarea
-                                value={journal}
-                                onChange={e => setJournal(e.target.value)}
-                                placeholder="Write your thoughts..."
-                                style={{ width: '100%', minHeight: '150px', padding: '1rem', backgroundColor: '#1a1a1a', border: '1px solid #333', color: '#fff', borderRadius: '15px' }}
-                            />
-                            <button
-                                onClick={() => setStep(2)}
-                                className="btn btn-primary"
-                                disabled={journal.length < 5}
-                                style={{ width: '100%', marginTop: '2rem', opacity: journal.length < 5 ? 0.5 : 1 }}
-                            >
-                                Submit Journal →
-                            </button>
-                        </div>
-                    )}
-                </div>
-            )}
-            {step === 2 && (
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🛡️</div>
-                    <h3>Mindset of a Leader</h3>
-                    <p style={{ marginBottom: '2rem' }}>Your spirit is now aligned for greatness.</p>
-                    <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>
-                        Claim Certificate 📜
-                    </button>
-                </div>
-            )}
-        </div>
-    );
-};
+        <div style={{
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 2000,
+            display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem'
+        }}>
+            <div className="card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative' }}>
+                <button onClick={onClose} style={{ position: 'absolute', top: '1rem', right: '1rem', fontSize: '1.5rem', background: 'none', color: '#fff' }}>&times;</button>
 
-const CertificateModule = ({ onNext }) => {
-    return (
-        <div style={{ padding: '1rem', textAlign: 'center', animation: 'fadeIn 1s' }}>
-            <h2 style={{ color: '#FFD700', marginBottom: '1rem' }}>🎉 Congratulations! 🎉</h2>
-            <p>You have completed the Health, Wellness & Mindset Course.</p>
-            <div style={{
-                margin: '2rem auto', padding: '2rem', border: '10px solid #FFD700',
-                borderRadius: '10px', backgroundColor: '#fff', color: '#000', maxWidth: '500px'
-            }}>
-                <h1 style={{ fontFamily: 'serif', color: '#000' }}>Certificate of Completion</h1>
-                <p>This certifies that</p>
-                <div style={{ borderBottom: '2px solid #000', margin: '1rem 2rem', fontSize: '1.5rem', fontFamily: 'cursive' }}>
-                    Future Leader
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <div style={{ fontSize: '4rem' }}>{module.icon}</div>
+                    <h2>{module.title}</h2>
                 </div>
-                <p>Has successfully mastered the pillars of</p>
-                <h3>Health, Wellness & Mindset</h3>
-                <div style={{ fontSize: '3rem', margin: '1rem' }}>🏅</div>
-                <p style={{ fontSize: '0.8rem', color: '#555' }}>African Future Academy</p>
+
+                {!showQuiz ? (
+                    <div>
+                        <div style={{ lineHeight: '1.8', whiteSpace: 'pre-wrap', marginBottom: '2rem', color: '#ddd' }}>
+                            {module.content}
+                        </div>
+                        <button onClick={() => setShowQuiz(true)} className="btn btn-primary" style={{ width: '100%' }}>
+                            Take Quiz 📝
+                        </button>
+                    </div>
+                ) : (
+                    <div style={{ animation: 'fadeIn 0.3s' }}>
+                        <h3 style={{ marginBottom: '1.5rem', color: 'var(--color-secondary)' }}>Question {quizIdx + 1} / {module.quiz.length}</h3>
+                        <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>{module.quiz[quizIdx].q}</p>
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {module.quiz[quizIdx].o.map((opt, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleAnswer(idx)}
+                                    className="btn btn-outline"
+                                    style={{ textAlign: 'left', padding: '1rem' }}
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
-            <button onClick={onNext} className="btn btn-primary" style={{ width: '100%' }}>Return to Hub →</button>
         </div>
     );
 };

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import './KidsMascot.css';
 
 const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
-    const { login, signup } = useAuth();
+    const { login, signup, verifyOtp } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -13,6 +13,8 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
     const [loading, setLoading] = useState(false);
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
     const [showVisme, setShowVisme] = useState(false);
+    const [isOtpStep, setIsOtpStep] = useState(false);
+    const [otp, setOtp] = useState('');
 
     useEffect(() => {
         // Load Visme Script
@@ -33,10 +35,23 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
         try {
             if (isLogin) {
                 await login(email, password);
+                onClose();
+            } else if (isOtpStep) {
+                await verifyOtp(email, otp);
+                onClose();
             } else {
+                // SIGNUP FLOW
+                // 1. Call signup -> Wait for it to complete
                 await signup(email, password, ageGroup, username);
+
+                // 2. If successful, explicitly switch to OTP step
+                // Note: The context returns user data, but we just need to know it didn't throw error
+                setTimeout(() => {
+                    setIsOtpStep(true);
+                    setError(''); // Clear any previous errors
+                    alert(`Verification code sent to ${email}`); // Temporary feedback for mobile
+                }, 100);
             }
-            onClose();
         } catch (err) {
             console.error("Auth Error:", err);
             setError(err.message || 'Authentication failed. Please check your details.');
@@ -64,14 +79,20 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5000,
-            padding: '1rem', backdropFilter: 'blur(10px)'
+            backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 5000,
+            backdropFilter: 'blur(10px)',
+            overflowY: 'auto', // Enable vertical scrolling
+            WebkitOverflowScrolling: 'touch', // Smooth scroll on iOS
+            display: 'grid', // Use grid for better centering with scroll
+            placeItems: 'center',
+            padding: '1rem'
         }}>
             <div className="card" style={{
                 width: '100%', maxWidth: '420px',
                 position: 'relative', padding: '2.5rem 2rem',
                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-                border: '1px solid var(--color-border)'
+                border: '1px solid var(--color-border)',
+                margin: 'auto' // Center in grid
             }}>
                 <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: 'var(--color-text-muted)', fontSize: '1.5rem', transition: 'var(--transition)', zIndex: 100 }}>&times;</button>
 
@@ -87,10 +108,12 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                         color: ageGroup === 'teens' ? '#00BFFF' : '#82c240',
                         marginBottom: '10px'
                     } : { fontSize: '2rem', color: '#fff' }}>
-                        {isLogin ? 'Welcome Back' : 'Get Started'}
+                        {isOtpStep ? 'Verify Email' : (isLogin ? 'Welcome Back' : 'Get Started')}
                     </h2>
                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                        {isLogin ? 'Sign in to continue your journey' : 'Create an account to save your progress'}
+                        {isOtpStep
+                            ? `Enter the 6-digit code sent to ${email}`
+                            : (isLogin ? 'Sign in to continue your journey' : 'Create an account to save your progress')}
                     </p>
                 </div>
 
@@ -118,61 +141,77 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                     ></div>
                 ) : (
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                        {!isLogin && (
+                        {isOtpStep ? (
                             <input
-                                type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required
+                                type="text" placeholder="6-digit verification code" value={otp}
+                                onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required
+                                maxLength={6}
                                 style={{
-                                    padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                    fontFamily: 'inherit', fontSize: '1rem'
+                                    padding: '1.25rem', borderRadius: '12px', background: '#222', border: '1px solid #00C851', color: '#fff',
+                                    fontFamily: 'monospace', fontSize: '1.5rem', textAlign: 'center', letterSpacing: '0.5rem'
                                 }}
                             />
-                        )}
-                        <input
-                            type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required
-                            style={{
-                                padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                fontFamily: 'inherit', fontSize: '1rem'
-                            }}
-                        />
-                        <input
-                            type="password" placeholder="Password" value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            onFocus={() => (ageGroup === 'kids' || ageGroup === 'teens') && setIsPasswordFocused(true)}
-                            onBlur={() => setIsPasswordFocused(false)}
-                            required
-                            style={{
-                                padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                fontFamily: 'inherit', fontSize: '1rem'
-                            }}
-                        />
-                        {!isLogin && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>Select Age Group</label>
-                                <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)} style={{
-                                    padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                    fontFamily: 'inherit', fontSize: '1rem'
-                                }}>
-                                    <option value="kids">Kids (5-12)</option>
-                                    <option value="teens">Teens (13-19)</option>
-                                    <option value="adults">Adults (20+)</option>
-                                </select>
-                            </div>
+                        ) : (
+                            <>
+                                {!isLogin && (
+                                    <input
+                                        type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required
+                                        style={{
+                                            padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                            fontFamily: 'inherit', fontSize: '1rem'
+                                        }}
+                                    />
+                                )}
+                                <input
+                                    type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required
+                                    style={{
+                                        padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                        fontFamily: 'inherit', fontSize: '1rem'
+                                    }}
+                                />
+                                <input
+                                    type="password" placeholder="Password" value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    onFocus={() => (ageGroup === 'kids' || ageGroup === 'teens') && setIsPasswordFocused(true)}
+                                    onBlur={() => setIsPasswordFocused(false)}
+                                    required
+                                    style={{
+                                        padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                        fontFamily: 'inherit', fontSize: '1rem'
+                                    }}
+                                />
+                                {!isLogin && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <label style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>Select Age Group</label>
+                                        <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)} style={{
+                                            padding: '1.2rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                            fontFamily: 'inherit', fontSize: '1rem', appearance: 'none', cursor: 'pointer'
+                                        }}>
+                                            <option value="kids">Kids (5-12)</option>
+                                            <option value="teens">Teens (13-19)</option>
+                                            <option value="adults">Adults (20+)</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </>
                         )}
 
                         {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', textAlign: 'center', background: 'rgba(255,69,0,0.1)', padding: '0.75rem', borderRadius: '8px' }}>{error}</p>}
 
                         <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', padding: '1rem' }}>
-                            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
+                            {loading ? 'Processing...' : (isOtpStep ? 'Verify & Continue' : (isLogin ? 'Sign In' : 'Create Account'))}
                         </button>
                     </form>
                 )}
 
-                <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
-                    {isLogin ? "Don't have an account? " : "Already have an account? "}
-                    <button onClick={() => setIsLogin(!isLogin)} style={{ color: 'var(--color-primary)', fontWeight: '600', marginLeft: '0.25rem', textDecoration: 'underline' }}>
-                        {isLogin ? 'Sign Up' : 'Sign In'}
-                    </button>
-                </div>
+                {!isOtpStep && (
+                    <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+                        {isLogin ? "Don't have an account? " : "Already have an account? "}
+                        <button onClick={() => setIsLogin(!isLogin)} style={{ color: 'var(--color-primary)', fontWeight: '600', marginLeft: '0.25rem', textDecoration: 'underline' }}>
+                            {isLogin ? 'Sign Up' : 'Sign In'}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

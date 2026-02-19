@@ -13,7 +13,7 @@ const MODULE_CAPS = {
     criticalThinking: 2000
 };
 const DEFAULT_CAP = 2000;
-const WITHDRAWAL_LIMIT = 5000;
+const WITHDRAWAL_LIMIT = 10000;
 
 export const useWallet = () => {
     const { token } = useAuth();
