@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
+import { useGamification } from '../context/GamificationContext';
 import Toast from '../components/Toast';
 
 const Finance = ({ ageGroup }) => {
   const navigate = useNavigate();
   const { balance, moduleBalances, moduleEarnings, addEarnings, deductPenalty, getModuleCap, WITHDRAWAL_LIMIT, setModuleBalance } = useWallet();
+  const { addPoints } = useGamification();
   const MODULE_CAP = getModuleCap('finance');
 
   const isKid = ageGroup?.toLowerCase() === 'kids' || ageGroup?.toLowerCase() === 'kid';
@@ -893,6 +895,7 @@ const Finance = ({ ageGroup }) => {
 
     if (levelId === currentLevel) {
       setCurrentLevel(prev => prev + 1);
+      addPoints(levelId * 10); // Gamification: Award points based on level
       setAttempts(0);
     }
   };

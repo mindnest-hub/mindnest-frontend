@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
+import { useGamification } from '../context/GamificationContext';
 import SoilLab from '../components/SoilLab';
 import AgriBusinessPlanner from '../components/AgriBusinessPlanner';
 import InvestPitch from '../components/InvestPitch';
@@ -23,6 +24,7 @@ const Agripreneurship = () => {
     const navigate = useNavigate();
 
     const { addEarnings, deductGlobal, balance, getAgeGroup } = useWallet();
+    const { addPoints } = useGamification();
     const safeGetAgeGroup = getAgeGroup || (() => 'kids');
     const ageGroup = safeGetAgeGroup() || 'kids';
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
@@ -163,6 +165,7 @@ const Agripreneurship = () => {
                 } else {
                     setMoney(prev => prev + yieldAmount);
                     addEarnings('agri', yieldAmount);
+                    addPoints(yieldAmount / 5); // Award points based on yield
                     showToast(`Harvest complete! +₦${yieldAmount} 🌽`, 'success');
                     setCropStage(3);
                     setTimeout(() => setCropStage(0), 2000);
@@ -170,6 +173,7 @@ const Agripreneurship = () => {
             } else {
                 setMoney(prev => prev + yieldAmount);
                 addEarnings('agri', yieldAmount);
+                addPoints(yieldAmount / 5); // Award points based on yield
                 showToast(`Harvest complete! +₦${yieldAmount} 🌽`, 'success');
                 setCropStage(3);
                 setTimeout(() => setCropStage(0), 2000);
@@ -183,6 +187,7 @@ const Agripreneurship = () => {
             const earnings = 900; // 3x of 300
             setMoney(prev => prev + earnings);
             addEarnings('agri', earnings);
+            addPoints(earnings / 10); // Award points for value-added sales
             setProcessedStock(prev => prev - 1);
             setSoldFlakes(prev => prev + 1);
             showToast("Sold Corn Flakes! 🥣 +₦900", 'success');
@@ -232,12 +237,14 @@ const Agripreneurship = () => {
         const reward = Math.floor(score / 2);
         setMoney(prev => prev + reward);
         addEarnings('agri', reward);
+        addPoints(reward);
         showToast(`Soil Lab complete! Earned ₦${reward}.`, 'success');
     };
 
     const handleDeal = (amount) => {
         setMoney(prev => prev + amount);
         addEarnings('agri', amount);
+        addPoints(amount / 10);
         showToast(`Funding Received! ₦${amount.toLocaleString()} added to your farm capital.`, 'success');
     };
 

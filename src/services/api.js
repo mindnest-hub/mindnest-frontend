@@ -116,5 +116,33 @@ export const api = {
         } catch (error) {
             return [];
         }
+    },
+
+    // Payment
+    initializePayment: async (token, email, amount) => {
+        const res = await fetch(`${API_URL}/payment/initialize`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ email, amount }),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to initialize payment');
+        }
+        return res.json();
+    },
+
+    verifyPayment: async (token, reference) => {
+        const res = await fetch(`${API_URL}/payment/verify/${reference}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to verify payment');
+        }
+        return res.json();
     }
 };

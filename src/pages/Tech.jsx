@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
+import { useGamification } from '../context/GamificationContext';
 import { useWallet } from '../hooks/useWallet';
 
 const Tech = () => {
   const navigate = useNavigate();
   const { addEarnings, ageGroup } = useWallet();
+  const { addPoints } = useGamification();
   const canvasRef = useRef(null);
 
   const isKid = ageGroup === 'Kids';
@@ -39,6 +41,7 @@ const Tech = () => {
   const completeLesson = (lessonId, points) => {
     // Award points and money every time to encourage replay
     setTechPoints(prev => prev + points);
+    addPoints(points); // Award points to gamification system
     addEarnings('tech', points); // Will be silent if capped
 
     if (!completedLessons.includes(lessonId)) {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
+import { useGamification } from '../context/GamificationContext';
 import { triggerLiveEvent } from '../components/LiveNotifications';
 import { africanResources } from '../data/africanResources';
 import Toast from '../components/Toast';
@@ -17,6 +18,7 @@ const CriticalThinking = ({ ageGroup }) => {
         console.error("CriticalThinking: Wallet Error", e);
     }
     const { addEarnings } = wallet || {};
+    const { addPoints } = useGamification();
 
     const [expandedModule, setExpandedModule] = useState(null);
     const [globalError, setGlobalError] = useState(null);
@@ -1032,6 +1034,7 @@ const CriticalThinking = ({ ageGroup }) => {
         if (!completedModules.includes(id)) {
             setCompletedModules(prev => [...prev, id]);
             setBrainPower(prev => prev + 10);
+            addPoints(50); // Award 50 points for completing a module
             setShowLevelUp(true);
             triggerConfetti();
             addEarnings('criticalThinking', 100);

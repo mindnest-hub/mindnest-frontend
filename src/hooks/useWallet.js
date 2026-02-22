@@ -146,5 +146,36 @@ export const useWallet = () => {
 
     const getAgeGroup = () => localStorage.getItem('ageGroup');
 
-    return { balance, moduleBalances, addEarnings, deductPenalty, setModuleBalance, getModuleCap, deductGlobal, moduleEarnings, getAgeGroup, WITHDRAWAL_LIMIT, isSyncing };
+    const refreshBalance = async () => {
+        if (!token) return;
+        setIsSyncing(true);
+        try {
+            const userData = await api.getProfile(token);
+            if (userData.moduleBalances && typeof userData.moduleBalances === 'object') {
+                setModuleBalances(userData.moduleBalances);
+            }
+            if (userData.moduleEarnings && typeof userData.moduleEarnings === 'object') {
+                setModuleEarnings(userData.moduleEarnings);
+            }
+        } catch (err) {
+            console.error("Failed to refresh balance:", err);
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
+    return {
+        balance,
+        moduleBalances,
+        addEarnings,
+        deductPenalty,
+        setModuleBalance,
+        getModuleCap,
+        deductGlobal,
+        moduleEarnings,
+        getAgeGroup,
+        refreshBalance,
+        WITHDRAWAL_LIMIT,
+        isSyncing
+    };
 };

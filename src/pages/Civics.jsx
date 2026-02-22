@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import Toast from '../components/Toast';
+import { useGamification } from '../context/GamificationContext';
 import CivicGuide from '../components/CivicGuide';
 
 const Civics = ({ ageGroup }) => {
     const navigate = useNavigate();
     const { addEarnings, moduleEarnings } = useWallet();
+    const { addPoints } = useGamification();
 
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
@@ -120,8 +122,10 @@ const Civics = ({ ageGroup }) => {
             setCompletedPillars([...completedPillars, id]);
             if (id <= 10) {
                 addEarnings('civics', 200); // ₦200 per pillar for first 10
+                addPoints(50); // Gamification: Award 50 points per pillar
                 showToast(`Pillar Completed! +${currency}200 🗳️`, 'success');
             } else {
+                addPoints(100); // Final mastery bonus
                 showToast(`Final Mastery Revealed! 🏆`, 'success');
             }
             triggerConfetti();

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
+import { useGamification } from '../context/GamificationContext';
 import { useWallet } from '../hooks/useWallet';
 import { bodyHealthData } from '../data/bodyHealthData';
 
@@ -11,6 +12,7 @@ const KidsWellnessHub = ({ onComplete }) => {
     const [progress, setProgress] = useState(() => JSON.parse(localStorage.getItem('kidsHealthProgress')) || {});
     const [activeGame, setActiveGame] = useState(null);
     const { addEarnings, balance } = useWallet();
+    const { addPoints } = useGamification();
 
     const games = [
         { id: 'food_sort', name: 'Food Sorter', icon: '🍎', color: '#FF4444' },
@@ -31,6 +33,7 @@ const KidsWellnessHub = ({ onComplete }) => {
 
     const handleLevelComplete = (gameId, level) => {
         const reward = level === 1 ? 20 : level === 2 ? 30 : 50; // Total 100 per game
+        addPoints(reward / 2); // Award points (50% of money reward)
         addEarnings('health', reward);
 
         setProgress(prev => {
@@ -541,6 +544,7 @@ const Health = ({ ageGroup }) => {
 
             setCompletedLevels(newCompleted);
             addEarnings('health', 150);
+            addPoints(75); // Award points (50% of money reward)
             showToast(`Level ${index + 1} Complete! +₦150 🏆`, 'success');
         }
     };

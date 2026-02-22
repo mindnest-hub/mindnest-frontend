@@ -5,10 +5,12 @@ import ResourceList from '../components/ResourceList';
 import { useWallet } from '../hooks/useWallet';
 import { africanResources } from '../data/africanResources';
 import { civilizationsData } from '../data/civilizationsData';
+import { useGamification } from '../context/GamificationContext';
 
 const History = ({ ageGroup }) => {
     const navigate = useNavigate();
     const { balance, moduleEarnings, addEarnings, deductPenalty, getModuleCap } = useWallet();
+    const { addPoints } = useGamification();
     const MODULE_CAP = getModuleCap('history');
 
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
@@ -184,7 +186,8 @@ const History = ({ ageGroup }) => {
             setWrongAttempts(0); // Reset attempts on correct answer
             // Reward: ₦100 per correct answer
             addEarnings('history', 100);
-            showToast(`${currentQuestion.fact}\n\n(+₦100)`, 'success', knowledgeDuration);
+            addPoints(50, 'Resource Game Correction');
+            showToast(`${currentQuestion.fact}\n\n(+₦100 & +50 XP)`, 'success', knowledgeDuration);
         } else {
             const newAttempts = wrongAttempts + 1;
             setWrongAttempts(newAttempts);
@@ -213,22 +216,60 @@ const History = ({ ageGroup }) => {
 
     const events = [
         {
+            year: "20,000 BC",
+            title: "The Ishango Bone 🦴",
+            desc: "The world's oldest mathematical tool, found in modern-day DR Congo.",
+            details: "It is a baboon fibula with a tally system that suggests African ancestors were using advanced prime number arithmetic and lunar calendars long before anywhere else.",
+            targetGroup: "teens"
+        },
+        {
             year: "3000 BC",
             title: "The Pyramids of Giza",
             desc: "Ancient Egyptians built the pyramids using advanced math and engineering.",
-            details: "The Great Pyramid was the tallest man-made structure for over 3,800 years. It shows the incredible genius of African ancestors."
+            details: "The Great Pyramid was the tallest man-made structure for over 3,800 years. It shows the incredible genius of African ancestors.",
+            targetGroup: "all"
+        },
+        {
+            year: "500 BC",
+            title: "Nok Iron Innovation ⚒️",
+            desc: "Mastery of iron-smelting technology in modern Nigeria.",
+            details: "The Nok people developed highly advanced blast furnaces. This technology bypassed the 'Bronze Age' completely, jumping straight to the Iron Age—proving unique African innovation paths.",
+            targetGroup: "teens"
+        },
+        {
+            year: "Pre-Colonial",
+            title: "Cowries & Trade Cycles 📿",
+            desc: "Understanding the complex economic systems of pre-colonial Africa.",
+            details: "Before European arrival, Africa had thriving global trade using Cowrie shells and Gold weights. These systems were stable, inflation-resistant, and regulated by powerful merchant guilds.",
+            targetGroup: "adults"
         },
         {
             year: "1324 AD",
             title: "Mansa Musa's Pilgrimage",
             desc: "The Emperor of Mali, the richest man in history, traveled to Mecca.",
-            details: "He brought so much gold that he changed the economy of every city he visited. Timbuktu became a global center of learning."
+            details: "He brought so much gold that he changed the economy of every city he visited. Timbuktu became a global center of learning.",
+            targetGroup: "all"
+        },
+        {
+            year: "1624 AD",
+            title: "Queen Nzinga's Diplomacy 👑",
+            desc: "Strategic negotiation against Portuguese colonization in Angola.",
+            details: "Queen Nzinga famously sat on a servant's back to show equality when the Portuguese didn't offer her a chair. She used strategic alliances and guerilla warfare for 40 years.",
+            targetGroup: "all"
+        },
+        {
+            year: "1820s",
+            title: "Shaka Zulu's Military Genius ⚔️",
+            desc: "Invention of the Iklwa spear and the Buffalo Horn formation.",
+            details: "Shaka revolutionized warfare with logistics, professional training, and tactical innovations that made the Zulu nation a global power in Southern Africa.",
+            targetGroup: "teens"
         },
         {
             year: "1884",
             title: "The Berlin Conference",
-            desc: "European powers met to divide Africa among themselves, creating artificial borders.",
-            details: "They drew lines on a map without asking the people. This separated families and tribes, creating problems that still exist today. This was the 'Scramble for Africa'."
+            desc: "European powers met to divide Africa among themselves.",
+            details: "They drew lines on a map without asking the people. This 'Scramble for Africa' separated families and created artificial borders.",
+            targetGroup: "all"
         },
         {
             year: "1896",
@@ -236,69 +277,71 @@ const History = ({ ageGroup }) => {
             desc: "Ethiopia defeated Italy and remained independent.",
             details: "Emperor Menelik II and Empress Taytu Betul united their people to defend their land. It is a symbol of African strength and resistance.",
             speeches: [
-                { speaker: "Emperor Menelik II", text: "Enemies have come who would ruin our country and change our religion. They have passed the sea... I have no intention of being indifferent when my country is attacked. Up to now I have ruled by the grace of God... if you are strong, lend me your strength. If you are weak, help me with your prayer." },
-                { speaker: "Empress Taytu Betul", text: "I am a woman. I do not like war. But I would rather die than accept your deal." }
+                { speaker: "Emperor Menelik II", text: "Enemies have come who would ruin our country... if you are strong, lend me your strength." },
+                { speaker: "Empress Taytu Betul", text: "I would rather die than accept your deal." }
             ],
-            modernContext: "Today, Ethiopia continues this legacy of self-reliance with the Grand Ethiopian Renaissance Dam (GERD), a massive hydroelectric project fully funded by the Ethiopian people."
+            modernContext: "Today, Ethiopia continues this legacy of self-reliance.",
+            targetGroup: "all"
+        },
+        {
+            year: "1900",
+            title: "Pan-African Congress ✊",
+            desc: "Strategic union of African leaders in London to fight for global rights.",
+            details: "Organized by Henry Sylvester Williams and attended by W.E.B. Du Bois, this marked the shift from local resistance to a global strategic network for liberation.",
+            targetGroup: "adults"
         },
         {
             year: "1957",
             title: "Ghana's Independence 🇬🇭",
             desc: "Kwame Nkrumah led Ghana to become the first Sub-Saharan nation to gain independence.",
-            details: "On March 6, 1957, the Gold Coast became Ghana. Nkrumah's vision was for a United States of Africa.",
-            speeches: [
-                { speaker: "Kwame Nkrumah", text: "At long last, the battle has ended! And thus, Ghana, your beloved country is free forever!" },
-                { speaker: "Kwame Nkrumah", text: "Our independence is meaningless unless it is linked up with the total liberation of the African continent." }
-            ],
-            keyPlayers: ["Kwame Nkrumah", "The Big Six"]
-        },
-        {
-            year: "1960",
-            title: "The Year of Africa",
-            desc: "17 African nations gained independence in a single year!",
-            details: "A wave of freedom swept across the continent, ending colonial rule in many places."
+            details: "Nkrumah's vision was for a United States of Africa.",
+            targetGroup: "all"
         },
         {
             year: "1961",
-            title: "Patrice Lumumba's Vision & Sacrifice 🇨🇬",
-            desc: "The first Prime Minister of the independent Congo and a hero of African independence.",
-            details: "Lumumba was a Pan-Africanist who fought for the total economic independence of the Congo. He was assassinated in 1961 in a plot involving foreign powers who feared his vision of a strong, united Africa. To hide the crime, his body was dissolved in acid. However, a Belgian officer kept a single tooth as a trophy. In 2022, after 61 years of tireless fighting by his family, this last remain—his tooth—was finally returned to the Democratic Republic of Congo for a proper state funeral, symbolizing a closure to a painful chapter of history.",
-            speeches: [
-                { speaker: "Patrice Lumumba", text: "We are no longer your monkeys! Congo's independence is a decisive step towards the liberation of the whole African continent." },
-                { speaker: "Patrice Lumumba", text: "History will one day have its say... Africa will write its own history, and it will be, to the north and to the south of the Sahara, a history of glory and dignity." }
-            ]
+            title: "Patrice Lumumba's Sacrifice 🇨🇬",
+            desc: "First Prime Minister of independent Congo and hero of African economic freedom.",
+            details: "Lumumba fought for the total economic independence of the Congo. He was assassinated in a plot involving foreign powers who feared his vision.",
+            targetGroup: "all"
+        },
+        {
+            year: "1963",
+            title: "Foundation of the OAU 🌍",
+            desc: "Strategic coalition of 32 nations to end colonialism.",
+            details: "The Organization of African Unity was a strategic lesson in continental governance and diplomacy, leading to the liberation of the remaining colonies.",
+            targetGroup: "adults"
         },
         {
             year: "1994",
             title: "Nelson Mandela becomes President 🇿🇦",
             desc: "Apartheid ended in South Africa.",
-            details: "After 27 years in prison, Mandela forgave his captors and united the 'Rainbow Nation'.",
+            details: "After 27 years in prison, Mandela united the 'Rainbow Nation'.",
             timeline: [
-                { year: "1918", event: "Born in Mvezo, South Africa." },
-                { year: "1964", event: "Sentenced to life in prison at the Rivonia Trial." },
-                { year: "1990", event: "Released from Victor Verster Prison." },
-                { year: "1994", event: "Inaugurated as the first black President of South Africa." }
+                { year: "1918", event: "Born in Mvezo." },
+                { year: "1994", event: "Inaugurated as the first black President." }
             ],
-            speeches: [
-                { speaker: "Nelson Mandela (1964)", text: "I have cherished the ideal of a democratic and free society... It is an ideal which I hope to live for and to achieve. But if needs be, it is an ideal for which I am prepared to die." },
-                { speaker: "Nelson Mandela (1994)", text: "Never, never and never again shall it be that this beautiful land will again experience the oppression of one by another." }
-            ]
+            targetGroup: "all"
         },
         {
-            year: "2002",
-            title: "The African Union (AU) 🌍",
-            desc: "African leaders united to promote peace, unity, and economic growth.",
-            details: "Replacing the OAU, the AU focuses on 'African Solutions to African Problems'. It represents the reversing of the division caused by the Berlin Conference.",
-            modernContext: "Today, the AU works on the Agenda 2063, a blueprint for transforming Africa into the global powerhouse of the future."
+            year: "Modern",
+            title: "The AfCFTA Era 💹",
+            desc: "African Continental Free Trade Area—creating the world's largest free trade zone.",
+            details: "A strategic lesson in transformation: 54 nations uniting to build a single market, reducing dependence on foreign systems and building internal wealth.",
+            targetGroup: "adults"
         },
         {
             year: "2020s",
             title: "The African Digital Renaissance 🚀",
-            desc: "Africa becomes a global leader in mobile money and fintech innovation.",
-            details: "From M-Pesa in Kenya to the thriving tech hubs in Yaba (Lagos) and Cape Town, African youth are using technology to solve local problems. This is the 'Leapfrog' era where Africa bypasses old tech for the new.",
-            modernContext: "Africa has the youngest population in the world, with over 60% under age 25. You are part of this history!"
+            desc: "Africa becomes a global leader in fintech innovation.",
+            details: "From M-Pesa to thriving tech hubs, African youth are using technology to solve local problems. You are part of this history!",
+            targetGroup: "all"
         }
-    ];
+    ].filter(e => {
+        if (e.targetGroup === 'all') return true;
+        if (isTeen && e.targetGroup === 'teens') return true;
+        if (isAdult && e.targetGroup === 'adults') return true;
+        return false;
+    });
 
     const independenceCalendar = [
         { date: "Jan 1, 1956", country: "Sudan 🇸🇩", leader: "Ismail al-Azhari" },
@@ -695,6 +738,7 @@ const History = ({ ageGroup }) => {
                                                             if (isCorrect) {
                                                                 const reward = isKid ? 150 : 250;
                                                                 addEarnings('history', reward);
+                                                                addPoints(reward / 5);
                                                                 showToast(`Path Mastered! +₦${reward} 📜`, 'success');
                                                             }
                                                         }}
