@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { GamificationProvider } from './context/GamificationContext';
 import Chatbot from './components/Chatbot';
+import ProtectedRoute from './components/ProtectedRoute';
 // ... existing imports ...
 
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
@@ -39,7 +40,11 @@ function App() {
                 <Route path="/relationships" element={<Relationships ageGroup={ageGroup} />} />
                 <Route path="/purpose" element={<Purpose ageGroup={ageGroup} />} />
                 <Route path="/transparency" element={<Transparency />} />
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin" element={
+                  <ProtectedRoute adminOnly={true}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
               </Routes>
             </Suspense>
             <Chatbot />
