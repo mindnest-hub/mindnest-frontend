@@ -6,9 +6,11 @@ import { useWallet } from '../hooks/useWallet';
 import { africanResources } from '../data/africanResources';
 import { civilizationsData } from '../data/civilizationsData';
 import { useGamification } from '../context/GamificationContext';
+import { useAuth } from '../context/AuthContext';
 
 const History = ({ ageGroup }) => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const { balance, moduleEarnings, addEarnings, deductPenalty, getModuleCap } = useWallet();
     const { addPoints } = useGamification();
     const MODULE_CAP = getModuleCap('history');
@@ -376,6 +378,32 @@ const History = ({ ageGroup }) => {
             >
                 ← Back to Hub
             </button>
+
+            {!user && (
+                <div style={{
+                    backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                    border: '1px solid #ffa500',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                    marginBottom: '2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    animation: 'fadeIn 0.5s',
+                    marginTop: '4rem'
+                }}>
+                    <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+                    <div>
+                        <h4 style={{ margin: 0, color: '#ffa500' }}>Guest Mode: Trial Only</h4>
+                        <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.8 }}>
+                            Financial rewards are reserved for registered MindNest students.
+                            <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: '#fff', textDecoration: 'underline', cursor: 'pointer', padding: 0, marginLeft: '5px' }}>
+                                Sign in to earn ₦
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <header style={{ marginBottom: '3rem', textAlign: 'center' }}>
                 <h1 style={{ fontSize: '3rem', color: 'var(--color-primary)' }}>

@@ -105,7 +105,10 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                     <div style={{ display: 'flex', gap: '0.8rem', marginRight: '1rem', alignItems: 'center' }}>
                         <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setShowPaymentPortal(true)}>
                             <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Wallet</div>
-                            <div style={{ fontWeight: '700', color: '#00C851' }}>₦{balance.toLocaleString()}</div>
+                            <div style={{ fontWeight: '700', color: user ? '#00C851' : 'var(--color-text-muted)' }}>
+                                ₦{balance.toLocaleString()}
+                                {!user && <span style={{ fontSize: '0.6rem', display: 'block', color: '#ffa500' }}>Guest Mode</span>}
+                            </div>
                         </div>
                         <div style={{ height: '20px', width: '1px', background: 'var(--color-border)' }}></div>
                         <div style={{ textAlign: 'center' }}>

@@ -110,6 +110,8 @@ export const useWallet = () => {
                 } catch (err) {
                     console.error("Failed to securely add reward to backend:", err);
                 }
+            } else {
+                console.warn(`[GUEST MODE] Reward of ₦${actualAmount} skipped for module ${module}. Direct database sync requires sign-in.`);
             }
 
             return { success: true, amount: actualAmount, capped: false };
