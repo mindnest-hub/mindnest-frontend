@@ -85,7 +85,7 @@ export const useWallet = () => {
         return MODULE_CAPS[module] || DEFAULT_CAP;
     };
 
-    const addEarnings = async (module, amount) => {
+    const addEarnings = async (module, amount, actionId = null) => {
         const currentModuleEarning = moduleEarnings[module] || 0;
         const currentModuleBalance = moduleBalances[module] || 0;
         const cap = getModuleCap(module);
@@ -101,10 +101,12 @@ export const useWallet = () => {
             // Update leaderboard locally
             updateEarnings(actualAmount);
 
-            // SECURITY: Securely update backend balance and XP
+            // SECURITY: Securely update backend balance and XP with deduplication
             if (token) {
                 try {
-                    await api.addReward(token, actualAmount, actualAmount);
+                    // Generate a semi-unique actionId if none provided (fallback)
+                    const finalActionId = actionId || `${module}_${Date.now()}_${actualAmount}`;
+                    await api.addReward(token, actualAmount, actualAmount, finalActionId, `Earning from ${module}`);
                 } catch (err) {
                     console.error("Failed to securely add reward to backend:", err);
                 }

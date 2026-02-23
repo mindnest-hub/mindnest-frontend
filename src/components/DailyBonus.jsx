@@ -19,7 +19,11 @@ const DailyBonus = () => {
                 const bonusAmount = 50;
                 setReward(bonusAmount);
                 setShowBonus(true);
-                addEarnings('finance', bonusAmount);
+
+                // SECURITY: Send unique actionId for deduplication
+                const dateKey = today.replace(/ /g, '_');
+                addEarnings('finance', bonusAmount, `daily_bonus_${dateKey}`);
+
                 localStorage.setItem('lastLoginDate', today);
             }
         };

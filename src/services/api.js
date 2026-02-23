@@ -108,14 +108,14 @@ export const api = {
         return res.json();
     },
 
-    addReward: async (token, amount, xp) => {
+    addReward: async (token, amount, xp, actionId, reason) => {
         const res = await fetch(`${API_URL}/user/reward`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ amount, xp }),
+            body: JSON.stringify({ amount, xp, actionId, reason }),
         });
         if (!res.ok) {
             const error = await res.json();
