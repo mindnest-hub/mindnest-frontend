@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import { useGamification } from '../context/GamificationContext';
+import { useAuth } from '../context/AuthContext';
 import Toast from '../components/Toast';
 
 const Finance = ({ ageGroup }) => {
   const navigate = useNavigate();
+  const { user, upgradeToElite } = useAuth();
   const { balance, moduleBalances, moduleEarnings, addEarnings, deductPenalty, getModuleCap, WITHDRAWAL_LIMIT, setModuleBalance } = useWallet();
   const { addPoints } = useGamification();
   const MODULE_CAP = getModuleCap('finance');
@@ -1979,7 +1981,20 @@ const Finance = ({ ageGroup }) => {
       id: 14,
       title: "Community Pot: City Builder 🍲",
       desc: "Why we pay taxes.",
-      content: (
+      content: (!user?.isElite && (isKid || isTeen)) ? (
+        <div style={{ textAlign: 'center', padding: '2rem', border: '2px dashed #007E33', borderRadius: '20px', backgroundColor: 'rgba(0,126,51,0.05)' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💎</div>
+          <h3 style={{ color: '#007E33' }}>Elite Mastery Required</h3>
+          <p>Certification levels are reserved for MindNest Elite members.</p>
+          <button
+            onClick={upgradeToElite}
+            className="btn"
+            style={{ backgroundColor: '#007E33', color: 'white', fontWeight: 'bold', padding: '0.8rem 1.5rem', borderRadius: '10px' }}
+          >
+            Upgrade to Elite (₦9,000 / year)
+          </button>
+        </div>
+      ) : (
         <div>
           <p><strong>Stage {Math.min(subStage, isKid ? 2 : 4) + 1}/{isKid ? 3 : 5}:</strong> Taxes build our community. Watch it grow!</p>
           <div style={{
@@ -2076,7 +2091,20 @@ const Finance = ({ ageGroup }) => {
       id: 16,
       title: "Wealth Engine: Diversified Choice 🌍",
       desc: "Invest to earn passive income.",
-      content: (
+      content: (!user?.isElite) ? (
+        <div style={{ textAlign: 'center', padding: '2rem', border: '2px dashed var(--color-primary)', borderRadius: '20px', backgroundColor: 'rgba(156, 39, 176, 0.05)' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💎</div>
+          <h3 style={{ color: 'var(--color-primary)' }}>Elite Wealth Engine</h3>
+          <p>The automated Wealth Engine is a premium feature for Elite members only.</p>
+          <button
+            onClick={upgradeToElite}
+            className="btn"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'white', fontWeight: 'bold', padding: '0.8rem 1.5rem', borderRadius: '10px' }}
+          >
+            Unlock Wealth Engine (₦9,000 / year)
+          </button>
+        </div>
+      ) : (
         <div>
           <p><strong>Stage {cryptoStage + 1}/3:</strong> Build your wealth engine.</p>
           <p style={{ fontSize: '0.9rem', color: '#aaa', marginBottom: '1rem' }}>

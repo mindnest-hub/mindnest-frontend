@@ -5,6 +5,8 @@ import { GamificationProvider } from './context/GamificationContext';
 import Chatbot from './components/Chatbot';
 // ... existing imports ...
 
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+
 function App() {
   const [ageGroup, setAgeGroup] = useState(localStorage.getItem('ageGroup') || null);
 
@@ -37,6 +39,7 @@ function App() {
                 <Route path="/relationships" element={<Relationships ageGroup={ageGroup} />} />
                 <Route path="/purpose" element={<Purpose ageGroup={ageGroup} />} />
                 <Route path="/transparency" element={<Transparency />} />
+                <Route path="/admin" element={<AdminDashboard />} />
               </Routes>
             </Suspense>
             <Chatbot />

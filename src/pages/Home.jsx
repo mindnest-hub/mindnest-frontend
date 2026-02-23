@@ -12,7 +12,7 @@ import { useWallet } from '../hooks/useWallet';
 
 const Home = ({ ageGroup, setAgeGroup }) => {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout, upgradeToElite } = useAuth();
     const { points, level, streak, getRankInfo, getNextRankInfo } = useGamification();
     const { balance, refreshBalance } = useWallet();
     const [showAgeModal, setShowAgeModal] = useState(!ageGroup);
@@ -20,6 +20,8 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showPaymentPortal, setShowPaymentPortal] = useState(false);
     const [hasShownAuthPrompt, setHasShownAuthPrompt] = useState(false);
+    const [upgrading, setUpgrading] = useState(false);
+    const [toast, setToast] = useState(null);
 
     const rank = getRankInfo();
     const nextRank = getNextRankInfo();
@@ -33,6 +35,20 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                 setShowAuthModal(true);
                 setHasShownAuthPrompt(true);
             }, 500);
+        }
+    };
+
+    const handleUpgradeElite = async () => {
+        if (!window.confirm('Upgrade to Elite Membership for ₦5,000?')) return;
+
+        setUpgrading(true);
+        try {
+            await upgradeToElite();
+            setToast({ message: 'Welcome to the Elite, MindNest Champion! 💎', type: 'success' });
+        } catch (error) {
+            setToast({ message: error.message || 'Upgrade failed. Check balance.', type: 'error' });
+        } finally {
+            setUpgrading(false);
         }
     };
 
@@ -108,6 +124,11 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                     <button onClick={() => setShowLeaderboard(true)} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
                         🏆 Ranking
                     </button>
+                    {user?.isAdmin && (
+                        <button onClick={() => navigate('/admin')} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderColor: '#FFD700', color: '#FFD700' }}>
+                            ⚙️ Admin
+                        </button>
+                    )}
                     {user ? (
                         <button onClick={logout} className="btn-outline" style={{
                             padding: '0.4rem 0.8rem',
@@ -152,7 +173,20 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.5rem' }}>
                         <div>
                             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Current Rank</span>
-                            <h2 style={{ fontSize: '1.5rem', margin: 0, color: 'var(--color-primary)' }}>{level}</h2>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <h2 style={{ fontSize: '1.5rem', margin: 0, color: 'var(--color-primary)' }}>{level}</h2>
+                                {user?.isElite && (
+                                    <span style={{
+                                        padding: '0.2rem 0.6rem',
+                                        borderRadius: '20px',
+                                        background: 'linear-gradient(90deg, #FFD700, #FFA500)',
+                                        color: '#000',
+                                        fontSize: '0.6rem',
+                                        fontWeight: 'bold',
+                                        textTransform: 'uppercase'
+                                    }}>Elite</span>
+                                )}
+                            </div>
                         </div>
                         {nextRank && (
                             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
@@ -170,6 +204,42 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                     <div className="badge-item" style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', filter: points > 5000 ? 'none' : 'grayscale(1)' }}>🏛️</div>
                 </div>
             </div>
+
+            {/* Elite Upgrade Section */}
+            {user && !user.isElite && (
+                <div className="card animate-fade" style={{
+                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,165,0,0.05) 100%)',
+                    border: '2px solid rgba(255,215,0,0.3)',
+                    marginBottom: '3rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '2rem'
+                }}>
+                    <div>
+                        <h2 style={{ color: '#FFD700', marginBottom: '0.5rem' }}>Unlock Mastery & AI Mentor 🔓</h2>
+                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
+                            {user?.hasUsedEarningsForElite
+                                ? "Mastery renewal requires a funded balance from a real deposit. One-time earnings allowance used."
+                                : "Get personalized guidance from your AI Mentor and unlock Mastery levels in every pillar."}
+                        </p>
+                    </div>
+                    <button
+                        disabled={upgrading}
+                        onClick={handleUpgradeElite}
+                        className="btn btn-primary"
+                        style={{
+                            background: 'linear-gradient(90deg, #FFD700, #FFA500)',
+                            border: 'none',
+                            color: '#000',
+                            fontWeight: 'bold',
+                            padding: '1rem 2rem'
+                        }}
+                    >
+                        {upgrading ? 'Upgrading...' : 'Upgrade for ₦9,000 / year'}
+                    </button>
+                </div>
+            )}
 
             <div style={{
                 display: 'grid',

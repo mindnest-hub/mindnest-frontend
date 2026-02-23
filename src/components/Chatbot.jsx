@@ -248,17 +248,15 @@ const Chatbot = () => {
                 })
             });
 
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error || 'Failed to connect to AI Mentor');
-            }
-
             const data = await res.json();
+            if (data.error) throw new Error(data.error);
             setMessages(prev => [...prev, { text: data.reply, sender: 'bot' }]);
         } catch (error) {
             console.error("AI Mentor Error:", error);
             setMessages(prev => [...prev, {
-                text: "Sorry, I'm having trouble connecting to the network. Please check your internet or try again later.",
+                text: error.message.includes('OPENAI_API_KEY')
+                    ? "My wisdom is temporarily unavailable as my keys are being polished. Please ask an admin to check the Edge Function secrets! 🔧"
+                    : "Sorry, I'm having trouble connecting to the network. Please check your internet or try again later.",
                 sender: 'bot'
             }]);
         } finally {
@@ -300,7 +298,9 @@ const Chatbot = () => {
                     {/* Header */}
                     <div style={{ padding: '1rem', borderBottom: '1px solid #333', backgroundColor: 'var(--color-primary)', borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem', color: '#fff' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>MindNest Consultant ✨</h3>
+                            <h3 style={{ margin: 0 }}>
+                                {user?.isElite ? '💎 AI Oracle' : 'MindNest Consultant ✨'}
+                            </h3>
                             <button
                                 onClick={() => setShowHistory(!showHistory)}
                                 style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '1.2rem' }}

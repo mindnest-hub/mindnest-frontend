@@ -144,5 +144,28 @@ export const api = {
             throw new Error(error.message || 'Failed to verify payment');
         }
         return res.json();
+    },
+
+    upgradeElite: async (token) => {
+        const res = await fetch(`${API_URL}/user/upgrade-elite`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to upgrade to Elite');
+        }
+        return res.json();
+    },
+
+    getAdminStats: async (token) => {
+        const res = await fetch(`${API_URL}/user/admin/stats`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to fetch admin stats');
+        }
+        return res.json();
     }
 };

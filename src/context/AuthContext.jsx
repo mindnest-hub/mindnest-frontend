@@ -91,8 +91,24 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const upgradeToElite = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No active session');
+
+        try {
+            const data = await api.upgradeElite(token);
+            if (data.user) {
+                setUser(prev => ({ ...prev, ...data.user }));
+            }
+            return data;
+        } catch (error) {
+            console.error('Upgrade to Elite failed:', error);
+            throw error;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, signup, verifyOtp, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, signup, verifyOtp, logout, upgradeToElite, loading }}>
             {children}
         </AuthContext.Provider>
     );
