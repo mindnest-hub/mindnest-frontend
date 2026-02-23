@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mindnest.africa/sitemap.xml
+Sitemap: https://mindnest.bond/sitemap.xml

@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://mindnest.africa/</loc>
+        <loc>https://mindnest.bond/</loc>
         <lastmod>2026-02-23</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://mindnest.africa/#/finance</loc>
+        <loc>https://mindnest.bond/#/finance</loc>
         <lastmod>2026-02-23</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://mindnest.africa/#/critical-thinking</loc>
+        <loc>https://mindnest.bond/#/critical-thinking</loc>
         <lastmod>2026-02-23</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://mindnest.africa/#/tech</loc>
+        <loc>https://mindnest.bond/#/tech</loc>
         <lastmod>2026-02-23</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://mindnest.africa/#/agri</loc>
+        <loc>https://mindnest.bond/#/agri</loc>
         <lastmod>2026-02-23</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://mindnest.africa/#/civics</loc>
+        <loc>https://mindnest.bond/#/civics</loc>
         <lastmod>2026-02-23</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
