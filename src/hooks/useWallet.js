@@ -67,13 +67,13 @@ export const useWallet = () => {
         localStorage.setItem('walletBalance', balance);
 
         // Sync with backend if logged in (Debounced)
+        // SECURITY: We no longer send walletBalance and XP here.
+        // Those are updated securely via api.addReward or handleWebhook.
         if (token) {
             const timeoutId = setTimeout(() => {
                 api.updateProgress(token, {
                     moduleBalances,
-                    moduleEarnings,
-                    xp: (moduleEarnings.history || 0) + (moduleEarnings.finance || 0) + (moduleEarnings.tech || 0),
-                    walletBalance: balance
+                    moduleEarnings
                 }).catch(err => console.error("Failed to sync progress with backend:", err));
             }, 2000); // 2 second debounce
 
@@ -85,7 +85,7 @@ export const useWallet = () => {
         return MODULE_CAPS[module] || DEFAULT_CAP;
     };
 
-    const addEarnings = (module, amount) => {
+    const addEarnings = async (module, amount) => {
         const currentModuleEarning = moduleEarnings[module] || 0;
         const currentModuleBalance = moduleBalances[module] || 0;
         const cap = getModuleCap(module);
@@ -94,11 +94,21 @@ export const useWallet = () => {
         const actualAmount = Math.min(amount, remainingSpace);
 
         if (actualAmount > 0) {
+            // Local update for immediate UI feedback
             setModuleEarnings(prev => ({ ...prev, [module]: currentModuleEarning + actualAmount }));
             setModuleBalances(prev => ({ ...prev, [module]: currentModuleBalance + actualAmount }));
 
-            // Update leaderboard
+            // Update leaderboard locally
             updateEarnings(actualAmount);
+
+            // SECURITY: Securely update backend balance and XP
+            if (token) {
+                try {
+                    await api.addReward(token, actualAmount, actualAmount);
+                } catch (err) {
+                    console.error("Failed to securely add reward to backend:", err);
+                }
+            }
 
             return { success: true, amount: actualAmount, capped: false };
         }

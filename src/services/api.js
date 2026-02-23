@@ -108,6 +108,22 @@ export const api = {
         return res.json();
     },
 
+    addReward: async (token, amount, xp) => {
+        const res = await fetch(`${API_URL}/user/reward`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ amount, xp }),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to add reward');
+        }
+        return res.json();
+    },
+
     getLeaderboard: async () => {
         try {
             const res = await fetch(`${API_URL}/user/leaderboard`);
