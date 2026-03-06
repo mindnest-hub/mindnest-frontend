@@ -6,6 +6,7 @@ import SoilLab from '../components/SoilLab';
 import AgriBusinessPlanner from '../components/AgriBusinessPlanner';
 import InvestPitch from '../components/InvestPitch';
 import { useWallet } from '../hooks/useWallet';
+import Header from '../components/Header';
 
 // Safe initialization helper
 const safeInit = (key, defaultValue, type = 'number') => {
@@ -269,7 +270,8 @@ const Agripreneurship = () => {
     const isMasterAgripreneur = balance >= 10000 && harvestCount >= 3;
 
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}

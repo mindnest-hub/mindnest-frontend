@@ -6,6 +6,7 @@ import Toast from '../components/Toast';
 import KidsWellnessHub from '../components/KidsWellnessHub';
 import { bodyHealthData } from '../data/bodyHealthData';
 import { mentalHealthData } from '../data/mentalHealthData';
+import Header from '../components/Header';
 
 const Wellness = ({ ageGroup }) => {
     const navigate = useNavigate();
@@ -23,7 +24,8 @@ const Wellness = ({ ageGroup }) => {
     // --- KIDS RENDER (PRESERVED EXACTLY AS IS) ---
     if (isKid) {
         return (
-            <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh' }}>
+            <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem', minHeight: '100vh' }}>
+                <Header />
                 <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <button onClick={() => navigate('/')} style={{ background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}>← Hub</button>
                     <h1 style={{ color: '#FFD700' }}>Wellness World 🌍</h1>
@@ -38,7 +40,8 @@ const Wellness = ({ ageGroup }) => {
     const showToast = (message, type = 'info', duration = 3000) => setToast({ message, type, duration });
 
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh', maxWidth: '1200px', margin: '0 auto' }}>
+        <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem', minHeight: '100vh', maxWidth: '1200px', margin: '0 auto' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} duration={toast.duration} onClose={() => setToast(null)} />}
 
             <header style={{ textAlign: 'center', marginBottom: '2rem' }}>

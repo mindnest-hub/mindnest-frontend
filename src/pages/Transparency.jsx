@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
+import Header from '../components/Header';
 
 const Transparency = () => {
     const navigate = useNavigate();
@@ -16,7 +17,8 @@ const Transparency = () => {
     };
 
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}

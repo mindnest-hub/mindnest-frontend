@@ -7,6 +7,7 @@ import { africanResources } from '../data/africanResources';
 import { civilizationsData } from '../data/civilizationsData';
 import { useGamification } from '../context/GamificationContext';
 import { useAuth } from '../context/AuthContext';
+import Header from '../components/Header';
 
 const History = ({ ageGroup }) => {
     const navigate = useNavigate();
@@ -367,7 +368,8 @@ const History = ({ ageGroup }) => {
     ];
 
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} duration={toast.duration} onClose={() => setToast(null)} />}
             <button
                 onClick={() => navigate('/')}

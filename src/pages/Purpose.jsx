@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useWallet } from '../hooks/useWallet';
 import Toast from '../components/Toast';
 import { purposeData } from '../data/purposeData';
+import Header from '../components/Header';
 
 const Purpose = ({ ageGroup }) => {
     const navigate = useNavigate();
@@ -39,7 +40,8 @@ const Purpose = ({ ageGroup }) => {
     };
 
     return (
-        <div className="container" style={{ paddingBottom: '5rem', maxWidth: '1000px', margin: '0 auto' }}>
+        <div className="container" style={{ paddingBottom: '5rem', maxWidth: '1000px', margin: '0 auto', paddingTop: '1rem' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
             {/* HEADER */}

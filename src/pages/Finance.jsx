@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import WalletHistory from '../components/WalletHistory';
 import Toast from '../components/Toast';
+import Header from '../components/Header';
 
 const Finance = ({ ageGroup }) => {
   const navigate = useNavigate();
@@ -2182,7 +2183,8 @@ const Finance = ({ ageGroup }) => {
   ];
 
   return (
-    <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+    <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem' }}>
+      <Header />
       {!user && (
         <div style={{
           backgroundColor: 'rgba(255, 165, 0, 0.1)',

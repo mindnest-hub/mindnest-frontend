@@ -82,7 +82,13 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                 flexWrap: 'wrap',
                 gap: '1rem'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div
+                    onClick={() => {
+                        localStorage.removeItem('ageGroup');
+                        window.location.reload();
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+                >
                     <div style={{
                         width: '40px',
                         height: '40px',

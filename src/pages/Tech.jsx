@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import { useGamification } from '../context/GamificationContext';
 import { useWallet } from '../hooks/useWallet';
+import Header from '../components/Header';
 
 const Tech = () => {
   const navigate = useNavigate();
@@ -999,7 +1000,8 @@ const Tech = () => {
   );
 
   return (
-    <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+    <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem' }}>
+      <Header />
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <button onClick={() => navigate('/')} style={{ background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         ← Back to Hub

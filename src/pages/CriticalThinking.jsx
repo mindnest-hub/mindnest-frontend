@@ -5,6 +5,7 @@ import { useGamification } from '../context/GamificationContext';
 import { triggerLiveEvent } from '../components/LiveNotifications';
 import { africanResources } from '../data/africanResources';
 import Toast from '../components/Toast';
+import Header from '../components/Header';
 const CriticalThinking = ({ ageGroup }) => {
     const navigate = useNavigate();
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
@@ -3242,6 +3243,7 @@ const CriticalThinking = ({ ageGroup }) => {
                 }
             `}</style>
 
+            <Header />
             <button
                 onClick={() => navigate('/')}
                 className="btn btn-sm"

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import Toast from './Toast';
+import Header from './Header';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
@@ -73,7 +74,8 @@ const AdminDashboard = () => {
     if (loading) return <div className="container" style={{ textAlign: 'center', paddingTop: '5rem' }}><h2>Loading Admin Intelligence... ⚙️</h2></div>;
 
     return (
-        <div className="container" style={{ paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingBottom: '4rem', paddingTop: '1rem' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>

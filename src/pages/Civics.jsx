@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
-import Toast from '../components/Toast';
+import toast from '../components/Toast';
 import { useGamification } from '../context/GamificationContext';
 import CivicGuide from '../components/CivicGuide';
+import Header from '../components/Header';
 
 const Civics = ({ ageGroup }) => {
     const navigate = useNavigate();
@@ -1064,7 +1065,8 @@ const Civics = ({ ageGroup }) => {
     const activePillarData = pillars.find(p => p.id === activePillar);
 
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem' }}>
+        <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
             {showConfetti && (

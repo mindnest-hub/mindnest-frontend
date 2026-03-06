@@ -4,6 +4,7 @@ import Toast from '../components/Toast';
 import { useGamification } from '../context/GamificationContext';
 import { useWallet } from '../hooks/useWallet';
 import { bodyHealthData } from '../data/bodyHealthData';
+import Header from '../components/Header';
 
 // --- KIDS WELLNESS COMPONENTS (10 SEQUENTIAL GAMES) ---
 
@@ -504,7 +505,8 @@ const Health = ({ ageGroup }) => {
     // --- KIDS RENDER ---
     if (isKid) {
         return (
-            <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh' }}>
+            <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem', minHeight: '100vh' }}>
+                <Header />
                 <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
                     <button onClick={() => navigate('/')} style={{ background: 'none', color: 'var(--color-primary)', fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}>← Hub</button>
                     <h1 style={{ color: '#FFD700' }}>Wellness World 🌍</h1>
@@ -552,7 +554,8 @@ const Health = ({ ageGroup }) => {
     const progressPercent = Math.round((completedLevels.filter(Boolean).length / TOTAL_LEVELS) * 100);
 
     return (
-        <div className="container" style={{ paddingTop: '4rem', paddingBottom: '4rem', minHeight: '100vh' }}>
+        <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem', minHeight: '100vh' }}>
+            <Header />
             {toast && <Toast message={toast.message} type={toast.type} duration={toast.duration} onClose={() => setToast(null)} />}
 
             <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
