@@ -58,17 +58,6 @@ class ErrorBoundary extends React.Component {
                         >
                             Refresh App
                         </button>
-                        <button
-                            onClick={() => {
-                                localStorage.clear();
-                                window.location.reload();
-                            }}
-                            style={{ padding: '15px 30px', backgroundColor: 'transparent', color: '#D15A36', border: '2px solid #D15A36', borderRadius: '30px', cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold', transition: 'transform 0.2s' }}
-                            onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-                            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-                        >
-                            Clear App Data (Fix Crash)
-                        </button>
                     </div>
 
                 </div>
