@@ -71,14 +71,6 @@ class ErrorBoundary extends React.Component {
                         </button>
                     </div>
 
-                    <details style={{ marginTop: '40px', color: '#888', maxWidth: '80%', fontSize: '0.9rem', textAlign: 'left', background: 'rgba(255,255,255,0.5)', padding: '15px', borderRadius: '10px' }}>
-                        <summary style={{ cursor: 'pointer', outline: 'none' }}>View Error Details</summary>
-                        <div style={{ marginTop: '10px', whiteSpace: 'pre-wrap', overflowX: 'auto' }}>
-                            {this.state.error && this.state.error.toString()}
-                            <br />
-                            {this.state.errorInfo && this.state.errorInfo.componentStack}
-                        </div>
-                    </details>
                 </div>
             );
         }
