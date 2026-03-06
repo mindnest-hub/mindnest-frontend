@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../hooks/useWallet';
 import { useGamification } from '../context/GamificationContext';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
+import WalletHistory from '../components/WalletHistory';
 import Toast from '../components/Toast';
 
 const Finance = ({ ageGroup }) => {
@@ -41,6 +43,17 @@ const Finance = ({ ageGroup }) => {
   const [userCountryInput, setUserCountryInput] = useState("");
 
   const [showBadge, setShowBadge] = useState(false);
+
+  // --- KYC STATE ---
+  const [kycType, setKycType] = useState('NIN');
+  const [kycFullName, setKycFullName] = useState(user?.username || '');
+  const [isSubmittingKyc, setIsSubmittingKyc] = useState(false);
+
+  // --- WITHDRAWAL STATE ---
+  const [bankName, setBankName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [accountName, setAccountName] = useState('');
+  const [isSubmittingWithdrawal, setIsSubmittingWithdrawal] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -443,7 +456,7 @@ const Finance = ({ ageGroup }) => {
     const currentScenario = tradeScenarios[subStage];
     if (option === currentScenario.correct) {
       const reward = subStage === 2 ? 40 : 30; // 30, 30, 40 distribution
-      showToast(`Good Trade! +₦${reward} 🤝\n${currentScenario.fact}`, 'success');
+      showToast(`Good Trade! +₦${reward} 🤝\n${currentScenario.fact} `, 'success');
       handleStageComplete(1, reward);
     } else {
       showToast("Not a fair trade! Think about the value exchange.", 'error');
@@ -467,7 +480,7 @@ const Finance = ({ ageGroup }) => {
           const fact = isKid
             ? "Saving a little every day builds a big mountain of treasure! 🏔️"
             : "Compound Interest Warning: If you don't save, inflation (price rises) will eat your buying power. Saving is your defense! 🛡️";
-          showToast(`Kolo Full! +₦${reward} 💰\n\n${fact}`, 'success');
+          showToast(`Kolo Full! +₦${reward} 💰\n\n${fact} `, 'success');
           handleStageComplete(2, reward);
         }
         return newScore;
@@ -498,7 +511,7 @@ const Finance = ({ ageGroup }) => {
 
     const reward = subStage === 2 ? 60 : 40;
     const currentScenario = budgetScenarios[Math.min(subStage, isKid ? 2 : 4)];
-    showToast(`${currentScenario.fact}`, "success");
+    showToast(`${currentScenario.fact} `, "success");
     handleStageComplete(3, reward);
   };
 
@@ -535,7 +548,7 @@ const Finance = ({ ageGroup }) => {
         if (newScore >= 5) {
           setSafeGameActive(false);
           const reward = subStage === 2 ? 40 : 30;
-          showToast(`Safe & Secure! +₦${reward}`, 'success');
+          showToast(`Safe & Secure! +₦${reward} `, 'success');
           handleStageComplete(5, reward);
         }
         return newScore;
@@ -596,7 +609,7 @@ const Finance = ({ ageGroup }) => {
   };
 
   const handleRiskChoiceHander = (opt) => {
-    setRiskChoiceFeedback(`${opt.name}: ${opt.outcome}`);
+    setRiskChoiceFeedback(`${opt.name}: ${opt.outcome} `);
     handleStageComplete(8, opt.reward);
 
     setTimeout(() => {
@@ -2412,7 +2425,7 @@ const Finance = ({ ageGroup }) => {
                   ) : verificationStatus === 'verifying' ? (
                     <div style={{ padding: '2rem' }}>
                       <div className="spinner" style={{ width: '50px', height: '50px', border: '5px solid #333', borderTop: '5px solid #00C851', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 1rem auto' }}></div>
-                      <p>Verifying Identity...</p>
+                      <p>Verifying Records...</p>
                       <p style={{ fontSize: '0.8rem', color: '#aaa' }}>Checking History Module Records...</p>
                       <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
                     </div>
@@ -2423,16 +2436,124 @@ const Finance = ({ ageGroup }) => {
                       <p>You need at least <strong>₦2,000</strong> in your History Wallet to prove you understand our roots before building wealth.</p>
                       <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#333', marginTop: '1rem' }}>Close & Go Earn</button>
                     </div>
+                  ) : !user.kycVerified ? (
+                    // KYC FORM STEP
+                    <div style={{ animation: 'fadeIn 0.5s', textAlign: 'left' }}>
+                      <h3 style={{ color: '#00C851', textAlign: 'center' }}>Identity Verification (KYC)</h3>
+                      <p style={{ fontSize: '0.85rem', color: '#aaa', marginBottom: '1.5rem', textAlign: 'center' }}>Required by financial regulations to prevent fraud.</p>
+
+                      <div style={{ marginBottom: '1rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.4rem' }}>Select ID Type</label>
+                        <select
+                          value={kycType}
+                          onChange={(e) => setKycType(e.target.value)}
+                          style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #444' }}
+                        >
+                          <option value="NIN">National Identity Number (NIN)</option>
+                          <option value="Gov ID">Voter's Card / Driver's License</option>
+                          <option value="Passport">International Passport</option>
+                        </select>
+                      </div>
+
+                      <div style={{ marginBottom: '1rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.4rem' }}>{kycType} Number</label>
+                        <input
+                          type="text"
+                          placeholder={`Enter your ${kycType} number`}
+                          value={idNumber}
+                          onChange={(e) => setIdNumber(e.target.value)}
+                          style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #444' }}
+                        />
+                      </div>
+
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.4rem' }}>Full Legal Name</label>
+                        <input
+                          type="text"
+                          placeholder="As it appears on your ID"
+                          value={kycFullName}
+                          onChange={(e) => setKycFullName(e.target.value)}
+                          style={{ width: '100%', padding: '0.8rem', borderRadius: '10px', backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #444' }}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button
+                          disabled={isSubmittingKyc || !idNumber || !kycFullName}
+                          onClick={async () => {
+                            setIsSubmittingKyc(true);
+                            try {
+                              const token = localStorage.getItem('token');
+                              await api.submitKYC(token, { kycType, idNumber, fullName: kycFullName });
+                              // We should ideally refresh the user profile here, but for now we'll just proceed
+                              // In a real app, the useAuth refresh method would be called.
+                              showToast("KYC Verified Successfully!", "success");
+                              // Temporary hack to bypass wait for profile refresh
+                              user.kycVerified = true;
+                              setVerificationStatus('success');
+                            } catch (err) {
+                              showToast(err.message, "error");
+                            } finally {
+                              setIsSubmittingKyc(false);
+                            }
+                          }}
+                          className="btn"
+                          style={{ backgroundColor: '#00C851', flex: 1, fontWeight: 'bold' }}
+                        >
+                          {isSubmittingKyc ? 'Verifying...' : 'Submit Verification'}
+                        </button>
+                        <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#333', flex: 1 }}>Cancel</button>
+                      </div>
+                    </div>
                   ) : (
-                    // SUCCESS - SHOW FORM
+                    // SUCCESS - SHOW BANK FORM
                     <div style={{ animation: 'fadeIn 0.5s' }}>
                       <p style={{ color: '#00C851', fontWeight: 'bold' }}>Verification Successful! ✅</p>
                       <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Enter your Nigerian Bank Account details.</p>
-                      <input type="text" placeholder="Bank Name (e.g. GTBank)" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
-                      <input type="text" placeholder="Account Number" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
-                      <input type="text" placeholder="Account Name" style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', border: 'none' }} />
+                      <input
+                        type="text"
+                        placeholder="Bank Name (e.g. GTBank)"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #444' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Account Number"
+                        value={accountNumber}
+                        onChange={(e) => setAccountNumber(e.target.value)}
+                        style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #444' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Account Name"
+                        value={accountName}
+                        onChange={(e) => setAccountName(e.target.value)}
+                        style={{ width: '100%', padding: '1rem', marginBottom: '1rem', borderRadius: '10px', backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #444' }}
+                      />
                       <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button onClick={() => showToast("Withdrawal Request Sent! 🚀 (This is a demo)", 'success')} className="btn" style={{ backgroundColor: '#00C851', flex: 1 }}>Confirm</button>
+                        <button
+                          disabled={isSubmittingWithdrawal || !bankName || !accountNumber || !accountName}
+                          onClick={async () => {
+                            setIsSubmittingWithdrawal(true);
+                            try {
+                              const token = localStorage.getItem('token');
+                              await api.requestWithdrawal(token, WITHDRAWAL_LIMIT, { bankName, accountNumber, accountName });
+                              showToast("Withdrawal Request Sent! 🚀", 'success');
+                              setShowWithdrawModal(false);
+                              // Refresh profile to show updated balance
+                              window.location.reload();
+                            } catch (err) {
+                              showToast(err.message, "error");
+                            } finally {
+                              setIsSubmittingWithdrawal(false);
+                            }
+                          }}
+                          className="btn"
+                          style={{ backgroundColor: '#00C851', flex: 1, fontWeight: 'bold' }}
+                        >
+                          {isSubmittingWithdrawal ? 'Sending...' : 'Confirm'}
+                        </button>
                         <button onClick={() => setShowWithdrawModal(false)} className="btn" style={{ backgroundColor: '#ff4444', flex: 1 }}>Cancel</button>
                       </div>
                     </div>

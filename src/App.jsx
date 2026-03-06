@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { GamificationProvider } from './context/GamificationContext';
 import Chatbot from './components/Chatbot';
 import ProtectedRoute from './components/ProtectedRoute';
+import WordOriginManager from './components/WordOriginManager';
 // ... existing imports ...
 
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));

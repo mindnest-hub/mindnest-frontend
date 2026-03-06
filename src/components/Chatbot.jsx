@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { getLegalAdvice } from '../data/legalRights';
 import DocumentDrafter from './DocumentDrafter';
 
@@ -69,7 +70,29 @@ const Chatbot = () => {
     const [showDocumentDrafter, setShowDocumentDrafter] = useState(false);
     const messagesEndRef = useRef(null);
 
-    // Save session data whenever relevant state changes
+    // PERSISTENCE: Sync history from DB on mount
+    useEffect(() => {
+        const syncHistory = async () => {
+            if (user) {
+                try {
+                    const token = localStorage.getItem('token');
+                    const history = await api.getAiHistory(token);
+                    if (history && history.length > 0) {
+                        const formatted = history.flatMap(h => [
+                            { text: h.message, sender: 'user' },
+                            { text: h.response, sender: 'bot' }
+                        ]);
+                        setMessages([...defaultMessages, ...formatted]);
+                    }
+                } catch (err) {
+                    console.error("Failed to sync AI history:", err);
+                }
+            }
+        };
+        syncHistory();
+    }, [user]);
+
+    // Save session data whenever relevant state changes (REDUCED for server-syncing)
     useEffect(() => {
         if (!currentSessionId && messages.length <= 1 && !country && !topic) return;
 
@@ -106,6 +129,22 @@ const Chatbot = () => {
         setTopic("");
         setChallengerStep(0);
         setShowHistory(false);
+    };
+
+    const resetServerHistory = async () => {
+        if (!user) return;
+        if (!window.confirm("Are you sure you want to clear your AI Mentor's memory? This cannot be undone.")) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            await api.clearAiHistory(token);
+            setMessages(defaultMessages);
+            setSessions([]);
+            localStorage.removeItem('chatSessions');
+            setShowHistory(false);
+        } catch (err) {
+            console.error("Failed to clear AI history:", err);
+        }
     };
 
     const loadSession = (session) => {
@@ -215,7 +254,7 @@ const Chatbot = () => {
         }
 
 
-        // --- SUPABASE EDGE FUNCTION AI ---
+        // --- BACKEND PERSISTENT AI ---
         try {
             // Content Safety Filter
             const inappropriateKeywords = ['sex', 'nude', 'porn', 'xxx', 'naked', 'explicit'];
@@ -223,40 +262,26 @@ const Chatbot = () => {
 
             if (isInappropriate) {
                 setMessages(prev => [...prev, {
-                    text: "I'm here to help with educational topics like legal rights, property verification, and investment advice, or we can just have a general chat. Please keep questions appropriate and on-topic.",
+                    text: "I'm here to help with educational topics. Please keep questions appropriate.",
                     sender: 'bot'
                 }]);
                 setIsLoading(false);
                 return;
             }
 
-            const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_URL?.split('.')[0].split('//')[1];
-            const functionUrl = `https://${SUPABASE_PROJECT_ID}.functions.supabase.co/chat`;
-
-            const res = await fetch(functionUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem('token')}` // Pass JWT for identity if needed
-                },
-                body: JSON.stringify({
-                    message: userMsg,
-                    userId: user?.id,
-                    ageMode: ageMode,
-                    topic: topic,
-                    country: country
-                })
+            const token = localStorage.getItem('token');
+            const res = await api.sendAiChat(token, {
+                message: userMsg,
+                ageMode: ageMode,
+                topic: topic,
+                country: country
             });
 
-            const data = await res.json();
-            if (data.error) throw new Error(data.error);
-            setMessages(prev => [...prev, { text: data.reply, sender: 'bot' }]);
+            setMessages(prev => [...prev, { text: res.response, sender: 'bot' }]);
         } catch (error) {
             console.error("AI Mentor Error:", error);
             setMessages(prev => [...prev, {
-                text: error.message.includes('OPENAI_API_KEY')
-                    ? "My wisdom is temporarily unavailable as my keys are being polished. Please ask an admin to check the Edge Function secrets! 🔧"
-                    : "Sorry, I'm having trouble connecting to the network. Please check your internet or try again later.",
+                text: "My wisdom is temporarily unavailable. Please check your connection or try again later.",
                 sender: 'bot'
             }]);
         } finally {
@@ -378,9 +403,25 @@ const Chatbot = () => {
                                 ))
                             )}
                             <button
-                                onClick={startNewChat}
+                                onClick={resetServerHistory}
                                 style={{
                                     marginTop: 'auto',
+                                    padding: '0.8rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid #ff4444',
+                                    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                                    color: '#ff4444',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold'
+                                }}
+                                title="Reset AI memory across all devices"
+                            >
+                                🗑️ Reset All Memory
+                            </button>
+                            <button
+                                onClick={startNewChat}
+                                style={{
+                                    marginTop: '0.5rem',
                                     padding: '0.8rem',
                                     borderRadius: '8px',
                                     border: '1px solid var(--color-primary)',
