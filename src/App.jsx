@@ -5,9 +5,34 @@ import { GamificationProvider } from './context/GamificationContext';
 import Chatbot from './components/Chatbot';
 import ProtectedRoute from './components/ProtectedRoute';
 import WordOriginManager from './components/WordOriginManager';
-// ... existing imports ...
+import DailyBonus from './components/DailyBonus';
+
+// Pages
+import Home from './pages/Home';
+import History from './pages/History';
+import Finance from './pages/Finance';
+import CriticalThinking from './pages/CriticalThinking';
+import Agripreneurship from './pages/Agripreneurship';
+import Tech from './pages/Tech';
+import Civics from './pages/Civics';
+import Health from './pages/Health';
+import Wellness from './pages/Wellness';
+import Habits from './pages/Habits';
+import Relationships from './pages/Relationships';
+import Purpose from './pages/Purpose';
+import Transparency from './pages/Transparency';
 
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+
+const LoadingScreen = () => (
+  <div style={{
+    display: 'flex', justifyContent: 'center', alignItems: 'center',
+    height: '100vh', backgroundColor: '#1a1a1a', color: '#FFD700',
+    fontSize: '1.5rem', fontWeight: 'bold'
+  }}>
+    MindNest is loading... 🦁
+  </div>
+);
 
 function App() {
   const [ageGroup, setAgeGroup] = useState(localStorage.getItem('ageGroup') || null);
