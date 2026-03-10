@@ -7,6 +7,7 @@ import AgriBusinessPlanner from '../components/AgriBusinessPlanner';
 import InvestPitch from '../components/InvestPitch';
 import { useWallet } from '../hooks/useWallet';
 import Header from '../components/Header';
+import KidsFarmSimulator from '../components/KidsFarmSimulator';
 
 // Safe initialization helper
 const safeInit = (key, defaultValue, type = 'number') => {
@@ -346,47 +347,62 @@ const Agripreneurship = () => {
                 activeTab === 'farm' && (
                     <div className="grid-cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
                         <div className="card">
-                            <h2 style={{ marginBottom: '1rem' }}>Farm Status 📊</h2>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                                <span>Weather:</span>
-                                <strong>{weather}</strong>
-                            </div>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <span>Soil Moisture:</span>
-                                <div style={{ width: '100%', height: '10px', backgroundColor: '#333', borderRadius: '5px', marginTop: '0.5rem' }}>
-                                    <div style={{ width: `${soilMoisture}%`, height: '100%', backgroundColor: soilMoisture < 30 ? 'red' : '#00BFFF', borderRadius: '5px', transition: 'width 0.5s' }}></div>
-                                </div>
-                            </div>
-                            {hasProcessingUnit && (
-                                <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#333', borderRadius: '10px' }}>
-                                    <h4>🏭 Processing Unit</h4>
-                                    <p>Corn Flakes Stock: {processedStock} boxes</p>
-                                    <button
-                                        onClick={handleSellProcessed}
-                                        disabled={processedStock === 0}
-                                        className="btn"
-                                        style={{ width: '100%', backgroundColor: processedStock > 0 ? 'var(--color-secondary)' : '#555' }}
-                                    >
-                                        Sell Stock (+₦900/box)
-                                    </button>
-                                </div>
-                            )}
-                            {!hasProcessingUnit && (
-                                <button onClick={buyProcessingUnit} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#444', border: '1px solid var(--color-secondary)', opacity: level >= 3 ? 1 : 0.5 }}>
-                                    {level >= 3 ? 'Buy Processing Unit (₦5,000) 🏗️' : '🔒 Locked (Reach Level 3)'}
-                                </button>
+                            {isKid ? (
+                                <KidsFarmSimulator
+                                    onHarvest={(val) => {
+                                        setMoney(prev => prev + val);
+                                        setHarvestCount(prev => prev + 1);
+                                        showToast(`Harvest complete! +${val} added to farm capital 🌾`, 'success');
+                                    }}
+                                    currency="₦"
+                                />
+                            ) : (
+                                <>
+                                    <h2 style={{ marginBottom: '1rem' }}>Farm Status 📊</h2>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                        <span>Weather:</span>
+                                        <strong>{weather}</strong>
+                                    </div>
+                                    <div style={{ marginBottom: '1rem' }}>
+                                        <span>Soil Moisture:</span>
+                                        <div style={{ width: '100%', height: '10px', backgroundColor: '#333', borderRadius: '5px', marginTop: '0.5rem' }}>
+                                            <div style={{ width: `${soilMoisture}%`, height: '100%', backgroundColor: soilMoisture < 30 ? 'red' : '#00BFFF', borderRadius: '5px', transition: 'width 0.5s' }}></div>
+                                        </div>
+                                    </div>
+                                    {hasProcessingUnit && (
+                                        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#333', borderRadius: '10px' }}>
+                                            <h4>🏭 Processing Unit</h4>
+                                            <p>Corn Flakes Stock: {processedStock} boxes</p>
+                                            <button
+                                                onClick={handleSellProcessed}
+                                                disabled={processedStock === 0}
+                                                className="btn"
+                                                style={{ width: '100%', backgroundColor: processedStock > 0 ? 'var(--color-secondary)' : '#555' }}
+                                            >
+                                                Sell Stock (+₦900/box)
+                                            </button>
+                                        </div>
+                                    )}
+                                    {!hasProcessingUnit && (
+                                        <button onClick={buyProcessingUnit} className="btn" style={{ width: '100%', marginTop: '1rem', backgroundColor: '#444', border: '1px solid var(--color-secondary)', opacity: level >= 3 ? 1 : 0.5 }}>
+                                            {level >= 3 ? 'Buy Processing Unit (₦5,000) 🏗️' : '🔒 Locked (Reach Level 3)'}
+                                        </button>
+                                    )}
+                                </>
                             )}
                         </div>
 
-                        <div className="card" style={{ textAlign: 'center' }}>
-                            <h2 style={{ marginBottom: '2rem' }}>Field 1 ({upgrades.vertical ? 'Vertical Farm 🏢' : 'Maize'})</h2>
-                            <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>{getCropEmoji()}</div>
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                                {cropStage === 0 && <button className="btn btn-primary" onClick={handlePlant}>Plant (-₦100)</button>}
-                                {cropStage > 0 && cropStage < 3 && <button className="btn" style={{ backgroundColor: '#00BFFF', color: '#fff' }} onClick={handleWater}>{isKid ? 'Water 💧' : 'Irrigate 💧'}</button>}
-                                {cropStage === 2 && <button className="btn" style={{ backgroundColor: 'var(--color-secondary)', color: '#fff' }} onClick={handleHarvest}>Harvest (+₦{upgrades.vertical ? '450' : '300'})</button>}
+                        {!isKid && (
+                            <div className="card" style={{ textAlign: 'center' }}>
+                                <h2 style={{ marginBottom: '2rem' }}>Field 1 ({upgrades.vertical ? 'Vertical Farm 🏢' : 'Maize'})</h2>
+                                <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>{getCropEmoji()}</div>
+                                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                    {cropStage === 0 && <button className="btn btn-primary" onClick={handlePlant}>Plant (-₦100)</button>}
+                                    {cropStage > 0 && cropStage < 3 && <button className="btn" style={{ backgroundColor: '#00BFFF', color: '#fff' }} onClick={handleWater}>Irrigate 💧</button>}
+                                    {cropStage === 2 && <button className="btn" style={{ backgroundColor: 'var(--color-secondary)', color: '#fff' }} onClick={handleHarvest}>Harvest (+₦{upgrades.vertical ? '450' : '300'})</button>}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 )
             }
