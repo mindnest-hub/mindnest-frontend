@@ -8,6 +8,7 @@ import { civicEducationContent } from '../data/civicEducationContent';
 import BudgetSimulator from '../components/BudgetSimulator';
 import PoliticalTrickSimulator from '../components/PoliticalTrickSimulator';
 import ClassCaptainSimulator from '../components/ClassCaptainSimulator';
+import KidsCivicsGame from '../components/KidsCivicsGame';
 
 const Civics = ({ ageGroup }) => {
     const navigate = useNavigate();
@@ -51,6 +52,7 @@ const Civics = ({ ageGroup }) => {
     const [toastMsg, setToastMsg] = useState(null);
     const [showConfetti, setShowConfetti] = useState(false);
     const [showCertificate, setShowCertificate] = useState(false);
+    const [activeGameModuleId, setActiveGameModuleId] = useState(null); // Kids game launcher
     const [completedModules, setCompletedModules] = useState(() => {
         const saved = localStorage.getItem('civicsExpansionProgress');
         return saved ? JSON.parse(saved) : [];
@@ -211,7 +213,27 @@ const Civics = ({ ageGroup }) => {
 
                                 {renderContent(mod.content)}
 
-                                <div style={{ marginTop: '3rem', textAlign: 'center', padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '15px' }}>
+                                {isKid && (
+                                    <button
+                                        onClick={() => setActiveGameModuleId(mod.id)}
+                                        className="btn"
+                                        style={{
+                                            backgroundColor: '#9C27B0',
+                                            color: 'white',
+                                            width: '100%',
+                                            marginTop: '1rem',
+                                            fontSize: '1.1rem',
+                                            padding: '1rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.75rem'
+                                        }}
+                                    >
+                                        🎮 Play 3 Games — Earn Rewards!
+                                    </button>
+                                )}
+                                <div style={{ marginTop: isKid ? '0.75rem' : '2rem', textAlign: 'center', padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: '15px' }}>
                                     {!completedModules.includes(mod.id) ? (
                                         <button
                                             onClick={() => handleModuleComplete(mod.id)}
@@ -238,6 +260,14 @@ const Civics = ({ ageGroup }) => {
                         )}
                     </div>
                 </div>
+            )}
+
+            {/* KIDS GAME MODAL */}
+            {activeGameModuleId && isKid && (
+                <KidsCivicsGame
+                    moduleId={activeGameModuleId}
+                    onClose={() => setActiveGameModuleId(null)}
+                />
             )}
 
             {/* SIMULATORS */}
