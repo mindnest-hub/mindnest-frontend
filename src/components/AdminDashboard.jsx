@@ -11,7 +11,8 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [pendingKyc, setPendingKyc] = useState([]);
     const [withdrawals, setWithdrawals] = useState([]);
-    const [activeTab, setActiveTab] = useState('stats'); // 'stats', 'kyc', 'withdrawals'
+    const [researchData, setResearchData] = useState([]);
+    const [activeTab, setActiveTab] = useState('stats'); // 'stats', 'kyc', 'withdrawals', 'research'
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState(null);
     const [actionLoading, setActionLoading] = useState(false);
@@ -25,14 +26,16 @@ const AdminDashboard = () => {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const [statsData, kycData, withdrawalData] = await Promise.all([
+                const [statsData, kycData, withdrawalData, researchResp] = await Promise.all([
                     api.getAdminStats(token),
                     api.getAdminKycPending(token),
-                    api.getAdminWithdrawals(token)
+                    api.getAdminWithdrawals(token),
+                    api.getAdminResearchData(token).catch(() => []) // Catch if endpoint not fully ready
                 ]);
                 setStats(statsData);
                 setPendingKyc(kycData);
                 setWithdrawals(withdrawalData);
+                setResearchData(researchResp);
             } catch (error) {
                 setToast({ message: error.message || 'Failed to fetch admin data', type: 'error' });
             } finally {
@@ -115,6 +118,16 @@ const AdminDashboard = () => {
                     }}
                 >
                     Withdrawals {withdrawals.filter(w => w.status === 'pending').length > 0 && <span style={{ background: '#ff4444', color: 'white', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '10px' }}>{withdrawals.filter(w => w.status === 'pending').length}</span>}
+                </button>
+                <button
+                    onClick={() => setActiveTab('research')}
+                    style={{
+                        background: 'none', border: 'none', color: activeTab === 'research' ? '#FFD700' : '#888',
+                        fontWeight: activeTab === 'research' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '1.1rem',
+                        display: 'flex', alignItems: 'center', gap: '0.5rem'
+                    }}
+                >
+                    Research Data {researchData.length > 0 && <span style={{ background: '#9C27B0', color: 'white', fontSize: '0.7rem', padding: '2px 6px', borderRadius: '10px' }}>{researchData.length}</span>}
                 </button>
             </div>
 
@@ -302,6 +315,55 @@ const AdminDashboard = () => {
                                                         </button>
                                                     </div>
                                                 )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {activeTab === 'research' && (
+                <div className="card">
+                    <h3>Civics Research Data 🧪</h3>
+                    <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '2rem' }}>Anonymized decision tracking from Civics Simulator modules.</p>
+                    {researchData.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '3rem', color: '#666' }}>
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔬</div>
+                            <p>No research data collected yet.</p>
+                        </div>
+                    ) : (
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                                <thead>
+                                    <tr style={{ borderBottom: '2px solid #333' }}>
+                                        <th style={{ padding: '1rem' }}>User / Age</th>
+                                        <th style={{ padding: '1rem' }}>Simulator</th>
+                                        <th style={{ padding: '1rem' }}>Decision Data</th>
+                                        <th style={{ padding: '1rem' }}>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {researchData.map(r => (
+                                        <tr key={r.id} style={{ borderBottom: '1px solid #222' }}>
+                                            <td style={{ padding: '1rem' }}>
+                                                <div style={{ fontWeight: 'bold' }}>{r.user?.username || 'Unknown'}</div>
+                                                <div style={{ fontSize: '0.75rem', color: '#666', textTransform: 'capitalize' }}>{r.ageGroup}</div>
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <span style={{ background: '#9C27B0', color: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                                                    {r.simulatorType}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <pre style={{ fontSize: '0.75rem', color: '#aaa', background: '#111', padding: '0.5rem', borderRadius: '5px', maxHeight: '100px', overflowY: 'auto', margin: 0 }}>
+                                                    {JSON.stringify(r.decisionData, null, 2)}
+                                                </pre>
+                                            </td>
+                                            <td style={{ padding: '1rem', fontSize: '0.8rem', color: '#888' }}>
+                                                {new Date(r.createdAt).toLocaleString()}
                                             </td>
                                         </tr>
                                     ))}

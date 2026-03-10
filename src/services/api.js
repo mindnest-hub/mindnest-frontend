@@ -319,5 +319,33 @@ export const api = {
             throw new Error(error.message || 'Failed to submit KYC');
         }
         return res.json();
+    },
+
+    // Civics Research
+    submitResearchData: async (token, data) => {
+        const res = await fetch(`${API_URL}/civics/research`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to submit research data');
+        }
+        return res.json();
+    },
+
+    getAdminResearchData: async (token) => {
+        const res = await fetch(`${API_URL}/civics/admin/research`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to fetch research data');
+        }
+        return res.json();
     }
 };

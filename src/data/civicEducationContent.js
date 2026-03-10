@@ -1,465 +1,268 @@
 export const civicEducationContent = {
-    // Political Parties Module
-    politicalParties: {
-        teens: {
-            title: "🏛 Understanding Political Parties",
-            sections: [
-                {
-                    heading: "What is a Political Party?",
-                    content: `A political party is more than just a logo or a campaign slogan. It is a structured organization that:
- • Defines how a country or community is run
- • Selects candidates to represent citizens
- • Organizes resources and policies to influence government
-
-Why it matters:
- • Parties determine who makes decisions that affect your daily life—schools, roads, healthcare, taxes, security.
- • Weak parties mean decisions are left to the powerful few, often called godfathers.
-
-Your role:
- • Know the parties' rules, processes, and ideology
- • Join, observe, or participate in local party structures
- • Use your voice to influence policy and candidate selection`
-                },
-                {
-                    heading: "⚠️ Godfathers Are Symptoms, Not Villains",
-                    content: `Godfathers exist because the system is weak, not because people are inherently bad:
- • Parties lack ideology and internal democracy
- • State power controls resources, making politics a business
- • Elections become investment opportunities for the wealthy
-
-Godfathers do three things:
- 1. Finance campaigns 💵
- 2. Control delegates 🗳️
- 3. Expect personal returns 🔄
-
-Ignore the structure, and godfathers will always decide who represents you.`
-                },
-                {
-                    heading: "😡 The Cost of Doing Nothing",
-                    content: `Many Nigerians—and citizens everywhere—think politics is "someone else's job." The truth: sitting on the sidelines has real consequences.
-
-If you remain passive:
- • The same insiders decide for you every election cycle 🔁
- • Policies are shaped by money and influence, not merit or public interest 💰
- • Corruption, inefficiency, and nepotism persist unchallenged 🏚️
- • Public resources and opportunities are captured by a few, leaving you frustrated and powerless
-
-Every time you skip participation, you hand control to the few who show up early and play the game.`
-                },
-                {
-                    heading: "🔍 Real Political Participation",
-                    content: `True influence comes from long before election day. This includes:
- • Understanding party constitutions and rules 📜
- • Paying attention to primaries and delegate selection 🗳️
- • Joining internal party politics to influence decisions 💪
- • Building alliances and networks slowly, strategically 🤝
-
-If you only care about elections or scandals, you miss where real power lives.`
-                },
-                {
-                    heading: "👦👧 How Teens Can Start",
-                    content: `Even if you're young, you can:
- • Learn about different parties and their ideas 💡
- • Ask questions about how candidates are chosen ❓
- • Join youth wings of political parties or volunteer 🎉
- • Encourage your friends to participate 👫
-
-Small actions today can shape who leads tomorrow.`
-                },
-                {
-                    heading: "🔑 Key Message",
-                    content: ` • Elections are not decided in one day; they happen in rooms many people never enter 🏛️
- • If citizens stay outside the process, the same insiders will keep choosing for everyone 🔁
-
-Start early, stay involved, understand the rules. 💪`
-                }
-            ]
+    kidsCivics: [
+        {
+            id: "kids_mod_1",
+            title: "Module 1: What Is a Community?",
+            content: `### Family, school, village, city
+A community is a group of people living or working together. You belong to many communities!
+### Why people need rules
+Rules keep us safe. Imagine playing football with no rules—it would be confusing!
+### Helping each other
+Good citizens help community members, like picking up trash or sharing with friends.`
         },
-        adults: {
-            title: "🏛 Understanding Political Parties",
-            sections: [
-                {
-                    heading: "What is a Political Party?",
-                    content: `A political party is more than just a logo or a campaign slogan. It is a structured organization that:
- • Defines how a country or community is run
- • Selects candidates to represent citizens
- • Organizes resources and policies to influence government
-
-Why it matters:
- • Parties determine who makes decisions that affect your daily life—schools, roads, healthcare, taxes, security.
- • Weak parties mean decisions are left to the powerful few, often called godfathers.
-
-Your role:
- • Know the parties' rules, processes, and ideology
- • Join, observe, or participate in local party structures
- • Use your voice to influence policy and candidate selection`
-                },
-                {
-                    heading: "⚠️ Godfathers Are Symptoms, Not Villains",
-                    content: `Godfathers exist because the system is weak, not because people are inherently bad:
- • Parties lack ideology and internal democracy
- • State power controls resources, making politics a business
- • Elections become investment opportunities for the wealthy
-
-Godfathers do three things:
- 1. Finance campaigns 💵
- 2. Control delegates 🗳️
- 3. Expect personal returns 🔄
-
-Ignore the structure, and godfathers will always decide who represents you.
-
-Implication for Citizens:
- • Staying passive ensures the same insiders remain in control.
- • Active participation is the only way to shift power to ordinary citizens.`
-                },
-                {
-                    heading: "😡 The Cost of Doing Nothing",
-                    content: `Consequences of Sitting on the Sidelines:
- • Same insiders choose candidates repeatedly 🔁
- • Policies are shaped by money, influence, and self-interest 💰
- • Corruption, inefficiency, and nepotism continue unchecked 🏚️
- • Public resources are misused while citizens complain online
-
-Key Truth:
-
-Every time you do nothing, you hand control to those who show up early and play the system.`
-                },
-                {
-                    heading: "🔍 Real Political Participation",
-                    content: `Participation starts long before Election Day:
- • Learn party rules and constitutions 📜
- • Follow primaries and delegate selection 🗳️
- • Attend ward meetings and local forums 🏘️
- • Run for positions within the party 🏅
- • Build networks and influence gradually 🌱`
-                },
-                {
-                    heading: "💡 What Adults Must Do",
-                    content: ` • Stop waiting for a savior candidate—no one bypasses structure.
- • Get involved early: before elections, before crises.
- • Engage in party and community politics, even at small levels.
- • Educate others—your influence grows as your network becomes active.
-
-The harsh truth:
-Politics is like a river. If you stay on the bank, the water flows past you. If you step in and paddle, you can reach the shore you want.`
-                },
-                {
-                    heading: "🔑 Key Takeaways",
-                    content: ` • Elections are not one-day events—they are the culmination of months or years of internal decisions.
- • Power is in the process, not the headlines.
- • Passivity is costly—it ensures the same insiders stay in control.
- • Active participation—even small, consistent action—shapes outcomes in your favor.
-
-Show up early, stay involved, understand the rules, and take ownership of your country.`
-                }
-            ]
-        }
-    },
-
-    // Wards & Local Government Module
-    wards: {
-        teens: {
-            title: "🏘 What Is a Ward?",
-            sections: [
-                {
-                    heading: "Definition",
-                    content: `A ward is a small area in your town or city used for local government and elections.
-Think of it as your neighborhood or community unit that has its own leaders and representatives.
-
-Example:
-If your school is in a big city, the city is divided into small areas. Each area is a ward. Residents in that ward vote for local leaders who represent them.`
-                },
-                {
-                    heading: "Roles and Functions of a Ward",
-                    content: `A ward is important because it connects citizens to local government. Its roles include:
-
- 1. Local Representation 🗳️
- • Elects ward councillors or committee members
- • These leaders speak for the ward in local government
-
- 2. Community Planning 🏗️
- • Helps decide on roads, schools, markets, and healthcare facilities in the ward
-
- 3. Service Delivery Monitoring 👀
- • Checks if water, electricity, waste collection, and other services are working properly
-
- 4. Voter Engagement ✅
- • Organizes local meetings, voter registration drives, and elections
- • Helps citizens participate in democracy
-
- 5. Conflict Resolution ⚖️
- • Handles small disputes in the community, like land or neighborhood issues`
-                },
-                {
-                    heading: "Limitations of a Ward",
-                    content: `Even though wards are powerful locally, they have limits:
- • Limited budget 💰 – Can't fund big projects like highways or state hospitals
- • Dependence on higher government 🏛️ – Needs city, state, or federal government approval for major projects
- • Limited law-making powers 📜 – Can't make laws; only enforces rules and policies set by higher authorities
- • Political influence ⚠️ – Leaders may be influenced by party godfathers or powerful politicians
-
-Wards are your first chance to engage in politics, but they work best when citizens actively participate.`
-                },
-                {
-                    heading: "Why Teens Should Care About Wards",
-                    content: ` • They are the closest government to you 🏡
- • Small actions here—attending meetings, volunteering, asking questions—can create real change
- • Understanding your ward teaches you how politics and government work before you can vote
-
-Fun Tip for Teens:
-
-Imagine your ward like your classroom. If you only complain about school rules and never participate in class council, nothing changes. Get involved, speak up, and make a difference!`
-                }
-            ]
+        {
+            id: "kids_mod_2",
+            title: "Module 2: Leaders and Leadership",
+            content: `### What leaders do
+Leaders help organize things and solve problems, like a teacher or a Class Captain.
+### Good vs bad leadership
+Good leaders listen and help. Bad leaders only care about themselves.
+### Responsibility
+When you are a leader, it is your job to make sure the team succeeds.`
         },
-        adults: {
-            title: "🏘 What Is a Ward?",
-            sections: [
-                {
-                    heading: "Definition",
-                    content: `A ward is a small area in your town or city used for local government and elections.
-Think of it as your neighborhood or community unit that has its own leaders and representatives.
-
-Example:
-If your school is in a big city, the city is divided into small areas. Each area is a ward. Residents in that ward vote for local leaders who represent them.`
-                },
-                {
-                    heading: "Roles and Functions of a Ward",
-                    content: `A ward is important because it connects citizens to local government. Its roles include:
-
- 1. Local Representation 🗳️
- • Elects ward councillors or committee members
- • These leaders speak for the ward in local government
-
- 2. Community Planning 🏗️
- • Helps decide on roads, schools, markets, and healthcare facilities in the ward
-
- 3. Service Delivery Monitoring 👀
- • Checks if water, electricity, waste collection, and other services are working properly
-
- 4. Voter Engagement ✅
- • Organizes local meetings, voter registration drives, and elections
- • Helps citizens participate in democracy
-
- 5. Conflict Resolution ⚖️
- • Handles small disputes in the community, like land or neighborhood issues`
-                },
-                {
-                    heading: "Limitations of a Ward",
-                    content: `Even though wards are powerful locally, they have limits:
- • Limited budget 💰 – Can't fund big projects like highways or state hospitals
- • Dependence on higher government 🏛️ – Needs city, state, or federal government approval for major projects
- • Limited law-making powers 📜 – Can't make laws; only enforces rules and policies set by higher authorities
- • Political influence ⚠️ – Leaders may be influenced by party godfathers or powerful politicians
-
-Wards are your first chance to engage in politics, but they work best when citizens actively participate.`
-                },
-                {
-                    heading: "Strategic Engagement for Adults",
-                    content: `As an adult, your engagement with ward politics is critical:
- • Attend ward meetings regularly
- • Track ward budgets and project implementation
- • Submit petitions and formal feedback
- • Participate in council sessions
- • Monitor councillor performance and hold them accountable
-
-Your sustained involvement at the ward level creates the foundation for broader civic influence.`
-                }
-            ]
+        {
+            id: "kids_mod_3",
+            title: "Module 3: Rules and Laws",
+            content: `### Why rules exist
+Laws are rules made by the government so everyone stays safe and treated equally.
+### What happens when rules are broken
+There are consequences, so people learn to do the right thing next time.
+### Fairness and justice
+Fairness means everyone has an equal chance. Justice means making things right if someone is treated unfairly.`
+        },
+        {
+            id: "kids_mod_4",
+            title: "Module 4: Rights and Respect",
+            content: `### Simple rights
+You have the right to Safety, Education, and to speak politely.
+### What are human rights?
+These are things every person needs to live happily. You also must respect others' rights!`
+        },
+        {
+            id: "kids_mod_5",
+            title: "Module 5: Government Basics",
+            content: `### What does the Government do?
+The government helps provide Schools, Roads, Hospitals, and Security. They manage the country so everyone can live well.`
+        },
+        {
+            id: "kids_mod_6",
+            title: "Module 6: Voting",
+            content: `### How Voting Works
+Voting is like choosing a class captain.
+### Concepts
+- Everyone gets a voice
+- Majority decision wins
+- It must be a fair election with no cheating.`
+        },
+        {
+            id: "kids_mod_7",
+            title: "Module 7: My Role as a Kid",
+            content: `### What can you do?
+- Obey rules at home and school.
+- Don't litter! Keep your community clean.
+- Stand up to bullies and be kind.`
         }
-    },
+    ],
 
-    // 10-Module Comprehensive Curriculum
-    comprehensiveCurriculum: {
-        teens: [
-            {
-                id: 1,
-                title: "1️⃣ How Government Works",
-                content: `**Levels of government:** Local (wards, councils), State, Federal
-**Roles of each level:** who makes decisions and who provides services
-**How laws are made:** bills → legislature → executive approval
+    teenCivics: [
+        {
+            id: "teen_mod_1",
+            title: "Module 1: The Constitution & Laws",
+            content: `### Definition
+The Constitution is the supreme law of the land. It defines the rules that even the President must obey.
+### Rule of Law
+No one is above the law. Without it, the strongest people can do whatever they want.
+### How laws are made
+Bills are proposed in the Legislature, debated, and signed by the Executive.`
+        },
+        {
+            id: "teen_mod_2",
+            title: "Module 2: Three Branches of Government",
+            content: `### The Executive
+The President, Governors, and Ministers. They enforce laws and run the country.
+### The Legislature
+Senators and Representatives. They make laws and control the budget.
+### The Judiciary
+The Courts and Judges. They interpret laws and resolve disputes.
+### Checks and Balances
+Each branch checks the power of the other so no one becomes a dictator.`
+        },
+        {
+            id: "teen_mod_3",
+            title: "Module 3: Elections and Representation",
+            content: `### Voting
+Voting decides who holds power over resources.
+### Types of Elections
+There are local (Ward/LGA), State, and Federal elections.
+### Why Voting Matters
+If you don't vote, you let others choose leaders who might not care about your future.`
+        },
+        {
+            id: "teen_mod_4",
+            title: "Module 4: Political Promises and Reality",
+            content: `### Understanding manifestos
+A manifesto is a written promise. Always ask: "How will they pay for this?"
+### Spotting impossible promises
+If someone promises to give everyone free money without explaining how to create wealth, it is likely a trick.`
+        },
+        {
+            id: "teen_mod_5",
+            title: "Module 5: Media, Propaganda, and Truth",
+            content: `### Fake News
+False information designed to make you angry or afraid. Always check the source!
+### How politicians use social media
+They often use bots or influencers to manipulate trends and distract youth from real issues.`
+        },
+        {
+            id: "teen_mod_6",
+            title: "Module 6: African Political Context",
+            content: `### Colonial History to Independence
+Understanding how modern African borders were formed and the shift to self-rule.
+### The rise of democracy vs military rule
+Why holding onto democratic power requires constant vigilance by citizens.`
+        },
+        {
+            id: "teen_mod_7",
+            title: "Module 7: The Power of Youth",
+            content: `### Civic engagement
+Youth are the majority in Africa. You have the power to organize, protest peacefully, and build civic tech tools to demand transparency.`
+        },
+        {
+            id: "teen_mod_8",
+            title: "Module 8: Overcoming Tribalism",
+            content: `### Unity vs Division
+Why politicians use tribe to divide people (so you don't notice bad governance).
+### The Pan-African vision
+United we stand, divided we fall. Good roads and good hospitals don't care about your tribe.`
+        },
+        {
+            id: "teen_tricks",
+            title: "BONUS: 12 Political Tricks (Lite)",
+            content: `Politicians use psychology to manipulate voters. For example:
+- **The Us vs. Them Trick:** Making you hate another tribe so you vote out of fear.
+- **The Free T-Shirt Trick (Vote Buying):** Giving you a small gift today, but stealing your future wealth.
+- **The Distraction Trick:** Starting a fake argument online to hide a bad law being passed.`
+        }
+    ],
 
-**Actionable:**
- • Observe local government activities, school councils, youth parliaments`
-            },
-            {
-                id: 2,
-                title: "2️⃣ Elections and Voting",
-                content: `**How voting works** in wards and national elections
-**Importance of registering early**
-**Difference** between voting for local and national offices
-
-**Actionable:**
- • Track school elections, mock elections`
-            },
-            {
-                id: 3,
-                title: "3️⃣ Political Parties",
-                content: `**What parties are** and why they matter
-**Youth wings:** opportunities to participate and influence
-**Role of party manifestos** and ideology
-
-**Actionable:**
- • Join youth wings, attend local party events`
-            },
-            {
-                id: 4,
-                title: "4️⃣ Wards and Local Government",
-                content: `**What a ward is** and its functions
-**How ward leaders are elected**
-**Community monitoring** and participation
-
-**Actionable:**
- • Attend ward meetings, volunteer in community projects`
-            },
-            {
-                id: 5,
-                title: "5️⃣ Rights and Responsibilities",
-                content: `**Basic civil and political rights:** free speech, vote, education, safety
-**Responsibilities:** obey laws, respect others, participate in community
-
-**Actionable:**
- • Join youth civic programs, report community issues responsibly`
-            },
-            {
-                id: 6,
-                title: "6️⃣ Holding Government Accountable",
-                content: `**Ask questions** and report issues to local leaders
-**Participate** in community surveys or school-led initiatives
-
-**Actionable:**
- • Volunteer in civic campaigns`
-            },
-            {
-                id: 7,
-                title: "7️⃣ Civic Engagement in Daily Life",
-                content: `**Start small:** school councils, youth clubs, ward meetings
-**Discuss politics** with peers and family responsibly
-**Learn** how community projects are funded and managed`
-            },
-            {
-                id: 8,
-                title: "8️⃣ Ethics, Leadership, and Anti-Corruption",
-                content: `**Understand** honesty, fairness, and responsibility in leadership
-**Recognize corruption** and how it affects communities
-
-**Actionable:**
- • Practice ethical decision-making in school and community`
-            },
-            {
-                id: 9,
-                title: "9️⃣ Civic Technology & Tools",
-                content: `**How to use** apps, websites, and platforms to monitor government
-**Tools for tracking** elections, budgets, and service delivery
-**Social media responsibly:** awareness, not just outrage
-
-**Actionable:**
- • Civic quizzes, reporting platforms, mock elections apps`
-            },
-            {
-                id: 10,
-                title: "🔟 Key Takeaways for Teens",
-                content: ` • Civic power starts early and consistently
- • Participation is better than passive complaining
- • Knowledge + action = influence
- • Governments and parties respond to organized, informed citizens
- • Small steps in your ward/community build toward national impact`
-            }
-        ],
-        adults: [
-            {
-                id: 1,
-                title: "1️⃣ How Government Works",
-                content: `**Detailed explanation of branches of government:** Legislative, Executive, Judiciary
-**Checks and balances:** how power is separated
-**Understanding budget allocation** and public finance
-
-**Actionable:**
- • Attend town hall meetings, read local/state budgets`
-            },
-            {
-                id: 2,
-                title: "2️⃣ Elections and Voting",
-                content: `**How primaries, delegates, and political parties** shape election outcomes
-**Monitoring elections** and reporting irregularities
-**Importance of voting** consistently and knowledgeably
-
-**Actionable:**
- • Participate in voter education campaigns, engage in civic advocacy`
-            },
-            {
-                id: 3,
-                title: "3️⃣ Political Parties",
-                content: `**Internal party structures,** primaries, and delegate selection
-**How to influence party decisions** through formal channels
-**Recognizing godfather influence** and mitigating it
-
-**Actionable:**
- • Engage in internal party processes, monitor local candidate selection`
-            },
-            {
-                id: 4,
-                title: "4️⃣ Wards and Local Government",
-                content: `**Ward committees,** local governance structures, budget oversight
-**How to engage and hold councillors accountable**
-**Limitations of wards** and strategies to amplify impact
-
-**Actionable:**
- • Track ward budgets, submit petitions, participate in council sessions`
-            },
-            {
-                id: 5,
-                title: "5️⃣ Rights and Responsibilities",
-                content: `**Detailed civil, economic, social, and political rights**
-**How to exercise rights** without conflict
-**Responsibilities:** taxation, civic participation, law compliance
-
-**Actionable:**
- • Advocate for rights, mentor young citizens`
-            },
-            {
-                id: 6,
-                title: "6️⃣ Holding Government Accountable",
-                content: `**Monitor policies,** track government promises, submit petitions
-**Collaborate** with civic organizations and NGOs
-**Use media and formal channels** strategically, not just noise
-
-**Actionable:**
- • Organize community forums, use civic tech apps`
-            },
-            {
-                id: 7,
-                title: "7️⃣ Civic Engagement in Daily Life",
-                content: `**Participate** in local development projects
-**Track government service delivery** (water, electricity, roads, health)
-**Educate others,** mentor younger citizens`
-            },
-            {
-                id: 8,
-                title: "8️⃣ Ethics, Leadership, and Anti-Corruption",
-                content: `**How to spot corruption** in policies, contracts, and projects
-**Strategies for civic anti-corruption engagement**
-**Promoting transparency** in local and national governance`
-            },
-            {
-                id: 9,
-                title: "9️⃣ Civic Technology & Tools",
-                content: `**How to use** apps, websites, and platforms to monitor government
-**Tools for tracking** elections, budgets, and service delivery
-**Social media responsibly:** awareness, not just outrage
-
-**Actionable:**
- • Budget-tracking apps, community mapping, petitions`
-            },
-            {
-                id: 10,
-                title: "🔟 Key Takeaways for Adults",
-                content: ` • Civic power starts early and consistently
- • Participation is better than passive complaining
- • Knowledge + action = influence
- • Governments and parties respond to organized, informed citizens
- • Small steps in your ward/community build toward national impact`
-            }
-        ]
-    }
+    adultCivics: [
+        {
+            id: "adult_mod_1",
+            title: "Module 1: Public Finance & Taxes",
+            content: `### How Government Funds Itself
+Through taxes, borrowing, and natural resources.
+### Why paying taxes equals power
+He who pays the piper dictates the tune. When citizens pay direct taxes, they demand better services.
+### The danger of debt
+Borrowing for consumption (salaries) instead of production (infrastructure) bankrupts the future.`
+        },
+        {
+            id: "adult_mod_2",
+            title: "Module 2: The Budgeting Process",
+            content: `### "Follow the Money"
+Every political promise requires a budget. If it's not in the budget, it's a lie.
+### Misplaced Priorities
+Building a $100m governor's mansion while local clinics lack basic medicine.
+### Budget Transparency
+How to use tools to track what your local government is actually spending.`
+        },
+        {
+            id: "adult_mod_3",
+            title: "Module 3: Corruption and Accountability",
+            content: `### Types of Corruption
+Nepotism, embezzlement, and kickbacks.
+### How it affects daily life
+Corruption kills. Fake drugs, collapsed buildings, and lack of security are all results of corrupt practices.
+### Whistleblowing
+How citizens can safely report and demand open contracting.`
+        },
+        {
+            id: "adult_mod_4",
+            title: "Module 4: Lawmaking and the Legislature",
+            content: `### The Power of the Purse
+The legislature controls the budget. They are just as powerful as the President.
+### Constituency Projects
+Funds given to lawmakers to develop their local areas—these are often highly corrupted.
+### Recalling a Lawmaker
+The ultimate civic power: removing a non-performing representative before their term ends.`
+        },
+        {
+            id: "adult_mod_5",
+            title: "Module 5: Citizen Rights and Legal Action",
+            content: `### Freedom of Information Act (FOI)
+Your legal right to demand records from the government.
+### Public Interest Litigation
+Suing the government on behalf of the public when laws or rights are violated.`
+        },
+        {
+            id: "adult_mod_6",
+            title: "Module 6: Political Ideologies",
+            content: `### Left vs Right vs Center
+Understanding policies: Are they socialist (welfare-focused) or capitalist (market-focused)?
+### Why ideology matters
+Without ideology, political parties are just vehicles for individuals seeking access to the treasury.`
+        },
+        {
+            id: "adult_mod_7",
+            title: "Module 7: The Electoral System",
+            content: `### Internal Party Democracy
+Godfatherism, primaries, and how candidates are chosen.
+### INEC/Electoral Bodies
+The role of the umpire.
+### Protecting the Vote
+From registration to the polling unit to the final collation.`
+        },
+        {
+            id: "adult_mod_8",
+            title: "Module 8: Civic Activism and Advocacy",
+            content: `### Organizing
+How to build a coalition for change in your Ward or LGA.
+### Effective Protest
+Moving from online outrage to physical action and, ultimately, policy change.`
+        },
+        {
+            id: "adult_mod_9",
+            title: "Module 9: The Local Government (LGA)",
+            content: `### The closest government to the people
+Why state governors often paralyze LGAs by controlling their funds.
+### The Demand for Autonomy
+Why LGAs need financial independence to fix the grassroots.`
+        },
+        {
+            id: "adult_mod_10",
+            title: "Module 10: The Ultimate Power of the Citizen",
+            content: `### The Office of the Citizen
+It is the highest office in the land.
+### Continuous Engagement
+Democracy is not a one-day voting event; it is a 365-day job of monitoring and demanding accountability.`
+        },
+        {
+            id: "adult_tricks",
+            title: "BONUS: 12 Psychological Tricks Politicians Use",
+            content: `### 1. The Savior Complex
+"Only I can fix it." (Creates dependency).
+### 2. The Scapegoat (Us vs. Them)
+Blaming another tribe/religion for all economic failures.
+### 3. Deliberate Deprivation (Weaponizing Poverty)
+Keeping people poor so a bag of rice buys their vote.
+### 4. The Distraction Technique (Dead Cat Strategy)
+Throwing a shocking scandal into the news to hide a worse economic policy.
+### 5. False Equivalence
+"Yes I stole, but the other guy stole too, so we are all the same."
+### 6. The Bandwagon Effect
+Paying influencers to make it seem like "everyone" supports them.
+### 7. Complexification
+Using confusing economic jargon so citizens give up trying to understand the budget.
+### 8. Fear Mongering
+"If the other party wins, there will be war."
+### 9. Tokenism
+Appointing one young person or one woman to claim "inclusiveness" while maintaining the old guard.
+### 10. The Big Lie
+Repeating a false claim so violently and frequently that people begin to accept it as truth.
+### 11. Co-opting Institutions
+Quietly placing loyalists in the Electoral Commission or Judiciary.
+### 12. Gaslighting
+Denying the reality citizens live in (e.g., "The economy is doing great!" when food prices have doubled).`
+        }
+    ]
 };
