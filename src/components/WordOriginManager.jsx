@@ -28,23 +28,44 @@ const WordOriginManager = ({ ageGroup }) => {
         '/agri': ['finance', 'history']
     };
 
+    // Cooldown in milliseconds (7 minutes)
+    const COOLDOWN = 7 * 60 * 1000;
+
     useEffect(() => {
-        const path = location.pathname;
-        const categories = routeMap[path];
+        const checkAndShow = () => {
+            const lastShown = localStorage.getItem('lastWordOriginShown');
+            const now = Date.now();
 
-        if (categories) {
-            const candidates = wordOrigins.filter(w =>
-                categories.includes(w.category) && !seenWords.includes(w.id)
-            );
-
-            if (candidates.length > 0) {
-                const word = candidates[Math.floor(Math.random() * candidates.length)];
-                const timer = setTimeout(() => {
-                    setShowToast(word);
-                }, 2000);
-                return () => clearTimeout(timer);
+            if (lastShown && (now - parseInt(lastShown)) < COOLDOWN) {
+                return;
             }
-        }
+
+            const path = location.pathname;
+            const categories = routeMap[path];
+
+            if (categories) {
+                const candidates = wordOrigins.filter(w =>
+                    categories.includes(w.category) && !seenWords.includes(w.id)
+                );
+
+                if (candidates.length > 0) {
+                    const word = candidates[Math.floor(Math.random() * candidates.length)];
+                    setShowToast(word);
+                    localStorage.setItem('lastWordOriginShown', now.toString());
+                }
+            }
+        };
+
+        // Check on mount and on route change
+        const initialTimer = setTimeout(checkAndShow, 10000); // Wait 10s after landing
+
+        // Setup interval to check every minute (optional, but good if they stay on page)
+        const interval = setInterval(checkAndShow, 60000);
+
+        return () => {
+            clearTimeout(initialTimer);
+            clearInterval(interval);
+        };
     }, [location.pathname, seenWords]);
 
     const handleMouseDown = (e) => {

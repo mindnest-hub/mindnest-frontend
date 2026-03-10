@@ -8,6 +8,7 @@ import InvestPitch from '../components/InvestPitch';
 import { useWallet } from '../hooks/useWallet';
 import Header from '../components/Header';
 import KidsFarmSimulator from '../components/KidsFarmSimulator';
+import TeenAdultFarmSimulator from '../components/TeenAdultFarmSimulator';
 
 // Safe initialization helper
 const safeInit = (key, defaultValue, type = 'number') => {
@@ -393,14 +394,8 @@ const Agripreneurship = () => {
                         </div>
 
                         {!isKid && (
-                            <div className="card" style={{ textAlign: 'center' }}>
-                                <h2 style={{ marginBottom: '2rem' }}>Field 1 ({upgrades.vertical ? 'Vertical Farm 🏢' : 'Maize'})</h2>
-                                <div style={{ fontSize: '5rem', marginBottom: '2rem' }}>{getCropEmoji()}</div>
-                                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                                    {cropStage === 0 && <button className="btn btn-primary" onClick={handlePlant}>Plant (-₦100)</button>}
-                                    {cropStage > 0 && cropStage < 3 && <button className="btn" style={{ backgroundColor: '#00BFFF', color: '#fff' }} onClick={handleWater}>Irrigate 💧</button>}
-                                    {cropStage === 2 && <button className="btn" style={{ backgroundColor: 'var(--color-secondary)', color: '#fff' }} onClick={handleHarvest}>Harvest (+₦{upgrades.vertical ? '450' : '300'})</button>}
-                                </div>
+                            <div className="card">
+                                <TeenAdultFarmSimulator ageGroup={ageGroup} currency="₦" />
                             </div>
                         )}
                     </div>
