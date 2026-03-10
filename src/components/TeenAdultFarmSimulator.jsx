@@ -189,21 +189,8 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
         (crop.difficulty === 'easy' || fertility >= (config?.fertThreshold || 40)) &&
         pestLevel < 70;
 
-    // Drain stats over time
-    useEffect(() => {
-        if (phase !== 'growing') return;
-        const interval = setInterval(() => {
-            setSoilDrain();
-        }, 2500);
-        return () => clearInterval(interval);
-    }, [phase, crop]);
+    // resource drain is handled by the useEffect below
 
-    const setSoilDrain = () => {
-        const moistureLoss = crop?.difficulty === 'hard' ? 8 : crop?.difficulty === 'normal' ? 6 : 5;
-        const fertilityLoss = crop?.difficulty !== 'easy' ? 4 : 0;
-        setSoilDrain._count = (setSoilDrain._count || 0) + 1;
-        setSoilDrain = undefined; // remove the closure-captured version — we use the effect below
-    };
 
     // Use separate effect for resource drain to avoid stale closure issue
     useEffect(() => {
