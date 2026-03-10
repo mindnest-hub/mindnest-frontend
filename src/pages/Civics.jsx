@@ -72,12 +72,26 @@ const Civics = ({ ageGroup }) => {
 
     const handleModuleComplete = (id) => {
         if (!completedModules.includes(id)) {
-            setCompletedModules([...completedModules, id]);
+            const updated = [...completedModules, id];
+            setCompletedModules(updated);
             addEarnings('civics', 250);
             addPoints(75);
             showToast(`Module Mastered! +${currency}250 🏆`, 'success');
             setShowConfetti(true);
             setTimeout(() => setShowConfetti(false), 3000);
+
+            // Auto-advance to next module after toast plays
+            const currentIndex = modules.findIndex(m => m.id === id);
+            const nextModule = modules[currentIndex + 1];
+            if (nextModule) {
+                setTimeout(() => {
+                    setActiveModule(nextModule.id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 1500);
+            } else {
+                // Last module — show certificate
+                setTimeout(() => setShowCertificate(true), 1800);
+            }
         }
     };
 
