@@ -9,93 +9,129 @@ import { useGamification } from '../context/GamificationContext';
 // Hard = water + fertilize + pest control + pruning
 
 const CROP_CATALOGUE = [
-    // ── EASY ─────────────────────────────────────────────────────────────────
+    // ── LEVEL 1: EASY ─────────────────────────────────────────────────────────
     {
         id: 'sweet_potato',
+        level: 1,
         name: 'Sweet Potato',
         emoji: '🍠',
         color: '#FF9800',
         difficulty: 'easy',
-        difficultyLabel: '🟢 Easy',
         seedCost: 150,
         harvestValue: 500,
-        germinationDays: '7–10 days',
-        growthDays: '90–120 days',
         mechanics: ['water'],
-        funFact: 'Sweet potato is one of the most drought-tolerant crops in Nigeria. Vines can be planted without seeds!',
+        funFact: 'Sweet potato is one of the most drought-tolerant crops. Vines can be planted without seeds!',
         businessNote: 'Profit margin: ~240% ROI. Very low input, steady local demand.',
         stages: [
-            { name: 'Soil Prep', emoji: '🟫', desc: 'Ridge or mound the soil for drainage. Sweet potatoes need loose, well-drained earth.' },
-            { name: 'Vine Cutting Planted', emoji: '🌱', desc: 'Plant vine cuttings (not seeds) horizontally in ridges. Water lightly.' },
-            { name: 'Sprouting', emoji: '🌿', desc: 'Shoots emerge within 7–10 days. Roots begin anchoring underground.' },
-            { name: 'Vine Spread', emoji: '🌿🌿', desc: 'Vines sprawl across the ground. This ground cover suppresses weeds naturally!' },
-            { name: 'Root Swelling', emoji: '🟤', desc: 'Underground tubers begin to swell with starch. Reduce watering to avoid rot.' },
-            { name: 'Maturation', emoji: '🍠', desc: 'Leaves start yellowing — the plant signals readiness. Test-dig one storage root.' },
-            { name: 'Ready to Harvest! 🏆', emoji: '🍠✨', desc: 'Lift tubers carefully with a fork. Cure in the sun for 4–7 days before selling.' }
+            { name: 'Soil Prep', emoji: '🟫', desc: 'Ridge or mound the soil for drainage.' },
+            { name: 'Vine Cutting Planted', emoji: '🌱', desc: 'Plant vine cuttings (not seeds) horizontally.' },
+            { name: 'Sprouting', emoji: '🌿', desc: 'Shoots emerge within 7–10 days.' },
+            { name: 'Vine Spread', emoji: '🌿🌿', desc: 'Vines sprawl across the ground.' },
+            { name: 'Root Swelling', emoji: '🟤', desc: 'Underground tubers begin to swell.' },
+            { name: 'Maturation', emoji: '🍠', desc: 'Leaves start yellowing — nearly ready!' },
+            { name: 'Ready to Harvest! 🏆', emoji: '🍠✨', desc: 'Lift tubers carefully. Cure in the sun before selling.' }
         ]
     },
-    // ── NORMAL ───────────────────────────────────────────────────────────────
+    // ── LEVEL 2: NORMAL ────────────────────────────────────────────────────────
     {
         id: 'pepper',
+        level: 2,
         name: 'Scotch Bonnet Pepper',
         emoji: '🌶️',
         color: '#FF4444',
         difficulty: 'normal',
-        difficultyLabel: '🟡 Normal',
         seedCost: 250,
         harvestValue: 900,
-        germinationDays: '10–21 days',
-        growthDays: '80–100 days',
         mechanics: ['water', 'fertilize'],
-        funFact: 'Nigeria is one of the largest pepper producers in the world. Scotch bonnets command premium prices in markets.',
+        funFact: 'Nigeria is one of the largest pepper producers in the world.',
         businessNote: 'Profit margin: ~260% ROI. Multiple harvest windows per season boost income.',
         stages: [
-            { name: 'Nursery Prep', emoji: '🟫', desc: 'Prepare seedling trays with loamy compost mix. Pepper seeds need 25–30°C to germinate.' },
-            { name: 'Seed Sowing', emoji: '🌱', desc: 'Sow seeds 1cm deep. Cover lightly. Keep moist — never waterlogged.' },
-            { name: 'Germination', emoji: '🌿', desc: 'Seeds crack open and cotyledons push above soil (Day 10–21). Guard against damping off.' },
-            { name: 'Transplanting', emoji: '🪴', desc: 'At 6 weeks, transplant seedlings at 50cm spacing. Water immediately after transplant.' },
-            { name: 'Vegetative Growth', emoji: '🌿🌿', desc: 'Apply nitrogen-rich fertilizer now for strong leafy growth. Stake tall plants.' },
-            { name: 'Flowering', emoji: '🌼', desc: 'White/purple flowers appear. Avoid excess nitrogen now — switch to phosphorus fertilizer.' },
-            { name: 'Fruit Set', emoji: '🟡', desc: 'Peppers form and grow. Maintain consistent moisture — drought causes blossom drop.' },
-            { name: 'Ready to Harvest! 🏆', emoji: '🌶️✨', desc: 'Pick once fully coloured (red/orange). Leave some to continue producing for a second flush.' }
+            { name: 'Nursery Prep', emoji: '🟫', desc: 'Loamy compost mix with 25–30°C temperature.' },
+            { name: 'Seed Sowing', emoji: '🌱', desc: 'Sow 1cm deep. Keep moist but never waterlogged.' },
+            { name: 'Germination', emoji: '🌿', desc: 'Seeds crack open (Day 10–21).' },
+            { name: 'Transplanting', emoji: '🪴', desc: 'At 6 weeks, transplant seedlings at 50cm spacing.' },
+            { name: 'Vegetative Growth', emoji: '🌿🌿', desc: 'Apply nitrogen-rich fertilizer now.' },
+            { name: 'Flowering & Fruit', emoji: '🌼', desc: 'Peppers form. Maintain consistent moisture.' },
+            { name: 'Ready to Harvest! 🏆', emoji: '🌶️✨', desc: 'Pick once fully coloured (red/orange).' }
         ]
     },
-    // ── HARD ─────────────────────────────────────────────────────────────────
+    // ── LEVEL 3: HARD ──────────────────────────────────────────────────────────
     {
         id: 'watermelon',
+        level: 3,
         name: 'Watermelon',
         emoji: '🍉',
         color: '#00C851',
         difficulty: 'hard',
-        difficultyLabel: '🔴 Hard',
         seedCost: 400,
         harvestValue: 1500,
-        germinationDays: '3–10 days',
-        growthDays: '70–85 days',
         mechanics: ['water', 'fertilize', 'pestcontrol'],
-        funFact: 'Watermelons are 91% water. Nigeria produces over 700,000 tonnes annually, mostly in Kano and Zamfara.',
-        businessNote: 'Profit margin: ~275% ROI. High risk but premium market pricing, especially in dry season.',
+        funFact: 'Watermelons are 91% water. Nigeria produces over 700,000 tonnes annually.',
+        businessNote: 'Profit margin: ~275% ROI. High risk but premium market pricing.',
         stages: [
-            { name: 'Deep Soil Prep', emoji: '🟫', desc: 'Till 30–40cm deep. Watermelons need deeply aerated soil for expansive root systems. Add organic matter.' },
-            { name: 'Direct Sowing', emoji: '🌱', desc: 'Plant 3 seeds per hill, 2m apart. Thin to 2 strongest after germination.' },
-            { name: 'Germination', emoji: '🌿', desc: 'Seedlings emerge in 3–10 days. Two seed leaves (cotyledons) open first. Thin weak seedlings.' },
-            { name: 'Vine Establishment', emoji: '🌿🌿', desc: 'Vines begin to sprawl rapidly. Apply starter fertilizer with high phosphorus.' },
-            { name: 'Rapid Vine Growth', emoji: '🍃🍃', desc: 'Vines can grow 30cm/day! Watch for aphids and cucumber beetles. Apply neem oil spray if spotted.' },
-            { name: 'Flowering & Pollination', emoji: '🌺', desc: 'Male flowers appear first, then females (with tiny melon base). Bees must transfer pollen!' },
-            { name: 'Fruit Set & Swelling', emoji: '🟢', desc: 'Fertilized fruits swell fast. Apply potassium-rich fertilizer. One fruit per vine for max size.' },
-            { name: 'Maturation', emoji: '🍉', desc: 'Yellow ground spot, dry tendril, and hollow thump = nearly ripe. Stop watering 1 week before harvest.' },
-            { name: 'Ready to Harvest! 🏆', emoji: '🍉✨', desc: 'Cut with a sharp knife leaving a 5cm stem. Handle gently — bruising reduces market price.' }
+            { name: 'Deep Soil Prep', emoji: '🟫', desc: 'Till 30–40cm deep for expansive root systems.' },
+            { name: 'Direct Sowing', emoji: '🌱', desc: 'Plant 3 seeds per hill, 2m apart.' },
+            { name: 'Germination', emoji: '🌿', desc: 'Seedlings emerge in 3–10 days.' },
+            { name: 'Vine Establishment', emoji: '🌿🌿', desc: 'Vines begin to sprawl rapidly.' },
+            { name: 'Flowering & Bees', emoji: '🌺', desc: 'Bees must transfer pollen between flowers!' },
+            { name: 'Fruit Swelling', emoji: '🟢', desc: 'Apply potassium-rich fertilizer now.' },
+            { name: 'Ready to Harvest! 🏆', emoji: '🍉✨', desc: 'Cut with a sharp knife leaving a 5cm stem.' }
+        ]
+    },
+    // ── LEVEL 4: ADVANCED ──────────────────────────────────────────────────────
+    {
+        id: 'cocoa',
+        level: 4,
+        name: 'Cocoa (The Gold Standard)',
+        emoji: '🍫',
+        color: '#795548',
+        difficulty: 'hard',
+        seedCost: 1000,
+        harvestValue: 4500,
+        mechanics: ['water', 'fertilize', 'pestcontrol'],
+        funFact: 'Nigeria is a top global cocoa producer. A cocoa tree can live for 100 years!',
+        businessNote: 'Long-term investment. High initial cost, massive lifetime returns.',
+        stages: [
+            { name: 'Shade Setup', emoji: '🌂', desc: 'Young cocoa needs shade from plantain or palm trees.' },
+            { name: 'Nursery Sprouting', emoji: '🌱', desc: 'Careful monitoring of humidity.' },
+            { name: 'Main Field Prep', emoji: '🟫', desc: 'Lining and pegging for optimal tree spacing.' },
+            { name: 'Tree Maturity', emoji: '🌳', desc: 'Pruning is essential to maximize pods.' },
+            { name: 'Pod Formation', emoji: '🍈', desc: 'Pods grow directly on the trunk (cauliflory).' },
+            { name: 'Fermentation Prep', emoji: '📦', desc: 'Pods are turning yellow/orange. Harvest is near.' },
+            { name: 'Ready to Harvest! 🏆', emoji: '🍫✨', desc: 'The beans are ready for the market!' }
+        ]
+    },
+    // ── LEVEL 5: MASTER ────────────────────────────────────────────────────────
+    {
+        id: 'rotation_master',
+        level: 5,
+        name: 'Strategic Crop Rotation',
+        emoji: '♻️',
+        color: '#9C27B0',
+        difficulty: 'hard',
+        seedCost: 0,
+        harvestValue: 8000,
+        mechanics: ['water', 'fertilize', 'pestcontrol'],
+        isRotation: true,
+        funFact: 'Mastering rotation is the peak of modern sustainable agriculture.',
+        businessNote: 'Reduces dependency on chemical fertilizers by 40%.',
+        stages: [
+            { name: 'System Analysis', emoji: '📊', desc: 'Mapping soil nutrient depletion from past seasons.' },
+            { name: 'Legume Phase', emoji: '🥜', desc: 'Planting groundnuts to fix nitrogen back into soil.' },
+            { name: 'Cereal Cycle', emoji: '🌽', desc: 'Maize uses the fixed nitrogen for rapid growth.' },
+            { name: 'Vegetable Flush', emoji: '🍅', desc: 'Tomatoes clear pathogens.' },
+            { name: 'Cover Crop Lock', emoji: '🍀', desc: 'Cover crops protect the soil from erosion.' },
+            { name: 'Soil Restoration', emoji: '✨', desc: 'Soil health is fully restored and optimized.' },
+            { name: 'Master Harvest! 🏆', emoji: '💰✨', desc: 'Maximum yield across the entire rotation cycle!' }
         ]
     }
 ];
 
 const DIFFICULTY_CONFIG = {
-    easy: { color: '#00C851', label: 'EASY', waterThreshold: 35, fertThreshold: null, pestChance: 0, description: 'Water management only. Perfect for starting your agribusiness.' },
-    normal: { color: '#FF9800', label: 'NORMAL', waterThreshold: 40, fertThreshold: 50, pestChance: 0.08, description: 'Water + Fertilize. Balance nutrients to maximise yield.' },
-    hard: { color: '#FF4444', label: 'HARD', waterThreshold: 45, fertThreshold: 55, pestChance: 0.18, description: 'Water + Fertilize + Pest Control. Professional-grade farm management.' }
+    easy: { color: '#00C851', label: 'EASY', waterThreshold: 35, fertThreshold: null, pestChance: 0, description: 'Water management only.' },
+    normal: { color: '#FF9800', label: 'NORMAL', waterThreshold: 40, fertThreshold: 50, pestChance: 0.1, description: 'Water + Fertilize.' },
+    hard: { color: '#FF4444', label: 'HARD', waterThreshold: 45, fertThreshold: 55, pestChance: 0.22, description: 'Full management.' }
 };
-
-const STAGE_DURATION = 4500;
 
 // ─── HELPER COMPONENTS ────────────────────────────────────────────────────────
 
@@ -158,23 +194,31 @@ const StageTimeline = ({ stages, currentStage, color }) => (
     </div>
 );
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-
 const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
+    const { user } = useAuth();
     const { addEarnings } = useWallet();
     const { addPoints } = useGamification();
     const isAdult = ageGroup === 'adults' || ageGroup === 'Adults';
+    const isElite = user?.isElite && (!user?.eliteExpires || new Date(user.eliteExpires) > new Date());
 
+    // Growth Duration Calculation
+    // Teens: 300s / 5 transitions = 60s per stage
+    // Adults: 600s / 5 transitions = 120s per stage
+    const STAGE_DURATION = isAdult ? 120000 : 60000;
+
+    const [currentLevel, setCurrentLevel] = useState(() => parseInt(localStorage.getItem(isAdult ? 'adultFarmLevel' : 'teenFarmLevel')) || 1);
     const [phase, setPhase] = useState('pick'); // 'pick' | 'growing' | 'done'
     const [chosenId, setChosenId] = useState(null);
     const [stage, setStage] = useState(0);
     const [moisture, setMoisture] = useState(100);
     const [fertility, setFertility] = useState(80);
     const [pestLevel, setPestLevel] = useState(0);
+    const [weedLevel, setWeedLevel] = useState(0);
     const [growing, setGrowing] = useState(false);
     const [waterCount, setWaterCount] = useState(0);
     const [fertCount, setFertCount] = useState(0);
     const [pestCount, setPestCount] = useState(0);
+    const [weedCount, setWeedCount] = useState(0);
     const [pestAlert, setPestAlert] = useState(false);
     const [showBiz, setShowBiz] = useState(false);
     const [showFact, setShowFact] = useState(false);
@@ -192,27 +236,42 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
     // resource drain is handled by the useEffect below
 
 
-    // Use separate effect for resource drain to avoid stale closure issue
+    // Persist Level
+    useEffect(() => {
+        localStorage.setItem(isAdult ? 'adultFarmLevel' : 'teenFarmLevel', currentLevel);
+    }, [currentLevel, isAdult]);
+
+    // Resource Drain logic: Moisture hits critical (~35%) every 40-50s
     useEffect(() => {
         if (phase !== 'growing' || !crop) return;
         const drain = setInterval(() => {
-            const mLoss = crop.difficulty === 'hard' ? 8 : crop.difficulty === 'normal' ? 6 : 5;
-            const fLoss = crop.difficulty !== 'easy' ? 4 : 0;
-            setSoilDrain && undefined; // no-op safety
+            // Drop 4% every 2.5s = 1.6% per sec. 65% drop in 40.6s.
+            // Weed Competition: >50% weeds = 1.5x moisture loss & 2x fertility loss
+            const weedMultiplierM = weedLevel > 50 ? 1.5 : 1;
+            const weedMultiplierF = weedLevel > 50 ? 2.0 : 1;
+
+            const mLoss = 4 * weedMultiplierM;
+            const fLoss = (crop.difficulty !== 'easy' ? 3 : 0) * weedMultiplierF;
+
             setMoisture(prev => Math.max(0, prev - mLoss));
             if (crop.difficulty !== 'easy') setFertility(prev => Math.max(0, prev - fLoss));
+
+            // Weed Growth: faster if moisture is high
+            if (moisture > 30) {
+                setWeedLevel(prev => Math.min(100, prev + (isAdult ? 7 : 5)));
+            }
 
             // Pest chance
             if (crop.difficulty !== 'easy' && Math.random() < (config?.pestChance || 0)) {
                 setPestLevel(prev => {
-                    const next = Math.min(100, prev + 20);
+                    const next = Math.min(100, prev + 25);
                     if (next >= 40) setPestAlert(true);
                     return next;
                 });
             }
         }, 2500);
         return () => clearInterval(drain);
-    }, [phase, crop]);
+    }, [phase, crop, config, weedLevel, moisture, fertility, isAdult]);
 
     // Auto-grow when conditions met
     useEffect(() => {
@@ -225,7 +284,7 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
             });
         }, STAGE_DURATION);
         return () => clearTimeout(timerRef.current);
-    }, [phase, growing, stage, canGrow, isLastStage]);
+    }, [phase, growing, stage, canGrow, isLastStage, STAGE_DURATION, crop]);
 
     // Stop growing if conditions fail
     useEffect(() => {
@@ -240,14 +299,16 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
         setMoisture(100);
         setFertility(80);
         setPestLevel(0);
+        setWeedLevel(0);
         setGrowing(true);
-        setWaterCount(0); setFertCount(0); setPestCount(0);
+        setWaterCount(0); setFertCount(0); setPestCount(0); setWeedCount(0);
         setPestAlert(false);
     };
 
     const handleWater = () => { setMoisture(100); setWaterCount(w => w + 1); };
     const handleFertilize = () => { setFertility(100); setFertCount(f => f + 1); };
     const handleSpray = () => { setPestLevel(0); setPestAlert(false); setPestCount(p => p + 1); };
+    const handleWeed = () => { setWeedLevel(0); setWeedCount(w => w + 1); };
 
     const computeBonus = () => {
         // Efficiency bonus: fewer inputs = higher efficiency
@@ -269,8 +330,8 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
 
     const resetAll = () => {
         setPhase('pick'); setChosenId(null); setStage(0);
-        setMoisture(100); setFertility(80); setPestLevel(0);
-        setGrowing(false); setWaterCount(0); setFertCount(0); setPestCount(0);
+        setMoisture(100); setFertility(80); setPestLevel(0); setWeedLevel(0);
+        setGrowing(false); setWaterCount(0); setFertCount(0); setPestCount(0); setWeedCount(0);
         setPestAlert(false); setShowBiz(false); setShowFact(false);
     };
 
@@ -281,54 +342,79 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
             {/* ── CROP PICKER ─────────────────────────────────────────── */}
             {phase === 'pick' && (
                 <div style={{ animation: 'popIn 0.4s ease' }}>
-                    <h2 style={{ color: 'var(--color-primary)', marginBottom: '0.25rem' }}>Farm Status 🌱</h2>
-                    <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h2 style={{ color: 'var(--color-primary)', margin: 0 }}>Farm Status 🌱</h2>
+                        <div style={{ backgroundColor: '#FFD700', color: '#000', padding: '0.4rem 0.8rem', borderRadius: '15px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                            Level {currentLevel} Mastery
+                        </div>
+                    </div>
+                    <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '1rem' }}>
                         {isAdult
                             ? 'Select your crop. Manage water, nutrients, and pests to maximise your profit margin.'
                             : 'Pick a crop and run your farm. Harder crops need more care but earn more!'}
                     </p>
-                    <div style={{
-                        display: 'inline-flex', gap: '0.5rem', marginBottom: '1.5rem',
-                        backgroundColor: '#111', borderRadius: '20px', padding: '6px 12px', flexWrap: 'wrap'
-                    }}>
-                        <span style={{ color: '#00C851', fontSize: '0.8rem' }}>🟢 Easy: water only</span>
-                        <span style={{ color: '#888' }}>|</span>
-                        <span style={{ color: '#FF9800', fontSize: '0.8rem' }}>🟡 Normal: +fertilize</span>
-                        <span style={{ color: '#888' }}>|</span>
-                        <span style={{ color: '#FF4444', fontSize: '0.8rem' }}>🔴 Hard: +pests</span>
-                    </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {CROP_CATALOGUE.map(c => (
-                            <button key={c.id} onClick={() => handleChoose(c.id)}
-                                style={{
-                                    backgroundColor: '#1a1a1a', border: `2px solid ${c.color}`,
-                                    borderRadius: '15px', padding: '1.25rem', textAlign: 'left',
-                                    cursor: 'pointer', color: '#fff', fontFamily: 'inherit', transition: 'all 0.2s',
-                                    display: 'flex', alignItems: 'center', gap: '1rem'
-                                }}>
-                                <span style={{ fontSize: '2.8rem' }}>{c.emoji}</span>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '4px' }}>
-                                        <span style={{ fontWeight: 'bold', fontSize: '1.05rem', color: c.color }}>{c.name}</span>
-                                        <DifficultyBadge diff={c.difficulty} />
+                        {CROP_CATALOGUE.map(c => {
+                            const isLvlLocked = c.level > currentLevel;
+                            const isEliteLocked = (c.id === 'watermelon' || c.id === 'cocoa' || c.level >= 3) && !isElite;
+                            const isLocked = isLvlLocked || isEliteLocked;
+                            const isCurrent = c.level === currentLevel;
+
+                            return (
+                                <button
+                                    key={c.id}
+                                    onClick={() => {
+                                        if (isLvlLocked) {
+                                            alert(`Complete Level ${c.level - 1} to unlock ${c.name}!`);
+                                        } else if (isEliteLocked) {
+                                            if (window.confirm(`🔴 ${c.name} is for ELITE members only. Join the Elite Mastery tier to unlock advanced farming. Upgrade now?`)) {
+                                                window.location.hash = "#finance";
+                                            }
+                                        } else {
+                                            handleChoose(c.id);
+                                        }
+                                    }}
+                                    style={{
+                                        backgroundColor: '#1a1a1a',
+                                        border: `2px solid ${isLocked ? '#333' : isCurrent ? 'var(--color-primary)' : c.color}`,
+                                        borderRadius: '15px', padding: '1.25rem', textAlign: 'left',
+                                        cursor: isLocked ? 'not-allowed' : 'pointer', color: '#fff', fontFamily: 'inherit', transition: 'all 0.2s',
+                                        display: 'flex', alignItems: 'center', gap: '1rem',
+                                        opacity: isLocked ? 0.6 : 1,
+                                        position: 'relative',
+                                        filter: isLvlLocked ? 'grayscale(1)' : 'none'
+                                    }}>
+                                    <span style={{ fontSize: '2.8rem' }}>{isLvlLocked ? '🔒' : isEliteLocked ? '💎' : c.emoji}</span>
+
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '4px' }}>
+                                            <span style={{ fontWeight: 'bold', fontSize: '1.05rem', color: isLocked ? '#666' : c.color }}>{c.name}</span>
+                                            <DifficultyBadge diff={c.difficulty} />
+                                            <span style={{ fontSize: '0.7rem', color: isCurrent ? 'var(--color-primary)' : '#666', fontWeight: 'bold' }}>Lvl {c.level}</span>
+                                        </div>
+
+                                        <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.78rem', color: '#666', flexWrap: 'wrap' }}>
+                                            <span>💰 Harvest: {currency}{c.harvestValue}</span>
+                                            <span>🌾 Seed: {currency}{c.seedCost}</span>
+                                        </div>
+
+                                        <div style={{ fontSize: '0.75rem', color: isEliteLocked ? 'var(--color-primary)' : '#555', marginTop: '4px', fontWeight: isEliteLocked ? 'bold' : 'normal' }}>
+                                            {isLvlLocked ? `Unlocks at Level ${c.level}` : isEliteLocked ? '💎 ELITE MASTERY REQUIRED' : `🔧 Manage: ${c.mechanics.join(' + ')}`}
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.78rem', color: '#aaa', flexWrap: 'wrap' }}>
-                                        <span>🌱 Germinates: {c.germinationDays}</span>
-                                        <span>📅 Full: {c.growthDays}</span>
-                                        <span>💰 Harvest: {currency}{c.harvestValue}</span>
-                                        <span>🌾 Seed: {currency}{c.seedCost}</span>
-                                    </div>
-                                    <div style={{ fontSize: '0.75rem', color: '#555', marginTop: '4px' }}>
-                                        🔧 Manage: {c.mechanics.join(' + ')}
-                                        {isAdult && <span style={{ color: '#888', marginLeft: '0.5rem' }}>· {c.businessNote.split('.')[0]}</span>}
-                                    </div>
-                                </div>
-                                <div style={{ backgroundColor: c.color, color: '#000', borderRadius: '20px', padding: '0.35rem 0.8rem', fontSize: '0.78rem', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-                                    Plant ▶
-                                </div>
-                            </button>
-                        ))}
+                                    {!isLocked && (
+                                        <div style={{
+                                            backgroundColor: isCurrent ? 'var(--color-primary)' : c.color,
+                                            color: isCurrent ? '#fff' : '#000',
+                                            borderRadius: '20px', padding: '0.35rem 0.8rem', fontSize: '0.78rem', fontWeight: 'bold', whiteSpace: 'nowrap'
+                                        }}>
+                                            {isCurrent ? 'Play Now ▶' : 'Replay'}
+                                        </div>
+                                    )}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -377,9 +463,10 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
                     {/* ── RESOURCE BARS ── */}
                     <div style={{ backgroundColor: '#111', borderRadius: '12px', padding: '1rem', marginBottom: '1.25rem', border: '1px solid #222' }}>
                         <StatBar label="Soil Moisture" value={moisture} color="#00BFFF" icon="💧" />
-                        {crop.difficulty !== 'easy' && <StatBar label="Soil Fertility" value={fertility} color="#00C851" icon="🌿" />}
+                        {crop.difficulty !== 'easy' && <StatBar label="Soil Fertility" value={fertility} color="#FFD700" icon="✨" />}
+                        <StatBar label="Weed Pressure" value={weedLevel} color="#4CAF50" icon="🌿" />
                         {crop.difficulty === 'hard' && (
-                            <div style={{ marginBottom: '0.5rem' }}>
+                            <div style={{ marginTop: '0.9rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '4px' }}>
                                     <span style={{ color: '#aaa' }}>🐛 Pest Pressure</span>
                                     <span style={{ color: pestLevel > 60 ? '#FF4444' : pestLevel > 30 ? '#FF9800' : '#00C851', fontWeight: 'bold' }}>
@@ -409,15 +496,20 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
                     )}
 
                     {/* Action Buttons */}
-                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${crop.mechanics.length + (isLastStage ? 1 : 0)}, 1fr)`, gap: '0.75rem', marginBottom: '1rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${crop.mechanics.length + 1 + (isLastStage ? 1 : 0)}, 1fr)`, gap: '0.75rem', marginBottom: '1rem' }}>
                         {!isLastStage && (
-                            <button onClick={handleWater} className="btn" style={{ backgroundColor: '#00BFFF', color: '#000', fontWeight: 'bold', flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px', padding: '0.75rem' }}>
-                                💧<span style={{ fontSize: '0.75rem' }}>Water</span>
-                            </button>
+                            <>
+                                <button onClick={handleWater} className="btn" style={{ backgroundColor: '#00BFFF', color: '#000', fontWeight: 'bold', flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px', padding: '0.75rem' }}>
+                                    💧<span style={{ fontSize: '0.75rem' }}>Water</span>
+                                </button>
+                                <button onClick={handleWeed} className="btn" style={{ backgroundColor: '#4CAF50', color: '#fff', fontWeight: 'bold', flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px', padding: '0.75rem' }}>
+                                    🧹<span style={{ fontSize: '0.75rem' }}>Weed</span>
+                                </button>
+                            </>
                         )}
                         {crop.difficulty !== 'easy' && !isLastStage && (
-                            <button onClick={handleFertilize} className="btn" style={{ backgroundColor: '#4CAF50', color: '#fff', fontWeight: 'bold', flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px', padding: '0.75rem' }}>
-                                🌿<span style={{ fontSize: '0.75rem' }}>Fertilize</span>
+                            <button onClick={handleFertilize} className="btn" style={{ backgroundColor: '#FFD700', color: '#000', fontWeight: 'bold', flexDirection: 'column', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px', padding: '0.75rem' }}>
+                                ✨<span style={{ fontSize: '0.75rem' }}>Fertilize</span>
                             </button>
                         )}
                         {crop.difficulty === 'hard' && !isLastStage && (
@@ -477,7 +569,14 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
                     <DifficultyBadge diff={crop.difficulty} />
 
                     <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '1.5rem 0', flexWrap: 'wrap' }}>
-                        {[['💰', `+${currency}${earned}`, '#00C851', 'Earned'], ['⭐', `+${isAdult ? 120 : 90} XP`, '#FFD700', 'XP'], ['💧', `${waterCount}×`, '#00BFFF', 'Watered'], crop.difficulty !== 'easy' && ['🌿', `${fertCount}×`, '#4CAF50', 'Fertilized'], crop.difficulty === 'hard' && ['🧪', `${pestCount}×`, '#9C27B0', 'Sprayed']].filter(Boolean).map(([e, v, c, l]) => (
+                        {[
+                            ['💰', `+${currency}${earned}`, '#00C851', 'Earned'],
+                            ['⭐', `+${isAdult ? 120 : 90} XP`, '#FFD700', 'XP'],
+                            ['💧', `${waterCount}×`, '#00BFFF', 'Watered'],
+                            ['🧹', `${weedCount}×`, '#4CAF50', 'Weeding'],
+                            crop.difficulty !== 'easy' && ['✨', `${fertCount}×`, '#FFD700', 'Fertilized'],
+                            crop.difficulty === 'hard' && ['🧪', `${pestCount}×`, '#9C27B0', 'Sprayed']
+                        ].filter(Boolean).map(([e, v, c, l]) => (
                             <div key={l} style={{ backgroundColor: '#111', border: '1px solid #222', borderRadius: '12px', padding: '1rem', minWidth: '80px' }}>
                                 <div style={{ fontSize: '1.5rem' }}>{e}</div>
                                 <div style={{ color: c, fontWeight: 'bold' }}>{v}</div>
@@ -495,15 +594,26 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
                         </div>
                     )}
 
-                    {/* Real-world learning card */}
                     <div style={{ backgroundColor: '#1a1a1a', borderRadius: '15px', padding: '1.25rem', marginBottom: '2rem', border: `1px solid ${crop.color}44`, textAlign: 'left' }}>
-                        <p style={{ color: '#666', fontSize: '0.8rem', margin: '0 0 0.5rem', fontWeight: 'bold' }}>🌍 Real-World Learning</p>
+                        <p style={{ color: '#666', fontSize: '0.8rem', margin: '0 0 0.5rem', fontWeight: 'bold' }}>🌍 {crop.isRotation ? 'Mastery Insight' : 'Real-World Learning'}</p>
                         <p style={{ color: '#ccc', margin: '0 0 0.75rem', fontSize: '0.88rem' }}>{crop.funFact}</p>
-                        {isAdult && <p style={{ color: '#888', margin: 0, fontSize: '0.82rem', borderTop: '1px solid #222', paddingTop: '0.5rem' }}>📈 {crop.businessNote}</p>}
+                        <div style={{ backgroundColor: 'rgba(76,175,80,0.1)', borderLeft: '3px solid #4CAF50', padding: '0.8rem', borderRadius: '4px', marginBottom: '1rem' }}>
+                            <small style={{ color: '#aaa' }}>💡 <strong>Agripreneur Tip:</strong> Pulled weeds can be recycled into <strong>compost</strong> or used as <strong>mulch</strong>! This is a core part of "Waste to Wealth" — turning a farm problem into a soil nutrient solution.</small>
+                        </div>
+                        {isAdult && <p style={{ color: '#888', margin: 0, fontSize: '0.82rem', borderTop: '1px solid #222', paddingTop: '0.5rem', marginTop: '0.5rem' }}>📈 {crop.businessNote}</p>}
                     </div>
 
-                    <button onClick={resetAll} className="btn" style={{ backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '1.05rem', padding: '0.9rem 2.5rem' }}>
-                        🌱 Try a Different Crop
+                    <button
+                        onClick={() => {
+                            if (crop.level === currentLevel && currentLevel < 5) {
+                                setCurrentLevel(prev => prev + 1);
+                            }
+                            resetAll();
+                        }}
+                        className="btn"
+                        style={{ backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '1.05rem', padding: '0.9rem 2.5rem' }}
+                    >
+                        {crop.level < currentLevel ? '🌱 Plant Again' : crop.level < 5 ? '🌱 Unlock Next Level!' : '🌱 Master Another Rotation'}
                     </button>
                 </div>
             )}

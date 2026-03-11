@@ -162,14 +162,34 @@ export const api = {
         return res.json();
     },
 
-    upgradeElite: async (token) => {
+    upgradeToElite: async (token, duration) => {
         const res = await fetch(`${API_URL}/user/upgrade-elite`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ duration })
         });
         if (!res.ok) {
             const error = await res.json();
             throw new Error(error.message || 'Failed to upgrade to Elite');
+        }
+        return res.json();
+    },
+
+    purchaseAiUnlimited: async (token, duration) => {
+        const res = await fetch(`${API_URL}/user/purchase-ai-unlimited`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ duration })
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Purchase failed');
         }
         return res.json();
     },

@@ -2,17 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useWallet } from '../hooks/useWallet';
 import { useGamification } from '../context/GamificationContext';
 
-// 3 Real crops with accurate growth stages and real-world timelines
+// 5 levels with different crops. Level 5 is a rotation challenge.
 const CROPS = {
     maize: {
         id: 'maize',
+        level: 1,
         name: 'Maize (Corn)',
         emoji: '🌽',
-        seedEmoji: '🌾',
-        icon: '🌽',
         color: '#FFD700',
-        daysToGerminate: '5–10 days',
-        totalDays: '90–120 days',
         harvestValue: 400,
         seedCost: 100,
         funFact: 'Maize is Nigeria\'s most widely grown crop! It needs full sunlight and regular watering.',
@@ -29,13 +26,10 @@ const CROPS = {
     },
     tomato: {
         id: 'tomato',
+        level: 2,
         name: 'Tomato',
         emoji: '🍅',
-        seedEmoji: '🔴',
-        icon: '🍅',
         color: '#FF4444',
-        daysToGerminate: '5–10 days',
-        totalDays: '70–85 days',
         harvestValue: 500,
         seedCost: 150,
         funFact: 'Tomatoes are one of Africa\'s most valuable vegetables! They need staking as they grow tall.',
@@ -52,16 +46,13 @@ const CROPS = {
     },
     cassava: {
         id: 'cassava',
+        level: 3,
         name: 'Cassava',
         emoji: '🍠',
-        seedEmoji: '🪵',
-        icon: '🍠',
         color: '#8B4513',
-        daysToGerminate: '7–14 days (stems)',
-        totalDays: '270–365 days',
         harvestValue: 600,
         seedCost: 80,
-        funFact: 'Cassava feeds more than 500 million people in Africa! Its roots are rich in carbohydrates and very drought-tolerant.',
+        funFact: 'Cassava feeds more than 500 million people in Africa! Its roots are rich in carbohydrates.',
         stages: [
             { name: 'Soil Ready', emoji: '🟫', desc: 'Sandy loam soil prepared on raised mounds. Cassava loves good drainage!', day: 0 },
             { name: 'Stem Cutting Planted', emoji: '🌱', desc: 'Cassava doesn\'t grow from seeds — you plant stem cuttings! (Month 1)', day: 1 },
@@ -69,13 +60,56 @@ const CROPS = {
             { name: 'Early Growth', emoji: '🪴', desc: 'Young leaves unfurl and reach for sunlight. Roots are thickening below. (Month 2)', day: 3 },
             { name: 'Rapid Growth', emoji: '🌿🌿🌿', desc: 'Tall, leafy canopy forming! The plant is storing starch in its roots. (Month 4–6)', day: 4 },
             { name: 'Root Enlargement', emoji: '🟤', desc: 'Underground roots swell dramatically with starch. Minimal watering now. (Month 7–8)', day: 5 },
-            { name: 'Maturation', emoji: '🍠', desc: 'Leaves start yellowing — the plant is directing energy to roots. Nearly ready! (Month 10–11)', day: 6 },
-            { name: 'Ready to Harvest! 🏆', emoji: '🍠✨', desc: 'Tubers are thick and starchy at 12 months. Dig carefully to avoid breaking them!', day: 7 }
+            { name: 'Maturation', emoji: '🍠', desc: 'Leaves start yellowing — nearly ready! (Month 10–11)', day: 6 },
+            { name: 'Ready to Harvest! 🏆', emoji: '🍠✨', desc: 'Tubers are thick and starchy at 12 months.', day: 7 }
+        ]
+    },
+    watermelon: {
+        id: 'watermelon',
+        level: 4,
+        name: 'Watermelon',
+        emoji: '🍉',
+        color: '#00C851',
+        harvestValue: 800,
+        seedCost: 200,
+        funFact: 'Watermelons are 92% water! They need lots of room for their vines to sprawl across the farm.',
+        stages: [
+            { name: 'Soil Ready', emoji: '🟫', desc: 'Rich soil mounded up. Watermelons need lots of nutrients!', day: 0 },
+            { name: 'Seeds Sown', emoji: '🌱', desc: 'Start in small pots or mounded soil. Keep warm!', day: 1 },
+            { name: 'Germination', emoji: '🌿', desc: 'Fast growth! The first two leaves appear in just a few days.', day: 2 },
+            { name: 'Vining Stage', emoji: '🌿🌿', desc: 'The plant starts to sprawl. Clear space around it!', day: 3 },
+            { name: 'Flowering', emoji: '🌼', desc: 'Beautiful yellow flowers! Male flowers appear first.', day: 4 },
+            { name: 'Fruit Set', emoji: '🟢', desc: 'Little green balls appear. They will grow very fast now!', day: 5 },
+            { name: 'Growth Peak', emoji: '🍉', desc: 'The melon gets heavy. Dont move it or the vine might break!', day: 6 },
+            { name: 'Ready to Harvest! 🏆', emoji: '🍉✨', desc: 'When the bottom turns yellow and the stem bents, it is ripe!', day: 7 }
+        ]
+    },
+    rotation: {
+        id: 'rotation',
+        level: 5,
+        name: 'Crop Rotation Challenge',
+        emoji: '♻️',
+        color: '#9C27B0',
+        harvestValue: 1500,
+        seedCost: 0,
+        funFact: 'Crop rotation keeps soil healthy! Planting different things in order stops pests and adds natural nutrients.',
+        isRotation: true,
+        sequence: ['maize', 'tomato', 'watermelon'],
+        stages: [
+            { name: 'Soil Health Check', emoji: '🧪', desc: 'Preparing to rotate crops to keep your farm soil powerful!', day: 0 },
+            { name: 'Planting Maize', emoji: '🌽', desc: 'Step 1: Maize adds structure and clears certain pests.', day: 1 },
+            { name: 'Nurturing Maize', emoji: '🌿', desc: 'Keeping the first rotation strong...', day: 2 },
+            { name: 'Planting Tomato', emoji: '🍅', desc: 'Step 2: Tomatoes help break the cycle of maize-specific beetles.', day: 3 },
+            { name: 'Nurturing Tomato', emoji: '🌿', desc: 'Keeping the second rotation healthy...', day: 4 },
+            { name: 'Planting Watermelon', emoji: '🍉', desc: 'Step 3: Melons provide ground cover and finalize the rotation pulse.', day: 5 },
+            { name: 'Rotation Success', emoji: '♻️', desc: 'Your soil is now more nutrient-rich than when you started!', day: 6 },
+            { name: 'Golden Harvest! 🏆', emoji: '💰✨', desc: 'The farm is booming! Your rotation plan worked perfectly.', day: 7 }
         ]
     }
 };
 
-const STAGE_DURATION = 4000; // 4s per stage in real-time for the game
+// 180s / 6 transitions = 30s per stage
+const STAGE_DURATION = 30000;
 
 const StageTimeline = ({ stages, currentStage }) => (
     <div style={{ marginBottom: '1.5rem', overflowX: 'auto' }}>
@@ -117,11 +151,14 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
     const { addEarnings } = useWallet();
     const { addPoints } = useGamification();
 
+    const [currentLevel, setCurrentLevel] = useState(() => parseInt(localStorage.getItem('kidsFarmLevel')) || 1);
     const [phase, setPhase] = useState('pick'); // 'pick' | 'growing' | 'harvested'
     const [chosenCrop, setChosenCrop] = useState(null);
     const [stage, setStage] = useState(0);
     const [soilMoisture, setSoilMoisture] = useState(100);
+    const [weedLevel, setWeedLevel] = useState(0);
     const [waterCount, setWaterCount] = useState(0);
+    const [weedCount, setWeedCount] = useState(0);
     const [growing, setGrowing] = useState(false);
     const [showFact, setShowFact] = useState(false);
     const [celebrateHarvest, setCelebrateHarvest] = useState(false);
@@ -131,14 +168,28 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
     const isLastStage = crop && stage === crop.stages.length - 1;
     const canGrow = soilMoisture >= 40;
 
-    // Moisture drains over time
+    // Persist Level
+    useEffect(() => {
+        localStorage.setItem('kidsFarmLevel', currentLevel);
+    }, [currentLevel]);
+
+    // Moisture drains over time: critical (40%) in ~40 seconds
     useEffect(() => {
         if (phase !== 'growing') return;
         const drain = setInterval(() => {
-            setSoilMoisture(prev => Math.max(0, prev - 6));
+            // Drop 4% every 2.5s = 1.6% per sec. 60% drop (to 40%) in 37.5s.
+            // If weeds > 50%, moisture drains 1.5x faster.
+            const weedMultiplier = weedLevel > 50 ? 1.5 : 1;
+            const mLoss = 4 * weedMultiplier;
+            setSoilMoisture(prev => Math.max(0, prev - mLoss));
+
+            // Weeds grow faster if moisture is high
+            if (soilMoisture > 40) {
+                setWeedLevel(prev => Math.min(100, prev + 5));
+            }
         }, 2500);
         return () => clearInterval(drain);
-    }, [phase]);
+    }, [phase, weedLevel, soilMoisture]);
 
     // Auto-advance stages when moisture is fine
     useEffect(() => {
@@ -152,7 +203,7 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
             });
         }, STAGE_DURATION);
         return () => clearTimeout(intervalRef.current);
-    }, [phase, growing, stage, canGrow, isLastStage]);
+    }, [phase, growing, stage, canGrow, isLastStage, crop]);
 
     const handleChooseCrop = (id) => {
         setChosenCrop(id);
@@ -171,9 +222,15 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
     const handleHarvest = () => {
         const value = crop.harvestValue;
         addEarnings('agri', value);
-        addPoints(80);
+        addPoints(100);
         setCelebrateHarvest(true);
         setPhase('harvested');
+
+        // Advance level if it matches current
+        if (crop.level === currentLevel && currentLevel < 5) {
+            setCurrentLevel(prev => prev + 1);
+        }
+
         onHarvest && onHarvest(value);
         setTimeout(() => setCelebrateHarvest(false), 3000);
     };
@@ -194,52 +251,73 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
             {/* CROP PICKER */}
             {phase === 'pick' && (
                 <div style={{ animation: 'popIn 0.4s ease' }}>
-                    <h2 style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }}>Farm Status 🌱</h2>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h2 style={{ color: 'var(--color-primary)', margin: 0 }}>Farm Status 🌱</h2>
+                        <div style={{ backgroundColor: '#FFD700', color: '#000', padding: '0.4rem 0.8rem', borderRadius: '15px', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                            Level {currentLevel} Mastery
+                        </div>
+                    </div>
                     <p style={{ color: '#aaa', marginBottom: '1.5rem' }}>
-                        Choose what you want to plant on your farm. Each crop teaches you something different about real farming!
+                        Plant your way to becoming a Master Agripreneur! Unlock new crops by completing each level.
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {Object.values(CROPS).map(c => (
-                            <button
-                                key={c.id}
-                                onClick={() => handleChooseCrop(c.id)}
-                                style={{
-                                    backgroundColor: '#1a1a1a',
-                                    border: `2px solid ${c.color}`,
-                                    borderRadius: '15px',
-                                    padding: '1.25rem',
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    color: '#fff',
-                                    fontFamily: 'inherit',
-                                    transition: 'all 0.2s',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem'
-                                }}
-                            >
-                                <span style={{ fontSize: '3rem' }}>{c.emoji}</span>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: c.color, marginBottom: '0.25rem' }}>
-                                        {c.name}
+                        {Object.values(CROPS).map(c => {
+                            const isLocked = c.level > currentLevel;
+                            const isCurrent = c.level === currentLevel;
+
+                            return (
+                                <button
+                                    key={c.id}
+                                    onClick={() => !isLocked && handleChooseCrop(c.id)}
+                                    disabled={isLocked}
+                                    style={{
+                                        backgroundColor: isLocked ? '#0d0d0d' : '#1a1a1a',
+                                        border: `2px solid ${isLocked ? '#222' : isCurrent ? 'var(--color-primary)' : c.color}`,
+                                        borderRadius: '15px',
+                                        padding: '1.25rem',
+                                        textAlign: 'left',
+                                        cursor: isLocked ? 'not-allowed' : 'pointer',
+                                        color: isLocked ? '#444' : '#fff',
+                                        fontFamily: 'inherit',
+                                        transition: 'all 0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '1rem',
+                                        opacity: isLocked ? 0.6 : 1,
+                                        position: 'relative',
+                                        filter: isLocked ? 'grayscale(0.8)' : 'none'
+                                    }}
+                                >
+                                    <span style={{ fontSize: '3rem' }}>{isLocked ? '🔒' : c.emoji}</span>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: isLocked ? '#444' : c.color, marginBottom: '0.25rem' }}>
+                                                {c.name}
+                                            </div>
+                                            <span style={{ fontSize: '0.7rem', color: isCurrent ? 'var(--color-primary)' : '#666', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                                                Lvl {c.level}
+                                            </span>
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', color: isLocked ? '#333' : '#aaa' }}>
+                                            {isLocked ? `Complete Level ${c.level - 1} to unlock this!` : c.funFact.substring(0, 60) + '...'}
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', color: isLocked ? '#333' : '#00C851', marginTop: '0.2rem', fontWeight: 'bold' }}>
+                                            {!isLocked && `💰 Harvest Value: ${currency}${c.harvestValue}`}
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.8rem', color: '#aaa', flexWrap: 'wrap' }}>
-                                        <span>🌱 Germinates in {c.daysToGerminate}</span>
-                                        <span>📅 Full growth: {c.totalDays}</span>
-                                        <span>💰 Harvest: {currency}{c.harvestValue}</span>
-                                    </div>
-                                    <div style={{ fontSize: '0.78rem', color: '#666', marginTop: '0.4rem' }}>
-                                        Seed cost: {currency}{c.seedCost}
-                                    </div>
-                                </div>
-                                <div style={{
-                                    backgroundColor: c.color, color: '#000', borderRadius: '20px',
-                                    padding: '0.4rem 0.9rem', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap'
-                                }}>
-                                    Plant This ▶
-                                </div>
-                            </button>
-                        ))}
+                                    {!isLocked && (
+                                        <div style={{
+                                            backgroundColor: isCurrent ? 'var(--color-primary)' : c.color,
+                                            color: isCurrent ? '#fff' : '#000',
+                                            borderRadius: '20px',
+                                            padding: '0.4rem 0.9rem', fontSize: '0.8rem', fontWeight: 'bold', whiteSpace: 'nowrap'
+                                        }}>
+                                            {isCurrent ? 'Play Now ▶' : 'Replay'}
+                                        </div>
+                                    )}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -317,23 +395,32 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
                     )}
 
                     {/* Action Buttons */}
-                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
                         {!isLastStage && (
-                            <button
-                                onClick={handleWater}
-                                className="btn"
-                                style={{ flex: 1, backgroundColor: '#00BFFF', color: '#000', fontWeight: 'bold' }}
-                            >
-                                💧 Water Crops
-                            </button>
+                            <>
+                                <button
+                                    onClick={handleWater}
+                                    className="btn"
+                                    style={{ backgroundColor: '#00BFFF', color: '#000', fontWeight: 'bold' }}
+                                >
+                                    💧 Water Crops
+                                </button>
+                                <button
+                                    onClick={handleWeeding}
+                                    className="btn"
+                                    style={{ backgroundColor: '#4CAF50', color: '#fff', fontWeight: 'bold' }}
+                                >
+                                    🌿 Pull Weeds
+                                </button>
+                            </>
                         )}
                         {isLastStage && (
                             <button
                                 onClick={handleHarvest}
                                 className="btn"
-                                style={{ flex: 1, backgroundColor: crop.color, color: '#000', fontWeight: 'bold', fontSize: '1.1rem' }}
+                                style={{ backgroundColor: crop.color, color: '#000', fontWeight: 'bold', fontSize: '1.1rem' }}
                             >
-                                🌾 Harvest Now! +{currency}{crop.harvestValue}
+                                🧺 Harvest! +{currency}{crop.harvestValue}
                             </button>
                         )}
                         <button
@@ -341,7 +428,7 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
                             className="btn btn-outline"
                             style={{ color: crop.color, borderColor: crop.color }}
                         >
-                            💡 Crop Fact
+                            💡 Weed Facts
                         </button>
                     </div>
 
@@ -366,18 +453,20 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
                             <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#00BFFF' }}>💧 {waterCount}</div>
                         </div>
                         <div style={{ flex: 1, backgroundColor: '#111', borderRadius: '10px', padding: '0.75rem', textAlign: 'center', border: '1px solid #222' }}>
-                            <div style={{ fontSize: '0.75rem', color: '#666' }}>Crop</div>
-                            <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: crop.color }}>{crop.emoji} {crop.id}</div>
+                            <div style={{ fontSize: '0.75rem', color: '#666' }}>Weeds Pulled</div>
+                            <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#4CAF50' }}>🌿 {weedCount}</div>
                         </div>
                         <div style={{ flex: 1, backgroundColor: '#111', borderRadius: '10px', padding: '0.75rem', textAlign: 'center', border: '1px solid #222' }}>
-                            <div style={{ fontSize: '0.75rem', color: '#666' }}>Harvest Value</div>
-                            <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#00C851' }}>{currency}{crop.harvestValue}</div>
+                            <div style={{ fontSize: '0.75rem', color: '#666' }}>Crop Type</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: crop.color }}>{crop.emoji} {crop.name}</div>
                         </div>
+                        <div style={{ fontSize: '0.75rem', color: '#666' }}>Harvest Value</div>
+                        <div style={{ fontSize: '1.3rem', fontWeight: 'bold', color: '#00C851' }}>{currency}{crop.harvestValue}</div>
                     </div>
                 </div>
             )}
 
-            {/* HARVESTED */}
+            {/* HARVESTED SCREEN */}
             {phase === 'harvested' && crop && (
                 <div style={{ textAlign: 'center', padding: '2rem 0', animation: 'popIn 0.5s ease' }}>
                     {celebrateHarvest && (
@@ -388,22 +477,33 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
                     <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>{crop.emoji}</div>
                     <h2 style={{ color: '#00C851', marginBottom: '0.5rem' }}>Harvest Complete! 🏆</h2>
                     <p style={{ color: '#ccc', marginBottom: '1.5rem' }}>
-                        Your {crop.name} is harvested. You earned <strong style={{ color: '#00C851' }}>{currency}{crop.harvestValue}</strong> + 80 XP!
+                        Your {crop.name} is harvested. You earned <strong style={{ color: '#00C851' }}>{currency}{crop.harvestValue}</strong> + 100 XP!
                     </p>
                     <div style={{
                         backgroundColor: '#1a1a1a', borderRadius: '15px', padding: '1.25rem', marginBottom: '2rem',
-                        border: `1px solid ${crop.color}`, textAlign: 'left'
+                        border: `2px solid ${crop.color}`, textAlign: 'left'
                     }}>
                         <p style={{ color: '#888', fontSize: '0.85rem', margin: '0 0 0.5rem', fontWeight: 'bold' }}>
-                            🌍 Real World Learning
+                            🌍 {crop.isRotation ? 'Mastery Insight' : 'Real-World Learning'}
                         </p>
-                        <p style={{ color: '#ccc', margin: 0, fontSize: '0.9rem' }}>
-                            {crop.funFact} In real life, {crop.name.toLowerCase()} takes <strong>{crop.totalDays}</strong> from planting to harvest.
-                            You watered your crops <strong style={{ color: '#00BFFF' }}>{waterCount} times</strong> — great job!
-                        </p>
+                        <div style={{ color: '#ccc', margin: 0, fontSize: '0.9rem' }}>
+                            {crop.funFact}
+                            <br /><br />
+                            {crop.isRotation ? (
+                                <strong>You have successfully completed the Crop Rotation! Your soil is now at peak health.</strong>
+                            ) : (
+                                <>In real life, this crop takes months of care. You watered your crops <strong style={{ color: '#00BFFF' }}>{waterCount} times</strong> — great job!</>
+                            )}
+                            <br /><br />
+                            <div style={{ backgroundColor: 'rgba(76, 175, 80, 0.1)', borderLeft: '4px solid #4CAF50', padding: '0.75rem', borderRadius: '4px', marginTop: '1rem' }}>
+                                <p style={{ color: '#ccc', margin: 0, fontSize: '0.85rem' }}>
+                                    💡 <strong>Agri-Master Fact:</strong> Pulled weeds shouldn't be thrown away! You can use them for <strong>mulching</strong> (to keep soil moist) or as <strong>compost green matter</strong> to feed your next crop.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                     <button onClick={handleReset} className="btn" style={{ backgroundColor: 'var(--color-primary)', color: 'white', fontSize: '1.1rem', padding: '1rem 2.5rem' }}>
-                        🌱 Plant Again (Choose a New Crop)
+                        {crop.level < 5 ? (crop.level === currentLevel - 1 ? '🌱 Unlock Next Level!' : '🌱 Plant Again') : '🌱 Master Another Rotation'}
                     </button>
                 </div>
             )}

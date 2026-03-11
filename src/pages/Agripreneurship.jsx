@@ -35,7 +35,11 @@ const Agripreneurship = () => {
     const isAdult = !isKid && !isTeen;
 
     // State with Safe Init
-    const [isPremium, setIsPremium] = useState(false);
+    const { user } = useWallet();
+    const isElite = user?.isElite && (!user?.eliteExpires || new Date(user.eliteExpires) > new Date());
+    const [isPremium, setIsPremium] = useState(false); // keep for demo button but override logic
+    const hasPremiumAccess = isPremium || isElite;
+
     const [soilMoisture, setSoilMoisture] = useState(80);
     const [cropStage, setCropStage] = useState(0);
     const [money, setMoney] = useState(1000);
@@ -416,7 +420,7 @@ const Agripreneurship = () => {
                         <AgriBusinessPlanner onClose={() => { }} />
                     </div>
                     <div style={{ height: '100%' }}>
-                        {isPremium ? (
+                        {hasPremiumAccess ? (
                             <InvestPitch onDeal={handleDeal} />
                         ) : (
                             <div className="card" style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', border: '2px solid gold' }}>

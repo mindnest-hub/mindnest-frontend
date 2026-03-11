@@ -91,12 +91,12 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
-    const upgradeToElite = async () => {
+    const upgradeToElite = async (duration) => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No active session');
 
         try {
-            const data = await api.upgradeElite(token);
+            const data = await api.upgradeToElite(token, duration);
             if (data.user) {
                 setUser(prev => ({ ...prev, ...data.user }));
             }
@@ -107,8 +107,38 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const purchaseAiUnlimited = async (duration) => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No active session');
+
+        try {
+            const data = await api.purchaseAiUnlimited(token, duration);
+            if (data.user) {
+                setUser(prev => ({ ...prev, ...data.user }));
+            }
+            return data;
+        } catch (error) {
+            console.error('AI Unlimited purchase failed:', error);
+            throw error;
+        }
+    };
+
+    const refreshProfile = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        try {
+            const userData = await api.getProfile(token);
+            setUser(prev => ({ ...prev, ...userData }));
+        } catch (error) {
+            console.error('Failed to refresh profile:', error);
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, signup, verifyOtp, logout, upgradeToElite, loading }}>
+        <AuthContext.Provider value={{
+            user, login, signup, verifyOtp, logout,
+            upgradeToElite, purchaseAiUnlimited, refreshProfile, loading
+        }}>
             {children}
         </AuthContext.Provider>
     );

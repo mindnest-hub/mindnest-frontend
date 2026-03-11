@@ -6,6 +6,7 @@ import Toast from '../components/Toast';
 import KidsWellnessHub from '../components/KidsWellnessHub';
 import { bodyHealthData } from '../data/bodyHealthData';
 import { mentalHealthData } from '../data/mentalHealthData';
+import { fruitData } from '../data/fruitData';
 import Header from '../components/Header';
 
 const Wellness = ({ ageGroup }) => {
@@ -17,11 +18,12 @@ const Wellness = ({ ageGroup }) => {
     // Age Group Logic
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
+    const isElite = user?.isElite && (!user?.eliteExpires || new Date(user.eliteExpires) > new Date());
 
-    // Tabs for Teens/Adults: 'body', 'mind', 'tools'
+    // Tabs for Teens/Adults
     const [activeTab, setActiveTab] = useState('body');
 
-    // --- KIDS RENDER (PRESERVED EXACTLY AS IS) ---
+    // --- KIDS RENDER ---
     if (isKid) {
         return (
             <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem', minHeight: '100vh' }}>
@@ -36,7 +38,6 @@ const Wellness = ({ ageGroup }) => {
         );
     }
 
-    // --- TEENS & ADULTS RENDER (MERGED BODY & MIND) ---
     const showToast = (message, type = 'info', duration = 3000) => setToast({ message, type, duration });
 
     return (
@@ -55,21 +56,28 @@ const Wellness = ({ ageGroup }) => {
                 <button
                     onClick={() => setActiveTab('body')}
                     className={`btn ${activeTab === 'body' ? 'btn-primary' : 'btn-outline'}`}
-                    style={{ minWidth: '120px' }}
+                    style={{ minWidth: '100px' }}
                 >
                     🏃 Body
                 </button>
                 <button
                     onClick={() => setActiveTab('mind')}
                     className={`btn ${activeTab === 'mind' ? 'btn-primary' : 'btn-outline'}`}
-                    style={{ minWidth: '120px' }}
+                    style={{ minWidth: '100px' }}
                 >
                     🧠 Mind
                 </button>
                 <button
+                    onClick={() => setActiveTab('apothecary')}
+                    className={`btn ${activeTab === 'apothecary' ? 'btn-primary' : 'btn-outline'}`}
+                    style={{ minWidth: '100px', border: activeTab !== 'apothecary' && !isElite ? '1px solid gold' : '' }}
+                >
+                    🍎 {isElite ? 'Apothecary' : 'Elite Apothecary'} {!isElite && '🔒'}
+                </button>
+                <button
                     onClick={() => setActiveTab('tools')}
                     className={`btn ${activeTab === 'tools' ? 'btn-primary' : 'btn-outline'}`}
-                    style={{ minWidth: '120px' }}
+                    style={{ minWidth: '100px' }}
                 >
                     🛠️ Tools
                 </button>
@@ -82,6 +90,9 @@ const Wellness = ({ ageGroup }) => {
                 {activeTab === 'mind' && (
                     <MindSection isTeen={isTeen} addEarnings={addEarnings} showToast={showToast} />
                 )}
+                {activeTab === 'apothecary' && (
+                    <ApothecarySection isElite={isElite} />
+                )}
                 {activeTab === 'tools' && (
                     <ToolsSection isTeen={isTeen} showToast={showToast} />
                 )}
@@ -90,7 +101,91 @@ const Wellness = ({ ageGroup }) => {
     );
 };
 
-// --- SUB-SECTIONS (Extracted from previous Health.jsx and MentalHealth.jsx) ---
+// --- SUB-SECTIONS ---
+
+const ApothecarySection = ({ isElite }) => {
+    const [selectedItem, setSelectedItem] = useState(null);
+
+    if (!isElite) {
+        return (
+            <div className="card" style={{ textAlign: 'center', padding: '3rem 1rem', border: '2px solid gold', background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a10 100%)' }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>🔒 🍎 🧪</div>
+                <h2 style={{ color: 'gold', marginBottom: '1rem' }}>Elite Apothecary Access</h2>
+                <p style={{ color: '#ccc', maxWidth: '500px', margin: '0 auto 2rem auto', lineHeight: '1.6' }}>
+                    Discover the secrets of the earth. Get nutritional deep-dives, "Waste to Wealth" reuse tips, and planting guides for powerful fruits and spices.
+                </p>
+                <button onClick={() => window.location.hash = "#finance"} className="btn btn-primary" style={{ backgroundColor: 'gold', color: '#000', fontWeight: 'bold' }}>
+                    Join Elite Mastery 💎
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
+                {fruitData.map(item => (
+                    <div key={item.id} className="card" style={{ border: '1px solid #333', cursor: 'pointer', transition: 'transform 0.2s' }} onClick={() => setSelectedItem(item)} onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+                        <div style={{ fontSize: '3.5rem', marginBottom: '1rem', textAlign: 'center' }}>{item.emoji}</div>
+                        <h3 style={{ color: item.color, textAlign: 'center', marginBottom: '0.5rem' }}>{item.name}</h3>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', justifyContent: 'center' }}>
+                            {item.nutrition.slice(0, 3).map(n => (
+                                <span key={n} style={{ fontSize: '0.7rem', background: '#222', padding: '2px 8px', borderRadius: '10px', color: '#aaa' }}>{n}</span>
+                            ))}
+                        </div>
+                        <button className="btn btn-outline" style={{ width: '100%', marginTop: '1.5rem', borderColor: `${item.color}44`, color: item.color }}>Study Benefits →</button>
+                    </div>
+                ))}
+            </div>
+
+            {selectedItem && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.92)', zIndex: 3000, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1rem' }}>
+                    <div className="card" style={{ maxWidth: '700px', width: '100%', maxHeight: '90vh', overflowY: 'auto', border: `2px solid ${selectedItem.color}`, position: 'relative' }}>
+                        <button onClick={() => setSelectedItem(null)} style={{ position: 'absolute', top: '20px', right: '20px', fontSize: '2rem', background: 'none', color: 'white', cursor: 'pointer', zIndex: 10 }}>&times;</button>
+
+                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                            <div style={{ fontSize: '5rem' }}>{selectedItem.emoji}</div>
+                            <h2 style={{ color: selectedItem.color, fontSize: '2rem' }}>{selectedItem.name} Apothecary</h2>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+                            <div style={{ background: '#111', padding: '1rem', borderRadius: '12px' }}>
+                                <h4 style={{ color: selectedItem.color, marginBottom: '0.8rem' }}>🧬 Essential Nutrition</h4>
+                                <ul style={{ fontSize: '0.9rem', color: '#ccc', paddingLeft: '1.2rem' }}>
+                                    {selectedItem.nutrition.map(n => <li key={n} style={{ marginBottom: '0.4rem' }}>{n}</li>)}
+                                </ul>
+                            </div>
+                            <div style={{ background: '#111', padding: '1rem', borderRadius: '12px' }}>
+                                <h4 style={{ color: '#00C851', marginBottom: '0.8rem' }}>🏥 Bodily Benefits</h4>
+                                {selectedItem.benefits.map(b => (
+                                    <div key={b.title} style={{ marginBottom: '0.8rem' }}>
+                                        <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#fff' }}>{b.title}</div>
+                                        <div style={{ fontSize: '0.75rem', color: '#aaa' }}>{b.desc}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div style={{ background: 'linear-gradient(45deg, #1a1a1a, #0d0d0d)', padding: '1.5rem', borderRadius: '15px', border: '1px solid #333' }}>
+                            <h3 style={{ color: 'gold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>💰 Waste to Wealth</h3>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <div style={{ fontWeight: 'bold', color: '#fff', fontSize: '1rem', marginBottom: '0.3rem' }}>♻️ Reuse Insights</div>
+                                <p style={{ color: '#ccc', fontSize: '0.9rem' }}>{selectedItem.wasteToWealth.reuse}</p>
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <div style={{ fontWeight: 'bold', color: '#4CAF50', fontSize: '1rem', marginBottom: '0.3rem' }}>🌱 Planting Guide</div>
+                                <p style={{ color: '#ccc', fontSize: '0.9rem' }}>{selectedItem.wasteToWealth.plant}</p>
+                            </div>
+                            <div style={{ fontSize: '0.85rem', fontStyle: 'italic', color: '#888', borderTop: '1px solid #333', paddingTop: '0.8rem' }}>
+                                💡 Elite Tip: {selectedItem.wasteToWealth.tip}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 const BodySection = ({ isTeen, addEarnings, showToast }) => {
     const modules = isTeen ? bodyHealthData.teens : bodyHealthData.adults;
@@ -111,9 +206,7 @@ const BodySection = ({ isTeen, addEarnings, showToast }) => {
         if (!completedLevels[index]) {
             const newCompleted = [...completedLevels];
             newCompleted[index] = true;
-            // Pad if needed
             while (newCompleted.length < modules.length) newCompleted.push(false);
-
             setCompletedLevels(newCompleted);
             addEarnings('health', 150);
             showToast(`Level ${index + 1} Complete! +₦150 🏆`, 'success');
@@ -153,11 +246,7 @@ const BodySection = ({ isTeen, addEarnings, showToast }) => {
 const MindSection = ({ isTeen, addEarnings, showToast }) => {
     const modules = isTeen ? mentalHealthData.teens : mentalHealthData.adults;
     const progressKey = `mentalHealthProgress_${isTeen ? 'teen' : 'adult'}`;
-
-    // Store as array of IDs for mental health
-    const [completedModules, setCompletedModules] = useState(() =>
-        JSON.parse(localStorage.getItem(progressKey)) || []
-    );
+    const [completedModules, setCompletedModules] = useState(() => JSON.parse(localStorage.getItem(progressKey)) || []);
 
     useEffect(() => {
         localStorage.setItem(progressKey, JSON.stringify(completedModules));
@@ -174,44 +263,22 @@ const MindSection = ({ isTeen, addEarnings, showToast }) => {
     return (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
             {modules.map(mod => (
-                <MentalModuleCard
-                    key={mod.id}
-                    module={mod}
-                    isCompleted={completedModules.includes(mod.id)}
-                    onComplete={() => handleComplete(mod.id)}
-                />
+                <MentalModuleCard key={mod.id} module={mod} isCompleted={completedModules.includes(mod.id)} onComplete={() => handleComplete(mod.id)} />
             ))}
         </div>
     );
 };
 
-// Reusing the MentalModuleCard logic (inline for simplicity in this merged file)
 const MentalModuleCard = ({ module, isCompleted, onComplete }) => {
     const [expanded, setExpanded] = useState(false);
     const [quizIdx, setQuizIdx] = useState(0);
-    const [answers, setAnswers] = useState({});
-
-    // Adapt legacy quiz format if needed (Mental data uses 'correct' index, Body uses 'a' index... need to be careful)
-    // mentalHealthData uses: { question, options, correct }
-    // bodyHealthData uses: { q, o, a }
-    // Wait, I updated mentalHealthData to match body format? 
-    // Let's check mentalHealthData structure from previous steps... 
-    // I rewrote mentalHealthData in Step 5084. I used { q, o, a } format there! Good.
-    // So both use { q, o, a }.
 
     const handleAnswer = (idx) => {
-        const correct = idx === module.quiz[quizIdx].a;
-        if (correct) {
+        if (idx === module.quiz[quizIdx].a) {
             alert("Correct!");
-            if (quizIdx < module.quiz.length - 1) {
-                setQuizIdx(quizIdx + 1);
-            } else {
-                onComplete();
-                setExpanded(false);
-            }
-        } else {
-            alert("Incorrect, try again.");
-        }
+            if (quizIdx < module.quiz.length - 1) setQuizIdx(quizIdx + 1);
+            else { onComplete(); setExpanded(false); }
+        } else alert("Try again.");
     };
 
     return (
@@ -219,10 +286,7 @@ const MentalModuleCard = ({ module, isCompleted, onComplete }) => {
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{module.icon}</div>
             <h3>{module.title}</h3>
             <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '1rem' }}>{module.desc}</p>
-            <button onClick={() => setExpanded(!expanded)} className="btn btn-primary" style={{ width: '100%' }}>
-                {expanded ? "Close" : isCompleted ? "Review" : "Start"}
-            </button>
-
+            <button onClick={() => setExpanded(!expanded)} className="btn btn-primary" style={{ width: '100%' }}>{expanded ? "Close" : isCompleted ? "Review" : "Start"}</button>
             {expanded && (
                 <div style={{ marginTop: '1rem', borderTop: '1px solid #444', paddingTop: '1rem' }}>
                     <div style={{ whiteSpace: 'pre-wrap', marginBottom: '1rem', color: '#ddd' }}>{module.content}</div>
@@ -242,7 +306,6 @@ const MentalModuleCard = ({ module, isCompleted, onComplete }) => {
 };
 
 const ToolsSection = ({ isTeen, showToast }) => {
-    // Ported from MentalHealth.jsx ToolsSection
     return (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
             <div className="card">
@@ -257,7 +320,6 @@ const ToolsSection = ({ isTeen, showToast }) => {
                 <h3>🌬️ Guided Breathing</h3>
                 <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={() => alert("Imagine a breathing circle animation here...")}>Start Session</button>
             </div>
-            {/* Crisis Resources */}
             <div className="card" style={{ borderColor: '#ff4444' }}>
                 <h3 style={{ color: '#ff4444' }}>🆘 Crisis Resources</h3>
                 <p style={{ fontSize: '0.9rem' }}>Emergency contacts available.</p>
@@ -267,7 +329,6 @@ const ToolsSection = ({ isTeen, showToast }) => {
 };
 
 const ModuleViewer = ({ module, onClose, onComplete }) => {
-    // Generic viewer for Body modules (popup style)
     const [quizIdx, setQuizIdx] = useState(0);
     const [showQuiz, setShowQuiz] = useState(false);
 
@@ -276,9 +337,7 @@ const ModuleViewer = ({ module, onClose, onComplete }) => {
             alert("Correct!");
             if (quizIdx < module.quiz.length - 1) setQuizIdx(quizIdx + 1);
             else onComplete();
-        } else {
-            alert("Try again.");
-        }
+        } else alert("Try again.");
     };
 
     return (

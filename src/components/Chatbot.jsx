@@ -1,12 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
-import { getLegalAdvice } from '../data/legalRights';
-import DocumentDrafter from './DocumentDrafter';
 
 const Chatbot = () => {
     // Session Management State
-    const { user } = useAuth();
+    const { user, refreshProfile } = useAuth();
     const [sessions, setSessions] = useState(() => {
         const saved = localStorage.getItem('chatSessions');
         return saved ? JSON.parse(saved) : [];
@@ -21,7 +19,7 @@ const Chatbot = () => {
 
     // Initial default message
     const defaultMessages = [
-        { text: "Hello! I'm your MindNest Consultant. 🌍 Select a topic to get started.", sender: 'bot' }
+        { text: "Hello! I'm your African Oracle Mentor. 🌍 Select a topic to get started.", sender: 'bot' }
     ];
 
     // Lazy initialization of active chat state based on current session
@@ -55,20 +53,16 @@ const Chatbot = () => {
         return "";
     });
 
-    const [challengerStep, setChallengerStep] = useState(() => {
-        const sid = localStorage.getItem('currentSessionId');
-        if (sid) {
-            const savedSessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
-            const active = savedSessions.find(s => s.id === sid);
-            if (active) return active.challengerStep || 0;
-        }
-        return 0;
-    });
-
+    const [challengerStep, setChallengerStep] = useState(0);
     const [ageMode, setAgeMode] = useState("adults");
-    const [isLoading, setIsLoading] = useState(false);
-    const [showDocumentDrafter, setShowDocumentDrafter] = useState(false);
+    const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
+
+    // Derived State for Monetization
+    const isAiUnlimited = user?.isElite ||
+        (user?.aiUnlimitedExpires && new Date(user.aiUnlimitedExpires) > new Date()) ||
+        (user?.eliteExpires && new Date(user.eliteExpires) > new Date());
 
     // PERSISTENCE: Sync history from DB on mount
     useEffect(() => {
@@ -92,7 +86,7 @@ const Chatbot = () => {
         syncHistory();
     }, [user]);
 
-    // Save session data whenever relevant state changes (REDUCED for server-syncing)
+    // Save session data whenever relevant state changes
     useEffect(() => {
         if (!currentSessionId && messages.length <= 1 && !country && !topic) return;
 
@@ -167,14 +161,12 @@ const Chatbot = () => {
         }
     };
 
-    const [input, setInput] = useState("");
-
     const countries = ["Nigeria", "Ghana", "Kenya", "South Africa", "Uganda", "Rwanda", "Tanzania"];
     const topics = [
-        { id: 'rights', label: '⚖️ Legal Rights', prompt: 'legal rights and police procedures' },
-        { id: 'land', label: '🏠 Land & Property', prompt: 'land titles, verification, and property scams' },
-        { id: 'chat', label: '💬 Let\'s Chat', prompt: 'general conversation, educational guidance, and MindNest features' },
-        { id: 'invest', label: '📈 Investment', prompt: 'real estate investment and financial growth' }
+        { id: 'rights', label: '⚖️ Legal Rights', prompt: 'legal rights' },
+        { id: 'land', label: '🏠 Land & Property', prompt: 'land titles' },
+        { id: 'chat', label: '💬 Guidance', prompt: 'general guidance' },
+        { id: 'invest', label: '📈 Investment', prompt: 'financial growth' }
     ];
 
     const scrollToBottom = () => {
@@ -184,91 +176,15 @@ const Chatbot = () => {
     useEffect(scrollToBottom, [messages]);
 
     const handleSend = async () => {
-        if (!input.trim()) return;
-        if (!country) {
-            setMessages(prev => [...prev, { text: "Please select a country first! 🏳️", sender: 'bot' }]);
-            return;
-        }
-        if (!topic) {
-            setMessages(prev => [...prev, { text: "Please select a topic above! 👆", sender: 'bot' }]);
-            return;
-        }
+        if (!input.trim() || loading) return;
+        if (!country || !topic) return;
 
         const userMsg = input;
         setMessages(prev => [...prev, { text: userMsg, sender: 'user' }]);
         setInput("");
-        setIsLoading(true);
+        setLoading(true);
 
-        // --- CHALLENGER SCRIPT LOGIC (Victor's Version) ---
-        if ((topic === 'invest' || topic === 'land') && ageMode === 'adults') {
-
-            // Start the script if keywords match or if already in flow
-            if (challengerStep === 0 && (userMsg.toLowerCase().includes('buy') || userMsg.toLowerCase().includes('invest') || userMsg.toLowerCase().includes('land'))) {
-                setTimeout(() => {
-                    setMessages(prev => [...prev, {
-                        text: "Before we talk about the property itself, I want to understand what your long-term plan is. Are you looking for safety, appreciation, steady cash flow, or a mix of all three?",
-                        sender: 'bot'
-                    }]);
-                    setChallengerStep(1); // Move to Step 1 (Warm Up)
-                    setIsLoading(false);
-                }, 1000);
-                return;
-            }
-
-            if (challengerStep > 0) {
-                setTimeout(() => {
-                    let response = "";
-                    let nextStep = challengerStep + 1;
-
-                    switch (challengerStep) {
-                        case 1: // Reframe
-                            response = "Interesting choice. Most people focus only on the building they’re buying. But what actually determines whether they gain or lose money is something different… it’s the **verification risk** — the land documents and the development history behind the property.";
-                            break;
-                        case 2: // Insight
-                            response = "From the cases I’ve handled, over 60% of property problems don’t come from the building — they come from the land history: wrong layout approvals, family disputes, or faulty excision. These don't show up in a site visit. They only show up when someone checks the backend.";
-                            break;
-                        case 3: // Cost
-                            response = "When people skip proper verification, the property feels cheaper — until the government marks it, or a family comes with a court injunction. Then they realize the ‘cheap’ property actually costs 3x more in stress and correction.";
-                            break;
-                        case 4: // Solution
-                            response = "That’s why every property I recommend has passed through a **3-layer verification process**: \n1. Document authenticity check\n2. Land registry cross-verification\n3. Development & boundary history review.\n\nSo you’re getting protection built into the deal.";
-                            break;
-                        case 5: // Lens
-                            response = "Now, look at this unit through that lens: \n• The excision file is clean\n• The survey matches coordinates\n• No overlapping claims\n\nThat’s why this one is positioned for safe growth.";
-                            break;
-                        case 6: // CTA
-                            response = "If this aligns with what you’re looking for — **safety first, profit next** — then we can move forward and reserve it. If not, no pressure. I would rather you buy the right property than a fast one.\n\nWould you like to proceed with **MindNest Realty**?";
-                            nextStep = 0; // End of script
-                            break;
-                        default:
-                            response = "Let me know if you have any other questions!";
-                            nextStep = 0;
-                    }
-
-                    setMessages(prev => [...prev, { text: response, sender: 'bot' }]);
-                    setChallengerStep(nextStep);
-                    setIsLoading(false);
-                }, 1500); // Slight delay for natural feel
-                return;
-            }
-        }
-
-
-        // --- BACKEND PERSISTENT AI ---
         try {
-            // Content Safety Filter
-            const inappropriateKeywords = ['sex', 'nude', 'porn', 'xxx', 'naked', 'explicit'];
-            const isInappropriate = inappropriateKeywords.some(keyword => userMsg.toLowerCase().includes(keyword));
-
-            if (isInappropriate) {
-                setMessages(prev => [...prev, {
-                    text: "I'm here to help with educational topics. Please keep questions appropriate.",
-                    sender: 'bot'
-                }]);
-                setIsLoading(false);
-                return;
-            }
-
             const token = localStorage.getItem('token');
             const res = await api.sendAiChat(token, {
                 message: userMsg,
@@ -278,14 +194,15 @@ const Chatbot = () => {
             });
 
             setMessages(prev => [...prev, { text: res.response, sender: 'bot' }]);
+            refreshProfile();
         } catch (error) {
             console.error("AI Mentor Error:", error);
             setMessages(prev => [...prev, {
-                text: "My wisdom is temporarily unavailable. Please check your connection or try again later.",
+                text: "My wisdom is temporarily unavailable. Please try again later.",
                 sender: 'bot'
             }]);
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
@@ -295,249 +212,112 @@ const Chatbot = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
                     position: 'fixed', bottom: '2rem', right: '2rem',
-                    width: '60px', height: '60px', borderRadius: '50%',
+                    width: '60px', height: '60px', borderRadius: '30px',
                     backgroundColor: 'var(--color-primary)', color: '#fff',
-                    border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    border: 'none', boxShadow: '0 4px 15px rgba(0, 200, 81, 0.3)',
                     cursor: 'pointer', zIndex: 1000, fontSize: '1.5rem',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'transform 0.3s ease'
                 }}
             >
-                {isOpen ? '✕' : '💬'}
+                {isOpen ? '✕' : '🌍'}
             </button>
 
             {isOpen && (
                 <div style={{
-                    position: 'fixed',
-                    bottom: '7rem',
-                    right: '2rem',
-                    width: 'min(350px, calc(100vw - 4rem))',
-                    height: 'min(600px, calc(100vh - 10rem))',
-                    backgroundColor: 'var(--color-surface)',
-                    borderRadius: '1rem',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    zIndex: 1000,
-                    border: '1px solid var(--color-text-muted)'
+                    position: 'fixed', bottom: '7rem', right: '2rem',
+                    width: 'min(400px, calc(100vw - 4rem))',
+                    height: 'min(700px, calc(100vh - 10rem))',
+                    backgroundColor: '#0a0a0a', borderRadius: '1.5rem',
+                    boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+                    display: 'flex', flexDirection: 'column',
+                    zIndex: 1000, overflow: 'hidden', border: '1px solid #333'
                 }}>
-                    {/* Header */}
-                    <div style={{ padding: '1rem', borderBottom: '1px solid #333', backgroundColor: 'var(--color-primary)', borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem', color: '#fff' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h3 style={{ margin: 0 }}>
-                                {user?.isElite ? '💎 AI Oracle' : 'MindNest Consultant ✨'}
-                            </h3>
-                            <button
-                                onClick={() => setShowHistory(!showHistory)}
-                                style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '1.2rem' }}
-                                title="Chat History"
-                            >
-                                {showHistory ? '💬' : '📜'}
-                            </button>
+                    {/* HEADER */}
+                    <div style={{ padding: '1.25rem', background: '#121212', borderBottom: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                            <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>🌍</div>
+                            <h3 style={{ margin: 0, fontSize: '1rem', color: '#fff' }}>African Oracle</h3>
                         </div>
-                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                {['kids', 'teens', 'adults'].map(mode => (
-                                    <button
-                                        key={mode}
-                                        onClick={() => setAgeMode(mode)}
-                                        style={{
-                                            fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '10px', border: 'none',
-                                            backgroundColor: ageMode === mode ? '#fff' : 'rgba(255,255,255,0.3)',
-                                            color: ageMode === mode ? 'var(--color-primary)' : '#fff', cursor: 'pointer'
-                                        }}
-                                    >
-                                        {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                                    </button>
-                                ))}
-                            </div>
-                            <button
-                                onClick={startNewChat}
-                                style={{
-                                    fontSize: '0.7rem', padding: '0.2rem 0.5rem', borderRadius: '10px',
-                                    border: '1px solid rgba(255,255,255,0.3)', background: 'none',
-                                    color: '#fff', cursor: 'pointer'
-                                }}
-                                title="New Chat"
-                            >
-                                ➕
-                            </button>
-                        </div>
+                        <button onClick={() => setShowHistory(!showHistory)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}>{showHistory ? '💬' : '📜'}</button>
                     </div>
 
-                    {showHistory ? (
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <h4 style={{ color: '#aaa', margin: '0 0 0.5rem 0' }}>Recent Conversations</h4>
-                            {sessions.length === 0 ? (
-                                <p style={{ color: '#666', fontSize: '0.9rem', textAlign: 'center', marginTop: '2rem' }}>No past conversations yet.</p>
-                            ) : (
-                                sessions.map(s => (
-                                    <div
-                                        key={s.id}
-                                        onClick={() => loadSession(s)}
-                                        style={{
-                                            padding: '0.8rem',
-                                            borderRadius: '8px',
-                                            backgroundColor: currentSessionId === s.id ? 'rgba(156, 39, 176, 0.2)' : '#222',
-                                            border: `1px solid ${currentSessionId === s.id ? 'var(--color-primary)' : '#333'}`,
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center'
-                                        }}
-                                    >
-                                        <div style={{ overflow: 'hidden' }}>
-                                            <div style={{ color: '#fff', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                                {s.snippet}
-                                            </div>
-                                            <div style={{ color: '#666', fontSize: '0.7rem', marginTop: '0.2rem' }}>
-                                                {s.country || 'No Country'} • {s.topic ? topics.find(t => t.id === s.topic)?.label : 'No Topic'}
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={(e) => deleteSession(s.id, e)}
-                                            style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: '1rem' }}
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))
-                            )}
-                            <button
-                                onClick={resetServerHistory}
-                                style={{
-                                    marginTop: 'auto',
-                                    padding: '0.8rem',
-                                    borderRadius: '8px',
-                                    border: '1px solid #ff4444',
-                                    backgroundColor: 'rgba(255, 68, 68, 0.1)',
-                                    color: '#ff4444',
-                                    cursor: 'pointer',
-                                    fontWeight: 'bold'
-                                }}
-                                title="Reset AI memory across all devices"
-                            >
-                                🗑️ Reset All Memory
-                            </button>
-                            <button
-                                onClick={startNewChat}
-                                style={{
-                                    marginTop: '0.5rem',
-                                    padding: '0.8rem',
-                                    borderRadius: '8px',
-                                    border: '1px solid var(--color-primary)',
-                                    backgroundColor: 'transparent',
-                                    color: 'var(--color-primary)',
-                                    cursor: 'pointer',
-                                    fontWeight: 'bold'
-                                }}
-                            >
-                                + Start New Conversation
-                            </button>
+                    {/* QUOTA BAR */}
+                    {!isAiUnlimited && (
+                        <div style={{ height: '3px', width: '100%', backgroundColor: '#111' }}>
+                            <div style={{
+                                height: '100%', width: `${Math.min((user?.aiMessagesLeft || 0) * 10, 100)}%`,
+                                backgroundColor: (user?.aiMessagesLeft || 0) <= 3 ? '#ff4444' : 'var(--color-primary)',
+                                transition: 'width 0.5s ease'
+                            }} />
                         </div>
-                    ) : (
-                        <>
-                            {/* Settings Area */}
-                            <div style={{ padding: '0.5rem', borderBottom: '1px solid #333', backgroundColor: '#222' }}>
-                                {!country ? (
-                                    <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                                        {countries.map(c => (
-                                            <button key={c} onClick={() => setCountry(c)} style={{ whiteSpace: 'nowrap', padding: '0.3rem 0.6rem', borderRadius: '15px', border: '1px solid #555', background: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem' }}>{c}</button>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#aaa', fontSize: '0.8rem' }}>
-                                        <span>📍 {country}</span>
-                                        <button onClick={() => { setCountry(""); setTopic(""); setChallengerStep(0); }} style={{ background: 'none', border: 'none', color: 'var(--color-accent)', cursor: 'pointer' }}>Change</button>
-                                    </div>
-                                )}
+                    )}
 
-                                {country && !topic && (
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                        {topics.map(t => (
-                                            <button key={t.id} onClick={() => setTopic(t.id)} style={{ padding: '0.5rem', borderRadius: '5px', border: '1px solid var(--color-primary)', background: 'rgba(156, 39, 176, 0.1)', color: '#fff', cursor: 'pointer', fontSize: '0.8rem', textAlign: 'left' }}>
-                                                {t.label}
-                                            </button>
-                                        ))}
+                    <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                        {showHistory ? (
+                            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem' }}>
+                                {sessions.map(s => (
+                                    <div key={s.id} onClick={() => loadSession(s)} style={{ padding: '0.8rem', borderRadius: '10px', backgroundColor: '#111', marginBottom: '0.5rem', cursor: 'pointer', border: '1px solid #222' }}>
+                                        <div style={{ color: '#eee', fontSize: '0.85rem' }}>{s.snippet}</div>
                                     </div>
-                                )}
-                                {topic && (
-                                    <div style={{ marginTop: '0.5rem', color: 'var(--color-accent)', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                                        Topic: {topics.find(t => t.id === topic)?.label}
-                                    </div>
-                                )}
+                                ))}
                             </div>
-
-                            {/* Messages or Document Drafter */}
-                            {showDocumentDrafter ? (
-                                <DocumentDrafter
-                                    country={country}
-                                    onClose={() => setShowDocumentDrafter(false)}
-                                />
-                            ) : (
-                                <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    {messages.map((msg, idx) => (
-                                        <div key={idx} style={{
-                                            alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                                            backgroundColor: msg.sender === 'user' ? 'var(--color-primary)' : '#333',
-                                            color: '#fff', padding: '0.8rem', borderRadius: '1rem',
-                                            maxWidth: '85%', fontSize: '0.9rem', whiteSpace: 'pre-wrap'
-                                        }}>
-                                            {msg.text}
+                        ) : (
+                            <>
+                                <div style={{ padding: '0.75rem', borderBottom: '1px solid #222', backgroundColor: '#0d0d0d' }}>
+                                    {!country ? (
+                                        <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
+                                            {countries.map(c => (
+                                                <button key={c} onClick={() => setCountry(c)} style={{ padding: '0.4rem 0.8rem', borderRadius: '20px', backgroundColor: '#111', color: '#fff', border: '1px solid #333', fontSize: '0.75rem' }}>{c}</button>
+                                            ))}
                                         </div>
-                                    ))}
-                                    {topic === 'rights' && country && (
-                                        <button
-                                            onClick={() => setShowDocumentDrafter(true)}
-                                            style={{
-                                                alignSelf: 'flex-start',
-                                                padding: '0.8rem 1rem',
-                                                borderRadius: '10px',
-                                                border: '1px solid var(--color-accent)',
-                                                background: 'rgba(0, 200, 81, 0.1)',
-                                                color: 'var(--color-accent)',
-                                                cursor: 'pointer',
-                                                fontSize: '0.9rem',
-                                                fontWeight: 'bold',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '0.5rem'
-                                            }}
-                                        >
-                                            📝 Draft a Legal Document
-                                        </button>
+                                    ) : (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                                            <span style={{ color: '#fff' }}>📍 {country} {topic && `• ${topics.find(t => t.id === topic)?.label}`}</span>
+                                            <button onClick={() => { setCountry(""); setTopic(""); }} style={{ color: 'var(--color-primary)', background: 'none', border: 'none' }}>Reset</button>
+                                        </div>
                                     )}
-                                    {isLoading && <div style={{ alignSelf: 'flex-start', color: '#888', fontSize: '0.8rem' }}>Thinking...</div>}
+                                    {country && !topic && (
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.75rem' }}>
+                                            {topics.map(t => (
+                                                <button key={t.id} onClick={() => setTopic(t.id)} style={{ padding: '0.5rem', borderRadius: '8px', backgroundColor: '#111', color: '#eee', border: '1px solid #333', fontSize: '0.8rem' }}>{t.label}</button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {messages.map((msg, i) => (
+                                        <div key={i} style={{
+                                            alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                            backgroundColor: msg.sender === 'user' ? 'var(--color-primary)' : '#1a1a1a',
+                                            padding: '0.8rem 1rem', borderRadius: '12px', maxWidth: '85%', fontSize: '0.9rem', color: '#fff'
+                                        }}>{msg.text}</div>
+                                    ))}
+                                    {loading && <div style={{ color: '#666', fontSize: '0.8rem' }}>Oracle is consulting the stars...</div>}
                                     <div ref={messagesEndRef} />
                                 </div>
-                            )}
 
-                            {/* Input Area */}
-                            <div style={{ padding: '1rem', borderTop: '1px solid #333', display: 'flex', gap: '0.5rem' }}>
-                                <input
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                                    placeholder={topic ? `Ask about ${topics.find(t => t.id === topic)?.label}...` : "Select a topic above..."}
-                                    disabled={!topic}
-                                    style={{
-                                        flex: 1, padding: '0.8rem', borderRadius: '20px',
-                                        border: 'none', backgroundColor: '#333', color: '#fff'
-                                    }}
-                                />
-                                <button
-                                    onClick={handleSend}
-                                    disabled={!topic || isLoading}
-                                    style={{
-                                        width: '40px', height: '40px', borderRadius: '50%',
-                                        border: 'none', backgroundColor: (topic && !isLoading) ? 'var(--color-primary)' : '#555',
-                                        color: '#fff', cursor: 'pointer'
-                                    }}
-                                >
-                                    ➤
-                                </button>
-                            </div>
-                        </>
-                    )}
+                                <div style={{ padding: '1.25rem', borderTop: '1px solid #222' }}>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <input
+                                            value={input}
+                                            onChange={(e) => setInput(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                                            placeholder={topic ? "Speak to the Oracle..." : "Select a topic..."}
+                                            style={{ flex: 1, padding: '0.8rem', borderRadius: '12px', border: '1px solid #333', backgroundColor: '#111', color: '#fff', outline: 'none' }}
+                                        />
+                                        <button onClick={handleSend} style={{ width: '45px', height: '45px', borderRadius: '12px', backgroundColor: 'var(--color-primary)', border: 'none', color: '#fff' }}>➤</button>
+                                    </div>
+                                    {!isAiUnlimited && (
+                                        <div style={{ marginTop: '0.8rem', textAlign: 'center', fontSize: '0.7rem', color: '#666' }}>
+                                            {user?.aiMessagesLeft} messages remaining. <a href="#finance" style={{ color: 'var(--color-primary)' }}>Get Unlimited</a>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             )}
         </>
