@@ -202,9 +202,9 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
     const isElite = user?.isElite && (!user?.eliteExpires || new Date(user.eliteExpires) > new Date());
 
     // Growth Duration Calculation
-    // Teens: 300s / 5 transitions = 60s per stage
-    // Adults: 600s / 5 transitions = 120s per stage
-    const STAGE_DURATION = isAdult ? 120000 : 60000;
+    // Teens: 300s / 5 transitions = 60s per stage -> Reduced to 8s
+    // Adults: 600s / 5 transitions = 120s per stage -> Reduced to 15s
+    const STAGE_DURATION = isAdult ? 15000 : 8000;
 
     const [currentLevel, setCurrentLevel] = useState(() => parseInt(localStorage.getItem(isAdult ? 'adultFarmLevel' : 'teenFarmLevel')) || 1);
     const [phase, setPhase] = useState('pick'); // 'pick' | 'growing' | 'done'
@@ -385,7 +385,7 @@ const TeenAdultFarmSimulator = ({ ageGroup = 'teens', currency = '₦' }) => {
                                         position: 'relative',
                                         filter: isLvlLocked ? 'grayscale(1)' : 'none'
                                     }}>
-                                    <span style={{ fontSize: '2.8rem' }}>{isLvlLocked ? '🔒' : isEliteLocked ? '💎' : c.emoji}</span>
+                                    <span style={{ fontSize: '2.8rem', flexShrink: 0 }}>{isLvlLocked ? '🔒' : isEliteLocked ? '💎' : c.emoji}</span>
 
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '4px' }}>

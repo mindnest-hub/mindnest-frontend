@@ -108,8 +108,8 @@ const CROPS = {
     }
 };
 
-// 180s / 6 transitions = 30s per stage
-const STAGE_DURATION = 30000;
+// 180s / 6 transitions = 30s per stage. Reducing to 5s for fast testing/progression
+const STAGE_DURATION = 5000;
 
 const StageTimeline = ({ stages, currentStage }) => (
     <div style={{ marginBottom: '1.5rem', overflowX: 'auto' }}>
@@ -288,7 +288,7 @@ const KidsFarmSimulator = ({ onHarvest, currency = '₦' }) => {
                                         filter: isLocked ? 'grayscale(0.8)' : 'none'
                                     }}
                                 >
-                                    <span style={{ fontSize: '3rem' }}>{isLocked ? '🔒' : c.emoji}</span>
+                                    <span style={{ fontSize: '3rem', flexShrink: 0 }}>{isLocked ? '🔒' : c.emoji}</span>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                             <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: isLocked ? '#444' : c.color, marginBottom: '0.25rem' }}>

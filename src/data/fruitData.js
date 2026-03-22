@@ -100,7 +100,7 @@ export const fruitData = [
             plant: 'Moringa is a "survival tree." It grows incredibly fast even in poor soil. Just stick a seed in the ground.',
             tip: 'Dry the leaves into a powder to add a nutritional "Elite" boost to any meal without changing the flavor much.'
         }
-    }
+    },
     {
         id: 'strawberry',
         name: 'Strawberry',
