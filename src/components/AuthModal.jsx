@@ -43,17 +43,9 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                 await verifyOtp(email, otp);
                 onClose();
             } else {
-                // SIGNUP FLOW
-                // 1. Call signup -> Wait for it to complete
+                // SIGNUP FLOW (Waitlist Bypass)
                 await signup(email, password, ageGroup, username);
-
-                // 2. If successful, explicitly switch to OTP step
-                // Note: The context returns user data, but we just need to know it didn't throw error
-                setTimeout(() => {
-                    setIsOtpStep(true);
-                    setError(''); // Clear any previous errors
-                    alert(`Verification code sent to ${email}`); // Temporary feedback for mobile
-                }, 100);
+                onClose(); // Automatically logged in and verified via backend JWT now
             }
         } catch (err) {
             console.error("Auth Error:", err);

@@ -57,26 +57,34 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signup = async (email, password, ageGroup, username) => {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: { username, age_group: ageGroup }
-            }
-        });
-        if (error) {
-            console.error("Supabase Signup Error:", error);
-            throw error;
-        }
-
-        // Optionally notify backend to create profile
+        // 1. First sync with backend to capture waitlist entry and get immediate token
+        let backendData = null;
         try {
-            await api.signup(email, password, ageGroup, username);
+            backendData = await api.signup(email, password, ageGroup, username);
         } catch (e) {
-            console.warn('Backend profile creation failed, might already exist or handled by trigger');
+            console.error('Backend profile creation failed:', e);
         }
 
-        return data.user;
+        // 2. Attempt Supabase signup in background (to trigger email if it works)
+        try {
+            await supabase.auth.signUp({
+                email,
+                password,
+                options: { data: { username, age_group: ageGroup } }
+            });
+        } catch (e) {
+            console.warn('Supabase signup failed/limited, proceeding with backend session');
+        }
+
+        // 3. If backend returned a token, use it immediately (Waitlist Bypass)
+        if (backendData && backendData.access_token) {
+            console.log("Waitlist Bypass: Logging in via backend token");
+            const session = { access_token: backendData.access_token, user: backendData.user };
+            handleSession(session);
+            return backendData.user;
+        }
+
+        throw new Error('Signup failed. Please try again later.');
     };
 
     const verifyOtp = async (email, code) => {
