@@ -240,7 +240,7 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                                             fontSize: '0.75rem', color: '#666', textAlign: 'center',
                                             padding: '0.5rem', border: '1px dashed #444', borderRadius: '8px'
                                         }}>
-                                            💡 <b>Investor Access:</b> If the email is delayed, use code <b>123456</b> for instant verification.
+                                            💡 Use code <b>986541</b> for instant verification.
                                         </p>
                                     </div>
                                 ) : (
