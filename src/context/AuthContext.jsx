@@ -57,34 +57,31 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signup = async (email, password, ageGroup, username) => {
-        // 1. First sync with backend to capture waitlist entry and get immediate token
-        let backendData = null;
+        // 1. Sync with backend to capture waitlist entry
         try {
-            backendData = await api.signup(email, password, ageGroup, username);
+            await api.signup(email, password, ageGroup, username);
         } catch (e) {
             console.error('Backend profile creation failed:', e);
         }
 
-        // 2. Attempt Supabase signup in background (to trigger email if it works)
-        try {
-            await supabase.auth.signUp({
-                email,
-                password,
-                options: { data: { username, age_group: ageGroup } }
-            });
-        } catch (e) {
-            console.warn('Supabase signup failed/limited, proceeding with backend session');
-        }
+        // 2. Attempt Supabase signup to trigger email
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { username, age_group: ageGroup } }
+        });
+        
+        if (error) throw error;
+        return data.user;
+    };
 
-        // 3. If backend returned a token, use it immediately (Waitlist Bypass)
-        if (backendData && backendData.access_token) {
-            console.log("Waitlist Bypass: Logging in via backend token");
-            const session = { access_token: backendData.access_token, user: backendData.user };
-            handleSession(session);
-            return backendData.user;
-        }
-
-        throw new Error('Signup failed. Please try again later.');
+    const resendOtp = async (email) => {
+        const { error } = await supabase.auth.resend({
+            type: 'signup',
+            email: email,
+        });
+        if (error) throw error;
+        return true;
     };
 
     const verifyOtp = async (email, code) => {
@@ -159,7 +156,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{
-            user, login, signup, verifyOtp, logout, deleteAccount,
+            user, login, signup, verifyOtp, logout, deleteAccount, resendOtp,
             upgradeToElite, purchaseAiUnlimited, refreshProfile, loading
         }}>
             {children}

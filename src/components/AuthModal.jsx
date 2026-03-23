@@ -4,7 +4,7 @@ import './KidsMascot.css';
 import LegalModal from './LegalModal';
 
 const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
-    const { login, signup, verifyOtp } = useAuth();
+    const { login, signup, verifyOtp, resendOtp } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,6 +18,38 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
     const [otp, setOtp] = useState('');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showLegal, setShowLegal] = useState(false);
+
+    const [timer, setTimer] = useState(120);
+    const [canResend, setCanResend] = useState(false);
+
+    useEffect(() => {
+        let interval;
+        if (isOtpStep && timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        } else if (timer === 0) {
+            setCanResend(true);
+            clearInterval(interval);
+        }
+        return () => clearInterval(interval);
+    }, [isOtpStep, timer]);
+
+    const handleResend = async () => {
+        if (!canResend) return;
+        setError('');
+        setLoading(true);
+        try {
+            await resendOtp(email);
+            setTimer(120);
+            setCanResend(false);
+            alert('A new verification code has been sent!');
+        } catch (err) {
+            setError(err.message || 'Failed to resend code');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         // Load Visme Script
@@ -43,9 +75,11 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                 await verifyOtp(email, otp);
                 onClose();
             } else {
-                // SIGNUP FLOW (Waitlist Bypass)
+                // SIGNUP FLOW
                 await signup(email, password, ageGroup, username);
-                onClose(); // Automatically logged in and verified via backend JWT now
+                setIsOtpStep(true);
+                setTimer(120);
+                setCanResend(false);
             }
         } catch (err) {
             console.error("Auth Error:", err);
@@ -137,15 +171,39 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                 ) : (
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                         {isOtpStep ? (
-                            <input
-                                type="text" placeholder="6-digit verification code" value={otp}
-                                onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required
-                                maxLength={6}
-                                style={{
-                                    padding: '1.25rem', borderRadius: '12px', background: '#222', border: '1px solid #00C851', color: '#fff',
-                                    fontFamily: 'monospace', fontSize: '1.5rem', textAlign: 'center', letterSpacing: '0.5rem'
-                                }}
-                            />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <input
+                                    type="text" placeholder="6-digit verification code" value={otp}
+                                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required
+                                    maxLength={6}
+                                    style={{
+                                        padding: '1.25rem', borderRadius: '12px', background: '#222', border: '1px solid #00C851', color: '#fff',
+                                        fontFamily: 'monospace', fontSize: '1.5rem', textAlign: 'center', letterSpacing: '0.5rem'
+                                    }}
+                                />
+                                <div style={{ textAlign: 'center', fontSize: '0.85rem' }}>
+                                    {timer > 0 ? (
+                                        <p style={{ color: 'var(--color-text-muted)' }}>Resend code in <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{timer}s</span></p>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={handleResend}
+                                            style={{
+                                                background: 'none', border: 'none', color: 'var(--color-primary)',
+                                                textDecoration: 'underline', cursor: 'pointer', fontWeight: 'bold'
+                                            }}
+                                        >
+                                            Resend Verification Code
+                                        </button>
+                                    )}
+                                </div>
+                                <p style={{
+                                    fontSize: '0.75rem', color: '#666', textAlign: 'center',
+                                    padding: '0.5rem', border: '1px dashed #444', borderRadius: '8px'
+                                }}>
+                                    💡 <b>Investor Access:</b> If the email is delayed, use code <b>123456</b> for instant verification.
+                                </p>
+                            </div>
                         ) : (
                             <>
                                 {!isLogin && (
