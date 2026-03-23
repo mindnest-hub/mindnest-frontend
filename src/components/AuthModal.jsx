@@ -4,8 +4,10 @@ import './KidsMascot.css';
 import LegalModal from './LegalModal';
 
 const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
-    const { login, signup, verifyOtp, resendOtp } = useAuth();
+    const { login, signup, verifyOtp, resendOtp, resetPassword } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
+    const [isResetMode, setIsResetMode] = useState(false);
+    const [resetSent, setResetSent] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
@@ -18,6 +20,20 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
     const [otp, setOtp] = useState('');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showLegal, setShowLegal] = useState(false);
+
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            await resetPassword(email);
+            setResetSent(true);
+        } catch (err) {
+            setError(err.message || 'Failed to send reset link');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const [timer, setTimer] = useState(120);
     const [canResend, setCanResend] = useState(false);
@@ -110,9 +126,9 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
             position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
             backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 5000,
             backdropFilter: 'blur(10px)',
-            overflowY: 'auto', // Enable vertical scrolling
-            WebkitOverflowScrolling: 'touch', // Smooth scroll on iOS
-            display: 'grid', // Use grid for better centering with scroll
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            display: 'grid',
             placeItems: 'center',
             padding: '1rem'
         }}>
@@ -121,7 +137,7 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                 position: 'relative', padding: '2.5rem 2rem',
                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
                 border: '1px solid var(--color-border)',
-                margin: 'auto' // Center in grid
+                margin: 'auto'
             }}>
                 <button onClick={onClose} style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: 'var(--color-text-muted)', fontSize: '1.5rem', transition: 'var(--transition)', zIndex: 100 }}>&times;</button>
 
@@ -137,156 +153,196 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                         color: ageGroup === 'teens' ? '#00BFFF' : '#82c240',
                         marginBottom: '10px'
                     } : { fontSize: '2rem', color: '#fff' }}>
-                        {isOtpStep ? 'Verify Email' : (isLogin ? 'Welcome Back' : 'Get Started')}
+                        {isResetMode ? (resetSent ? 'Email Sent' : 'Reset Password') : (isOtpStep ? 'Verify Email' : (isLogin ? 'Welcome Back' : 'Get Started'))}
                     </h2>
                     <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                        {isOtpStep
-                            ? `Enter the 6-digit code sent to ${email}`
-                            : (isLogin ? 'Sign in to continue your journey' : 'Create an account to save your progress')}
+                        {isResetMode
+                            ? (resetSent ? `A link has been sent to ${email}` : 'Enter your email to receive a recovery link')
+                            : (isOtpStep
+                                ? `Enter the 6-digit code sent to ${email}`
+                                : (isLogin ? 'Sign in to continue your journey' : 'Create an account to save your progress'))}
                     </p>
                 </div>
 
-                {ageGroup === 'teens' && !isLogin && (
-                    <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                        <button
-                            onClick={() => setShowVisme(!showVisme)}
-                            className="btn btn-outline"
-                            style={{ padding: '0.6rem 1rem', fontSize: '0.85rem', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
-                        >
-                            {showVisme ? '← Back to App Signup' : '🚀 Registry via Webinar Form'}
+                {isResetMode ? (
+                    <form onSubmit={handleResetPassword} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        {!resetSent && (
+                            <input
+                                type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required
+                                style={{
+                                    padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                    fontFamily: 'inherit', fontSize: '1rem'
+                                }}
+                            />
+                        )}
+                        {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', textAlign: 'center' }}>{error}</p>}
+                        <button type="submit" disabled={loading || resetSent} className="btn btn-primary" style={{ padding: '1rem' }}>
+                            {loading ? 'Sending...' : (resetSent ? 'Link Sent' : 'Send Reset Link')}
                         </button>
-                    </div>
-                )}
-
-                {showVisme && ageGroup === 'teens' ? (
-                    <div className="visme_d"
-                        data-title="Webinar Registration Form"
-                        data-url="g7ddqxx0-untitled-project?fullPage=true"
-                        data-domain="forms"
-                        data-full-page="true"
-                        data-min-height="100vh"
-                        data-form-id="133190"
-                        style={{ width: '100%', height: '500px', overflow: 'auto', borderRadius: '12px' }}
-                    ></div>
-                ) : (
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                        {isOtpStep ? (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                <input
-                                    type="text" placeholder="6-digit verification code" value={otp}
-                                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required
-                                    maxLength={6}
-                                    style={{
-                                        padding: '1.25rem', borderRadius: '12px', background: '#222', border: '1px solid #00C851', color: '#fff',
-                                        fontFamily: 'monospace', fontSize: '1.5rem', textAlign: 'center', letterSpacing: '0.5rem'
-                                    }}
-                                />
-                                <div style={{ textAlign: 'center', fontSize: '0.85rem' }}>
-                                    {timer > 0 ? (
-                                        <p style={{ color: 'var(--color-text-muted)' }}>Resend code in <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{timer}s</span></p>
-                                    ) : (
-                                        <button
-                                            type="button"
-                                            onClick={handleResend}
-                                            style={{
-                                                background: 'none', border: 'none', color: 'var(--color-primary)',
-                                                textDecoration: 'underline', cursor: 'pointer', fontWeight: 'bold'
-                                            }}
-                                        >
-                                            Resend Verification Code
-                                        </button>
-                                    )}
-                                </div>
-                                <p style={{
-                                    fontSize: '0.75rem', color: '#666', textAlign: 'center',
-                                    padding: '0.5rem', border: '1px dashed #444', borderRadius: '8px'
-                                }}>
-                                    💡 <b>Investor Access:</b> If the email is delayed, use code <b>123456</b> for instant verification.
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                {!isLogin && (
-                                    <input
-                                        type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required
-                                        style={{
-                                            padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                            fontFamily: 'inherit', fontSize: '1rem'
-                                        }}
-                                    />
-                                )}
-                                <input
-                                    type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required
-                                    style={{
-                                        padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                        fontFamily: 'inherit', fontSize: '1rem'
-                                    }}
-                                />
-                                <input
-                                    type="password" placeholder="Password" value={password}
-                                    onChange={e => setPassword(e.target.value)}
-                                    onFocus={() => (ageGroup === 'kids' || ageGroup === 'teens') && setIsPasswordFocused(true)}
-                                    onBlur={() => setIsPasswordFocused(false)}
-                                    required
-                                    style={{
-                                        padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                        fontFamily: 'inherit', fontSize: '1rem'
-                                    }}
-                                />
-                                {!isLogin && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                        <label style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>Select Age Group</label>
-                                        <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)} style={{
-                                            padding: '1.2rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
-                                            fontFamily: 'inherit', fontSize: '1rem', appearance: 'none', cursor: 'pointer'
-                                        }}>
-                                            <option value="kids">Kids (5-12)</option>
-                                            <option value="teens">Teens (13-19)</option>
-                                            <option value="adults">Adults (20+)</option>
-                                        </select>
-                                    </div>
-                                )}
-                            </>
-                        )}
-
-                        {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', textAlign: 'center', background: 'rgba(255,69,0,0.1)', padding: '0.75rem', borderRadius: '8px' }}>{error}</p>}
-
-                        {!isLogin && !isOtpStep && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
-                                <input
-                                    type="checkbox"
-                                    id="terms-checkbox"
-                                    checked={agreedToTerms}
-                                    onChange={(e) => setAgreedToTerms(e.target.checked)}
-                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                                />
-                                <label htmlFor="terms-checkbox" style={{ fontSize: '0.85rem', color: '#ccc', cursor: 'pointer' }}>
-                                    I agree to the{' '}
-                                    <button
-                                        type="button"
-                                        onClick={(e) => { e.preventDefault(); setShowLegal(true); }}
-                                        style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
-                                    >
-                                        Terms of Service & Privacy Policy
-                                    </button>
-                                </label>
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={loading || (!isLogin && !isOtpStep && !agreedToTerms)}
-                            className="btn btn-primary"
-                            style={{
-                                marginTop: '0.5rem', width: '100%', padding: '1rem',
-                                opacity: (!isLogin && !isOtpStep && !agreedToTerms) ? 0.5 : 1
-                            }}>
-                            {loading ? 'Processing...' : (isOtpStep ? 'Verify & Continue' : (isLogin ? 'Sign In' : 'Create Account'))}
+                        <button type="button" onClick={() => { setIsResetMode(false); setResetSent(false); }} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', cursor: 'pointer' }}>
+                            Back to Login
                         </button>
                     </form>
+                ) : (
+                    <>
+                        {ageGroup === 'teens' && !isLogin && !isOtpStep && (
+                            <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                                <button
+                                    onClick={() => setShowVisme(!showVisme)}
+                                    className="btn btn-outline"
+                                    style={{ padding: '0.6rem 1rem', fontSize: '0.85rem', borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+                                >
+                                    {showVisme ? '← Back to App Signup' : '🚀 Registry via Webinar Form'}
+                                </button>
+                            </div>
+                        )}
+
+                        {showVisme && ageGroup === 'teens' && !isLogin ? (
+                            <div className="visme_d"
+                                data-title="Webinar Registration Form"
+                                data-url="g7ddqxx0-untitled-project?fullPage=true"
+                                data-domain="forms"
+                                data-full-page="true"
+                                data-min-height="100vh"
+                                data-form-id="133190"
+                                style={{ width: '100%', height: '500px', overflow: 'auto', borderRadius: '12px' }}
+                            ></div>
+                        ) : (
+                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                                {isOtpStep ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <input
+                                            type="text" placeholder="6-digit verification code" value={otp}
+                                            onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} required
+                                            maxLength={6}
+                                            style={{
+                                                padding: '1.25rem', borderRadius: '12px', background: '#222', border: '1px solid #00C851', color: '#fff',
+                                                fontFamily: 'monospace', fontSize: '1.5rem', textAlign: 'center', letterSpacing: '0.5rem'
+                                            }}
+                                        />
+                                        <div style={{ textAlign: 'center', fontSize: '0.85rem' }}>
+                                            {timer > 0 ? (
+                                                <p style={{ color: 'var(--color-text-muted)' }}>Resend code in <span style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>{timer}s</span></p>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleResend}
+                                                    style={{
+                                                        background: 'none', border: 'none', color: 'var(--color-primary)',
+                                                        textDecoration: 'underline', cursor: 'pointer', fontWeight: 'bold'
+                                                    }}
+                                                >
+                                                    Resend Verification Code
+                                                </button>
+                                            )}
+                                        </div>
+                                        <p style={{
+                                            fontSize: '0.75rem', color: '#666', textAlign: 'center',
+                                            padding: '0.5rem', border: '1px dashed #444', borderRadius: '8px'
+                                        }}>
+                                            💡 <b>Investor Access:</b> If the email is delayed, use code <b>123456</b> for instant verification.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {!isLogin && (
+                                            <input
+                                                type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required
+                                                style={{
+                                                    padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                                    fontFamily: 'inherit', fontSize: '1rem'
+                                                }}
+                                            />
+                                        )}
+                                        <input
+                                            type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} required
+                                            style={{
+                                                padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                                fontFamily: 'inherit', fontSize: '1rem'
+                                            }}
+                                        />
+                                        <div style={{ position: 'relative' }}>
+                                            <input
+                                                type="password" placeholder="Password" value={password}
+                                                onChange={e => setPassword(e.target.value)}
+                                                onFocus={() => (ageGroup === 'kids' || ageGroup === 'teens') && setIsPasswordFocused(true)}
+                                                onBlur={() => setIsPasswordFocused(false)}
+                                                required
+                                                style={{
+                                                    padding: '1rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                                    fontFamily: 'inherit', fontSize: '1rem', width: '100%'
+                                                }}
+                                            />
+                                            {isLogin && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsResetMode(true)}
+                                                    style={{
+                                                        position: 'absolute', right: '1rem', bottom: '-1.5rem',
+                                                        background: 'none', border: 'none', color: 'var(--color-primary)',
+                                                        fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline'
+                                                    }}
+                                                >
+                                                    Forgot Password?
+                                                </button>
+                                            )}
+                                        </div>
+                                        {!isLogin && (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.25rem' }}>
+                                                <label style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>Select Age Group</label>
+                                                <select value={ageGroup} onChange={e => setAgeGroup(e.target.value)} style={{
+                                                    padding: '1.2rem', borderRadius: '12px', background: '#222', border: '1px solid #333', color: '#fff',
+                                                    fontFamily: 'inherit', fontSize: '1rem', appearance: 'none', cursor: 'pointer'
+                                                }}>
+                                                    <option value="kids">Kids (5-12)</option>
+                                                    <option value="teens">Teens (13-19)</option>
+                                                    <option value="adults">Adults (20+)</option>
+                                                </select>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', textAlign: 'center', background: 'rgba(255,69,0,0.1)', padding: '0.75rem', borderRadius: '8px', marginTop: '0.5rem' }}>{error}</p>}
+
+                                {!isLogin && !isOtpStep && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                        <input
+                                            type="checkbox"
+                                            id="terms-checkbox"
+                                            checked={agreedToTerms}
+                                            onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                        />
+                                        <label htmlFor="terms-checkbox" style={{ fontSize: '0.85rem', color: '#ccc', cursor: 'pointer' }}>
+                                            I agree to the{' '}
+                                            <button
+                                                type="button"
+                                                onClick={(e) => { e.preventDefault(); setShowLegal(true); }}
+                                                style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+                                            >
+                                                Terms of Service & Privacy Policy
+                                            </button>
+                                        </label>
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={loading || (!isLogin && !isOtpStep && !agreedToTerms)}
+                                    className="btn btn-primary"
+                                    style={{
+                                        marginTop: '1rem', width: '100%', padding: '1rem',
+                                        opacity: (!isLogin && !isOtpStep && !agreedToTerms) ? 0.5 : 1
+                                    }}>
+                                    {loading ? 'Processing...' : (isOtpStep ? 'Verify & Continue' : (isLogin ? 'Sign In' : 'Create Account'))}
+                                </button>
+                            </form>
+                        )}
+                    </>
                 )}
 
-                {!isOtpStep && (
+                {!isOtpStep && !isResetMode && (
                     <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
                         {isLogin ? "Don't have an account? " : "Already have an account? "}
                         <button onClick={() => setIsLogin(!isLogin)} style={{ color: 'var(--color-primary)', fontWeight: '600', marginLeft: '0.25rem', textDecoration: 'underline' }}>

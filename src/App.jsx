@@ -21,6 +21,7 @@ import Habits from './pages/Habits';
 import Relationships from './pages/Relationships';
 import Purpose from './pages/Purpose';
 import Transparency from './pages/Transparency';
+import ResetPassword from './pages/ResetPassword';
 
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
@@ -66,6 +67,9 @@ function App() {
                 <Route path="/relationships" element={<Relationships ageGroup={ageGroup} />} />
                 <Route path="/purpose" element={<Purpose ageGroup={ageGroup} />} />
                 <Route path="/transparency" element={<Transparency />} />
+                
+                <Route path="/reset-password" element={<ResetPassword />} />
+                
                 <Route path="/admin" element={
                   <ProtectedRoute adminOnly={true}>
                     <AdminDashboard />
