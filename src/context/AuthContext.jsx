@@ -57,38 +57,37 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signup = async (email, password, ageGroup, username) => {
-        // 1. Sync with backend to capture waitlist entry
-        try {
-            await api.signup(email, password, ageGroup, username);
-        } catch (e) {
-            console.error('Backend profile creation failed:', e);
-        }
+        // 1. Create Profile in Backend (this sends the email via Resend)
+        const response = await api.signup(email, password, ageGroup, username);
+        if (response.error) throw new Error(response.error);
 
-        // 2. Attempt Supabase signup to trigger email
+        // 2. Also register in Supabase for identity synchronization (optional but good for social logins later)
+        // We ignore the email from Supabase (it's often blocked anyway)
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: { data: { username, age_group: ageGroup } }
         });
         
-        if (error) throw error;
+        if (error) console.warn('Supabase sync warning:', error.message);
         return data.user;
     };
 
     const resendOtp = async (email) => {
-        const { error } = await supabase.auth.resend({
-            type: 'signup',
-            email: email,
-        });
-        if (error) throw error;
-        return true;
+        const response = await api.resendOtp(email);
+        return response;
     };
 
     const verifyOtp = async (email, code) => {
-        const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type: 'signup' });
-        if (error) throw error;
+        const data = await api.verifyOtp(email, code);
+        // data contains { access_token, user }
+        if (data.access_token) {
+            localStorage.setItem('token', data.access_token);
+            setUser(data.user);
+        }
         return data.user;
     };
+
 
     const resetPassword = async (email) => {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {

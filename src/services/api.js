@@ -71,11 +71,33 @@ export const api = {
     },
 
     verifyOtp: async (email, code) => {
-        // Supabase handles OTP verification on frontend usually
-        return { success: true };
+        const res = await fetch(`${API_URL}/auth/verify-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code }),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Verification failed');
+        }
+        return res.json();
+    },
+
+    resendOtp: async (email) => {
+        const res = await fetch(`${API_URL}/auth/resend-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to resend code');
+        }
+        return res.json();
     },
 
     login: async (email, password) => {
+
         // Supabase handles login on frontend
         return { success: true };
     },
