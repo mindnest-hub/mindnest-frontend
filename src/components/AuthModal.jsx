@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './KidsMascot.css';
+import LegalModal from './LegalModal';
 
 const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
     const { login, signup, verifyOtp } = useAuth();
@@ -15,6 +16,8 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
     const [showVisme, setShowVisme] = useState(false);
     const [isOtpStep, setIsOtpStep] = useState(false);
     const [otp, setOtp] = useState('');
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [showLegal, setShowLegal] = useState(false);
 
     useEffect(() => {
         // Load Visme Script
@@ -198,7 +201,36 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
 
                         {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', textAlign: 'center', background: 'rgba(255,69,0,0.1)', padding: '0.75rem', borderRadius: '8px' }}>{error}</p>}
 
-                        <button type="submit" disabled={loading} className="btn btn-primary" style={{ marginTop: '0.5rem', width: '100%', padding: '1rem' }}>
+                        {!isLogin && !isOtpStep && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                                <input
+                                    type="checkbox"
+                                    id="terms-checkbox"
+                                    checked={agreedToTerms}
+                                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                />
+                                <label htmlFor="terms-checkbox" style={{ fontSize: '0.85rem', color: '#ccc', cursor: 'pointer' }}>
+                                    I agree to the{' '}
+                                    <button
+                                        type="button"
+                                        onClick={(e) => { e.preventDefault(); setShowLegal(true); }}
+                                        style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+                                    >
+                                        Terms of Service & Privacy Policy
+                                    </button>
+                                </label>
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading || (!isLogin && !isOtpStep && !agreedToTerms)}
+                            className="btn btn-primary"
+                            style={{
+                                marginTop: '0.5rem', width: '100%', padding: '1rem',
+                                opacity: (!isLogin && !isOtpStep && !agreedToTerms) ? 0.5 : 1
+                            }}>
                             {loading ? 'Processing...' : (isOtpStep ? 'Verify & Continue' : (isLogin ? 'Sign In' : 'Create Account'))}
                         </button>
                     </form>
@@ -213,6 +245,7 @@ const AuthModal = ({ onClose, ageGroup: initialAgeGroup }) => {
                     </div>
                 )}
             </div>
+            {showLegal && <LegalModal onClose={() => setShowLegal(false)} />}
         </div>
     );
 };

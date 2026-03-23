@@ -12,7 +12,7 @@ import { useWallet } from '../hooks/useWallet';
 
 const Home = ({ ageGroup, setAgeGroup }) => {
     const navigate = useNavigate();
-    const { user, logout, upgradeToElite } = useAuth();
+    const { user, logout, deleteAccount, upgradeToElite } = useAuth();
     const { points, level, streak, getRankInfo, getNextRankInfo } = useGamification();
     const { balance, refreshBalance } = useWallet();
     const [showAgeModal, setShowAgeModal] = useState(!ageGroup);
@@ -22,6 +22,8 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     const [hasShownAuthPrompt, setHasShownAuthPrompt] = useState(false);
     const [upgrading, setUpgrading] = useState(false);
     const [toast, setToast] = useState(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const rank = getRankInfo();
     const nextRank = getNextRankInfo();
@@ -35,6 +37,17 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                 setShowAuthModal(true);
                 setHasShownAuthPrompt(true);
             }, 500);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        setIsDeleting(true);
+        try {
+            await deleteAccount();
+        } catch (error) {
+            alert('Failed to delete account. Please try again or contact support.');
+            setIsDeleting(false);
+            setShowDeleteConfirm(false);
         }
     };
 
@@ -139,12 +152,19 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                         </button>
                     )}
                     {user ? (
-                        <button onClick={logout} className="btn-outline" style={{
-                            padding: '0.4rem 0.8rem',
-                            fontSize: '0.8rem',
-                            borderRadius: '8px',
-                            border: '1px solid var(--color-border)'
-                        }}>Logout</button>
+                        <>
+                            <button onClick={() => setShowDeleteConfirm(true)} className="btn-outline" style={{
+                                padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '8px',
+                                border: '1px solid var(--color-danger)', color: 'var(--color-danger)',
+                                marginRight: '0.5rem'
+                            }}>Delete Account</button>
+                            <button onClick={logout} className="btn-outline" style={{
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.8rem',
+                                borderRadius: '8px',
+                                border: '1px solid var(--color-border)'
+                            }}>Logout</button>
+                        </>
                     ) : (
                         <button onClick={() => setShowAuthModal(true)} className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.9rem' }}>
                             Sign In
@@ -274,6 +294,26 @@ const Home = ({ ageGroup, setAgeGroup }) => {
             <footer style={{ marginTop: '8rem', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
                 &copy; {new Date().getFullYear()} MindNest Africa. For the people, by the people.
             </footer>
+
+            {showDeleteConfirm && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                    backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 6000, display: 'grid', placeItems: 'center', padding: '1rem'
+                }}>
+                    <div className="card" style={{ maxWidth: '400px', textAlign: 'center' }}>
+                        <h2 style={{ color: 'var(--color-danger)', marginBottom: '1rem' }}>Delete Account?</h2>
+                        <p style={{ color: '#ccc', marginBottom: '2rem' }}>
+                            Are you absolutely sure? This will permanently delete your progress, wallet balance, and all associated data. This action CANNOT be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button onClick={() => setShowDeleteConfirm(false)} className="btn btn-outline" disabled={isDeleting}>Cancel</button>
+                            <button onClick={handleDeleteAccount} className="btn" style={{ background: 'var(--color-danger)', color: '#fff' }} disabled={isDeleting}>
+                                {isDeleting ? 'Deleting...' : 'Yes, Delete'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

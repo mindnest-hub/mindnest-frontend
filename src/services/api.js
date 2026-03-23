@@ -92,6 +92,18 @@ export const api = {
         return res.json();
     },
 
+    deleteAccount: async (token) => {
+        const res = await fetch(`${API_URL}/user/account`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to delete account');
+        }
+        return res.json();
+    },
+
     updateProgress: async (token, data) => {
         const res = await fetch(`${API_URL}/user/progress`, {
             method: 'PATCH',

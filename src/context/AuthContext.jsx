@@ -123,6 +123,21 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const deleteAccount = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No active session');
+        try {
+            await api.deleteAccount(token);
+            // After successful deletion on backend, log out of Supabase
+            await supabase.auth.signOut();
+            localStorage.removeItem('token');
+            setUser(null);
+        } catch (error) {
+            console.error('Failed to delete account:', error);
+            throw error;
+        }
+    };
+
     const refreshProfile = async () => {
         const token = localStorage.getItem('token');
         if (!token) return;
@@ -136,7 +151,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{
-            user, login, signup, verifyOtp, logout,
+            user, login, signup, verifyOtp, logout, deleteAccount,
             upgradeToElite, purchaseAiUnlimited, refreshProfile, loading
         }}>
             {children}
