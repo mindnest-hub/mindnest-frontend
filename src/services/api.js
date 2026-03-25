@@ -1,4 +1,9 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = (() => {
+    const url = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    console.log(`[API] Using Backend at: ${url}`);
+    return url;
+})();
+
 
 // Local storage fallback functions
 const localAuth = {
@@ -63,12 +68,13 @@ export const api = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password, ageGroup, username }),
             });
-            // We ignore failures here as Supabase is the primary auth now
             return res.json();
         } catch (error) {
-            return { success: false, error: error.message };
+            console.error(`[API ERROR] Signup failed at ${API_URL}/auth/signup:`, error.message);
+            return { success: false, error: `Connection failed: ${error.message}. Please Check your VITE_API_URL settings.` };
         }
     },
+
 
     verifyOtp: async (email, code) => {
         const res = await fetch(`${API_URL}/auth/verify-otp`, {
