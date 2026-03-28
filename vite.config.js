@@ -34,7 +34,7 @@ export default defineConfig({
       }
     })
   ],
-  base: './', // Fixes file:// access (blank screen on PC)
+  base: '/', // Fixes Vercel 404 (root access)
   server: {
     host: true, // Exposes to network (fixes phone access)
   },
