@@ -15,13 +15,12 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     const { user, logout, deleteAccount, upgradeToElite } = useAuth();
     const { points, level, streak, getRankInfo, getNextRankInfo } = useGamification();
     const { balance, refreshBalance } = useWallet();
+    
     const [showAgeModal, setShowAgeModal] = useState(!ageGroup);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [showPaymentPortal, setShowPaymentPortal] = useState(false);
-    const [hasShownAuthPrompt, setHasShownAuthPrompt] = useState(false);
     const [upgrading, setUpgrading] = useState(false);
-    const [toast, setToast] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -32,284 +31,172 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     const handleAgeSelect = (group) => {
         setAgeGroup(group);
         setShowAgeModal(false);
-        if (!user && !hasShownAuthPrompt) {
-            setTimeout(() => {
-                setShowAuthModal(true);
-                setHasShownAuthPrompt(true);
-            }, 500);
-        }
     };
 
-    const handleDeleteAccount = async () => {
-        setIsDeleting(true);
-        try {
-            await deleteAccount();
-        } catch (error) {
-            alert('Failed to delete account. Please try again or contact support.');
-            setIsDeleting(false);
-            setShowDeleteConfirm(false);
+    const dashboardItems = [
+        { 
+            id: 'learning',
+            title: 'Continue Module', 
+            icon: '📚', 
+            content: 'History: Discovering African Wisdom',
+            progress: 65,
+            meta: '3 lessons left',
+            action: () => navigate('/history'),
+            color: '#C5A019'
+        },
+        { 
+            id: 'ai',
+            title: 'Ask AI Expert', 
+            icon: '🤖', 
+            content: 'Need help with land or business?',
+            meta: 'Instant answers on laws & rights',
+            action: () => navigate('/ai'),
+            color: '#00BFFF'
+        },
+        { 
+            id: 'ops',
+            title: 'Early Opportunities', 
+            icon: '💼', 
+            content: 'Agri Business Training available now',
+            meta: '2 new grants found',
+            action: () => navigate('/opportunities'),
+            color: '#006B3C'
+        },
+        { 
+            id: 'legal',
+            title: 'Legal Help', 
+            icon: '⚖️', 
+            content: 'Professional legal consultation',
+            meta: 'Verified lawyers available',
+            action: () => navigate('/services'),
+            color: '#FF4500'
         }
-    };
-
-    const handleUpgradeElite = async () => {
-        if (!window.confirm('Upgrade to Elite Membership for ₦5,000?')) return;
-
-        setUpgrading(true);
-        try {
-            await upgradeToElite();
-            setToast({ message: 'Welcome to the Elite, MindNest Champion! 💎', type: 'success' });
-        } catch (error) {
-            setToast({ message: error.message || 'Upgrade failed. Check balance.', type: 'error' });
-        } finally {
-            setUpgrading(false);
-        }
-    };
-
-    const pillars = [
-        { id: 1, title: 'History & Identity', icon: '🌍', desc: ageGroup === 'adults' ? 'Strategic lessons from African roots and global systems.' : 'Discover your roots and stories of African innovation.', path: '/history', color: '#B8860B' },
-        { id: 2, title: 'Financial Literacy', icon: '💰', desc: ageGroup === 'adults' ? 'Wealth building, investments, and risk management.' : 'Master saving habits and a healthy money mindset.', path: '/finance', color: '#00A86B' },
-        { id: 3, title: 'Critical Thinking', icon: '🧠', desc: ageGroup === 'adults' ? 'Risk analysis and strategic decision frameworks.' : 'Logic puzzles and bias awareness training.', path: '/critical-thinking', color: '#CD5C5C' },
-        { id: 4, title: 'Agripreneurship', icon: '🌱', desc: ageGroup === 'adults' ? 'Farming business, supply chains, and agri-finance.' : 'Sustainable food systems and farming awareness.', path: '/agri', color: '#2E8B57' },
-        { id: 5, title: 'Tech & AI', icon: '💻', desc: ageGroup === 'adults' ? 'AI productivity, automation, and digital income.' : 'AI awareness, digital skills, and cyber safety.', path: '/tech', color: '#4682B4' },
-        { id: 6, title: 'Health & Wellness', icon: '🌿', desc: ageGroup === 'adults' ? 'Integrated physical health and mental stability.' : 'Building healthy habits for body and mind.', path: '/health', color: '#DB7093' },
-        { id: 7, title: 'Civics & Ethics', icon: '⚖️', desc: ageGroup === 'adults' ? 'Governance, social responsibility, and leadership.' : 'Responsibility, ethics, and community awareness.', path: '/civics', color: '#DAA520' },
     ];
 
     return (
-        <div className="container" style={{ paddingBottom: '4rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <div className="dashboard-wrapper animate-fade">
             <LiveNotifications />
             <DailyBonus />
+            
             {showAuthModal && <AuthModal ageGroup={ageGroup} onClose={() => setShowAuthModal(false)} />}
             {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
             {showAgeModal && <AgeSelector onSelect={handleAgeSelect} />}
             {showPaymentPortal && <PaymentPortal onClose={() => setShowPaymentPortal(false)} onBalanceUpdate={refreshBalance} />}
 
-            {/* Navigation Header */}
-            <nav style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '1.5rem 0',
-                marginBottom: '1rem',
-                borderBottom: '1px solid var(--color-border)',
-                flexWrap: 'wrap',
-                gap: '1rem'
-            }}>
-                <div
-                    onClick={() => {
-                        localStorage.removeItem('ageGroup');
-                        window.location.reload();
-                    }}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
-                >
-                    <div style={{
-                        width: '40px',
-                        height: '40px',
-                        background: 'var(--color-primary)',
-                        borderRadius: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '1.2rem'
-                    }}>🛡️</div>
-                    <span style={{
-                        fontSize: '1.5rem',
-                        fontWeight: '700',
-                        fontFamily: 'var(--font-heading)',
-                        color: '#fff'
-                    }}>MindNest</span>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', gap: '0.8rem', marginRight: '1rem', alignItems: 'center' }}>
-                        <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => setShowPaymentPortal(true)}>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Wallet</div>
-                            <div style={{ fontWeight: '700', color: user ? '#00C851' : 'var(--color-text-muted)' }}>
-                                ₦{balance.toLocaleString()}
-                                {!user && <span style={{ fontSize: '0.6rem', display: 'block', color: '#ffa500' }}>Guest Mode</span>}
-                            </div>
-                        </div>
-                        <div style={{ height: '20px', width: '1px', background: 'var(--color-border)' }}></div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Points</div>
-                            <div style={{ fontWeight: '700', color: 'var(--color-primary)' }}>{points.toLocaleString()}</div>
-                        </div>
-                        <div style={{ height: '20px', width: '1px', background: 'var(--color-border)' }}></div>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Streak</div>
-                            <div style={{ fontWeight: '700', color: '#FF4500' }}>🔥 {streak}</div>
-                        </div>
+            {/* WELCOME SECTION */}
+            <header className="mb-8 mt-4 lg:mt-0 px-2">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-white mb-1">
+                            Welcome, {user?.username || 'Champion'} 🦁
+                        </h1>
+                        <p className="text-slate-400 text-sm">
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        </p>
                     </div>
-                    <button onClick={() => setShowPaymentPortal(true)} className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', backgroundColor: '#00C851', borderColor: '#00C851' }}>
-                        + Fund
-                    </button>
-                    <button onClick={() => setShowLeaderboard(true)} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>
-                        🏆 Ranking
-                    </button>
-                    {user?.isAdmin && (
-                        <button onClick={() => navigate('/admin')} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', borderColor: '#FFD700', color: '#FFD700' }}>
-                            ⚙️ Admin
-                        </button>
-                    )}
-                    {user ? (
-                        <>
-                            <button onClick={() => setShowDeleteConfirm(true)} className="btn-outline" style={{
-                                padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '8px',
-                                border: '1px solid var(--color-danger)', color: 'var(--color-danger)',
-                                marginRight: '0.5rem'
-                            }}>Delete Account</button>
-                            <button onClick={logout} className="btn-outline" style={{
-                                padding: '0.4rem 0.8rem',
-                                fontSize: '0.8rem',
-                                borderRadius: '8px',
-                                border: '1px solid var(--color-border)'
-                            }}>Logout</button>
-                        </>
-                    ) : (
-                        <button onClick={() => setShowAuthModal(true)} className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.9rem' }}>
-                            Sign In
-                        </button>
-                    )}
-                </div>
-            </nav>
-
-            {/* Gamification Dashboard Header */}
-            <div style={{
-                background: 'rgba(255,255,255,0.02)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '16px',
-                padding: '1.5rem',
-                marginBottom: '3rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '2rem',
-                flexWrap: 'wrap'
-            }}>
-                <div style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, var(--color-primary), #B8860B)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '2.5rem',
-                    boxShadow: '0 0 20px rgba(184, 134, 11, 0.3)'
-                }}>
-                    {rank.icon}
-                </div>
-                <div style={{ flex: 1, minWidth: '200px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.5rem' }}>
-                        <div>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Current Rank</span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <h2 style={{ fontSize: '1.5rem', margin: 0, color: 'var(--color-primary)' }}>{level}</h2>
-                                {user?.isElite && (
-                                    <span style={{
-                                        padding: '0.2rem 0.6rem',
-                                        borderRadius: '20px',
-                                        background: 'linear-gradient(90deg, #FFD700, #FFA500)',
-                                        color: '#000',
-                                        fontSize: '0.6rem',
-                                        fontWeight: 'bold',
-                                        textTransform: 'uppercase'
-                                    }}>Elite</span>
-                                )}
-                            </div>
-                        </div>
-                        {nextRank && (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                                {points} / {nextRank.min} to {nextRank.name}
-                            </span>
+                    <div className="flex items-center gap-2">
+                        {!user && (
+                            <button onClick={() => setShowAuthModal(true)} className="btn btn-primary px-6 py-2">
+                                Complete Signup
+                            </button>
+                        )}
+                        {user?.isAdmin && (
+                            <button onClick={() => navigate('/admin')} className="btn btn-outline px-4 py-2 border-yellow-400 text-yellow-400">
+                                ⚙️ Admin
+                            </button>
                         )}
                     </div>
-                    <div style={{ height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ width: `${Math.min(progressToNext, 100)}%`, height: '100%', background: 'var(--color-primary)', transition: 'width 0.5s ease' }}></div>
-                    </div>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <div className="badge-item" style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', filter: points > 100 ? 'none' : 'grayscale(1)' }}>🥇</div>
-                    <div className="badge-item" style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', filter: points > 1000 ? 'none' : 'grayscale(1)' }}>💎</div>
-                    <div className="badge-item" style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', filter: points > 5000 ? 'none' : 'grayscale(1)' }}>🏛️</div>
-                </div>
-            </div>
+            </header>
 
-            {/* Elite Upgrade Section */}
-            {user && !user.isElite && (
-                <div className="card animate-fade" style={{
-                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,165,0,0.05) 100%)',
-                    border: '2px solid rgba(255,215,0,0.3)',
-                    marginBottom: '3rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '2rem'
-                }}>
-                    <div>
-                        <h2 style={{ color: '#FFD700', marginBottom: '0.5rem' }}>Unlock Mastery & AI Mentor 🔓</h2>
-                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                            {user?.hasUsedEarningsForElite
-                                ? "Mastery renewal requires a funded balance from a real deposit. One-time earnings allowance used."
-                                : "Get personalized guidance from your AI Mentor and unlock Mastery levels in every pillar."}
-                        </p>
-                    </div>
-                    <button
-                        disabled={upgrading}
-                        onClick={handleUpgradeElite}
-                        className="btn btn-primary"
-                        style={{
-                            background: 'linear-gradient(90deg, #FFD700, #FFA500)',
-                            border: 'none',
-                            color: '#000',
-                            fontWeight: 'bold',
-                            padding: '1rem 2rem'
-                        }}
-                    >
-                        {upgrading ? 'Upgrading...' : 'Upgrade for ₦9,000 / year'}
-                    </button>
-                </div>
-            )}
-
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '2rem'
-            }}>
-                {pillars.map((pillar) => (
-                    <div key={pillar.id} className="card animate-fade" style={{ borderTop: `4px solid ${pillar.color}`, display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>{pillar.icon}</div>
-                        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.8rem' }}>{pillar.title}</h2>
-                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginBottom: '2rem' }}>{pillar.desc}</p>
-                        <button
-                            className="btn btn-outline"
-                            style={{ marginTop: 'auto', width: '100%' }}
-                            onClick={() => navigate(pillar.path)}
-                        >
-                            Start Learning
-                        </button>
+            {/* QUICK STATS BAR */}
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[
+                    { label: 'Level', val: level, icon: rank.icon, color: 'var(--color-primary)' },
+                    { label: 'Points', val: points.toLocaleString(), icon: '💰', color: '#fbbf24' },
+                    { label: 'Streak', val: `${streak} Days`, icon: '🔥', color: '#f97316' },
+                    { label: 'Wallet', val: `₦${balance.toLocaleString()}`, icon: '💳', color: '#10b981' },
+                ].map((stat, i) => (
+                    <div key={i} className="card p-4 flex flex-col items-center justify-center text-center">
+                        <span className="text-2xl mb-1">{stat.icon}</span>
+                        <span className="text-xs uppercase tracking-widest text-slate-500 mb-1">{stat.label}</span>
+                        <span className="text-xl font-bold" style={{ color: stat.color }}>{stat.val}</span>
                     </div>
                 ))}
-            </div>
+            </section>
 
-            <footer style={{ marginTop: '8rem', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                &copy; {new Date().getFullYear()} MindNest Africa. For the people, by the people.
-            </footer>
+            {/* DASHBOARD GRID */}
+            <section className="grid-cols md:grid-cols-2 lg:grid-cols-2 gap-6">
+                {dashboardItems.map((item) => (
+                    <div 
+                        key={item.id} 
+                        onClick={item.action}
+                        className="card group cursor-pointer border-l-4 p-6 transition-all hover:bg-slate-900"
+                        style={{ borderLeftColor: item.color }}
+                    >
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                                {item.icon}
+                            </div>
+                            <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded-full uppercase tracking-widest">
+                                {item.title}
+                            </span>
+                        </div>
+                        <h3 className="text-xl mb-2 group-hover:text-yellow-400 transition-colors">
+                            {item.content}
+                        </h3>
+                        {item.progress !== undefined ? (
+                            <div className="mt-4">
+                                <div className="flex justify-between text-xs mb-1">
+                                    <span className="text-slate-400">Progress</span>
+                                    <span className="text-yellow-400">{item.progress}%</span>
+                                </div>
+                                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full bg-yellow-400 transition-all duration-1000" 
+                                        style={{ width: `${item.progress}%` }}
+                                    ></div>
+                                </div>
+                                <p className="text-xs text-slate-500 mt-2">{item.meta}</p>
+                            </div>
+                        ) : (
+                             <p className="text-sm text-slate-500">{item.meta}</p>
+                        )}
+                    </div>
+                ))}
+            </section>
 
+            {/* ANNOUNCEMENT BANNER */}
+            {user && !user.isElite && (
+                <div className="mt-8 relative overflow-hidden rounded-2xl p-8 bg-gradient-to-r from-yellow-500/10 to-transparent border border-yellow-500/20">
+                    <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="text-center md:text-left">
+                            <h2 className="text-2xl font-bold text-yellow-400 mb-2">Become an Elite Member 💎</h2>
+                            <p className="text-slate-400 max-w-lg">
+                                Unlock unlimited AI consultations, professional document reviews, and advanced learning modules.
+                            </p>
+                        </div>
+                        <button 
+                            onClick={() => setShowPaymentPortal(true)}
+                            className="btn btn-primary bg-yellow-400 text-slate-950 hover:bg-yellow-300 font-bold px-10 py-4 shadow-xl shadow-yellow-500/20"
+                        >
+                            UPGRADE NOW 🚀
+                        </button>
+                    </div>
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                </div>
+            )}
+            
             {showDeleteConfirm && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-                    backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 6000, display: 'grid', placeItems: 'center', padding: '1rem'
-                }}>
-                    <div className="card" style={{ maxWidth: '400px', textAlign: 'center' }}>
-                        <h2 style={{ color: 'var(--color-danger)', marginBottom: '1rem' }}>Delete Account?</h2>
-                        <p style={{ color: '#ccc', marginBottom: '2rem' }}>
-                            Are you absolutely sure? This will permanently delete your progress, wallet balance, and all associated data. This action CANNOT be undone.
+                <div className="fixed inset-0 z-[100] grid place-items-center bg-black/90 p-4">
+                    <div className="card max-w-md p-8 text-center bg-slate-900 border-red-500/50">
+                        <h2 className="text-2xl font-bold text-red-500 mb-4">Delete Account? ⚠️</h2>
+                        <p className="text-slate-400 mb-8 leading-relaxed">
+                            This action is permanent and will erase all your progress, points, and digital identity.
                         </p>
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <button onClick={() => setShowDeleteConfirm(false)} className="btn btn-outline" disabled={isDeleting}>Cancel</button>
-                            <button onClick={handleDeleteAccount} className="btn" style={{ background: 'var(--color-danger)', color: '#fff' }} disabled={isDeleting}>
-                                {isDeleting ? 'Deleting...' : 'Yes, Delete'}
-                            </button>
+                        <div className="flex gap-4">
+                            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 btn btn-outline py-3">Keep It</button>
+                            <button onClick={() => logout()} className="flex-1 btn bg-red-600 text-white hover:bg-red-700 py-3">Delete Forever</button>
                         </div>
                     </div>
                 </div>

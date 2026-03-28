@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 
 const Chatbot = () => {
+    const navigate = useNavigate();
     // Session Management State
     const { user, refreshProfile } = useAuth();
     const [sessions, setSessions] = useState(() => {
@@ -175,13 +177,13 @@ const Chatbot = () => {
 
     useEffect(scrollToBottom, [messages]);
 
-    const handleSend = async () => {
-        if (!input.trim() || loading) return;
+    const handleSend = async (overrideMsg = null) => {
+        const userMsg = overrideMsg || input;
+        if (!userMsg.trim() || loading) return;
         if (!country || !topic) return;
 
-        const userMsg = input;
         setMessages(prev => [...prev, { text: userMsg, sender: 'user' }]);
-        setInput("");
+        if (!overrideMsg) setInput("");
         setLoading(true);
 
         try {
@@ -193,7 +195,15 @@ const Chatbot = () => {
                 country: country
             });
 
-            setMessages(prev => [...prev, { text: res.response, sender: 'bot' }]);
+            if (res.isLimitReached) {
+                setMessages(prev => [...prev, { 
+                    text: res.response || "You've reached your daily limit of 7 questions. Upgrade to Premium for unlimited access! 💎", 
+                    sender: 'bot',
+                    isSystem: true 
+                }]);
+            } else {
+                setMessages(prev => [...prev, { text: res.response, sender: 'bot' }]);
+            }
             refreshProfile();
         } catch (error) {
             console.error("AI Mentor Error:", error);
@@ -205,6 +215,12 @@ const Chatbot = () => {
             setLoading(false);
         }
     };
+
+    const quickActions = [
+        { label: '🏠 Verify Land', prompt: 'How do I verify a land title in Nigeria?' },
+        { label: '⚖️ Legal Aid', prompt: 'What are my rights as a tenant in Kenya?' },
+        { label: '📈 Biz Registration', prompt: 'How do I register a company in Ghana?' }
+    ];
 
     return (
         <>
@@ -290,12 +306,38 @@ const Chatbot = () => {
                                     {messages.map((msg, i) => (
                                         <div key={i} style={{
                                             alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-                                            backgroundColor: msg.sender === 'user' ? 'var(--color-primary)' : '#1a1a1a',
-                                            padding: '0.8rem 1rem', borderRadius: '12px', maxWidth: '85%', fontSize: '0.9rem', color: '#fff'
-                                        }}>{msg.text}</div>
+                                            backgroundColor: msg.isSystem ? '#222' : (msg.sender === 'user' ? 'var(--color-primary)' : '#1a1a1a'),
+                                            padding: '0.8rem 1rem', borderRadius: '12px', maxWidth: '85%', fontSize: '0.9rem', color: '#fff',
+                                            border: msg.isSystem ? '1px dashed #444' : 'none'
+                                        }}>
+                                            {msg.text}
+                                            {msg.isSystem && (
+                                                <div style={{ marginTop: '0.5rem' }}>
+                                                    <button onClick={() => navigate('/services')} style={{ color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 'bold' }}>Upgrade to Premium 💎</button>
+                                                </div>
+                                            )}
+                                        </div>
                                     ))}
                                     {loading && <div style={{ color: '#666', fontSize: '0.8rem' }}>Oracle is consulting the stars...</div>}
                                     <div ref={messagesEndRef} />
+                                </div>
+
+                                <div style={{ padding: '0.5rem 1rem', display: 'flex', gap: '0.5rem', overflowX: 'auto', noScrollbar: true }}>
+                                    {quickActions.map((action, i) => (
+                                        <button 
+                                            key={i} 
+                                            onClick={() => handleSend(action.prompt)}
+                                            style={{ 
+                                                padding: '0.4rem 0.8rem', borderRadius: '20px', backgroundColor: '#111', 
+                                                color: '#ddd', border: '1px solid #333', fontSize: '0.7rem', 
+                                                whiteSpace: 'nowrap', transition: 'all 0.2s'
+                                            }}
+                                            onMouseEnter={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                                            onMouseLeave={(e) => e.target.style.borderColor = '#333'}
+                                        >
+                                            {action.label}
+                                        </button>
+                                    ))}
                                 </div>
 
                                 <div style={{ padding: '1.25rem', borderTop: '1px solid #222' }}>
