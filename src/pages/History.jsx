@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import ResourceList from '../components/ResourceList';
 import { useWallet } from '../hooks/useWallet';
-import { africanResources } from '../data/africanResources';
-import { civilizationsData } from '../data/civilizationsData';
-import { useGamification } from '../context/GamificationContext';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
+import { 
+    kidsTimeline, 
+    professionalModules, 
+    independenceCalendar as historyIndependenceCalendar, 
+    teenQuizQuestions 
+} from '../data/historyContent';
 
 const History = ({ ageGroup }) => {
     const navigate = useNavigate();
@@ -57,6 +60,10 @@ const History = ({ ageGroup }) => {
     const [isVoiceCloned, setIsVoiceCloned] = useState(localStorage.getItem('isVoiceCloned') === 'true');
     const [clonedVoiceName, setClonedVoiceName] = useState(localStorage.getItem('clonedVoiceName') || '');
     const [availableVoices, setAvailableVoices] = useState([]);
+
+    // --- MODULE NAVIGATION STATE ---
+    const [activeModule, setActiveModule] = useState(null);
+    const [completedModules, setCompletedModules] = useState(JSON.parse(localStorage.getItem('completedModules') || '[]'));
 
     // Persist voice settings
     useEffect(() => {
@@ -217,147 +224,15 @@ const History = ({ ageGroup }) => {
         }
     };
 
-    const events = [
-        {
-            year: "20,000 BC",
-            title: "The Ishango Bone 🦴",
-            desc: "The world's oldest mathematical tool, found in modern-day DR Congo.",
-            details: "It is a baboon fibula with a tally system that suggests African ancestors were using advanced prime number arithmetic and lunar calendars long before anywhere else.",
-            targetGroup: "teens"
-        },
-        {
-            year: "3000 BC",
-            title: "The Pyramids of Giza",
-            desc: "Ancient Egyptians built the pyramids using advanced math and engineering.",
-            details: "The Great Pyramid was the tallest man-made structure for over 3,800 years. It shows the incredible genius of African ancestors.",
-            targetGroup: "all"
-        },
-        {
-            year: "500 BC",
-            title: "Nok Iron Innovation ⚒️",
-            desc: "Mastery of iron-smelting technology in modern Nigeria.",
-            details: "The Nok people developed highly advanced blast furnaces. This technology bypassed the 'Bronze Age' completely, jumping straight to the Iron Age—proving unique African innovation paths.",
-            targetGroup: "teens"
-        },
-        {
-            year: "Pre-Colonial",
-            title: "Cowries & Trade Cycles 📿",
-            desc: "Understanding the complex economic systems of pre-colonial Africa.",
-            details: "Before European arrival, Africa had thriving global trade using Cowrie shells and Gold weights. These systems were stable, inflation-resistant, and regulated by powerful merchant guilds.",
-            targetGroup: "adults"
-        },
-        {
-            year: "1324 AD",
-            title: "Mansa Musa's Pilgrimage",
-            desc: "The Emperor of Mali, the richest man in history, traveled to Mecca.",
-            details: "He brought so much gold that he changed the economy of every city he visited. Timbuktu became a global center of learning.",
-            targetGroup: "all"
-        },
-        {
-            year: "1624 AD",
-            title: "Queen Nzinga's Diplomacy 👑",
-            desc: "Strategic negotiation against Portuguese colonization in Angola.",
-            details: "Queen Nzinga famously sat on a servant's back to show equality when the Portuguese didn't offer her a chair. She used strategic alliances and guerilla warfare for 40 years.",
-            targetGroup: "all"
-        },
-        {
-            year: "1820s",
-            title: "Shaka Zulu's Military Genius ⚔️",
-            desc: "Invention of the Iklwa spear and the Buffalo Horn formation.",
-            details: "Shaka revolutionized warfare with logistics, professional training, and tactical innovations that made the Zulu nation a global power in Southern Africa.",
-            targetGroup: "teens"
-        },
-        {
-            year: "1884",
-            title: "The Berlin Conference",
-            desc: "European powers met to divide Africa among themselves.",
-            details: "They drew lines on a map without asking the people. This 'Scramble for Africa' separated families and created artificial borders.",
-            targetGroup: "all"
-        },
-        {
-            year: "1896",
-            title: "Battle of Adwa ⚔️",
-            desc: "Ethiopia defeated Italy and remained independent.",
-            details: "Emperor Menelik II and Empress Taytu Betul united their people to defend their land. It is a symbol of African strength and resistance.",
-            speeches: [
-                { speaker: "Emperor Menelik II", text: "Enemies have come who would ruin our country... if you are strong, lend me your strength." },
-                { speaker: "Empress Taytu Betul", text: "I would rather die than accept your deal." }
-            ],
-            modernContext: "Today, Ethiopia continues this legacy of self-reliance.",
-            targetGroup: "all"
-        },
-        {
-            year: "1900",
-            title: "Pan-African Congress ✊",
-            desc: "Strategic union of African leaders in London to fight for global rights.",
-            details: "Organized by Henry Sylvester Williams and attended by W.E.B. Du Bois, this marked the shift from local resistance to a global strategic network for liberation.",
-            targetGroup: "adults"
-        },
-        {
-            year: "1957",
-            title: "Ghana's Independence 🇬🇭",
-            desc: "Kwame Nkrumah led Ghana to become the first Sub-Saharan nation to gain independence.",
-            details: "Nkrumah's vision was for a United States of Africa.",
-            targetGroup: "all"
-        },
-        {
-            year: "1961",
-            title: "Patrice Lumumba's Sacrifice 🇨🇬",
-            desc: "First Prime Minister of independent Congo and hero of African economic freedom.",
-            details: "Lumumba fought for the total economic independence of the Congo. He was assassinated in a plot involving foreign powers who feared his vision.",
-            targetGroup: "all"
-        },
-        {
-            year: "1963",
-            title: "Foundation of the OAU 🌍",
-            desc: "Strategic coalition of 32 nations to end colonialism.",
-            details: "The Organization of African Unity was a strategic lesson in continental governance and diplomacy, leading to the liberation of the remaining colonies.",
-            targetGroup: "adults"
-        },
-        {
-            year: "1994",
-            title: "Nelson Mandela becomes President 🇿🇦",
-            desc: "Apartheid ended in South Africa.",
-            details: "After 27 years in prison, Mandela united the 'Rainbow Nation'.",
-            timeline: [
-                { year: "1918", event: "Born in Mvezo." },
-                { year: "1994", event: "Inaugurated as the first black President." }
-            ],
-            targetGroup: "all"
-        },
-        {
-            year: "Modern",
-            title: "The AfCFTA Era 💹",
-            desc: "African Continental Free Trade Area—creating the world's largest free trade zone.",
-            details: "A strategic lesson in transformation: 54 nations uniting to build a single market, reducing dependence on foreign systems and building internal wealth.",
-            targetGroup: "adults"
-        },
-        {
-            year: "2020s",
-            title: "The African Digital Renaissance 🚀",
-            desc: "Africa becomes a global leader in fintech innovation.",
-            details: "From M-Pesa to thriving tech hubs, African youth are using technology to solve local problems. You are part of this history!",
-            targetGroup: "all"
-        }
-    ].filter(e => {
+    const events = (isKid ? kidsTimeline : kidsTimeline).filter(e => {
         if (e.targetGroup === 'all') return true;
+        if (isKid && e.targetGroup === 'kids') return true;
         if (isTeen && e.targetGroup === 'teens') return true;
         if (isAdult && e.targetGroup === 'adults') return true;
         return false;
     });
 
-    const independenceCalendar = [
-        { date: "Jan 1, 1956", country: "Sudan 🇸🇩", leader: "Ismail al-Azhari" },
-        { date: "Mar 6, 1957", country: "Ghana 🇬🇭", leader: "Kwame Nkrumah" },
-        { date: "Oct 2, 1958", country: "Guinea 🇬🇳", leader: "Ahmed Sékou Touré" },
-        { date: "Oct 1, 1960", country: "Nigeria 🇳🇬", leader: "Nnamdi Azikiwe" },
-        { date: "Dec 9, 1961", country: "Tanzania 🇹🇿", leader: "Julius Nyerere" },
-        { date: "Dec 12, 1963", country: "Kenya 🇰🇪", leader: "Jomo Kenyatta" },
-        { date: "Oct 24, 1964", country: "Zambia 🇿🇲", leader: "Kenneth Kaunda" },
-        { date: "Jun 25, 1975", country: "Mozambique 🇲🇿", leader: "Samora Machel" },
-        { date: "Apr 18, 1980", country: "Zimbabwe 🇿🇼", leader: "Robert Mugabe" },
-        { date: "Mar 21, 1990", country: "Namibia 🇳🇦", leader: "Sam Nujoma" },
-    ];
+    const independenceCalendar = historyIndependenceCalendar;
 
     const teenQuizQuestions = [
         { q: "Which empire was ruled by the richest man in history, Mansa Musa?", a: "Mali Empire", options: ["Mali Empire", "Songhai Empire", "Ghana Empire"], fact: "Mali was so wealthy that Mansa Musa's pilgrimage to Mecca caused gold prices to drop in Egypt for a decade." },
@@ -366,6 +241,129 @@ const History = ({ ageGroup }) => {
         { q: "The Battle of Adwa in 1896 is significant because:", a: "Ethiopia defeated Italy to remain independent", options: ["Ethiopia defeated Italy to remain independent", "It started the Scramble for Africa", "It was the end of the Mali Empire"], fact: "Ethiopia was the only African nation to successfully defeat a European power during the colonial era." },
         { q: "What does 'Agenda 2063' refer to in the modern African context?", a: "The AU's blueprint for transforming Africa", options: ["The AU's blueprint for transforming Africa", "A plan for the 2063 Olympics in Cairo", "The date for a unified African currency"], fact: "Agenda 2063 is the African Union's strategic framework for the socio-economic transformation of the continent." }
     ];
+
+    const renderModuleNavigator = () => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
+            {professionalModules.map((mod) => (
+                <div 
+                    key={mod.id} 
+                    className="card" 
+                    onClick={() => {
+                        setActiveModule(mod);
+                        window.scrollTo(0, 400);
+                    }}
+                    style={{
+                        padding: '2rem',
+                        cursor: 'pointer',
+                        border: activeModule?.id === mod.id ? '2px solid var(--color-primary)' : '1px solid #333',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease',
+                        backgroundColor: completedModules.includes(mod.id) ? 'rgba(0, 200, 81, 0.05)' : 'rgba(255,255,255,0.02)'
+                    }}
+                >
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{mod.icon}</div>
+                    <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>{mod.title}</h3>
+                    {completedModules.includes(mod.id) && (
+                        <span style={{ 
+                            position: 'absolute', top: '10px', right: '10px', 
+                            backgroundColor: '#00C851', color: 'black', 
+                            padding: '2px 8px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 'bold' 
+                        }}>
+                            MASTERED ✅
+                        </span>
+                    )}
+                    <button className="btn btn-sm" style={{ marginTop: '1rem', width: '100%' }}>
+                        {completedModules.includes(mod.id) ? 'Review Module' : 'Start Journey'}
+                    </button>
+                </div>
+            ))}
+        </div>
+    );
+
+    const renderModuleReader = () => {
+        if (!activeModule) return null;
+
+        return (
+            <div style={{ 
+                animation: 'fadeIn 0.5s', 
+                backgroundColor: 'rgba(255,255,255,0.03)', 
+                padding: '2rem', 
+                borderRadius: '20px', 
+                border: '1px solid #444',
+                marginBottom: '4rem'
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                    <h2 style={{ color: 'var(--color-primary)', margin: 0 }}>{activeModule.title}</h2>
+                    <button 
+                        onClick={() => setActiveModule(null)}
+                        style={{ background: 'none', border: '1px solid #666', color: '#888', padding: '0.4rem 1rem', borderRadius: '10px', cursor: 'pointer' }}
+                    >
+                        Close Module
+                    </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+                    {activeModule.episodes.map((ep, i) => (
+                        <div key={i} style={{ borderLeft: '4px solid var(--color-primary)', paddingLeft: '2rem' }}>
+                            <h3 style={{ fontSize: '1.8rem', color: '#fff', marginBottom: '1rem' }}>{ep.title}</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {ep.content.map((line, li) => (
+                                    <p key={li} style={{ fontSize: '1.1rem', color: '#bbb', lineHeight: '1.6', margin: 0 }}>
+                                        {line.startsWith('**') ? <strong>{line.replace(/\*\*/g, '')}</strong> : line}
+                                    </p>
+                                ))}
+                            </div>
+                            
+                            <div style={{ 
+                                marginTop: '1.5rem', 
+                                padding: '1rem', 
+                                backgroundColor: 'rgba(255, 136, 0, 0.1)', 
+                                borderRadius: '12px',
+                                border: '1px dashed var(--color-primary)'
+                            }}>
+                                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-primary)', fontStyle: 'italic' }}>
+                                    <strong>Deep Fact:</strong> {ep.fact}
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => speakText(`${ep.title}. ${ep.content.join('. ')}. Fact: ${ep.fact}`)}
+                                className="btn btn-outline"
+                                style={{ marginTop: '1rem', fontSize: '0.8rem' }}
+                            >
+                                {isReading ? "🤫 Stop Narration" : "🔊 Listen to Episode"}
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                <div style={{ textAlign: 'center', marginTop: '4rem', padding: '2rem', borderTop: '1px solid #333' }}>
+                    {!completedModules.includes(activeModule.id) ? (
+                        <div>
+                            <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>You've reached the end of this module!</p>
+                            <button 
+                                onClick={() => {
+                                    const newCompleted = [...completedModules, activeModule.id];
+                                    setCompletedModules(newCompleted);
+                                    localStorage.setItem('completedModules', JSON.stringify(newCompleted));
+                                    addEarnings('history', 500);
+                                    addPoints(200);
+                                    showToast(`Module Mastered! +₦500 & +200 XP rewarded to your MindNest account.`, 'success');
+                                }}
+                                className="btn" 
+                                style={{ padding: '1rem 3rem', fontSize: '1.2rem' }}
+                            >
+                                Claim Module Reward (₦500) 🎁
+                            </button>
+                        </div>
+                    ) : (
+                        <p style={{ color: '#00C851', fontWeight: 'bold' }}>✅ This Module is Mastered. Keep Exploring!</p>
+                    )}
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className="container" style={{ paddingTop: '1rem', paddingBottom: '4rem' }}>
@@ -558,8 +556,18 @@ const History = ({ ageGroup }) => {
                 </div>
             </div>
 
-            {/* GREAT CIVILIZATIONS SECTION */}
+            {/* EXPERT LEARNING MODULES (TEENS/ADULTS) */}
             {!isKid && (
+                <section style={{ marginBottom: '4rem' }}>
+                    <h2 style={{ color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '0.5rem', marginBottom: '2rem' }}>
+                        🏔️ Platform Evolution: Expert Modules
+                    </h2>
+                    {activeModule ? renderModuleReader() : renderModuleNavigator()}
+                </section>
+            )}
+
+            {/* GREAT CIVILIZATIONS SECTION */}
+            {!isKid && !activeModule && (
                 <section style={{ marginBottom: '4rem' }}>
                     <h2 style={{ color: 'var(--color-secondary)', borderBottom: '2px solid var(--color-secondary)', paddingBottom: '0.5rem', marginBottom: '2rem' }}>
                         🏛️ Great African Civilizations

@@ -1,3 +1,6 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+
 const Sidebar = () => {
   const menuItems = [
     { name: 'Home', path: '/', icon: '🏠' },

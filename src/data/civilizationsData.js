@@ -89,5 +89,18 @@ export const civilizationsData = [
             'Powerful Queens (Kandakes) led armies into battle, notably against Romans.'
         ],
         funFact: 'Queen Amanirenas of Kush successfully led an army against the Roman Empire and negotiated a peace treaty!'
+    },
+    {
+        id: 'carthage',
+        title: 'Carthage (Tunisia)',
+        period: '814–146 BCE',
+        description: 'A massive North African maritime and commercial empire that dominated the Mediterranean for centuries.',
+        achievements: [
+            'Built a world-class navy and the sophisticated "Cothon" naval port.',
+            'Hannibal Barca, one of history\'s greatest generals, led an elephant-backed army across the Alps.',
+            'Advanced trade networks that connected Africa to Britain, Spain, and Greece.',
+            'One of the wealthiest and most densely populated cities of the ancient world.'
+        ],
+        funFact: 'Carthage was so advanced that their apartment buildings were often 6 stories high—rare for the ancient world!'
     }
 ];

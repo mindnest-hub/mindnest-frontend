@@ -56,7 +56,7 @@ const Chatbot = () => {
     });
 
     const [challengerStep, setChallengerStep] = useState(0);
-    const [ageMode, setAgeMode] = useState("adults");
+    const [ageMode, setAgeMode] = useState(user?.ageGroup?.toLowerCase() || "adults");
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);

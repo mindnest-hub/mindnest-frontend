@@ -1,14 +1,19 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const Services = () => {
-    const services = [
+    const { user } = useAuth();
+    const isKid = user?.ageGroup?.toLowerCase() === 'kids';
+
+    const fullServices = [
         { 
             id: 'land', 
             title: 'Land & Property Verification', 
             partner: 'Rollin Stone Properties Ltd', 
             icon: '🏢', 
             desc: 'Expert verification of C of O, Governors Consent, and land surveying. Buy safely with our verified partners.',
-            color: '#B8860B'
+            color: '#B8860B',
+            visible: !isKid
         },
         { 
             id: 'legal', 
@@ -16,7 +21,17 @@ const Services = () => {
             partner: 'MindNest Legal Partners', 
             icon: '⚖️', 
             desc: 'Get professional legal advice on tenancy, contracts, and citizen rights from certified lawyers.',
-            color: '#FF4500'
+            color: '#FF4500',
+            visible: !isKid
+        },
+        { 
+            id: 'junior_support',
+            title: 'Junior Tech Mentorship',
+            partner: 'MindNest Hub',
+            icon: '🛡️',
+            desc: 'Get matched with a verified mentor to help with your coding or history projects.',
+            color: '#00BFFF',
+            visible: isKid
         },
         { 
             id: 'business', 
@@ -24,7 +39,8 @@ const Services = () => {
             partner: 'Enterprise Hub', 
             icon: '📈', 
             desc: 'Fast tracking your business registration and obtaining tax identification numbers (TIN).',
-            color: '#00A86B'
+            color: '#00A86B',
+            visible: !isKid
         },
         { 
             id: 'contracts', 
@@ -32,15 +48,24 @@ const Services = () => {
             partner: 'MindNest Legal', 
             icon: '📄', 
             desc: 'Professional review of your employment, rental, or business partnership contracts.',
-            color: '#4682B4'
+            color: '#4682B4',
+            visible: !isKid
         }
     ];
+
+    const services = fullServices.filter(s => s.visible);
 
     return (
         <div className="section animate-fade">
             <div className="mb-12">
-                <h1 className="text-4xl font-bold mb-3 text-white">Professional Services Hub 🏛️</h1>
-                <p className="text-slate-400 max-w-2xl">Connect with verified experts to secure your assets and protect your rights. No more "Middle-man" risks.</p>
+                <h1 className="text-4xl font-bold mb-3 text-white">
+                    {isKid ? "Junior Support Hub 🛡️" : "Professional Services Hub 🏛️"}
+                </h1>
+                <p className="text-slate-400 max-w-2xl">
+                    {isKid 
+                        ? "Connect with verified mentors to help you grow your skills safely." 
+                        : "Connect with verified experts to secure your assets and protect your rights."}
+                </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -58,7 +83,9 @@ const Services = () => {
                             {service.desc}
                         </p>
                         <div className="flex flex-col gap-3">
-                            <button className="btn btn-primary w-full py-4 font-bold shadow-lg shadow-yellow-500/10">Book Consultation</button>
+                            <button className="btn btn-primary w-full py-4 font-bold shadow-lg shadow-yellow-500/10">
+                                {isKid ? "Request Mentor" : "Book Consultation"}
+                            </button>
                             <button className="btn btn-outline w-full py-3 text-xs font-bold">View Service Details</button>
                         </div>
                     </div>
@@ -66,11 +93,17 @@ const Services = () => {
             </div>
 
             <div className="mt-20 p-12 rounded-3xl bg-slate-900/40 border border-slate-800 text-center">
-                <h2 className="text-2xl font-bold mb-4">Are you a Professional Service Provider? 🤝</h2>
+                <h2 className="text-2xl font-bold mb-4">
+                    {isKid ? "Want to become a Junior Leader? 🌟" : "Are you a Professional Service Provider? 🤝"}
+                </h2>
                 <p className="text-slate-400 mb-8 max-w-2xl mx-auto">
-                    Join the MindNest ecosystem as a verified partner and help thousands of Africans make safe, informed decisions.
+                    {isKid 
+                        ? "Join our leadership program and earn special badges for helping others in the community."
+                        : "Join the MindNest ecosystem as a verified partner and help thousands of Africans make safe, informed decisions."}
                 </p>
-                <button className="btn btn-outline px-12 py-4 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-slate-950 font-bold">Apply for Partnership</button>
+                <button className="btn btn-outline px-12 py-4 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-slate-950 font-bold">
+                    {isKid ? "Apply for Leadership" : "Apply for Partnership"}
+                </button>
             </div>
         </div>
     );

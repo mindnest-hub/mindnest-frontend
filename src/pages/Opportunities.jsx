@@ -1,12 +1,22 @@
 import React from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const Opportunities = () => {
-    const list = [
-        { id: 1, title: 'Seed Grant for African Agri-tech', type: 'Grant', organization: 'Lagos Foundation', deadline: 'April 30, 2026', desc: 'Up to $10k in funding for sustainable farming innovative solutions.', icon: '🌱', color: '#B8860B' },
-        { id: 2, title: 'Junior Frontend Developer', type: 'Job', organization: 'Terra Code', deadline: 'Immediate', desc: 'React.js and Tailwind expertise needed for a fast-paced fintech startup.', icon: '💻', color: '#00BFFF' },
-        { id: 3, title: 'Real Estate Sales Associate', type: 'Partnership', organization: 'Rollin Stone Properties', deadline: 'Ongoing', desc: 'Join our referral network and earn high commissions on verified land sales.', icon: '🏢', color: '#FF4500' },
-        { id: 4, title: 'Digital Marketing Fellowship', type: 'Training', organization: 'Google Africa', deadline: 'May 15, 2026', desc: '3-month intensive training program for aspiring tech marketers.', icon: '📊', color: '#4682B4' }
+    const { user } = useAuth();
+    const ageGroup = user?.ageGroup?.toLowerCase() || 'adults';
+    const isKid = ageGroup === 'kids';
+    const isTeen = ageGroup === 'teens';
+
+    const fullList = [
+        { id: 1, title: 'Seed Grant for African Agri-tech', type: 'Grant', organization: 'Lagos Foundation', deadline: 'April 30, 2026', desc: 'Up to $10k in funding for sustainable farming innovative solutions.', icon: '🌱', color: '#B8860B', target: ['adults'] },
+        { id: 2, title: 'Junior Frontend Developer', type: 'Job', organization: 'Terra Code', deadline: 'Immediate', desc: 'React.js and Tailwind expertise needed for a fast-paced fintech startup.', icon: '💻', color: '#00BFFF', target: ['adults', 'teens'] },
+        { id: 3, title: 'Real Estate Sales Associate', type: 'Partnership', organization: 'Rollin Stone Properties', deadline: 'Ongoing', desc: 'Join our referral network and earn high commissions on verified land sales.', icon: '🏢', color: '#FF4500', target: ['adults'] },
+        { id: 4, title: 'Digital Marketing Fellowship', type: 'Training', organization: 'Google Africa', deadline: 'May 15, 2026', desc: '3-month intensive training program for aspiring tech marketers.', icon: '📊', color: '#4682B4', target: ['adults', 'teens'] },
+        { id: 5, title: 'Primary School Tech Scholarship', type: 'Scholarship', organization: 'MindNest Hub', deadline: 'August 10, 2026', desc: 'Full funding for young students exploring the basics of coding and history.', icon: '🎒', color: '#FFD700', target: ['kids'] },
+        { id: 6, title: 'Junior Farming Competition', type: 'Competition', organization: 'AgriJunior', deadline: 'July 20, 2026', desc: 'Win a tablet and learning kits by designing a virtual farm.', icon: '🚜', color: '#32CD32', target: ['kids', 'teens'] }
     ];
+
+    const list = fullList.filter(item => item.target.includes(ageGroup));
 
     return (
         <div className="section animate-fade">

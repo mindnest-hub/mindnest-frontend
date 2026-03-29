@@ -33,45 +33,53 @@ const Home = ({ ageGroup, setAgeGroup }) => {
         setShowAgeModal(false);
     };
 
+    const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
+    const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
+    const isAdult = !isKid && !isTeen;
+
     const dashboardItems = [
         { 
             id: 'learning',
-            title: 'Continue Module', 
+            title: isKid ? 'Adventure Learning' : 'Expert Modules', 
             icon: '📚', 
-            content: 'History: Discovering African Wisdom',
+            content: isKid ? 'History: Heroes of the Past' : 'History: Discovering African Wisdom',
             progress: 65,
-            meta: '3 lessons left',
+            meta: isKid ? 'Win Junior XP!' : '3 expert lessons left',
             action: () => navigate('/history'),
-            color: '#C5A019'
+            color: '#C5A019',
+            visible: true
         },
         { 
             id: 'ai',
-            title: 'Ask AI Expert', 
+            title: isKid ? 'Smart Mascot AI' : 'Ask AI Expert', 
             icon: '🤖', 
-            content: 'Need help with land or business?',
-            meta: 'Instant answers on laws & rights',
+            content: isKid ? 'Ask me anything about Africa!' : 'Need help with land or business?',
+            meta: isKid ? 'Your friendly learning guide' : 'Instant answers on laws & rights',
             action: () => navigate('/ai'),
-            color: '#00BFFF'
+            color: '#00BFFF',
+            visible: true
         },
         { 
             id: 'ops',
-            title: 'Early Opportunities', 
+            title: isKid ? 'Junior Scholarships' : 'Economic Opportunities', 
             icon: '💼', 
-            content: 'Agri Business Training available now',
-            meta: '2 new grants found',
+            content: isKid ? 'School & Tech Competitions' : 'Agri Business Training available now',
+            meta: isKid ? 'Apply for school rewards' : '2 new grants found',
             action: () => navigate('/opportunities'),
-            color: '#006B3C'
+            color: '#006B3C',
+            visible: true
         },
         { 
             id: 'legal',
-            title: 'Legal Help', 
+            title: 'Professional Services', 
             icon: '⚖️', 
-            content: 'Professional legal consultation',
-            meta: 'Verified lawyers available',
+            content: 'Legal & Land Consultation',
+            meta: 'Verified expert partners',
             action: () => navigate('/services'),
-            color: '#FF4500'
+            color: '#FF4500',
+            visible: !isKid
         }
-    ];
+    ].filter(item => item.visible);
 
     return (
         <div className="dashboard-wrapper animate-fade">
