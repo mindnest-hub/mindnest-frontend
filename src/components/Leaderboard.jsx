@@ -24,14 +24,16 @@ const Leaderboard = ({ onClose }) => {
 
         // Automatic location check if not verified
         if (!userLoc) {
-            handleVerify();
+            handleVerify(true); // Silent verification
         }
     }, []);
 
-    const handleVerify = async () => {
-        const result = await verifyLocation();
-        if (result) setUserLoc(result);
-        setList(getLeaderboard()); // Refresh to show flags if synced
+    const handleVerify = async (isSilent = false) => {
+        const result = await verifyLocation(isSilent);
+        if (result) {
+            setUserLoc(result);
+            setList(getLeaderboard()); // Refresh
+        }
     };
 
     // --- PODIUM LAYOUT ---
@@ -56,7 +58,7 @@ const Leaderboard = ({ onClose }) => {
                 {/* 2ND PLACE */}
                 {topThree[1] && (
                     <div className="flex flex-col items-center flex-1 max-w-[100px]">
-                        <span className="text-2xl mb-1">🌐</span>
+                        <span className="text-2xl mb-1">🇬🇭</span>
                         <p className="text-[10px] text-slate-500 font-bold uppercase mb-2">
                              - 
                         </p>
@@ -88,7 +90,7 @@ const Leaderboard = ({ onClose }) => {
                 {/* 3RD PLACE */}
                 {topThree[2] && (
                     <div className="flex flex-col items-center flex-1 max-w-[100px]">
-                        <span className="text-2xl mb-1">🌍</span>
+                        <span className="text-2xl mb-1">🇿🇦</span>
                         <p className="text-[10px] text-slate-500 font-bold uppercase mb-2">
                              - 
                         </p>
@@ -155,20 +157,6 @@ const Leaderboard = ({ onClose }) => {
                     </table>
                 </div>
 
-                {/* VERIFICATION PROMPT */}
-                {!userLoc && (
-                    <div className="mt-8 bg-[#C5A019]/10 border border-[#C5A019]/30 p-6 rounded-[28px] text-center">
-                        <p className="text-[11px] font-black uppercase tracking-widest text-[#C5A019] mb-4">Location Verification Required</p>
-                        <p className="text-xs text-slate-400 mb-6">Verify your real location to claim your official country flag and rank globally.</p>
-                        <button 
-                            disabled={isLocating}
-                            onClick={handleVerify}
-                            className="w-full bg-[#C5A019] text-black h-12 rounded-xl font-bold transition-transform active:scale-95"
-                        >
-                            {isLocating ? 'Verifying Signal...' : 'Verify Real User'}
-                        </button>
-                    </div>
-                )}
             </section>
         </div>
     );

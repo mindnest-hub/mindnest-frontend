@@ -12,15 +12,10 @@ export const useLocation = () => {
         return String.fromCodePoint(...codePoints);
     };
 
-    const verifyLocation = useCallback(async () => {
+    const verifyLocation = useCallback(async (isSilent = false) => {
         setIsLoading(true);
         try {
-            // Priority 1: Browser Geolocation (Most accurate but needs permission)
-            const coords = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-            });
-
-            // Priority 2: Reverse Geocode (Simple IP-based api fallback for "verify" part)
+            // Priority 1: Instant IP-based lookup (No permission needed, fast)
             const response = await fetch(`https://ipapi.co/json/`);
             const data = await response.json();
             
@@ -29,28 +24,30 @@ export const useLocation = () => {
                     countryCode: data.country_code,
                     countryName: data.country_name,
                     flag: getCountryFlag(data.country_code),
-                    verified: true
+                    verified: false // IP-verified
                 };
                 localStorage.setItem('userLocation', JSON.stringify(result));
+                
+                // If not silent, try to "upgrade" to GPS verification for better accuracy
+                if (!isSilent && navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            // Successfully got GPS
+                            const upgraded = { ...result, verified: true };
+                            localStorage.setItem('userLocation', JSON.stringify(upgraded));
+                        },
+                        () => {}, // Ignore errors for background check
+                        { timeout: 5000 }
+                    );
+                }
+
                 return result;
             }
         } catch (error) {
-            console.warn("Location check failed, falling back to IP only:", error);
-            // Fallback: Just IP
-            try {
-                const response = await fetch(`https://ipapi.co/json/`);
-                const data = await response.json();
-                const result = {
-                    countryCode: data.country_code || 'NG',
-                    countryName: data.country_name || 'Nigeria',
-                    flag: getCountryFlag(data.country_code || 'NG'),
-                    verified: false
-                };
-                localStorage.setItem('userLocation', JSON.stringify(result));
-                return result;
-            } catch (inner) {
-                return { countryCode: 'NG', flag: '🇳🇬', verified: false };
-            }
+            console.warn("Silent location check failed:", error);
+            const fallback = { countryCode: 'NG', flag: '🇳🇬', verified: false };
+            localStorage.setItem('userLocation', JSON.stringify(fallback));
+            return fallback;
         } finally {
             setIsLoading(false);
         }
