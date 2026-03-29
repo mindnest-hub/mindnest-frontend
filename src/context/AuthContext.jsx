@@ -37,6 +37,34 @@ export const AuthProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
+    // 4-HOUR INACTIVITY TIMER
+    useEffect(() => {
+        if (!user) return;
+
+        let inactivityTimer;
+        const TIMEOUT_MS = 4 * 60 * 60 * 1000; // 4 hours
+
+        const resetTimer = () => {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                console.log("[AUTH] Session expired due to 4h inactivity.");
+                logout();
+            }, TIMEOUT_MS);
+        };
+
+        // Events to track activity
+        const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+        events.forEach(event => document.addEventListener(event, resetTimer));
+
+        // Initial start
+        resetTimer();
+
+        return () => {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            events.forEach(event => document.removeEventListener(event, resetTimer));
+        };
+    }, [user]);
+
     const handleSession = async (session) => {
         const token = session.access_token;
         localStorage.setItem('token', token);
