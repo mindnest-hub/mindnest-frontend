@@ -1,6 +1,7 @@
 {
     "short_name": "MindNest",
-    "name": "MindNest: African Education Hub",
+    "name": "MindNest Africa Elite",
+    "description": "Learn. Grow. Earn. The #1 Elite Learning Ecosystem for Africa.",
     "icons": [
         {
             "src": "favicon.ico",
@@ -15,11 +16,15 @@
         {
             "src": "/nest_logo.png",
             "type": "image/png",
-            "sizes": "512x512"
+            "sizes": "512x512",
+            "purpose": "any maskable"
         }
     ],
-    "start_url": ".",
+    "start_url": "/",
     "display": "standalone",
-    "theme_color": "#9c27b0",
-    "background_color": "#1a1a1a"
+    "orientation": "portrait",
+    "theme_color": "#C5A019",
+    "background_color": "#050505",
+    "id": "bond.mindnest.app",
+    "categories": ["education", "finance", "productivity"]
 }

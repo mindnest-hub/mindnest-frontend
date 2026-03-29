@@ -1,6 +1,35 @@
 {
     "appId": "bond.mindnest.app",
-    "appName": "Learn. Grow. Earn.",
+    "appName": "MindNest Africa Elite",
     "webDir": "dist",
-    "bundledWebRuntime": false
+    "bundledWebRuntime": false,
+    "server": {
+        "androidScheme": "https",
+        "hostname": "mindnest.bond",
+        "cleartext": false
+    },
+    "ios": {
+        "contentInset": "always",
+        "scrollEnabled": true,
+        "backgroundColor": "#050505"
+    },
+    "android": {
+        "backgroundColor": "#050505",
+        "allowMixedContent": false,
+        "captureInput": true
+    },
+    "plugins": {
+        "SplashScreen": {
+            "launchShowDuration": 2000,
+            "launchAutoHide": true,
+            "backgroundColor": "#050505",
+            "androidSplashResourceName": "splash",
+            "androidScaleType": "CENTER_CROP",
+            "showSpinner": false
+        },
+        "StatusBar": {
+            "style": "dark",
+            "backgroundColor": "#050505"
+        }
+    }
 }

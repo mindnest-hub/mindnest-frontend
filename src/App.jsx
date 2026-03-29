@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, lazy, Suspense, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { GamificationProvider } from './context/GamificationContext';
@@ -53,18 +53,68 @@ const LoadingScreen = () => (
 
 function App() {
   const [ageGroup, setAgeGroup] = useState(localStorage.getItem('ageGroup') || null);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
 
   React.useEffect(() => {
-    if (ageGroup) {
-      localStorage.setItem('ageGroup', ageGroup);
-    }
+    if (ageGroup) localStorage.setItem('ageGroup', ageGroup);
   }, [ageGroup]);
+
+  useEffect(() => {
+    // Offline/Online detection
+    const goOffline = () => setIsOffline(true);
+    const goOnline  = () => setIsOffline(false);
+    window.addEventListener('offline', goOffline);
+    window.addEventListener('online', goOnline);
+
+    // PWA Install Prompt
+    const handler = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      const dismissed = localStorage.getItem('pwaInstallDismissed');
+      if (!dismissed) setShowInstallBanner(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => {
+      window.removeEventListener('offline', goOffline);
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('beforeinstallprompt', handler);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') localStorage.setItem('pwaInstalled', 'true');
+    setShowInstallBanner(false);
+    setInstallPrompt(null);
+  };
+
+  const handleDismissInstall = () => {
+    localStorage.setItem('pwaInstallDismissed', 'true');
+    setShowInstallBanner(false);
+  };
 
   return (
     <AuthProvider>
       <GamificationProvider>
         <Router>
           <div className="app-container bg-slate-950 min-h-screen">
+            {/* OFFLINE INDICATOR */}
+            {isOffline && (
+              <div className="offline-badge">📡 Offline — Syncing when reconnected</div>
+            )}
+            {/* PWA INSTALL BANNER */}
+            {showInstallBanner && (
+              <div id="pwa-install-banner">
+                <span>🦁 Add to Home Screen</span>
+                <button onClick={handleInstall} style={{ background: '#C5A019', color: '#000', border: 'none', padding: '6px 14px', borderRadius: '10px', fontWeight: '800', cursor: 'pointer' }}>Install</button>
+                <button onClick={handleDismissInstall} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: '16px' }}>×</button>
+              </div>
+            )}
             <WordOriginManager ageGroup={ageGroup} />
             <Suspense fallback={<LoadingScreen />}>
               <MainLayout setAgeGroup={setAgeGroup}>

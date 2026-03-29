@@ -10,26 +10,68 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
-      manifest: {
-        name: 'African Renaissance App',
-        short_name: 'AfricanEdu',
-        description: 'Reclaiming our past. Building our future.',
-        theme_color: '#FFD700',
-        background_color: '#0a0a0a',
-        display: 'standalone',
-        orientation: 'portrait',
-        icons: [
+      includeAssets: ['favicon.ico', 'logo.jpg', 'nest_logo.png'],
+      workbox: {
+        // Cache pages and assets for offline use
+        globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,woff2}'],
+        runtimeCaching: [
           {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            // API calls: Network first, fall back to cache
+            urlPattern: /^https:\/\/african-edu-backend\.onrender\.com/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'mindnest-api-cache',
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 }, // 24h
+              networkTimeoutSeconds: 10,
+            }
           },
           {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            // Images and static assets: Cache first
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'mindnest-images',
+              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 }, // 30 days
+            }
           }
+        ]
+      },
+      manifest: {
+        name: 'MindNest Africa Elite',
+        short_name: 'MindNest',
+        description: 'Learn. Grow. Earn. The #1 Elite Learning Ecosystem for Africa.',
+        theme_color: '#C5A019',
+        background_color: '#050505',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
+        id: 'bond.mindnest.app',
+        categories: ['education', 'finance', 'productivity'],
+        shortcuts: [
+          {
+            name: 'My Dashboard',
+            url: '/',
+            description: 'View your MindNest Elite Dashboard',
+            icons: [{ src: '/nest_logo.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Elite Community',
+            url: '/#/community',
+            description: 'Join the Elite community feed',
+            icons: [{ src: '/nest_logo.png', sizes: '192x192' }]
+          },
+          {
+            name: 'My Earnings',
+            url: '/#/services',
+            description: 'View and withdraw your earnings',
+            icons: [{ src: '/nest_logo.png', sizes: '192x192' }]
+          }
+        ],
+        icons: [
+          { src: 'nest_logo.png', sizes: '192x192', type: 'image/png' },
+          { src: 'nest_logo.png', sizes: '512x512', type: 'image/png' },
+          { src: 'nest_logo.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       }
     })

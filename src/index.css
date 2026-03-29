@@ -295,3 +295,88 @@ button {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ─── MOBILE HARDENING (Phase 4) ─────────────────────────── */
+
+/* Safe area insets for iPhone notch / Dynamic Island */
+.app-container {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Remove blue tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth font rendering on mobile */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Momentum scrolling on iOS */
+.overflow-y-auto, 
+.overflow-x-auto,
+[style*="overflow"],
+.no-scrollbar {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text selection on tap (buttons / nav) */
+button, a, nav, .pill-tab {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Bottom nav safe area — accounts for iPhone home bar */
+.fixed.bottom-0 {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* PWA Install Banner (appears when app is installable) */
+#pwa-install-banner {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  border: 1px solid rgba(197, 160, 25, 0.3);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+/* Active press scale for all interactive elements */
+button:active {
+  transform: scale(0.97);
+  transition: transform 0.1s;
+}
+
+/* Offline indicator pill */
+.offline-badge {
+  position: fixed;
+  top: env(safe-area-inset-top, 0);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ef4444;
+  color: white;
+  padding: 4px 16px;
+  border-radius: 0 0 12px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 9999;
+}
