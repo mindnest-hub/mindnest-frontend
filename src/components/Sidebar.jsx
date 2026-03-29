@@ -19,15 +19,15 @@ const Sidebar = ({ setAgeGroup }) => {
   const menuItems = [
     { name: 'New Module', path: '/learn', icon: '🚀', isNew: true },
     { name: 'Home', path: '/', icon: '🏠' },
-    { name: 'MindNest Points', path: '#', icon: '⭐' },
-    { name: 'Withdrawals', path: '#', icon: '💳', locked: true },
-    { name: 'Buy Elite', path: '#', icon: '🛍️' },
+    { name: 'Elite Community', path: '/community', icon: '👥' },
+    { name: 'My Earnings', path: '/services', icon: '💳' },
+    { name: 'Buy Elite', path: '/services', icon: '🛍️' },
     { name: 'Leaderboard', path: '#', icon: '📊' },
     { name: 'My Offers', path: '/opportunities', icon: '🏷️' },
     { name: 'My Stats', path: '#', icon: '📈' },
     { name: 'Certificates', path: '#', icon: '🏅' },
-    { name: 'Competitions', path: '#', icon: '🏆' },
-    { name: 'University', path: '/history', icon: '📚' },
+    { name: 'Competitions', path: '/community', icon: '🏆' },
+    { name: 'Academy', path: '/learn', icon: '📚' },
   ];
 
   return (

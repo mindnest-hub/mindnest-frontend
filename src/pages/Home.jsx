@@ -6,6 +6,7 @@ import Leaderboard from '../components/Leaderboard';
 import LiveNotifications from '../components/LiveNotifications';
 import AuthModal from '../components/AuthModal';
 import PaymentPortal from '../components/PaymentPortal';
+import DailyMissionBanner from '../components/DailyMissionBanner';
 import { useAuth } from '../context/AuthContext';
 import { useGamification } from '../context/GamificationContext';
 import { useWallet } from '../hooks/useWallet';
@@ -84,6 +85,8 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                     </div>
                 </div>
             </section>
+            {/* DAILY MISSION SIGNAL */}
+            <DailyMissionBanner />
 
             {/* CAPSULE TABS */}
             <div className="flex gap-2 mb-8 overflow-x-auto no-scrollbar pb-2">
