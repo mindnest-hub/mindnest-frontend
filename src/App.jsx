@@ -67,7 +67,7 @@ function App() {
           <div className="app-container bg-slate-950 min-h-screen">
             <WordOriginManager ageGroup={ageGroup} />
             <Suspense fallback={<LoadingScreen />}>
-              <MainLayout>
+              <MainLayout setAgeGroup={setAgeGroup}>
                 <Routes>
                   {/* MAIN DASHBOARD */}
                   <Route path="/" element={<Home ageGroup={ageGroup} setAgeGroup={setAgeGroup} />} />

@@ -1,19 +1,20 @@
 :root {
   /* Premium Edutech Palette - African Inspired */
   --color-bg: #0a0a0a;
-  --color-surface: #161616;
-  --color-surface-hover: #1e1e1e;
+  --color-bg-deep: #050505;
+  --color-surface: #121212;
+  --color-surface-hover: #1a1a1a;
   --color-primary: #C5A019;
   /* Sophisticated African Gold */
   --color-primary-soft: rgba(197, 160, 25, 0.1);
-  --color-secondary: #006B3C;
-  /* Emerald Green */
+  --color-secondary: #10b981;
+  /* Emerald Green / Success */
   --color-accent: #00BFFF;
   /* Tech Blue */
   --color-text: #F0F0F0;
-  --color-text-muted: #949494;
-  --color-danger: #FF4500;
-  --color-border: rgba(255, 255, 255, 0.08);
+  --color-text-muted: #666666;
+  --color-danger: #ef4444;
+  --color-border: rgba(255, 255, 255, 0.05);
 
   /* Typography - Responsive clamp sizes */
   --font-heading: 'Outfit', sans-serif;
@@ -219,14 +220,78 @@ button {
   background: #444;
 }
 
+/* Dashboard Specific UI */
+.dashboard-card {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.pill-tab {
+  padding: 0.6rem 1.25rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  background: transparent;
+  color: #666;
+}
+
+.pill-tab.active {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.badge-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.plus-center-btn {
+  width: 64px;
+  height: 64px;
+  background: #fff;
+  border-radius: 50%;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  border: 6px solid #0a0a0a;
+  transform: translateY(-20px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  transition: transform 0.2s;
+}
+
+.plus-center-btn:active {
+  transform: translateY(-20px) scale(0.9);
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

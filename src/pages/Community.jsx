@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useGamification } from '../hooks/useGamification';
+import { useWallet } from '../hooks/useWallet';
 
 const Community = () => {
     const [discussions, setDiscussions] = useState([

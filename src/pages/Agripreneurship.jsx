@@ -539,11 +539,11 @@ const Agripreneurship = () => {
                                 <div style={{ margin: '1rem 0', display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <span>Total Earnings {'>'} ₦10,000:</span>
-                                        <span style={{ color: balance >= 10000 ? '#00C851' : '#ff4444' }}>{balance >= 10000 ? "✅ Passed" : `❌ (${balance}/10000)`}</span>
+                                        <span style={{ color: balance >= 10000 ? '#00C851' : '#ff4444' }}>{balance >= 10000 ? "✅ Mastered" : `❌ (${balance}/10000)`}</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <span>Harvest Cycles {'>'} 3:</span>
-                                        <span style={{ color: harvestCount >= 3 ? '#00C851' : '#ff4444' }}>{harvestCount >= 3 ? "✅ Passed" : `❌ (${harvestCount}/3)`}</span>
+                                        <span style={{ color: harvestCount >= 3 ? '#00C851' : '#ff4444' }}>{harvestCount >= 3 ? "✅ Mastered" : `❌ (${harvestCount}/3)`}</span>
                                     </div>
                                 </div>
 

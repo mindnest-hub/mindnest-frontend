@@ -1,8 +1,14 @@
 const API_URL = (() => {
-    const url = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    console.log(`[API] Using Backend at: ${url}`);
-    return url;
+    // Priority: 1. Environment Variable, 2. Production Render URL, 3. Localhost
+    const envUrl = import.meta.env.VITE_API_URL;
+    const isProd = import.meta.env.PROD;
+    
+    if (envUrl) return envUrl;
+    if (isProd) return 'https://african-edu-backend.onrender.com';
+    return 'http://localhost:3000';
 })();
+
+console.log(`[API] Initialized with backend: ${API_URL}`);
 
 
 // Local storage fallback functions
