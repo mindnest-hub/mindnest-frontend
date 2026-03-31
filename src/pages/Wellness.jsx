@@ -15,6 +15,9 @@ const Wellness = ({ ageGroup }) => {
     const { addEarnings } = useWallet();
     const [toast, setToast] = useState(null);
 
+    // Always scroll to top when module opens
+    useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
+
     // Age Group Logic
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
@@ -295,7 +298,7 @@ const MentalModuleCard = ({ module, isCompleted, onComplete }) => {
                         <p>{module.quiz[quizIdx].q}</p>
                         <div style={{ display: 'grid', gap: '0.5rem', marginTop: '0.5rem' }}>
                             {module.quiz[quizIdx].o.map((opt, i) => (
-                                <button key={i} onClick={() => handleAnswer(i)} className="btn btn-outline" style={{ textAlign: 'left' }}>{opt}</button>
+                                <button key={i} onClick={() => handleAnswer(i)} className="btn btn-outline" style={{ textAlign: 'left', wordBreak: 'break-word', whiteSpace: 'normal', width: '100%' }}>{opt}</button>
                             ))}
                         </div>
                     </div>
@@ -355,7 +358,7 @@ const ModuleViewer = ({ module, onClose, onComplete }) => {
                         <h3>Question {quizIdx + 1}</h3>
                         <p>{module.quiz[quizIdx].q}</p>
                         {module.quiz[quizIdx].o.map((opt, i) => (
-                            <button key={i} onClick={() => handleAnswer(i)} className="btn btn-outline" style={{ display: 'block', width: '100%', margin: '0.5rem 0' }}>{opt}</button>
+                            <button key={i} onClick={() => handleAnswer(i)} className="btn btn-outline" style={{ display: 'block', width: '100%', margin: '0.5rem 0', textAlign: 'left', wordBreak: 'break-word', whiteSpace: 'normal' }}>{opt}</button>
                         ))}
                     </div>
                 )}

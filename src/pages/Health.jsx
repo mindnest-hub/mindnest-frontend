@@ -502,6 +502,9 @@ const Health = ({ ageGroup }) => {
     const isKid = ageGroup === 'kids' || ageGroup === 'Kids';
     const isTeen = ageGroup === 'teens' || ageGroup === 'Teens';
 
+    // Always scroll to top when module opens
+    useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, []);
+
     // --- KIDS RENDER ---
     if (isKid) {
         return (
@@ -706,7 +709,7 @@ const ModuleViewer = ({ module, isDone, onClose, onComplete }) => {
                                     key={idx}
                                     onClick={() => handleAnswer(idx)}
                                     className="btn btn-outline"
-                                    style={{ textAlign: 'left', padding: '1rem' }}
+                                    style={{ textAlign: 'left', padding: '1rem', wordBreak: 'break-word', whiteSpace: 'normal', width: '100%' }}
                                 >
                                     {opt}
                                 </button>

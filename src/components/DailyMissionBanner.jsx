@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGamification } from '../context/GamificationContext';
 
 const MISSIONS = [
     { id: 'finance', label: 'Finance Mission', task: 'Complete 2 Finance challenges today', xp: 200, emoji: '💰', route: '/finance' },
@@ -13,11 +12,10 @@ const MISSIONS = [
 const getDayOfWeek = () => new Date().getDay(); // 0=Sun…6=Sat
 const todaysMission = MISSIONS[getDayOfWeek() % MISSIONS.length];
 
-const GOAL_XP = todaysMission.xp;
+
 
 const DailyMissionBanner = () => {
     const navigate = useNavigate();
-    const { points } = useGamification?.() || {};
     const [dismissed, setDismissed] = useState(() => {
         const saved = localStorage.getItem('missionDismissedDate');
         return saved === new Date().toDateString();
