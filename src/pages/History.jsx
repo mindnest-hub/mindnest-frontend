@@ -5,7 +5,7 @@ import ResourceList from '../components/ResourceList';
 import Header from '../components/Header';
 import { useWallet } from '../hooks/useWallet';
 import { useAuth } from '../context/AuthContext';
-import { useGamification } from '../hooks/useGamification';
+import { useGamification } from '../context/GamificationContext';
 import { 
     kidsTimeline, 
     professionalModules, 
