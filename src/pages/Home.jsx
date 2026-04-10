@@ -16,28 +16,30 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     const { user, logout } = useAuth();
     
     // UI States
-    const [activeTab, setActiveTab] = useState('All');
+    const [activeTab, setActiveTab] = useState('My Paths');
     const [showProfileMenu, setShowProfileMenu] = useState(false);
 
-    // DUMMY ACCOUNTS TO MATCH SCREENSHOT
-    const accounts = [
+    // LEARNING PATHS DATA
+    const paths = [
         { 
             id: 1, 
-            accountNumber: '314773817',
+            pathNumber: '314773818',
             status: 'ACTIVE', 
-            type: 'Normal Two Step GOAT', 
-            startingBalance: '$5,000.00',
-            currentEquity: '$5,302.14',
-            pl: '+$302.14',
-            isPositive: true 
+            type: 'Professional Communication',
+            duration: '90 days duration',
+            startingDate: 'May 15, 2024',
+            currentProgress: '6/15 Lessons',
+            progressPct: '40%',
+            action1: () => navigate('/history'),
+            action2: () => navigate('/quiz')
         }
     ];
 
     return (
-        <div className="min-h-screen bg-[#000000] text-white px-4 pb-32 pt-6 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#050505] text-white px-4 pb-32 pt-6 font-sans relative overflow-x-hidden" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}>
             
             {/* TOP BAR / HEADER */}
-            <header className="flex items-center justify-between mb-6 mt-2">
+            <header className="flex items-center justify-between mb-4 mt-2">
                 <button onClick={() => setShowProfileMenu(true)} className="text-3xl font-light opacity-90">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 12H21M3 6H21M3 18H21" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -52,44 +54,86 @@ const Home = ({ ageGroup, setAgeGroup }) => {
             </header>
 
             {/* WELCOME BACK */}
-            <h1 className="text-[24px] font-normal tracking-tight mb-8">Welcome Back, {user?.username || 'Victor Chuku'}</h1>
+            <div className="mb-6">
+                <h1 className="text-[25px] font-normal tracking-tight mb-1">Welcome Back, {user?.username || 'Victor Chuku'}</h1>
+                <p className="text-[14px] text-slate-400 font-light">Let's explore MindNest Africa</p>
+            </div>
 
-            {/* TOTAL PAYOUT CARD */}
-            <section className="bg-[#121214] rounded-[24px] p-6 mb-8 text-center shadow-lg">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-[#F5C55A] text-lg">🏛️</span> 
-                    <span className="text-[14px] text-slate-400 font-medium">Total Payout</span>
+            {/* MY LEARNING PATH CARD */}
+            <section className="bg-[#121214] rounded-[22px] p-4 mb-6 shadow-2xl relative z-10 border border-white/5">
+                <div className="flex items-center justify-center gap-2 mb-4 mt-1">
+                    <span className="text-[#F5C55A] text-2xl pt-1">🌳</span> 
+                    <span className="text-[17px] text-white font-medium">My Learning Path</span>
                 </div>
-                <h2 className="text-[52px] font-normal tracking-tight mb-8">
-                    $0.00
-                </h2>
                 
-                {/* 3 Distinct Sub-boxes */}
+                {/* 2 Top Boxes */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                    {/* Goal Circular Progress */}
+                    <div className="bg-[#1A1A1E] rounded-[16px] p-4 flex flex-col items-center justify-center relative shadow-inner">
+                        <span className="text-[11px] text-slate-300 mb-4 block">Goal: Professional Skill Path</span>
+                        
+                        <div className="relative w-28 h-28 flex items-center justify-center">
+                            <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90 drop-shadow-md">
+                                <path className="text-[#2A2A2E] stroke-current" strokeWidth="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                {/* Semi Circle progress indicator */}
+                                <path className="text-[#F5C55A] stroke-current" strokeWidth="3" strokeDasharray="12.5, 100" fill="none" strokeLinecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div className="absolute flex flex-col items-center justify-center mt-1">
+                                <span className="text-[9px] text-slate-400">1 of 8 courses</span>
+                                <span className="text-[22px] font-normal leading-tight mt-1 text-white">12.5%</span>
+                                <span className="text-[9px] text-slate-400 mt-1">Complete</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Quiz Performance Bar Chart */}
+                    <div className="bg-[#1A1A1E] rounded-[16px] p-4 flex flex-col items-center justify-center relative shadow-inner">
+                        <span className="text-[11px] text-slate-300 mb-4 block flex items-center gap-1"><span className="text-[#F5C55A] text-xs">🎓</span> Quiz Performance</span>
+                        
+                        {/* Bar Chart Fake Representation */}
+                        <div className="flex items-end justify-center gap-1.5 h-[55px] mb-4 w-full px-2">
+                            <div className="w-[12%] bg-[#4ADE80] h-[30%] rounded-t-[2px]"></div>
+                            <div className="w-[12%] bg-[#4ADE80] h-[45%] rounded-t-[2px]"></div>
+                            <div className="w-[12%] bg-[#4ADE80] h-[60%] rounded-t-[2px]"></div>
+                            <div className="w-[12%] bg-[#4ADE80] h-[75%] rounded-t-[2px]"></div>
+                            <div className="w-[12%] bg-[#4ADE80] h-[70%] rounded-t-[2px]"></div>
+                            <div className="w-[12%] bg-[#4ADE80] h-[95%] rounded-t-[2px]"></div>
+                            <div className="w-[12%] bg-[#4ADE80] h-[100%] rounded-t-[2px]"></div>
+                        </div>
+
+                        <p className="text-[10px] text-slate-300 text-center leading-relaxed">
+                            Average Score: 92%<br/>
+                            <span className="text-slate-500">(on 3 quizzes)</span>
+                        </p>
+                    </div>
+                </div>
+                
+                {/* 3 Bottom Distinct Sub-boxes */}
                 <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-[#1A1A1E] rounded-[16px] py-4 flex flex-col items-center justify-center">
-                        <span className="text-[11px] text-slate-400 mb-1">Total Accounts</span>
-                        <span className="text-[24px] font-normal">5</span>
+                    <div className="bg-[#1A1A1E] rounded-[14px] py-4 flex flex-col items-center justify-center shadow-inner">
+                        <span className="text-[10px] text-slate-400 mb-1">Total Learning Time</span>
+                        <span className="text-[16px] font-normal text-white drop-shadow-sm">150 Hours</span>
                     </div>
-                    <div className="bg-[#1A1A1E] rounded-[16px] py-4 flex flex-col items-center justify-center">
-                        <span className="text-[11px] text-slate-400 mb-1">Passed</span>
-                        <span className="text-[24px] font-normal">0</span>
+                    <div className="bg-[#1A1A1E] rounded-[14px] py-4 flex flex-col items-center justify-center shadow-inner">
+                        <span className="text-[10px] text-slate-400 mb-1">Skills Gained</span>
+                        <span className="text-[16px] font-normal text-white drop-shadow-sm">4 Badges</span>
                     </div>
-                    <div className="bg-[#1A1A1E] rounded-[16px] py-4 flex flex-col items-center justify-center">
-                        <span className="text-[11px] text-slate-400 mb-1">Funded</span>
-                        <span className="text-[24px] font-normal">1</span>
+                    <div className="bg-[#1A1A1E] rounded-[14px] py-4 flex flex-col items-center justify-center shadow-inner">
+                        <span className="text-[10px] text-slate-400 mb-1">Certificates</span>
+                        <span className="text-[16px] font-normal text-white drop-shadow-sm">2</span>
                     </div>
                 </div>
             </section>
 
             {/* CAPSULE TABS */}
-            <div className="bg-[#111113] p-1.5 rounded-[24px] flex justify-between mb-10 overflow-hidden">
-                {['All', 'Active', 'Passed', 'Blocked', 'Failed'].map(tab => (
+            <div className="bg-[#121214] p-1.5 rounded-[24px] flex justify-between mb-8 overflow-hidden shadow-md">
+                {['My Paths', 'In Progress', 'Completed', 'Recommended'].map(tab => (
                     <button 
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`py-2.5 px-3 rounded-full text-[13px] font-medium transition-all ${
+                        className={`py-2.5 px-3 rounded-full text-[12px] font-medium transition-all ${
                             activeTab === tab 
-                            ? 'bg-[#2A2A2E] text-white' 
+                            ? 'bg-[#2A2A2E] text-white shadow-sm' 
                             : 'text-slate-400 hover:text-white'
                         }`}
                     >
@@ -98,53 +142,55 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                 ))}
             </div>
 
-            {/* ACCOUNT LIST SECTION */}
+            {/* ACCOUNT/PATH LIST SECTION */}
             <section>
                 <div className="mb-4">
-                    <h3 className="text-[18px] font-normal text-white">All Accounts (5)</h3>
+                    <h3 className="text-[16px] font-normal text-slate-100">All Learning Paths (4)</h3>
                 </div>
                 
                 <div className="space-y-6">
-                    {accounts.map((acc) => (
-                        <div key={acc.id} className="bg-[#121214] rounded-[24px] p-5">
-                            {/* Account Header */}
-                            <div className="flex items-center justify-between mb-1">
-                                <h4 className="text-[17px] font-normal text-white">Account {acc.id} - {acc.accountNumber}</h4>
-                                <span className={`px-3 py-1 rounded-[6px] text-[10px] font-bold tracking-wider ${
-                                    acc.status === 'ACTIVE' 
+                    {paths.map((path) => (
+                        <div key={path.id} className="bg-[#121214] rounded-[24px] p-5 shadow-xl border border-white/5">
+                            {/* Path Header */}
+                            <div className="flex items-center justify-between mb-2">
+                                <h4 className="text-[17px] font-normal text-white">Path {path.id} - {path.pathNumber}</h4>
+                                <span className={`px-4 py-[3px] rounded-full text-[10px] font-bold tracking-wider ${
+                                    path.status === 'ACTIVE' 
                                     ? 'bg-[#0F291E] text-[#4ADE80]' 
                                     : 'bg-red-900/30 text-red-500'
                                 }`}>
-                                    {acc.status}
+                                    {path.status}
                                 </span>
                             </div>
-                            <p className="text-[14px] text-slate-300 mb-6">{acc.type}</p>
+                            
+                            <div className="flex justify-between items-center mb-6">
+                                <p className="text-[13px] text-slate-200">{path.type}</p>
+                                <p className="text-[11px] text-slate-500">{path.duration}</p>
+                            </div>
                             
                             {/* Stats Columns */}
                             <div className="flex justify-between mb-8 pr-2">
                                 <div>
-                                    <p className="text-[11px] text-slate-500 mb-1">Starting Balance</p>
-                                    <p className="text-[15px] font-normal">{acc.startingBalance}</p>
+                                    <p className="text-[10px] text-slate-500 mb-1">Starting Date</p>
+                                    <p className="text-[14px] font-normal text-slate-100">{path.startingDate}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-[11px] text-slate-500 mb-1">Current Equity</p>
-                                    <p className="text-[15px] font-normal">{acc.currentEquity}</p>
+                                    <p className="text-[10px] text-slate-500 mb-1">Current Progress</p>
+                                    <p className="text-[14px] font-normal text-slate-100">{path.currentProgress}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-[11px] text-slate-500 mb-1">P/L</p>
-                                    <p className={`text-[15px] font-normal ${acc.isPositive ? 'text-[#4ADE80]' : 'text-red-500'}`}>
-                                        {acc.pl}
-                                    </p>
+                                    <p className="text-[10px] text-slate-500 mb-1">Progress %</p>
+                                    <p className="text-[14px] font-normal text-slate-100">{path.progressPct}</p>
                                 </div>
                             </div>
 
                             {/* Action Buttons */}
                             <div className="flex gap-3">
-                                <button className="flex-1 bg-[#F5C55A] text-black h-[50px] rounded-[20px] font-medium text-[14px] active:scale-95 transition-transform">
-                                    View Dashboard
+                                <button className="flex-1 bg-[#F5C55A] text-[#111] h-[48px] rounded-[20px] font-medium text-[13px] active:scale-95 transition-transform shadow-[0_4px_15px_rgba(245,197,90,0.15)]">
+                                    View Syllabus
                                 </button>
-                                <button className="flex-1 border border-[#F5C55A] text-[#F5C55A] h-[50px] rounded-[20px] font-medium text-[14px] active:scale-95 transition-transform bg-transparent">
-                                    Show Credentials
+                                <button className="flex-1 border border-[#F5C55A] text-[#F5C55A] h-[48px] rounded-[20px] font-medium text-[13px] active:scale-95 transition-transform bg-transparent hover:bg-[#F5C55A]/5">
+                                    Start Quiz
                                 </button>
                             </div>
                         </div>
