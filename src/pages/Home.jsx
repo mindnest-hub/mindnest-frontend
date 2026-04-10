@@ -23,15 +23,36 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     const paths = [
         { 
             id: 1, 
-            pathNumber: '314773818',
+            pathNumber: 'HISTORY-01',
             status: 'ACTIVE', 
-            type: 'Professional Communication',
-            duration: '90 days duration',
+            type: 'History University',
+            duration: '15 Lessons',
             startingDate: 'May 15, 2024',
             currentProgress: '6/15 Lessons',
             progressPct: '40%',
-            action1: () => navigate('/history'),
-            action2: () => navigate('/quiz')
+            action1: () => navigate('/history')
+        },
+        { 
+            id: 2, 
+            pathNumber: 'FINANCE-02',
+            status: 'ACTIVE', 
+            type: 'Financial Literacy',
+            duration: '12 Lessons',
+            startingDate: 'June 01, 2024',
+            currentProgress: '2/12 Lessons',
+            progressPct: '16%',
+            action1: () => navigate('/finance')
+        },
+        { 
+            id: 3, 
+            pathNumber: 'AGRI-03',
+            status: 'UPCOMING', 
+            type: 'Agripreneurship',
+            duration: '8 Lessons',
+            startingDate: 'Not started',
+            currentProgress: '0/8 Lessons',
+            progressPct: '0%',
+            action1: () => navigate('/agri')
         }
     ];
 
@@ -70,17 +91,17 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                 <div className="grid grid-cols-2 gap-3 mb-3">
                     {/* Goal Circular Progress */}
                     <div className="bg-[#1A1A1E] rounded-[16px] p-4 flex flex-col items-center justify-center relative shadow-inner">
-                        <span className="text-[11px] text-slate-300 mb-4 block">Goal: Professional Skill Path</span>
+                        <span className="text-[11px] text-slate-300 mb-4 block text-center">Goal: Elite Member Status</span>
                         
                         <div className="relative w-28 h-28 flex items-center justify-center">
                             <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90 drop-shadow-md">
                                 <path className="text-[#2A2A2E] stroke-current" strokeWidth="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 {/* Semi Circle progress indicator */}
-                                <path className="text-[#F5C55A] stroke-current" strokeWidth="3" strokeDasharray="12.5, 100" fill="none" strokeLinecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path className="text-[#F5C55A] stroke-current" strokeWidth="3" strokeDasharray="30, 100" fill="none" strokeLinecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             </svg>
                             <div className="absolute flex flex-col items-center justify-center mt-1">
-                                <span className="text-[9px] text-slate-400">1 of 8 courses</span>
-                                <span className="text-[22px] font-normal leading-tight mt-1 text-white">12.5%</span>
+                                <span className="text-[9px] text-slate-400">2 of 8 courses</span>
+                                <span className="text-[22px] font-normal leading-tight mt-1 text-white">30%</span>
                                 <span className="text-[9px] text-slate-400 mt-1">Complete</span>
                             </div>
                         </div>
@@ -145,7 +166,7 @@ const Home = ({ ageGroup, setAgeGroup }) => {
             {/* ACCOUNT/PATH LIST SECTION */}
             <section>
                 <div className="mb-4">
-                    <h3 className="text-[16px] font-normal text-slate-100">All Learning Paths (4)</h3>
+                    <h3 className="text-[16px] font-normal text-slate-100">All Learning Paths ({paths.length})</h3>
                 </div>
                 
                 <div className="space-y-6">
@@ -153,18 +174,18 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                         <div key={path.id} className="bg-[#121214] rounded-[24px] p-5 shadow-xl border border-white/5">
                             {/* Path Header */}
                             <div className="flex items-center justify-between mb-2">
-                                <h4 className="text-[17px] font-normal text-white">Path {path.id} - {path.pathNumber}</h4>
+                                <h4 className="text-[17px] font-normal text-white">{path.type}</h4>
                                 <span className={`px-4 py-[3px] rounded-full text-[10px] font-bold tracking-wider ${
                                     path.status === 'ACTIVE' 
                                     ? 'bg-[#0F291E] text-[#4ADE80]' 
-                                    : 'bg-red-900/30 text-red-500'
+                                    : 'bg-zinc-800 text-zinc-400'
                                 }`}>
                                     {path.status}
                                 </span>
                             </div>
                             
                             <div className="flex justify-between items-center mb-6">
-                                <p className="text-[13px] text-slate-200">{path.type}</p>
+                                <p className="text-[13px] text-slate-200">Path ID: {path.pathNumber}</p>
                                 <p className="text-[11px] text-slate-500">{path.duration}</p>
                             </div>
                             
@@ -186,11 +207,17 @@ const Home = ({ ageGroup, setAgeGroup }) => {
 
                             {/* Action Buttons */}
                             <div className="flex gap-3">
-                                <button className="flex-1 bg-[#F5C55A] text-[#111] h-[48px] rounded-[20px] font-medium text-[13px] active:scale-95 transition-transform shadow-[0_4px_15px_rgba(245,197,90,0.15)]">
+                                <button 
+                                    onClick={path.action1}
+                                    className="flex-1 bg-[#F5C55A] text-[#111] h-[48px] rounded-[20px] font-medium text-[13px] active:scale-95 transition-transform shadow-[0_4px_15px_rgba(245,197,90,0.15)]"
+                                >
                                     View Syllabus
                                 </button>
-                                <button className="flex-1 border border-[#F5C55A] text-[#F5C55A] h-[48px] rounded-[20px] font-medium text-[13px] active:scale-95 transition-transform bg-transparent hover:bg-[#F5C55A]/5">
-                                    Start Quiz
+                                <button 
+                                    onClick={path.action1}
+                                    className="flex-1 border border-[#F5C55A] text-[#F5C55A] h-[48px] rounded-[20px] font-medium text-[13px] active:scale-95 transition-transform bg-transparent hover:bg-[#F5C55A]/5"
+                                >
+                                    Start Node
                                 </button>
                             </div>
                         </div>
