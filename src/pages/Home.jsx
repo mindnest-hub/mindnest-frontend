@@ -255,13 +255,47 @@ const Home = ({ ageGroup, setAgeGroup }) => {
 
             {/* Hidden Drawer for Menu */}
             {showProfileMenu && (
-                <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex flex-col p-6 animate-fadeIn">
-                    <button onClick={() => setShowProfileMenu(false)} className="self-end text-3xl text-[#D9A060] mb-8">×</button>
-                    <h2 className="text-[#EBC188] text-2xl mb-8 font-light tracking-wide">Menu</h2>
-                    <ul className="space-y-6 text-lg text-white font-light tracking-widest uppercase">
-                        <li className="cursor-pointer hover:text-[#D9A060]" onClick={() => navigate('/docs')}>Settings</li>
-                        <li className="cursor-pointer hover:text-[#D9A060]" onClick={() => navigate('/services')}>Support</li>
-                        <li className="cursor-pointer text-red-400 mt-10" onClick={logout}>Sign Out</li>
+                <div className="fixed inset-0 z-[9999] bg-[#050505] flex flex-col p-6 animate-fadeIn overflow-y-auto">
+                    <button onClick={() => setShowProfileMenu(false)} className="self-end text-3xl text-white mb-6">×</button>
+                    
+                    <ul className="space-y-4 text-[22px] font-normal text-[#00BFFF]">
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/learn')}>
+                            <span className="text-2xl">🚀</span> New Module
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/')}>
+                            <span className="text-2xl">🏠</span> Home
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/events')}>
+                            <span className="text-2xl">👥</span> Elite Community
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/services')}>
+                            <span className="text-2xl">💳</span> My Earnings
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/finance')}>
+                            <span className="text-2xl">🛍️</span> Buy Elite
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/stats')}>
+                            <span className="text-2xl">📊</span> Leaderboard
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/opportunities')}>
+                            <span className="text-2xl">🏷️</span> My Offers
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/stats')}>
+                            <span className="text-2xl">📈</span> My Stats
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/docs')}>
+                            <span className="text-2xl">🥇</span> Certificates
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/events')}>
+                            <span className="text-2xl">🏆</span> Competitions
+                        </li>
+                        <li className="cursor-pointer flex items-center gap-3" onClick={() => navigate('/learn')}>
+                            <span className="text-2xl">📚</span> Academy
+                        </li>
+                        
+                        <li className="cursor-pointer flex items-center gap-3 text-red-500 mt-8 pt-4 border-t border-white/10" onClick={logout}>
+                            <span className="text-2xl">🚪</span> Sign Out
+                        </li>
                     </ul>
                 </div>
             )}
