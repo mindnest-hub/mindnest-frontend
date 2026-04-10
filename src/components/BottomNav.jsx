@@ -44,17 +44,17 @@ const BottomNav = () => {
         <span className="absolute left-1/2 -translate-x-1/2 top-[72px] text-[10px] font-bold text-white whitespace-nowrap uppercase tracking-tighter">New Challenge</span>
       </div>
 
-      {/* MY EARNINGS */}
+      {/* MY PAYOUTS */}
       <NavLink
         to="/services"
         className={({ isActive }) => 
           `flex flex-col items-center justify-center gap-1 min-w-[60px] transition-all ${
-            isActive ? 'text-[#C5A019]' : 'text-slate-600'
+            isActive ? 'text-[#F5C55A]' : 'text-slate-600'
           }`
         }
       >
-        <span className="text-2xl">💼</span>
-        <span className="text-[10px] font-bold tracking-tight whitespace-nowrap">My Earnings</span>
+        <span className="text-2xl opacity-90">💳</span>
+        <span className="text-[10px] font-bold tracking-tight whitespace-nowrap">My Payouts</span>
       </NavLink>
 
       {/* MY OFFERS */}
