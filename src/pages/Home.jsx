@@ -442,6 +442,9 @@ const Home = ({ ageGroup, setAgeGroup }) => {
                     </ul>
                     
                     <div className="pt-6 border-t border-white/10 mt-4 pb-12">
+                        <li className="cursor-pointer flex items-center gap-3 text-[#D9A060] font-medium text-[18px] hover:bg-[#D9A060]/10 p-2 rounded-lg mb-2" onClick={() => navigate('/legal')}>
+                            <span className="text-2xl">⚖️</span> Legal & Privacy
+                        </li>
                         <li className="cursor-pointer flex items-center gap-3 text-red-500 font-medium text-[18px] hover:bg-red-500/10 p-2 rounded-lg" onClick={logout}>
                             <span className="text-2xl">🚪</span> Sign Out
                         </li>

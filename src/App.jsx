@@ -14,6 +14,7 @@ import {
   PartnersPage, 
   MemberProfile 
 } from './pages/MindNestSections';
+import LegalDocs from './pages/LegalDocs';
 
 // LEARNING MODULES
 import History from './pages/History';
@@ -146,6 +147,7 @@ function App() {
                   <Route path="/relationships" element={<Relationships ageGroup={ageGroup} />} />
                   <Route path="/purpose" element={<Purpose ageGroup={ageGroup} />} />
                   <Route path="/transparency" element={<Transparency />} />
+                  <Route path="/legal" element={<LegalDocs />} />
                   
                   <Route path="/reset-password" element={<ResetPassword />} />
                   
