@@ -2,24 +2,24 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const LegalDocs = () => {
-    const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('terms');
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('terms');
 
-    // UI Styles
-    const textGradient = "text-transparent bg-clip-text bg-gradient-to-r from-[#D9A060] to-[#EBC188]";
-    const panelBg = "bg-[#121214] border border-[#B67F4B]/30 rounded-xl";
+  // UI Styles
+  const textGradient = "text-transparent bg-clip-text bg-gradient-to-r from-[#D9A060] to-[#EBC188]";
+  const panelBg = "bg-[#121214] border border-[#B67F4B]/30 rounded-xl";
 
-    const tabs = [
-        { id: 'terms', label: 'Terms & Conditions' },
-        { id: 'privacy', label: 'Privacy Policy' },
-        { id: 'cookie', label: 'Cookie Policy' },
-        { id: 'agreement', label: 'User Agreement' },
-        { id: 'ai', label: 'AI Ethics Policy' },
-        { id: 'appstore', label: 'App Store Terms' }
-    ];
+  const tabs = [
+    { id: 'terms', label: 'Terms & Conditions' },
+    { id: 'privacy', label: 'Privacy Policy' },
+    { id: 'cookie', label: 'Cookie Policy' },
+    { id: 'agreement', label: 'User Agreement' },
+    { id: 'ai', label: 'AI Ethics Policy' },
+    { id: 'appstore', label: 'App Store Terms' }
+  ];
 
-    const content = {
-        terms: `Terms and Conditions of Use for MindNest Africa
+  const content = {
+    terms: `Terms and Conditions of Use for MindNest Africa
 
 Effective Date: [Insert Date]
 Last Updated: [Insert Date]
@@ -414,7 +414,7 @@ Email: [Insert Email]
 Support: [Insert Support Email]
 Website: [Insert Website]
 Office: [Insert Address]`,
-        privacy: `2. PRIVACY POLICY (MindNest Africa)
+    privacy: `2. PRIVACY POLICY (MindNest Africa)
 
 Effective Date: [Insert Date]
 Last Updated: [Insert Date]
@@ -627,7 +627,7 @@ MindNest Africa Support & Compliance Team
 📧 Mindnestafrica@gmail.com
 🌐 Mindnest.bond
 📍 Port Harcourt, Rivers State, Nigeria`,
-        cookie: `COOKIE POLICY
+    cookie: `COOKIE POLICY
 
 Effective Date: [Insert Date]
 Last Updated: [Insert Date]
@@ -748,7 +748,7 @@ MindNest Africa Support & Compliance Team
 📧 Mindnestafrica@gmail.com
 🌐 Mindnest.bond
 📍 Port Harcourt, Rivers State, Nigeria`,
-        agreement: `USER AGREEMENT (MindNest Africa)
+    agreement: `USER AGREEMENT (MindNest Africa)
 
 Effective Date: [Insert Date]
 Last Updated: [Insert Date]
@@ -881,7 +881,7 @@ Continued use means acceptance of updates.
 📧 Mindnestafrica@gmail.com
 🌐 Mindnest.bond
 📍 Port Harcourt, Nigeria`,
-        ai: `🤖 5. AI ETHICAL USE POLICY
+    ai: `🤖 5. AI ETHICAL USE POLICY
 
 Effective Date: [Insert Date]
 
@@ -982,7 +982,7 @@ But we cannot guarantee perfection.
 Users can report AI issues to:
 
 📧 Mindnestafrica@gmail.com`,
-        appstore: `APP STORE TERMS (SHORT VERSION)
+    appstore: `APP STORE TERMS (SHORT VERSION)
 
 This version is used for:
  • App Store
@@ -1054,7 +1054,8 @@ We may update these terms at any time.
 
 📧 Mindnestafrica@gmail.com
 🌐 Mindnest.bond`
-    };
+  };
+
 
     return (
         <div className="min-h-screen bg-[#070707] text-white p-5 pb-32" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/black-scales.png")' }}>
@@ -1064,7 +1065,7 @@ We may update these terms at any time.
                 <button onClick={() => navigate(-1)} className="text-[#D9A060] bg-[#1a1a1a] p-2 rounded-full border border-[#D9A060]/30 hover:bg-[#D9A060]/10 transition-colors">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
                 </button>
-                <h1 className={\`text-2xl font-bold uppercase tracking-widest \${textGradient}\`}>Legal Center</h1>
+                <h1 className={`text-2xl font-bold uppercase tracking-widest ${textGradient}`}>Legal Center</h1>
             </div>
 
             {/* Horizontal Tabs */}
@@ -1073,7 +1074,7 @@ We may update these terms at any time.
                     <button 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={\`px-4 py-2 rounded-full text-[12px] font-semibold tracking-wide whitespace-nowrap transition-all \${activeTab === tab.id ? 'bg-[#D9A060] text-black shadow-[0_0_10px_rgba(217,160,96,0.5)]' : 'bg-[#1D1D20] text-slate-400 border border-[#D9A060]/20'}\`}
+                        className={`px-4 py-2 rounded-full text-[12px] font-semibold tracking-wide whitespace-nowrap transition-all ${activeTab === tab.id ? 'bg-[#D9A060] text-black shadow-[0_0_10px_rgba(217,160,96,0.5)]' : 'bg-[#1D1D20] text-slate-400 border border-[#D9A060]/20'}`}
                     >
                         {tab.label}
                     </button>
@@ -1081,7 +1082,7 @@ We may update these terms at any time.
             </div>
 
             {/* Content Display */}
-            <div className={\`p-6 \${panelBg} shadow-[0_5px_30px_rgba(0,0,0,0.5)]\`}>
+            <div className={`p-6 ${panelBg} shadow-[0_5px_30px_rgba(0,0,0,0.5)]`}>
                 <div className="prose prose-invert max-w-none">
                     {content[activeTab].split('\\n').map((line, idx) => {
                         if (line.trim() === '⸻') {
