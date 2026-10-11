@@ -22,6 +22,7 @@ const Home = ({ ageGroup, setAgeGroup }) => {
   const { moduleEarnings, balance } = useWallet();
   const { points, level } = useGamification();
   const [showMenu, setShowMenu] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const username = user?.username || user?.user_metadata?.username || 'Victor Chuku';
 
@@ -82,15 +83,10 @@ const Home = ({ ageGroup, setAgeGroup }) => {
   };
 
   // ── menu items ─────────────────────────────────────────────────────────────
-  const menuItems = [
-    { icon: '🚀', label: 'New Module',      route: '/learn' },
+  const navItems = [
     { icon: '🏠', label: 'Home',            route: '/' },
+    { icon: '🚀', label: 'New Module',      route: '/learn' },
     { icon: '👥', label: 'Elite Community', route: '/community' },
-    { icon: '💳', label: 'My Earnings',     route: '/services' },
-    { icon: '📊', label: 'Leaderboard',     route: '/stats' },
-    { icon: '🏷️', label: 'My Offers',       route: '/opportunities' },
-    { icon: '🥇', label: 'Certificates',    route: '/docs' },
-    { icon: '🏆', label: 'Competitions',    route: '/events' },
     { icon: '📚', label: 'Academy',         route: '/learn' },
     { icon: '🌾', label: 'History',         route: '/history' },
     { icon: '💰', label: 'Finance',         route: '/finance' },
@@ -100,6 +96,14 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     { icon: '🌱', label: 'Agripreneurship', route: '/agri' },
     { icon: '💻', label: 'Tech',            route: '/tech' },
     { icon: '🤖', label: 'AI Chatbot',      route: '/ai' },
+  ];
+
+  const profileItems = [
+    { icon: '💳', label: 'My Earnings',     route: '/services' },
+    { icon: '📊', label: 'Leaderboard',     route: '/stats' },
+    { icon: '🏷️', label: 'My Offers',       route: '/opportunities' },
+    { icon: '🥇', label: 'Certificates',    route: '/docs' },
+    { icon: '🏆', label: 'Competitions',    route: '/events' },
   ];
 
   const aiTopics = [
@@ -140,7 +144,7 @@ const Home = ({ ageGroup, setAgeGroup }) => {
         </div>
 
         {/* Profile */}
-        <button onClick={() => setShowMenu(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', background: 'none', border: 'none', cursor: 'pointer' }}>
+        <button onClick={() => setShowProfile(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', background: 'none', border: 'none', cursor: 'pointer' }}>
           <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#1A1208', border: '1.5px solid #C5A019', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#C5A019"><path d="M12 12c2.7 0 5-2.3 5-5S14.7 2 12 2 7 4.3 7 7s2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
           </div>
@@ -396,13 +400,37 @@ const Home = ({ ageGroup, setAgeGroup }) => {
             <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#00BFFF', marginBottom: '24px', marginTop: '4px', letterSpacing: '2px' }}>Menu</h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {menuItems.map((item, i) => (
+              {navItems.map((item, i) => (
                 <button key={i} onClick={() => { navigate(item.route); setShowMenu(false); }}
                   style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', color: '#00BFFF', fontSize: '15px', fontWeight: '500', textAlign: 'left', padding: '9px 10px', borderRadius: '10px', cursor: 'pointer' }}>
                   <span style={{ fontSize: '18px' }}>{item.icon}</span> {item.label}
                 </button>
               ))}
             </div>
+
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px', marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <button onClick={() => { navigate('/legal'); setShowMenu(false); }}
+                style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', color: '#C5A019', fontSize: '15px', fontWeight: '500', textAlign: 'left', padding: '9px 10px', borderRadius: '10px', cursor: 'pointer' }}>
+                <span>⚖️</span> Legal & Privacy
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── PROFILE DRAWER ──────────────────────────────────────────────── */}
+      {showProfile && (
+        <>
+          <div onClick={() => setShowProfile(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 9998, backdropFilter: 'blur(4px)' }} />
+          <div style={{
+            position: 'fixed', top: 0, right: 0, bottom: 0, width: '290px',
+            background: '#050505', zIndex: 9999, overflowY: 'auto',
+            borderLeft: '1px solid rgba(197,160,25,0.2)',
+            boxShadow: '-20px 0 60px rgba(0,0,0,0.9)',
+            padding: '20px 18px 40px',
+          }}>
+            <button onClick={() => setShowProfile(false)} style={{ position: 'absolute', top: '18px', left: '18px', background: 'none', border: 'none', color: '#fff', fontSize: '26px', cursor: 'pointer' }}>×</button>
+            <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#E8C96E', marginBottom: '24px', marginTop: '4px', letterSpacing: '2px', textAlign: 'right' }}>Profile</h2>
 
             {/* Level/Points from real data */}
             <div style={{ margin: '16px 0', padding: '12px', background: 'rgba(197,160,25,0.08)', border: '1px solid rgba(197,160,25,0.2)', borderRadius: '12px' }}>
@@ -414,11 +442,16 @@ const Home = ({ ageGroup, setAgeGroup }) => {
               </div>
             </div>
 
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <button onClick={() => { navigate('/legal'); setShowMenu(false); }}
-                style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', color: '#C5A019', fontSize: '15px', fontWeight: '500', textAlign: 'left', padding: '9px 10px', borderRadius: '10px', cursor: 'pointer' }}>
-                <span>⚖️</span> Legal & Privacy
-              </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {profileItems.map((item, i) => (
+                <button key={i} onClick={() => { navigate(item.route); setShowProfile(false); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', color: '#D4B87A', fontSize: '15px', fontWeight: '500', textAlign: 'left', padding: '9px 10px', borderRadius: '10px', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '18px' }}>{item.icon}</span> {item.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px', marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               <button onClick={logout}
                 style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'none', border: 'none', color: '#EF4444', fontSize: '15px', fontWeight: '500', textAlign: 'left', padding: '9px 10px', borderRadius: '10px', cursor: 'pointer' }}>
                 <span>🚪</span> Sign Out

@@ -97,28 +97,6 @@ const Finance = ({ ageGroup }) => {
     localStorage.setItem('dreamCost', dreamCost);
   }, [dreamGoal, dreamCost]);
 
-  // --- PASSIVE INCOME LOOP (LEVEL 16) ---
-  useEffect(() => {
-    if (currentLevel < 16) return;
-
-    const interval = setInterval(() => {
-      setPortfolio(prev => {
-        // Calculate yields
-        const realEstateYield = prev.realEstate * 50; // Lagos Rent ₦50 per unit
-        const stockYield = prev.stocks * 5; // Dividends ₦5 per share
-        const bankYield = prev.bankFixed * 10; // Interest ₦10 per k
-
-        const totalIncome = realEstateYield + stockYield + bankYield;
-
-        if (totalIncome > 0) {
-          return { ...prev, cash: prev.cash + totalIncome };
-        }
-        return prev;
-      });
-    }, 5000); // Pulse every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [currentLevel]);
 
 
 
@@ -438,6 +416,29 @@ const Finance = ({ ageGroup }) => {
   });
   const [newsEvent, setNewsEvent] = useState(null);
   const [passiveIncomeRate, setPassiveIncomeRate] = useState(0);
+
+  // --- PASSIVE INCOME LOOP (LEVEL 16) ---
+  useEffect(() => {
+    if (currentLevel < 16) return;
+
+    const interval = setInterval(() => {
+      setPortfolio(prev => {
+        // Calculate yields
+        const realEstateYield = prev.realEstate * 50; // Lagos Rent ₦50 per unit
+        const stockYield = prev.stocks * 5; // Dividends ₦5 per share
+        const bankYield = prev.bankFixed * 10; // Interest ₦10 per k
+
+        const totalIncome = realEstateYield + stockYield + bankYield;
+
+        if (totalIncome > 0) {
+          return { ...prev, cash: prev.cash + totalIncome };
+        }
+        return prev;
+      });
+    }, 5000); // Pulse every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [currentLevel]);
 
   const cryptoStages = [
     { title: "Buy Low, Sell High", desc: "Watch the trends!", target: 1200 },
