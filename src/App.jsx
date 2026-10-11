@@ -40,15 +40,23 @@ import ProtectedRoute from './components/ProtectedRoute';
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
 
 const LoadingScreen = () => (
-  <div style={{
-    display: 'flex', justifyContent: 'center', alignItems: 'center',
-    height: '100vh', backgroundColor: '#020617', color: '#fbbf24',
-    fontSize: '1.5rem', fontWeight: 'bold'
-  }}>
-    <div className="flex flex-col items-center gap-4">
-      <span className="text-4xl animate-bounce">🦁</span>
-      <span>MindNest is loading...</span>
+  <div style={{ backgroundColor: '#0A0A08', minHeight: '100vh', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    {/* Header skeleton */}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ width: '40px', height: '40px', background: '#1c1c1c', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
+      <div style={{ width: '120px', height: '24px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
+      <div style={{ width: '40px', height: '40px', background: '#1c1c1c', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
     </div>
+    {/* Content skeleton */}
+    <div style={{ width: '100%', height: '200px', background: '#1c1c1c', borderRadius: '16px', animation: 'pulse 1.5s infinite' }} />
+    <div style={{ width: '100%', height: '200px', background: '#1c1c1c', borderRadius: '16px', animation: 'pulse 1.5s infinite' }} />
+    <style>{`
+      @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 0.2; }
+        100% { opacity: 0.6; }
+      }
+    `}</style>
   </div>
 );
 

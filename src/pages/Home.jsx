@@ -18,7 +18,7 @@ const ALL_MODULES = [
 // ─── COMPONENT ────────────────────────────────────────────────────────────────
 const Home = ({ ageGroup, setAgeGroup }) => {
   const navigate   = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const { moduleEarnings, balance } = useWallet();
   const { points, level } = useGamification();
   const [showMenu, setShowMenu] = useState(false);
@@ -113,6 +113,47 @@ const Home = ({ ageGroup, setAgeGroup }) => {
     { label: 'Financial Literacy Check',     route: '/finance' },
     { label: 'Pocket Lawyer consultation',   route: '/ai' },
   ];
+
+  if (loading) {
+    return (
+      <div style={S.page}>
+        {/* Header Skeleton */}
+        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 8px' }}>
+          <div style={{ width: '32px', height: '24px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ width: '32px', height: '32px', background: '#1c1c1c', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
+            <div style={{ width: '60px', height: '20px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
+          </div>
+          <div style={{ width: '36px', height: '36px', background: '#1c1c1c', borderRadius: '50%', animation: 'pulse 1.5s infinite' }} />
+        </header>
+
+        {/* Welcome Skeleton */}
+        <div style={{ textAlign: 'center', padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: '180px', height: '20px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
+          <div style={{ width: '120px', height: '14px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
+        </div>
+
+        {/* 2x2 Grid Skeleton */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', padding: '0 8px', flex: 1 }}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} style={{ ...S.card, minHeight: '160px', display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px' }}>
+              <div style={{ width: '40px', height: '12px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
+              <div style={{ width: '80px', height: '24px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite' }} />
+              <div style={{ width: '100%', height: '12px', background: '#1c1c1c', borderRadius: '4px', animation: 'pulse 1.5s infinite', marginTop: 'auto' }} />
+            </div>
+          ))}
+        </div>
+
+        <style>{`
+          @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 0.2; }
+            100% { opacity: 0.6; }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div style={S.page}>
